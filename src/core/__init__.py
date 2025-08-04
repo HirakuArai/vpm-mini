@@ -13,6 +13,8 @@ core/__init__.py
 from dotenv import load_dotenv
 from openai import OpenAI
 import pathlib
+import time
+from uuid import uuid4
 
 # --- .env を読み込む（絶対パス指定で確実に） ----------------------------
 DOTENV_PATH = pathlib.Path(
@@ -32,8 +34,47 @@ def ask_openai(obj_id: str, user_msg: str) -> str:
     :param user_msg: ユーザ入力
     :return: アシスタントの返答テキスト
     """
+    from src.core.logger import append_log
+
+    session_id = str(uuid4())
+    msg_id = str(uuid4())
+    parent_id = None
+    model = "gpt-4o-mini"
+    start_ts = time.time()
+
+    # 送信ログ
+    append_log(
+        {
+            "role": "user",
+            "content": user_msg,
+            "session_id": session_id,
+            "msg_id": msg_id,
+            "parent_id": parent_id,
+            "objective": obj_id or "vpm-mini",
+            "channel": "chat-ui",
+            "model": model,
+        }
+    )
+
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model=model,
         messages=[{"role": "user", "content": user_msg}],
     )
+
+    # 受信ログ
+    append_log(
+        {
+            "role": "assistant",
+            "content": response.choices[0].message.content,
+            "session_id": session_id,
+            "msg_id": str(uuid4()),
+            "parent_id": msg_id,
+            "objective": obj_id or "vpm-mini",
+            "channel": "chat-ui",
+            "model": model,
+            "tokens_out": response.usage.completion_tokens,
+            "elapsed_ms": int((time.time() - start_ts) * 1000),
+        }
+    )
+
     return response.choices[0].message.content
