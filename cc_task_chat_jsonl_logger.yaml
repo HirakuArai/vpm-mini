@@ -1,0 +1,123 @@
+# ------------------------------------------------------------------
+# Claude Code Task – Implement Chat JSONL Logger (UTC Timestamp)
+# ------------------------------------------------------------------
+meta:
+  name: "Task 1 – Chat JSONL Logger"
+  repo_root: "/Users/hiraku/projects/vpm-mini"    # ← あなたのローカルパス
+  branch: "feature/chat_jsonl_logger"
+  default_shell: "bash -euo pipefail"
+
+steps:
+  # 1) ブランチ準備 -------------------------------------------------
+  - run: git pull --ff-only origin main
+  - run: git switch -c feature/chat_jsonl_logger
+
+  # 2) ファイル生成 ------------------------------------------------
+  - create_file:
+      path: src/core/logger.py
+      content: |
+        \"\"\"Central JSONL logger for Chat-UI messages (UTC).\"\"\"
+        from __future__ import annotations
+        import json, os
+        from pathlib import Path
+        from datetime import datetime, timezone
+
+        LOG_DIR = Path("objectives") / "vpm-mini" / "logs"
+        LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+        def _today_filename() -> Path:
+            """Return today’s log file path (UTC date)."""
+            date_str = datetime.utcnow().strftime("%Y-%m-%d")
+            return LOG_DIR / f"{date_str}.jsonl"
+
+        def append_log(entry: dict) -> None:
+            """Append one NDJSON record, adding timestamp if missing."""
+            if "timestamp" not in entry:
+                entry["timestamp"] = datetime.utcnow().isoformat(timespec="milliseconds") + "Z"
+            with _today_filename().open("a", encoding="utf-8") as f:
+                json.dump(entry, f, ensure_ascii=False)
+                f.write("\n")
+
+        # convenience for unit test
+        __all__ = ["append_log", "_today_filename"]
+
+  # 3) ask_openai ラッパをパッチ（送信前・受信後に append） -----
+  - patch_file:
+      path: src/core/chat_openai.py
+      pattern: "def ask_openai\\("
+      multiple: false
+      replacement: |
+        \\g<0>  # keep original def line
+            from src.core.logger import append_log  # added
+  - patch_file:
+      path: src/core/chat_openai.py
+      pattern: "response = openai\\.ChatCompletion\\.create\\([\\s\\S]+?\\)"
+      multiple: false
+      replacement: |
+        # ---- 送信ログ ----
+        append_log({
+            "role": "user",
+            "content": prompt,
+            "session_id": session_id,
+            "msg_id": str(uuid4()),
+            "parent_id": parent_id,
+            "objective": "vpm-mini",
+            "channel": "chat-ui",
+            "model": model,
+            "tokens_in": token_count(prompt)
+        })
+        \\g<0>
+        # ---- 受信ログ ----
+        append_log({
+            "role": "assistant",
+            "content": response.choices[0].message.content,
+            "session_id": session_id,
+            "msg_id": str(uuid4()),
+            "parent_id": parent_id,
+            "objective": "vpm-mini",
+            "channel": "chat-ui",
+            "model": model,
+            "tokens_out": response.usage.completion_tokens,
+            "elapsed_ms": int((time.time() - start_ts) * 1000)
+        })
+
+  # 4) ユニットテスト作成 -----------------------------------------
+  - create_file:
+      path: tests/test_logger.py
+      content: |
+        from src.core.logger import append_log, _today_filename
+        import json, os
+
+        def test_append_log_creates_file(tmp_path, monkeypatch):
+            # isolate log dir
+            monkeypatch.setattr("src.core.logger.LOG_DIR", tmp_path)
+            append_log({"role": "user", "content": "hello"})
+            file_path = _today_filename()
+            assert file_path.exists()
+            with file_path.open(encoding="utf-8") as f:
+                rec = json.loads(f.readline())
+            assert rec["role"] == "user"
+            assert rec["timestamp"].endswith("Z")
+
+  # 5) 静的解析＆テスト --------------------------------------------
+  - run: pre-commit run --all-files
+  - run: pytest -q
+
+  # 6) コミット & プッシュ -----------------------------------------
+  - run: git add src/core/logger.py src/core/chat_openai.py tests/test_logger.py
+  - run: git commit -m "feat: chat JSONL logger (UTC) + tests"
+  - run: git push -u origin feature/chat_jsonl_logger
+
+  # 7) 自動で PR を作成（CLI が対応していれば） -------------------
+  - create_pr:
+      title: "feat: Chat JSONL logger (UTC)"
+      base: "main"
+      labels: ["Step-A-2", "task-1", "backend"]
+      body: |
+        ### 概要
+        * NDJSON ロガーを追加（UTC 保存）
+        * ask_openai ラッパをフックし送受信ログを自動追記
+        * pytest & pre-commit Green
+
+  # 8) タグ付け（オプション） -------------------------------------
+  - run: git tag step-a2-task1-done && git push origin step-a2-task1-done
