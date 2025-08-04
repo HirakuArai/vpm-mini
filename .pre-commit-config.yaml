@@ -1,0 +1,17 @@
+repos:
+  - repo: https://github.com/psf/black
+    rev: 25.1.0          # ← pip で入れたバージョンに合わせる
+    hooks:
+      - id: black
+        args: ["--line-length", "88"]
+
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.4.0          # ruff 0.12 系対応タグ
+    hooks:
+      - id: ruff
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ["--baseline", ".secrets.baseline"]

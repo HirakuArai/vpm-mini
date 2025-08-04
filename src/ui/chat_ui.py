@@ -1,9 +1,11 @@
-import sys, pathlib
+import sys
+import pathlib
 import streamlit as st
 
 # --- ① src/ を import パスへ追加 --------------------------
 sys.path.append(str(pathlib.Path(__file__).resolve().parent.parent))
 from core import ask_openai
+
 # ---------------------------------------------------------
 
 st.set_page_config(page_title="vpm-mini Chat", page_icon="💬")
