@@ -21,5 +21,5 @@
 
 ## 次アクション
 1. このファイルをSTATE/に保存し、初回コミット
-2. ARTS（CIでreports/*.json保存）を設定
+2. ARTS（CIでreports/*.json保存）を設定 - CI setup PR opened
 3. LOG→SUM→TSTの順に実装

@@ -1,0 +1,22 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test-and-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prepare reports/*
+        run: |
+          mkdir -p reports
+          echo '{"status":"ci-boot"}' > reports/quality.json
+          echo '{"covered":0}'        > reports/coverage.json
+          echo '{"p50_ms":0,"p95_ms":0}' > reports/lag.json
+      - name: Upload reports as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: reports/*.json
+          if-no-files-found: error
