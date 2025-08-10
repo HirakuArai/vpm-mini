@@ -49,10 +49,10 @@ flowchart LR
 
   %% ==== Initial Setup (one-time, 運用基盤4つを含む) ====
   subgraph INIT["初期準備（1回だけ）"]
-    PRT[".github/pull_request_template.md"]
-    DoD["Issue用DoDテンプレ（プロジェクトノート）"]
-    STATE_INIT["STATE/current_state.md 作成（C・G・δ）"]
-    ARTS["CIで reports/*.json をアーティファクト保存（workflow追加）"]
+    PRT["PRT · .github/pull_request_template.md"]
+    DoD["DoD · Issue用DoDテンプレ（プロジェクトノート）"]
+    STATE_INIT["STATE_INIT · STATE/current_state.md 作成（C・G・δ）"]
+    ARTS["ARTS · CIで reports/*.json をアーティファクト保存（workflow追加）"]
     PRT --> DoD --> STATE_INIT --> ARTS
   end
   %% connect setup outputs to real nodes (not subgraph ids)
@@ -81,28 +81,24 @@ flowchart LR
   classDef wip fill:#FFF3BF,stroke:#E6A700,color:#7A5E00;
   classDef todo fill:#E9ECEF,stroke:#ADB5BD,color:#495057;
 
-  %% ==== 初期ステータス（必要に応じて編集してね） ====
-  %% Local: CLIは既存 → done。ログ保存/要約/ローカルテストはこれから → todo。
+  %% ==== 現状の進捗反映 ====
   class CLI done
   class LOG,SUM,TST todo
 
-  %% Repo: PR運用はwip、Issue/STATEはこれから → todo。
   class BR wip
   class ISS,ST todo
 
-  %% CI: まだ最小構成を入れる前 → todo。
   class HC,ART,STAT todo
 
-  %% Artifacts: これから → todo。
   class COV,LAG,QLT todo
 
-  %% Chat運用：Check-in/合意は運用開始段階 → wip
   class CK wip
   class DEC wip
 
-  %% 初期準備（運用基盤4つ）：まずは todo
-  class PRT,DoD,STATE_INIT,ARTS todo
+  class PRT done
+  class DoD todo
+  class STATE_INIT done
+  class ARTS wip
 
-  %% 運用フロー：常に繰り返すため wip。
   class O1,O2,O3,O4,O5 wip
 ```
