@@ -32,6 +32,9 @@
 ## 関連 Issue
 Fixes #
 
+## 完了条件（DoD）
+- [DoDリンク](https://github.com/users/HirakuArai/projects/1?pane=issue&itemId=123637605)
+
 ## チェックリスト (Reviewer ready)
 - [ ] 説明が埋まっている
 - [ ] テストを追加／更新した
