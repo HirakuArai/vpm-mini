@@ -55,7 +55,6 @@ flowchart LR
     ARTS["ARTS · CIで reports/*.json をアーティファクト保存（workflow追加）"]
     PRT --> DoD --> STATE_INIT --> ARTS
   end
-  %% connect setup outputs to real nodes (not subgraph ids)
   PRT -. "使う" .- BR
   DoD -. "参照" .- ISS
   STATE_INIT -. "更新" .- ST
@@ -88,7 +87,7 @@ flowchart LR
   class BR wip
   class ISS,ST todo
 
-  class HC,ART,STAT todo
+  class HC,ART,STAT done
 
   class COV,LAG,QLT todo
 
@@ -98,7 +97,7 @@ flowchart LR
   class PRT done
   class DoD todo
   class STATE_INIT done
-  class ARTS wip
+  class ARTS done
 
   class O1,O2,O3,O4,O5 wip
 ```
