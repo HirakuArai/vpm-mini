@@ -1,0 +1,22 @@
+# 現在地
+- 要約PipelineはGREEN
+- READMEの10分再現も完了
+
+# 目的
+- Phase 0 キックオフ
+
+# 差分
+- DigestのMVPを実装する
+
+# 決定
+- CLIでdigestを出す
+
+# 未決
+- 参照IDの付与
+
+# TODO
+- docs/sessionsへ出力
+- diagrams/srcへNav図を書く
+
+# リスク
+- 図ラベルの記号でmmdcが失敗
