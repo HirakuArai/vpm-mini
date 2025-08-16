@@ -4,12 +4,12 @@ flowchart LR
   subgraph L["Local Dev: vpm-mini（ローカル）"]
     CLI["CLI / Streamlit"]
     LOG["append_chatlog() → logs/*.jsonl"]
-    SUM["summary.run() → memory.json（先頭追記）"]
+    SUM["summary.run() → memory.json（先頭追記, ≤400字 要約）"]
     TST["pytest / make healthcheck（ローカル）"]
     CLI --> LOG --> SUM --> TST
   end
 
-  subgraph R["GitHub Repo（唯一の真実）"]
+  subgraph R["GitHub Repo（唯一の真実 / SSOT）"]
     BR["Branch / PR（テンプレ適用）"]
     ISS["Issue（DoD付き）"]
     ST["STATE/current_state.md（C・G・δ）"]
@@ -64,9 +64,9 @@ flowchart LR
   subgraph OPS["運用時（毎回）"]
     O1["1. ローカルで実装 → make healthcheck（任意）"]
     O2["2. PR作成（テンプレ／DoD記入）"]
-    O3["3. CI実行 → Artifacts確認"]
+    O3["3. CI実行 → Artifacts確認（≤400字要約, memory.json先頭追記）"]
     O4["4. Chatで[Check-in]共有 → 合意"]
-    O5["5. GreenならMerge → STATE更新"]
+    O5["5. GreenならMerge → STATE更新（P0-2/P0-3クリア）"]
     O1 --> O2 --> O3 --> O4 --> O5
   end
   TST --> O1
@@ -82,14 +82,21 @@ flowchart LR
 
   %% ==== 現状の進捗反映 ====
   class CLI done
-  class LOG,SUM,TST todo
+  class LOG done
+  class SUM done
+  class TST done
 
-  class BR wip
-  class ISS,ST todo
+  class BR done
+  class ISS todo
+  class ST wip
 
-  class HC,ART,STAT done
+  class HC done
+  class ART done
+  class STAT done
 
-  class COV,LAG,QLT todo
+  class COV todo
+  class LAG todo
+  class QLT done
 
   class CK wip
   class DEC wip
@@ -99,5 +106,10 @@ flowchart LR
   class STATE_INIT done
   class ARTS done
 
-  class O1,O2,O3,O4,O5 wip
+  class O1 done
+  class O2 done
+  class O3 done
+  class O4 wip
+  class O5 wip
+
 ```
