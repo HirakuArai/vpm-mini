@@ -5,6 +5,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 from .summary import build_session_digest, prepend_memory, summarize_last_session
+from .logs import extract_text_from_logs
 
 
 def _iso_date() -> str:
@@ -81,6 +82,7 @@ def _cli():
     p.add_argument(
         "--input", "-i", default="-", help="Transcript file path (or '-' for STDIN)"
     )
+    p.add_argument("--from-logs", help="Read from JSONL log file instead of --input")
     p.add_argument("--docs", default="docs/sessions", help="Output dir for digest md")
     p.add_argument(
         "--diagrams", default="diagrams/src", help="Output dir for mermaid md"
@@ -88,11 +90,15 @@ def _cli():
     p.add_argument("--max-chars", type=int, default=400)
     args = p.parse_args()
 
-    text = (
-        sys.stdin.read()
-        if args.input == "-"
-        else open(args.input, "r", encoding="utf-8").read()
-    )
+    # --from-logs takes priority over --input
+    if args.from_logs:
+        text = extract_text_from_logs(args.from_logs)
+    else:
+        text = (
+            sys.stdin.read()
+            if args.input == "-"
+            else open(args.input, "r", encoding="utf-8").read()
+        )
 
     # 1) サマリ生成（≤400字）→ memory.json 先頭追記
     summary = summarize_last_session(text, args.max_chars)
