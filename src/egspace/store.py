@@ -74,3 +74,25 @@ def get_today_raw_ref() -> str:
     """Get a placeholder raw_ref for today's log."""
     today = datetime.now().strftime("%Y-%m-%d")
     return f"logs/{today}/session.jsonl#latest"
+
+
+def get_recent_events(limit: int = 50) -> list[dict]:
+    """Get recent events from events.jsonl."""
+    ensure_dirs()
+    if not EV_FILE.exists():
+        return []
+
+    events = []
+    try:
+        with EV_FILE.open("r", encoding="utf-8") as f:
+            for line in f:
+                if line.strip():
+                    events.append(json.loads(line))
+        return events[-limit:] if limit > 0 else events
+    except Exception:
+        return []
+
+
+def get_index() -> dict:
+    """Get the current index mapping vec_id -> raw_ref."""
+    return _load_index()
