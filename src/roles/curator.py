@@ -6,6 +6,12 @@ sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
 from schema.v1_schema import validate_payload
+from src.egspace.store import (
+    new_vec_id,
+    append_event,
+    register_index,
+    get_today_raw_ref,
+)
 
 
 class Curator:
@@ -13,12 +19,33 @@ class Curator:
         validate_payload(payload, "in:Curator")
         print("[Curator] received:", payload)
 
+        # Create base result
         result = {
             "role": "Curator",
             "output": "dummy output from Curator",
             "ts": datetime.now(timezone.utc).isoformat(),
             "refs": [],
         }
+
+        # EG-Space integration
+        vec_id = new_vec_id("session")
+        event = {
+            "vec_id": vec_id,
+            "role": "Curator",
+            "payload": payload,
+            "result": result,
+            "ts": result["ts"],
+        }
+        append_event(event)
+
+        # Register in index with placeholder raw_ref
+        raw_ref = get_today_raw_ref()
+        register_index(vec_id, raw_ref)
+
+        # Add vec_id to result refs
+        result["refs"].append(vec_id)
+        print(f"wrote to egspace: {vec_id}")
+
         validate_payload(result, "out:Curator")
         print("[Curator] in/out: OK")
         return result

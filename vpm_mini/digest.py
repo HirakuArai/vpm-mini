@@ -8,6 +8,20 @@ from .summary import build_session_digest, prepend_memory, summarize_last_sessio
 from .logs import extract_text_from_logs
 from .egspace import get_stats
 
+# Import EG-Space functions
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+try:
+    from src.egspace.store import get_recent_events, get_index
+except ImportError:
+    # Fallback if EG-Space not available
+    def get_recent_events(limit: int = 50) -> list[dict]:
+        return []
+
+    def get_index() -> dict:
+        return {}
+
 
 def _iso_date() -> str:
     return datetime.now().strftime("%Y-%m-%d")
@@ -19,6 +33,9 @@ def render_digest_md(state: dict, stats: dict | None = None) -> str:
     lines.append(f"# Session Digest — {_iso_date()}\n")
     lines.append("## 概要（≤400字）\n")
     lines.append(state.get("summary_ja_<=400chars", "") + "\n")
+
+    # Add EG-Space references
+    _add_egspace_refs(lines)
 
     def section(title: str, key: str):
         lines.append(f"\n## {title}\n")
@@ -52,24 +69,61 @@ def render_digest_md(state: dict, stats: dict | None = None) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+def _add_egspace_refs(lines: list[str]) -> None:
+    """Add EG-Space references section to digest."""
+    try:
+        events = get_recent_events(10)  # Get last 10 events
+        index = get_index()
+
+        if events:
+            lines.append("\n## EG-Space References\n")
+            for event in events:
+                vec_id = event.get("vec_id", "")
+                role = event.get("role", "")
+                if vec_id:
+                    raw_ref = index.get(vec_id, "")
+                    if raw_ref:
+                        lines.append(f"- {role}: refs: [{vec_id}] → {raw_ref}")
+                    else:
+                        lines.append(f"- {role}: refs: [{vec_id}]")
+            lines.append("")
+    except Exception:
+        # Silently fail if EG-Space not available
+        pass
+
+
 def render_nav_mermaid(state: dict) -> str:
     """MermaidのNav図（コードフェンス付きMarkdown）を返す。"""
     C = state.get("C", "")[:80]
     G = state.get("G", "")[:80]
     d = state.get("delta", "")[:80]
+
+    # Get recent vec_ids for node labels
+    vec_ids = _get_recent_vec_ids(3)
+    vec_id_suffix = f"\\n[{vec_ids[0]}]" if vec_ids else ""
+
     return (
         "```mermaid\n"
         "flowchart LR\n"
-        '  C["現在地 (C)"] --> route["推奨ルート"]\n'
-        '  route --> G["目的地 (G)"]\n'
-        '  C -.-> delta["差分 δ"]\n'
-        '  decisions["主要決定"] --- route\n'
-        '  risks["主要リスク"] -.-> route\n'
+        f'  C["現在地 (C){vec_id_suffix}"] --> route["推奨ルート"]\n'
+        f'  route --> G["目的地 (G)"] \n'
+        f'  C -.-> delta["差分 δ"]\n'
+        f'  decisions["主要決定"] --- route\n'
+        f'  risks["主要リスク"] -.-> route\n'
         f"%% C: {C}\n"
         f"%% G: {G}\n"
         f"%% δ: {d}\n"
         "```\n"
     )
+
+
+def _get_recent_vec_ids(limit: int = 5) -> list[str]:
+    """Get recent vec_ids from EG-Space events."""
+    try:
+        events = get_recent_events(limit)
+        return [e.get("vec_id", "") for e in events if e.get("vec_id")]
+    except Exception:
+        return []
 
 
 def write_outputs(state: dict, out_docs: Path, out_diagrams: Path) -> tuple[Path, Path]:

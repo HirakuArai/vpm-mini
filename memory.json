@@ -1,4 +1,6 @@
 [
+  "Goal: implement feature X. Decision: use approach Y. Current status: planning phase.",
+  "This is a test session with goals and decisions.",
   "# 現在地 - 要約PipelineはGREEN - READMEの10分再現も完了 # 目的 - Phase 0 キックオフ # 差分 - DigestのMVPを実装する # 決定 - CLIでdigestを出す # 未決 - 参照IDの付与 # TODO - docs/sessionsへ出力 - diagrams/srcへNav図を書く # リスク - 図ラベルの記号でmmdcが失敗",
   "## 目的 - セッション要約システムの構築 - メモリ管理機能の実装 - 拡張可能なアーキテクチャの確立 ## 決定事項 1. 要約は400文字以内で生成する 2. memory.jsonへの追記は配列の先頭に行う 3. Session Digest構想への拡張を前提とした設計にする ## 未決事項 - LLM統合のタイミング - より高度な要約アルゴリズムの選定 - メタデータ管理の詳細仕様 ## 課題とリスク 現在の実装では、日本語の文章を適切に処理できるかが課題です。ブロッカーとなる課題は現時点では特定されていませんが、実装を進める中で新たな技術的課題が発生する可能性があります。## 次のステップ 1. P0-2の実装完了（要約機能とmemory.json追記） 2. テストケースの整備と品質確認 3. Session Digest機能の詳細設計 4. ドキュメントの整備 ## 技"
 ]
