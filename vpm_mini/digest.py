@@ -6,6 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from .summary import build_session_digest, prepend_memory, summarize_last_session
 from .logs import extract_text_from_logs
+from .egspace import get_stats
 
 # Import EG-Space functions
 import os
@@ -26,7 +27,7 @@ def _iso_date() -> str:
     return datetime.now().strftime("%Y-%m-%d")
 
 
-def render_digest_md(state: dict) -> str:
+def render_digest_md(state: dict, stats: dict | None = None) -> str:
     """docs/sessions/*-digest.md 向けのMarkdownを返す。"""
     lines = []
     lines.append(f"# Session Digest — {_iso_date()}\n")
@@ -55,6 +56,15 @@ def render_digest_md(state: dict) -> str:
     section("未決 / Open", "open_questions")
     section("TODO / 次の一手", "todos")
     section("リスク", "risks")
+
+    # Add progress snapshot if stats provided
+    if stats:
+        lines.append("\n---\n")
+        total = stats.get("total_events", 0)
+        latest = stats.get("latest_id", "")
+        lines.append(
+            f"+{total} events ingested | latest: {latest or 'N/A'} | healthcheck: "
+        )
 
     return "\n".join(lines).rstrip() + "\n"
 
@@ -161,10 +171,19 @@ def _cli():
     # 2) Digest骨格生成
     state = build_session_digest(text)
 
-    # 3) 出力
-    md, nav = write_outputs(state, Path(args.docs), Path(args.diagrams))
-    print(str(md))
-    print(str(nav))
+    # 3) 出力 (with stats if available)
+    stats = get_stats()
+    md_path = Path(args.docs) / f"{_iso_date()}_digest.md"
+    nav_path = Path(args.diagrams) / f"{_iso_date()}_nav.md"
+
+    Path(args.docs).mkdir(parents=True, exist_ok=True)
+    Path(args.diagrams).mkdir(parents=True, exist_ok=True)
+
+    md_path.write_text(render_digest_md(state, stats), encoding="utf-8")
+    nav_path.write_text(render_nav_mermaid(state), encoding="utf-8")
+
+    print(str(md_path))
+    print(str(nav_path))
 
 
 if __name__ == "__main__":
