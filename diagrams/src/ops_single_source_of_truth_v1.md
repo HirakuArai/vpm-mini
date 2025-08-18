@@ -5,12 +5,13 @@ flowchart LR
     CLI["CLI / Streamlit"]
     LOG["append_chatlog() → logs/*.jsonl"]
     SUM["summary.run() → memory.json（先頭追記, ≤400字 要約）"]
-    TST["pytest / make healthcheck（ローカル）"]
-    CLI --> LOG --> SUM --> TST
+    DIG["digest.run() → docs/sessions/*_digest.md, diagrams/src/*_nav.md"]
+    TST["pytest / scripts/healthcheck.sh（ローカル）"]
+    CLI --> LOG --> SUM --> DIG --> TST
   end
 
   subgraph R["GitHub Repo（唯一の真実 / SSOT）"]
-    BR["Branch / PR（テンプレ適用）"]
+    BR["Branch / PR（テンプレ適用, Auto-merge有効）"]
     ISS["Issue（DoD付き）"]
     ST["STATE/current_state.md（C・G・δ）"]
     BR -. "links" .- ISS
@@ -18,9 +19,9 @@ flowchart LR
   end
 
   subgraph C["GitHub Actions（CI／必須チェック）"]
-    HC["healthcheck（pytest）"]
+    HC["healthcheck（pytest + diagram export）"]
     ART["Artifacts: reports/*.json"]
-    STAT["Status Check（Green/Red）"]
+    STAT["Status Check（Green/Red, 自動マージ連動）"]
     HC --> ART --> STAT
   end
 
@@ -47,12 +48,12 @@ flowchart LR
   CK -. "参照" .- COV
   DEC --> BR
 
-  %% ==== Initial Setup (one-time, 運用基盤4つを含む) ====
+  %% ==== Initial Setup (one-time) ====
   subgraph INIT["初期準備（1回だけ）"]
     PRT["PRT · .github/pull_request_template.md"]
-    DoD["DoD · Issue用DoDテンプレ（プロジェクトノート）"]
+    DoD["DoD · Issue用DoDテンプレ"]
     STATE_INIT["STATE_INIT · STATE/current_state.md 作成（C・G・δ）"]
-    ARTS["ARTS · CIで reports/*.json をアーティファクト保存（workflow追加）"]
+    ARTS["ARTS · CIで reports/*.json をアーティファクト保存"]
     PRT --> DoD --> STATE_INIT --> ARTS
   end
   PRT -. "使う" .- BR
@@ -62,11 +63,11 @@ flowchart LR
 
   %% ==== Daily Ops (each change) ====
   subgraph OPS["運用時（毎回）"]
-    O1["1. ローカルで実装 → make healthcheck（任意）"]
-    O2["2. PR作成（テンプレ／DoD記入）"]
-    O3["3. CI実行 → Artifacts確認（≤400字要約, memory.json先頭追記）"]
+    O1["1. ローカルで実装 → healthcheck 実行"]
+    O2["2. PR作成（テンプレ／DoD記入, Auto-merge予約）"]
+    O3["3. CI実行 → Artifacts確認（≤400字要約, memory.json先頭追記, digest/nav生成）"]
     O4["4. Chatで[Check-in]共有 → 合意"]
-    O5["5. GreenならMerge → STATE更新（P0-2/P0-3クリア）"]
+    O5["5. Greenなら自動Merge → STATE更新（P0-2/P0-3クリア, Phase 0開始）"]
     O1 --> O2 --> O3 --> O4 --> O5
   end
   TST --> O1
@@ -84,6 +85,7 @@ flowchart LR
   class CLI done
   class LOG done
   class SUM done
+  class DIG done
   class TST done
 
   class BR done
@@ -111,5 +113,4 @@ flowchart LR
   class O3 done
   class O4 wip
   class O5 wip
-
 ```
