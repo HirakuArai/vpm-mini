@@ -1,0 +1,46 @@
+name: auto-open-pr
+on:
+  push:
+    branches:
+      - feat/cli-run-all-pipeline
+
+jobs:
+  open-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create or update PR to main
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: main
+          branch: feat/cli-run-all-pipeline
+          title: "feat(cli): add `run-all` pipeline (log→summary→digest→nav→egspace)"
+          body: |
+            ## 目的 (Purpose)
+            - Why: 各処理をバラバラに実行せず、1 操作で end-to-end パイプラインを回す
+            - What: CLI サブコマンド `run-all` を追加（log→summary→digest→nav→egspace 一巡）
+
+            ## 変更点 (Changes)
+            - [x] cli.py に `run-all` を追加（既存モードは維持）
+            - [x] 一連の処理を統合（log_turns → summary → digest_state → nav_mermaid → egspace_events）
+            - [x] CLI 統合テストを追加（3件）
+
+            ## 動作確認 (How to verify)
+            - [x] `python cli.py run-all "テストメッセージ"` で 5 生成物が一括更新
+              1. logs: `logs/YYYY-MM-DD.jsonl`
+              2. memory: `memory.json` 先頭に ≤400 字要約
+              3. digest: `docs/sessions/YYYY-MM-DD_digest.md`（refs: [vec_id] → raw_ref）
+              4. nav: `diagrams/src/YYYY-MM-DD_nav.md`（ノードに [session_…]）
+              5. egspace: `egspace/events.jsonl` / `egspace/index.json`
+            - [x] `pytest -q` → ✅ Green
+
+            ## 完了条件（DoD）
+            - 1 操作で log/memory.json/digest/nav/egspace が更新
+            - CI green → 自動マージ
+
+            🤖 Generated with [Claude Code](https://claude.ai/code)
+          labels: auto

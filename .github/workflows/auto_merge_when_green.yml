@@ -1,0 +1,32 @@
+name: auto-merge-when-green
+on:
+  check_suite:
+    types: [completed]
+  workflow_run:
+    workflows: ["CI", "healthcheck"]  # 既存のCI名に合わせて必要なら調整
+    types: [completed]
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Find open PRs labeled 'auto' and ready
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          prs=$(gh pr list --state open --label auto --json number,isDraft,mergeable,headRefName \
+                 --jq '.[] | select(.isDraft==false) | .number')
+          if [ -z "$prs" ]; then
+            echo "No candidate PRs"; exit 0; fi
+          for pr in $prs; do
+            echo "Processing PR #$pr"
+            # 試行1: ネイティブAuto-mergeを有効化（リポ設定でAuto-merge有効時）
+            gh api graphql -f query='
+              mutation($pr:ID!){
+                enablePullRequestAutoMerge(input:{pullRequestId:$pr, mergeMethod:SQUASH}){clientMutationId}
+              }' -f pr="$(gh pr view $pr --json id -q .id)" \
+            || gh pr merge $pr --squash --auto
+          done
