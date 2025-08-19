@@ -51,6 +51,33 @@ python -m vpm_mini.summary --input samples/transcript_ja.txt
 head -n 20 memory.json
 ```
 
+### メトリクス収集 (δ指標含む)
+
+VPM-Mini は自動的にカバレッジとレイテンシメトリクスを収集し、**δ (delta) 指標**によりDigest反映度のギャップを可視化します：
+
+```bash
+# メトリクス確認
+cat reports/coverage.json
+```
+
+**coverage.json の出力例：**
+```json
+{
+  "date": "2025-08-19",
+  "events_total": 15,
+  "digest_entries": 6,
+  "digest_reflect_rate": 0.4,
+  "delta_events": 9,
+  "delta_reflect_rate": 0.6
+}
+```
+
+**δ 指標の意味：**
+- `delta_events`: EG-Space総イベント数 − Digest反映数 (未反映のギャップ)
+- `delta_reflect_rate`: 1.0 − digest_reflect_rate (反映率の不足分)
+
+これらのδ指標は **Phase 1 KPIダッシュボード**の基礎データとして活用されます。
+
 ### （任意）図の書き出し
 
 会話マップなどのMermaid図を `.svg` に変換する場合：
@@ -71,9 +98,33 @@ head -n 20 memory.json
 
 ---
 
+---
+
+## アーキテクチャ概要
+
+VPM-Mini は **EG-Space (Event-Goal Space)** によるイベント追跡システムを核とし、全処理にユニークな `vec_id` を付与して意思決定のトレーサビリティを実現します。
+
+**δメトリクスの目的：**
+Digest反映度合いのギャップ指標として、EG-Space ↔ Digest間の情報流動性を定量化。Phase 1 では、これらδ指標をベースとしたKPIダッシュボードにより、システム改善の方向性を決定します。
+
+---
+
+## CI & Artifacts
+
+**Phase0-Health ワークフロー**により以下が自動収集されます：
+
+* **`artifacts-phase0`** アーティファクトバンドル:
+  * `reports/coverage.json` - **δ指標を含む**カバレッジメトリクス
+  * `reports/lag.json` - パイプライン段階別レイテンシ
+  * `reports/quality.json` - 品質ゲート結果  
+  * `diagrams/export/**` - Mermaid図のSVG出力
+
+---
+
 ## DoD（Definition of Done）
 
 * 上記手順がそのまま通ること
 * 要約が **400文字以内** で出力されること
 * `memory.json` の先頭に追記されること
+* **δ指標**が `reports/coverage.json` に正しく出力されること
 * （必要な場合のみ）Mermaid図が正しく出力されること

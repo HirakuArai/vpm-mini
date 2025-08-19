@@ -36,7 +36,7 @@ updated_at: 2025-08-10T02:00+09:00
 4. **Phase 2** – 小規模Swarm + Vector DB連携
 5. **Phase 3** – EG-Space完成 & セキュア化
 
-**現在地:** Step-A-2（P0の完了が直近ゴール）
+**現在地:** Step-A-2 + Step 11（P0の完了 + δメトリクス追加済み）
 **ゴール（短期）:** P0全タスク緑化 → Phase 0 移行
 
 ---
@@ -109,3 +109,13 @@ updated_at: 2025-08-10T02:00+09:00
 * 迷ったらこの文書冒頭の **宣言ブロック** を見る（唯一の前提）。
 * 依頼やPRは **コンテキスト・ヘッダ** から始める。
 * 進捗は **チェックリスト** で機械的に判定する。
+
+---
+
+## Phase 0 補足 (Step 11: δ metrics applied)
+
+**追加済み:** coverage.json に δ 指標を実装
+- `delta_events`: EG-Space events_total − digest_entries (未反映ギャップ)
+- `delta_reflect_rate`: 1.0 − digest_reflect_rate (反映率不足分)
+
+**Phase 1 連携:** KPIダッシュボードでδ指標をベースに改善方向性を決定

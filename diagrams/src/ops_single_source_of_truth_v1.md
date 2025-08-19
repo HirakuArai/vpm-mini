@@ -26,7 +26,7 @@ flowchart LR
   end
 
   subgraph P["Artifacts／Evidence（証拠保管）"]
-    COV["coverage.json（被覆ギャップ0）"]
+    COV["coverage.json（δ指標: 被覆ギャップ分析）"]
     LAG["lag.json（p50／p95）"]
     QLT["quality.json（≤400字／JSON妥当）"]
   end
@@ -96,8 +96,8 @@ flowchart LR
   class ART done
   class STAT done
 
-  class COV todo
-  class LAG todo
+  class COV done
+  class LAG done
   class QLT done
 
   class CK wip

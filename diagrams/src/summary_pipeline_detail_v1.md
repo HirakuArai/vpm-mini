@@ -55,6 +55,7 @@ flowchart LR
   OUT --> META
 
   %% ========= Notes =========
+  %% δ annotation: EG‑Space events total vs Digest reflection gap = δ metrics
   classDef box fill:#fff,stroke:#333,stroke-width:1px,color:#111;
   class UI,ENV,EV,TH,IDLE,DAILY,WCFG,WM,HASH,DET,ROUTER,CONV,GEN,SCHEMA,MEM,META,EMBED,VEC,CGH box;
 ```
