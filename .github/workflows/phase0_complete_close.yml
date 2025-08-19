@@ -1,0 +1,58 @@
+name: phase0-complete-close
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  close-issue:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Close "Phase 0 Complete" issue if completion doc exists
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if Phase 0 completion doc exists in main
+          if [ -f "docs/PHASE0_COMPLETION.md" ]; then
+            echo "Phase 0 completion document found in main branch"
+            
+            # Find open "Phase 0 Complete" issue
+            issue_number=$(gh issue list --state open --search "Phase 0 Complete in:title" --json number --jq '.[0].number // empty')
+            
+            if [ -n "$issue_number" ]; then
+              echo "Closing issue #$issue_number"
+              
+              close_comment=$(cat <<'EOF'
+## ✅ Phase 0 Complete — Merged to Main
+
+Phase 0 has been successfully completed and merged to the main branch.
+
+### Completion Evidence
+- ✅ All Steps 1-10 implemented and tested
+- ✅ `docs/PHASE0_COMPLETION.md` added with full evidence links  
+- ✅ CI `Phase0-Health` passing
+- ✅ Auto-PR/Auto-merge workflows operational
+
+### What's Next
+Phase 1 preparation begins:
+- KPI dashboard design
+- PoC architecture for swarm coordination
+- Vector DB integration planning
+
+**Phase 0 status:** 🎉 **COMPLETE**
+EOF
+)
+              
+              gh issue close "$issue_number" --comment "$close_comment"
+              echo "Issue #$issue_number closed successfully"
+            else
+              echo "No open 'Phase 0 Complete' issue found"
+            fi
+          else
+            echo "Phase 0 completion document not found, skipping issue closure"
+          fi

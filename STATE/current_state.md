@@ -2,13 +2,19 @@
 # === State Declaration (Single Source of Truth) ===
 active_repo: vpm-mini
 active_branch: main
-phase: Step-A-2   # P0-2 → P0-3 にフォーカス
-context_header: "repo=vpm-mini / branch=main / phase=Step-A-2"
-short_goal: "P0全タスクを緑化し、Phase 0 に移行できる状態をつくる"
+phase: Phase 0 Complete   # Step 1-10 all done; Step 10 declared
+context_header: "repo=vpm-mini / branch=main / phase=Phase 0 Complete"
+short_goal: "Phase 1 preparation: KPI design & PoC architecture"
 exit_criteria:
-  - "P0-2 GREEN: tests/test_summary.py が通る（要約 ≤ 400字 / memory.json 先頭へ追記）"
-  - "P0-3 GREEN: README に 10分再現チュートリアル＋セットアップ手順を整備"
-updated_at: 2025-08-10T02:00+09:00
+  - "✅ Phase 0 Complete: Step 1-9 done; Step 10 declared"
+  - "✅ docs/PHASE0_COMPLETION.md: Evidence collection and next phase roadmap"
+  - "✅ Phase0-Health CI: Single required check with auto-artifacts"
+  - "✅ Auto-PR/Auto-merge: feat/* → main workflow fully operational"
+next_goals:
+  - "Phase 1 - KPI design & PoC infrastructure"
+  - "Multi-agent coordination architecture"
+  - "Vector DB integration planning"
+updated_at: 2025-08-19T18:00+09:00
 # リポ切替時は必ず PR を作成し、タイトルに 'Decision: switch active_repo to …' を含めること
 ```
 

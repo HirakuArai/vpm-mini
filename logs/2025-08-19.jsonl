@@ -1,0 +1,32 @@
+{"ts": 1755541652.048992, "session_id": "cli_session_20250819_032732", "role": "user", "text": "implement authentication system with JWT tokens", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755541652.048992, "session_id": "cli_session_20250819_032732", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755541727.195275, "session_id": "cli_session_20250819_032847", "role": "user", "text": "test end-to-end pipeline integration", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755541727.195276, "session_id": "cli_session_20250819_032847", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755541727.197001, "session_id": "cli_session_20250819_032847", "role": "user", "text": "verify all outputs created", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755541727.197002, "session_id": "cli_session_20250819_032847", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755541727.224423, "session_id": "cli_session_20250819_032847", "role": "user", "text": "backwards compatibility test", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755541727.224424, "session_id": "cli_session_20250819_032847", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755541740.248851, "session_id": "cli_session_20250819_032900", "role": "user", "text": "verify all outputs created", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755541740.248852, "session_id": "cli_session_20250819_032900", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755541745.720688, "session_id": "cli_session_20250819_032905", "role": "user", "text": "test end-to-end pipeline integration", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755541745.720689, "session_id": "cli_session_20250819_032905", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755541745.722147, "session_id": "cli_session_20250819_032905", "role": "user", "text": "verify all outputs created", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755541745.722148, "session_id": "cli_session_20250819_032905", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755541745.723255, "session_id": "cli_session_20250819_032905", "role": "user", "text": "backwards compatibility test", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755541745.723255, "session_id": "cli_session_20250819_032905", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755541759.143053, "session_id": "cli_session_20250819_032919", "role": "user", "text": "テストメッセージ", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755541759.143054, "session_id": "cli_session_20250819_032919", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755544105.678373, "session_id": "cli_session_20250819_040825", "role": "user", "text": "healthcheck test message", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755544105.678374, "session_id": "cli_session_20250819_040825", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755544105.936828, "session_id": "cli_session_20250819_040825", "role": "user", "text": "healthcheck test message", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755544105.936829, "session_id": "cli_session_20250819_040825", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755544123.325842, "session_id": "cli_session_20250819_040843", "role": "user", "text": "healthcheck test message", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755544123.325842, "session_id": "cli_session_20250819_040843", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755544151.331565, "session_id": "cli_session_20250819_040911", "role": "user", "text": "healthcheck test message", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755544151.331566, "session_id": "cli_session_20250819_040911", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755544161.506555, "session_id": "cli_session_20250819_040921", "role": "user", "text": "healthcheck test message", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755544161.506556, "session_id": "cli_session_20250819_040921", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755544204.875713, "session_id": "cli_session_20250819_041004", "role": "user", "text": "healthcheck test message", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755544204.875714, "session_id": "cli_session_20250819_041004", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755544219.160581, "session_id": "cli_session_20250819_041019", "role": "user", "text": "healthcheck test message", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755544219.160582, "session_id": "cli_session_20250819_041019", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}

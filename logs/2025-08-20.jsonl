@@ -1,0 +1,18 @@
+{"ts": 1755624247.857207, "session_id": "cli_session_20250820_022407", "role": "user", "text": "metrics pipeline test", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755624247.857209, "session_id": "cli_session_20250820_022407", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755624259.945873, "session_id": "cli_session_20250820_022419", "role": "user", "text": "path output test", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755624259.945873, "session_id": "cli_session_20250820_022419", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755624260.167983, "session_id": "cli_session_20250820_022420", "role": "user", "text": "metrics test", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755624260.167984, "session_id": "cli_session_20250820_022420", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755625805.722437, "session_id": "cli_session_20250820_025005", "role": "user", "text": "ドキュメント更新テスト — README＋STATE確認", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755625805.722438, "session_id": "cli_session_20250820_025005", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755625819.337758, "session_id": "cli_session_20250820_025019", "role": "user", "text": "test end-to-end pipeline integration", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755625819.337759, "session_id": "cli_session_20250820_025019", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755625819.33978, "session_id": "cli_session_20250820_025019", "role": "user", "text": "verify all outputs created", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755625819.339781, "session_id": "cli_session_20250820_025019", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755625819.341836, "session_id": "cli_session_20250820_025019", "role": "user", "text": "backwards compatibility test", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755625819.341837, "session_id": "cli_session_20250820_025019", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755625819.743959, "session_id": "cli_session_20250820_025019", "role": "user", "text": "path output test", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755625819.74396, "session_id": "cli_session_20250820_025019", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755625819.967265, "session_id": "cli_session_20250820_025019", "role": "user", "text": "metrics test", "refs": [], "meta": {"lang": "ja"}}
+{"ts": 1755625819.967266, "session_id": "cli_session_20250820_025019", "role": "assistant", "text": "dummy output from Archivist", "refs": [], "meta": {"lang": "ja"}}

@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-08-19T04:11:06+09:00",
+  "healthcheck_version": "1.0-test",
+  "roles_loop_ok": true,
+  "schema_ok": true,
+  "summary_len_ok": true,
+  "structure_ok": true,
+  "activity_ok": true,
+  "health_score": 100,
+  "checks_total": 5,
+  "checks_passed": 5,
+  "checks_failed": 0
+}

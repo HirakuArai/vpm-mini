@@ -1,19 +1,53 @@
-name: healthcheck
+name: Phase0-Health
 on:
   pull_request:
   push:
     branches: [ main ]
+
 jobs:
-  healthcheck:
+  phase0-health:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install pytest
+          cache: 'pip'
+          
+      - name: Install test dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install pytest
-      - name: Run healthcheck
+          
+      - name: Setup Node.js for Mermaid CLI
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install Mermaid CLI
+        run: npm install -g @mermaid-js/mermaid-cli
+        
+      - name: Run Phase 0 verification
+        run: bash scripts/phase0_verify.sh
+        
+      - name: Run healthcheck validation
         run: bash scripts/healthcheck.sh
+        
+      - name: Export diagrams (Mermaid)
+        run: bash scripts/export_diagrams.sh || echo "Diagram export failed (non-critical)"
+        
+      - name: Upload Phase0 artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts-phase0
+          path: |
+            reports/coverage.json
+            reports/lag.json
+            reports/quality.json
+            reports/phase0_verify.log
+            docs/PHASE0_COMPLETION.md
+            diagrams/export/**
+          if-no-files-found: ignore
