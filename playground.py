@@ -1,5 +1,7 @@
 import sys
 import argparse
+import time
+import os
 
 
 def run_once(input_text: str):
@@ -37,11 +39,11 @@ def main():
         "--hello", action="store_true", help="Print hello message and exit"
     )
     parser.add_argument("--healthz", action="store_true")
+    parser.add_argument("--metrics", action="store_true")
     parser.add_argument("input", nargs="?", default="hello", help="Input text")
     args = parser.parse_args()
 
     # Handle trace_id generation and propagation
-    import os
 
     trace_id = args.trace_id or os.getenv("TRACE_ID")
     if not trace_id:
@@ -50,6 +52,15 @@ def main():
         trace_id = new_trace_id()
     os.environ["TRACE_ID"] = trace_id
 
+    if args.metrics:
+        from wsgiref.simple_server import make_server
+        from src.utils.metrics import render_metrics
+
+        port = int(os.getenv("METRICS_PORT", "9000"))
+        with make_server("", port, render_metrics) as httpd:
+            httpd.serve_forever()
+        return
+
     if args.healthz:
         from src.utils.healthz import serve
 
@@ -57,12 +68,16 @@ def main():
         return
 
     if args.hello:
+        _t = time.time()
+        role = args.role
+        ok = True
+        from src.utils.metrics import observe
+
         print(f"[hello] role={args.role} trace_id={os.getenv('TRACE_ID')}")
+        observe(role, ok, _t)
         try:
-            import os
             import shlex
             import subprocess
-            import sys
 
             host = os.getenv("REDIS_HOST")
             if host:
