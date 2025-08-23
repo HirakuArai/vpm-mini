@@ -8,12 +8,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: Prepare reports/*
         run: |
           mkdir -p reports
           echo '{"status":"ci-boot"}' > reports/quality.json
           echo '{"covered":0}'        > reports/coverage.json
           echo '{"p50_ms":0,"p95_ms":0}' > reports/lag.json
+      - name: Healthcheck
+        run: scripts/healthcheck.sh
       - name: Upload reports as artifact
         uses: actions/upload-artifact@v4
         with:
