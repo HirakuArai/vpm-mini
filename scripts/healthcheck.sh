@@ -20,7 +20,7 @@ need_jq=true; command -v jq >/dev/null 2>&1 && need_jq=false
 if $need_jq; then echo "[healthcheck] WARN: jq not found, installing may be required in CI"; fi
 
 tries=0
-until docker compose ps --format json | jq -s -e "map(select(.Service != \"redis\")) | all(.Health == \"healthy\")" >/dev/null 2>&1; do
+until docker compose ps --format json | jq -s -e "all(.Health == \"healthy\")" >/dev/null 2>&1; do
   tries=$((tries+1))
   if [[ $tries -ge 10 ]]; then
     echo "[healthcheck] FAIL: services not healthy after ${tries} tries" >&2

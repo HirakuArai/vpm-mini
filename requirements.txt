@@ -1,2 +1,2 @@
 # Core dependencies (currently using only Python standard library)
-# Add dependencies here as needed
+# Add dependencies here as neededprometheus-client==0.20.0

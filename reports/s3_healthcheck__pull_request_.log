@@ -1,0 +1,740 @@
+healthcheck	Set up job	﻿2025-08-23T23:00:12.7288097Z Current runner version: '2.328.0'
+healthcheck	Set up job	2025-08-23T23:00:12.7322710Z ##[group]Runner Image Provisioner
+healthcheck	Set up job	2025-08-23T23:00:12.7323906Z Hosted Compute Agent
+healthcheck	Set up job	2025-08-23T23:00:12.7324791Z Version: 20250818.377
+healthcheck	Set up job	2025-08-23T23:00:12.7325779Z Commit: 3c593e9f75fe0b87e893bca80d6e12ba089c61fc
+healthcheck	Set up job	2025-08-23T23:00:12.7326875Z Build Date: 2025-08-18T14:52:18Z
+healthcheck	Set up job	2025-08-23T23:00:12.7327912Z ##[endgroup]
+healthcheck	Set up job	2025-08-23T23:00:12.7328799Z ##[group]Operating System
+healthcheck	Set up job	2025-08-23T23:00:12.7329811Z Ubuntu
+healthcheck	Set up job	2025-08-23T23:00:12.7330958Z 24.04.2
+healthcheck	Set up job	2025-08-23T23:00:12.7331733Z LTS
+healthcheck	Set up job	2025-08-23T23:00:12.7332475Z ##[endgroup]
+healthcheck	Set up job	2025-08-23T23:00:12.7333376Z ##[group]Runner Image
+healthcheck	Set up job	2025-08-23T23:00:12.7334380Z Image: ubuntu-24.04
+healthcheck	Set up job	2025-08-23T23:00:12.7335163Z Version: 20250818.1.0
+healthcheck	Set up job	2025-08-23T23:00:12.7337019Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250818.1/images/ubuntu/Ubuntu2404-Readme.md
+healthcheck	Set up job	2025-08-23T23:00:12.7339576Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250818.1
+healthcheck	Set up job	2025-08-23T23:00:12.7341788Z ##[endgroup]
+healthcheck	Set up job	2025-08-23T23:00:12.7343763Z ##[group]GITHUB_TOKEN Permissions
+healthcheck	Set up job	2025-08-23T23:00:12.7346426Z Contents: read
+healthcheck	Set up job	2025-08-23T23:00:12.7347312Z Metadata: read
+healthcheck	Set up job	2025-08-23T23:00:12.7348241Z Packages: read
+healthcheck	Set up job	2025-08-23T23:00:12.7349015Z ##[endgroup]
+healthcheck	Set up job	2025-08-23T23:00:12.7352130Z Secret source: Actions
+healthcheck	Set up job	2025-08-23T23:00:12.7353371Z Prepare workflow directory
+healthcheck	Set up job	2025-08-23T23:00:12.7825727Z Prepare all required actions
+healthcheck	Set up job	2025-08-23T23:00:12.7881573Z Getting action download info
+healthcheck	Set up job	2025-08-23T23:00:12.9812254Z Download action repository 'actions/checkout@v4' (SHA:08eba0b27e820071cde6df949e0beb9ba4906955)
+healthcheck	Set up job	2025-08-23T23:00:13.0524469Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+healthcheck	Set up job	2025-08-23T23:00:13.2175094Z Complete job name: healthcheck
+healthcheck	Run actions/checkout@v4	﻿2025-08-23T23:00:13.2905312Z ##[group]Run actions/checkout@v4
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.2906346Z with:
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.2906872Z   repository: HirakuArai/vpm-mini
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.2907514Z   token: ***
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.2907910Z   ssh-strict: true
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.2908290Z   ssh-user: git
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.2908686Z   persist-credentials: true
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.2909118Z   clean: true
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.2909511Z   sparse-checkout-cone-mode: true
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.2910242Z   fetch-depth: 1
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.2910651Z   fetch-tags: false
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.2911029Z   show-progress: true
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.2911419Z   lfs: false
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.2911773Z   submodules: false
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.2912168Z   set-safe-directory: true
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.2912891Z ##[endgroup]
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.3988605Z Syncing repository: HirakuArai/vpm-mini
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.3990684Z ##[group]Getting Git version info
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.3991389Z Working directory is '/home/runner/work/vpm-mini/vpm-mini'
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.3992304Z [command]/usr/bin/git version
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5123773Z git version 2.51.0
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5149531Z ##[endgroup]
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5163612Z Temporarily overriding HOME='/home/runner/work/_temp/32d83ed4-d329-4125-ac79-71d035611c67' before making global git config changes
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5165675Z Adding repository directory to the temporary git global config as a safe directory
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5168023Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/vpm-mini/vpm-mini
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5200692Z Deleting the contents of '/home/runner/work/vpm-mini/vpm-mini'
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5204475Z ##[group]Initializing the repository
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5208200Z [command]/usr/bin/git init /home/runner/work/vpm-mini/vpm-mini
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5262674Z hint: Using 'master' as the name for the initial branch. This default branch name
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5265050Z hint: is subject to change. To configure the initial branch name to use in all
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5266772Z hint: of your new repositories, which will suppress this warning, call:
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5267601Z hint:
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5268134Z hint: 	git config --global init.defaultBranch <name>
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5268827Z hint:
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5269699Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5271519Z hint: 'development'. The just-created branch can be renamed via this command:
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5272385Z hint:
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5272806Z hint: 	git branch -m <name>
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5273321Z hint:
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5274001Z hint: Disable this message with "git config set advice.defaultBranchName false"
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5275158Z Initialized empty Git repository in /home/runner/work/vpm-mini/vpm-mini/.git/
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5277752Z [command]/usr/bin/git remote add origin https://github.com/HirakuArai/vpm-mini
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5308145Z ##[endgroup]
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5309245Z ##[group]Disabling automatic garbage collection
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5311958Z [command]/usr/bin/git config --local gc.auto 0
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5339509Z ##[endgroup]
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5340778Z ##[group]Setting up auth
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5345884Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5374931Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5626138Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5654205Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5872515Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5906162Z ##[endgroup]
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5907811Z ##[group]Fetching the repository
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.5915288Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +35a6d0f12a51d30f6ab0b9d55dc29f31ea458c90:refs/remotes/pull/25/merge
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7696878Z From https://github.com/HirakuArai/vpm-mini
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7698640Z  * [new ref]         35a6d0f12a51d30f6ab0b9d55dc29f31ea458c90 -> pull/25/merge
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7728845Z ##[endgroup]
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7729960Z ##[group]Determining the checkout info
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7736304Z ##[endgroup]
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7737151Z [command]/usr/bin/git sparse-checkout disable
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7782130Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7808887Z ##[group]Checking out the ref
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7814081Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/25/merge
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7891917Z Note: switching to 'refs/remotes/pull/25/merge'.
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7893917Z 
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7894663Z You are in 'detached HEAD' state. You can look around, make experimental
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7896343Z changes and commit them, and you can discard any commits you make in this
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7897447Z state without impacting any branches by switching back to a branch.
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7898010Z 
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7898380Z If you want to create a new branch to retain commits you create, you may
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7899235Z do so (now or later) by using -c with the switch command. Example:
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7899733Z 
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7900144Z   git switch -c <new-branch-name>
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7900735Z 
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7901066Z Or undo this operation with:
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7901551Z 
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7901858Z   git switch -
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7902220Z 
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7902813Z Turn off this advice by setting config variable advice.detachedHead to false
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7903672Z 
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7904632Z HEAD is now at 35a6d0f Merge 3991b6301d17043447dade2c6a14f1d77899266c into 1c789c59f737590414eeb64254f483a3a3699606
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7906862Z ##[endgroup]
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7941148Z [command]/usr/bin/git log -1 --format=%H
+healthcheck	Run actions/checkout@v4	2025-08-23T23:00:13.7963721Z 35a6d0f12a51d30f6ab0b9d55dc29f31ea458c90
+healthcheck	Run actions/setup-python@v5	﻿2025-08-23T23:00:13.8205041Z ##[group]Run actions/setup-python@v5
+healthcheck	Run actions/setup-python@v5	2025-08-23T23:00:13.8205574Z with:
+healthcheck	Run actions/setup-python@v5	2025-08-23T23:00:13.8205921Z   python-version: 3.11
+healthcheck	Run actions/setup-python@v5	2025-08-23T23:00:13.8206325Z   check-latest: false
+healthcheck	Run actions/setup-python@v5	2025-08-23T23:00:13.8206854Z   token: ***
+healthcheck	Run actions/setup-python@v5	2025-08-23T23:00:13.8207221Z   update-environment: true
+healthcheck	Run actions/setup-python@v5	2025-08-23T23:00:13.8207662Z   allow-prereleases: false
+healthcheck	Run actions/setup-python@v5	2025-08-23T23:00:13.8208074Z   freethreaded: false
+healthcheck	Run actions/setup-python@v5	2025-08-23T23:00:13.8208464Z ##[endgroup]
+healthcheck	Run actions/setup-python@v5	2025-08-23T23:00:13.9827969Z ##[group]Installed versions
+healthcheck	Run actions/setup-python@v5	2025-08-23T23:00:13.9907574Z Successfully set up CPython (3.11.13)
+healthcheck	Run actions/setup-python@v5	2025-08-23T23:00:13.9909009Z ##[endgroup]
+healthcheck	Install pytest	﻿2025-08-23T23:00:14.0036238Z ##[group]Run python -m pip install --upgrade pip
+healthcheck	Install pytest	2025-08-23T23:00:14.0036958Z [36;1mpython -m pip install --upgrade pip[0m
+healthcheck	Install pytest	2025-08-23T23:00:14.0037521Z [36;1mpython -m pip install pytest[0m
+healthcheck	Install pytest	2025-08-23T23:00:14.0112548Z shell: /usr/bin/bash -e {0}
+healthcheck	Install pytest	2025-08-23T23:00:14.0113047Z env:
+healthcheck	Install pytest	2025-08-23T23:00:14.0113531Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+healthcheck	Install pytest	2025-08-23T23:00:14.0114316Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+healthcheck	Install pytest	2025-08-23T23:00:14.0115067Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+healthcheck	Install pytest	2025-08-23T23:00:14.0115766Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+healthcheck	Install pytest	2025-08-23T23:00:14.0116457Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+healthcheck	Install pytest	2025-08-23T23:00:14.0117150Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+healthcheck	Install pytest	2025-08-23T23:00:14.0117738Z ##[endgroup]
+healthcheck	Install pytest	2025-08-23T23:00:14.4514305Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages (25.2)
+healthcheck	Install pytest	2025-08-23T23:00:15.0477789Z Collecting pytest
+healthcheck	Install pytest	2025-08-23T23:00:15.0826485Z   Downloading pytest-8.4.1-py3-none-any.whl.metadata (7.7 kB)
+healthcheck	Install pytest	2025-08-23T23:00:15.0966705Z Collecting iniconfig>=1 (from pytest)
+healthcheck	Install pytest	2025-08-23T23:00:15.1005945Z   Downloading iniconfig-2.1.0-py3-none-any.whl.metadata (2.7 kB)
+healthcheck	Install pytest	2025-08-23T23:00:15.1178343Z Collecting packaging>=20 (from pytest)
+healthcheck	Install pytest	2025-08-23T23:00:15.1214811Z   Downloading packaging-25.0-py3-none-any.whl.metadata (3.3 kB)
+healthcheck	Install pytest	2025-08-23T23:00:15.1344030Z Collecting pluggy<2,>=1.5 (from pytest)
+healthcheck	Install pytest	2025-08-23T23:00:15.1382174Z   Downloading pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+healthcheck	Install pytest	2025-08-23T23:00:15.1583671Z Collecting pygments>=2.7.2 (from pytest)
+healthcheck	Install pytest	2025-08-23T23:00:15.1621372Z   Downloading pygments-2.19.2-py3-none-any.whl.metadata (2.5 kB)
+healthcheck	Install pytest	2025-08-23T23:00:15.1708403Z Downloading pytest-8.4.1-py3-none-any.whl (365 kB)
+healthcheck	Install pytest	2025-08-23T23:00:15.1897849Z Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+healthcheck	Install pytest	2025-08-23T23:00:15.1952083Z Downloading iniconfig-2.1.0-py3-none-any.whl (6.0 kB)
+healthcheck	Install pytest	2025-08-23T23:00:15.2010425Z Downloading packaging-25.0-py3-none-any.whl (66 kB)
+healthcheck	Install pytest	2025-08-23T23:00:15.2070531Z Downloading pygments-2.19.2-py3-none-any.whl (1.2 MB)
+healthcheck	Install pytest	2025-08-23T23:00:15.2323019Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 52.1 MB/s  0:00:00
+healthcheck	Install pytest	2025-08-23T23:00:15.2537267Z Installing collected packages: pygments, pluggy, packaging, iniconfig, pytest
+healthcheck	Install pytest	2025-08-23T23:00:16.1747816Z 
+healthcheck	Install pytest	2025-08-23T23:00:16.1759807Z Successfully installed iniconfig-2.1.0 packaging-25.0 pluggy-1.6.0 pygments-2.19.2 pytest-8.4.1
+healthcheck	Run healthcheck	﻿2025-08-23T23:00:16.2381467Z ##[group]Run bash scripts/healthcheck.sh
+healthcheck	Run healthcheck	2025-08-23T23:00:16.2381994Z [36;1mbash scripts/healthcheck.sh[0m
+healthcheck	Run healthcheck	2025-08-23T23:00:16.2426721Z shell: /usr/bin/bash -e {0}
+healthcheck	Run healthcheck	2025-08-23T23:00:16.2427034Z env:
+healthcheck	Run healthcheck	2025-08-23T23:00:16.2427341Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+healthcheck	Run healthcheck	2025-08-23T23:00:16.2427845Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+healthcheck	Run healthcheck	2025-08-23T23:00:16.2428330Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+healthcheck	Run healthcheck	2025-08-23T23:00:16.2428761Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+healthcheck	Run healthcheck	2025-08-23T23:00:16.2429214Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+healthcheck	Run healthcheck	2025-08-23T23:00:16.2429674Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+healthcheck	Run healthcheck	2025-08-23T23:00:16.2430264Z ##[endgroup]
+healthcheck	Run healthcheck	2025-08-23T23:00:16.2506743Z [healthcheck] start
+healthcheck	Run healthcheck	2025-08-23T23:00:16.4863755Z time="2025-08-23T23:00:16Z" level=warning msg="/home/runner/work/vpm-mini/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+healthcheck	Run healthcheck	2025-08-23T23:00:16.5069391Z  synthesizer Pulling 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.5071433Z  watcher Pulling 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.5072529Z  archivist Pulling 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.5073236Z  redis Pulling 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.5073739Z  curator Pulling 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.5076603Z  planner Pulling 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.6472487Z  synthesizer Warning pull access denied for vpm-mini/app, repository does not exist or may require 'docker login': denied: requested access to the resource is denied
+healthcheck	Run healthcheck	2025-08-23T23:00:16.6475119Z  planner Warning pull access denied for vpm-mini/app, repository does not exist or may require 'docker login': denied: requested access to the resource is denied
+healthcheck	Run healthcheck	2025-08-23T23:00:16.6535879Z  watcher Warning pull access denied for vpm-mini/app, repository does not exist or may require 'docker login': denied: requested access to the resource is denied
+healthcheck	Run healthcheck	2025-08-23T23:00:16.6563070Z  archivist Warning pull access denied for vpm-mini/app, repository does not exist or may require 'docker login': denied: requested access to the resource is denied
+healthcheck	Run healthcheck	2025-08-23T23:00:16.7996970Z  b1badc6e5066 Pulling fs layer 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.7997641Z  746f3da5d8fb Pulling fs layer 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.7998281Z  1d58eaac926a Pulling fs layer 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.7998923Z  5c06f884d8fa Pulling fs layer 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.7999558Z  5ce544915f10 Pulling fs layer 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.8000417Z  b547341e3d62 Pulling fs layer 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.8001080Z  4f4fb700ef54 Pulling fs layer 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.8001729Z  b5cf1c58df65 Pulling fs layer 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.8002340Z  b547341e3d62 Waiting 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.8002862Z  4f4fb700ef54 Waiting 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.8003428Z  b5cf1c58df65 Waiting 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.8004036Z  5c06f884d8fa Waiting 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.8010762Z  5ce544915f10 Waiting 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.8355589Z  curator Warning pull access denied for vpm-mini/app, repository does not exist or may require 'docker login': denied: requested access to the resource is denied
+healthcheck	Run healthcheck	2025-08-23T23:00:16.8766829Z  1d58eaac926a Downloading [==================================================>]     875B/875B
+healthcheck	Run healthcheck	2025-08-23T23:00:16.8768554Z  1d58eaac926a Verifying Checksum 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.8769717Z  1d58eaac926a Download complete 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.8781528Z  746f3da5d8fb Downloading [==========================================>        ]     937B/1.103kB
+healthcheck	Run healthcheck	2025-08-23T23:00:16.8785416Z  746f3da5d8fb Downloading [==================================================>]  1.103kB/1.103kB
+healthcheck	Run healthcheck	2025-08-23T23:00:16.8785964Z  746f3da5d8fb Verifying Checksum 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.8786320Z  746f3da5d8fb Download complete 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.9005474Z  b1badc6e5066 Downloading [>                                                  ]  282.7kB/28.23MB
+healthcheck	Run healthcheck	2025-08-23T23:00:16.9293181Z  5ce544915f10 Downloading [>                                                  ]  155.6kB/15.34MB
+healthcheck	Run healthcheck	2025-08-23T23:00:16.9451448Z  5c06f884d8fa Downloading [>                                                  ]  15.13kB/1.438MB
+healthcheck	Run healthcheck	2025-08-23T23:00:16.9550626Z  5c06f884d8fa Verifying Checksum 
+healthcheck	Run healthcheck	2025-08-23T23:00:16.9551799Z  5c06f884d8fa Download complete 
+healthcheck	Run healthcheck	2025-08-23T23:00:17.0069078Z  b1badc6e5066 Downloading [============>                                      ]  6.958MB/28.23MB
+healthcheck	Run healthcheck	2025-08-23T23:00:17.0151096Z  b547341e3d62 Downloading [==================================================>]      96B/96B
+healthcheck	Run healthcheck	2025-08-23T23:00:17.0152165Z  b547341e3d62 Verifying Checksum 
+healthcheck	Run healthcheck	2025-08-23T23:00:17.0152750Z  b547341e3d62 Download complete 
+healthcheck	Run healthcheck	2025-08-23T23:00:17.0219612Z  5ce544915f10 Verifying Checksum 
+healthcheck	Run healthcheck	2025-08-23T23:00:17.0220283Z  5ce544915f10 Download complete 
+healthcheck	Run healthcheck	2025-08-23T23:00:17.0826340Z  b5cf1c58df65 Downloading [==================================================>]     570B/570B
+healthcheck	Run healthcheck	2025-08-23T23:00:17.0827051Z  b5cf1c58df65 Verifying Checksum 
+healthcheck	Run healthcheck	2025-08-23T23:00:17.0827776Z  b5cf1c58df65 Download complete 
+healthcheck	Run healthcheck	2025-08-23T23:00:17.1149679Z  b1badc6e5066 Downloading [===================>                               ]     11MB/28.23MB
+healthcheck	Run healthcheck	2025-08-23T23:00:17.2197348Z  4f4fb700ef54 Download complete 
+healthcheck	Run healthcheck	2025-08-23T23:00:17.2198684Z  b1badc6e5066 Downloading [============================>                      ]  16.19MB/28.23MB
+healthcheck	Run healthcheck	2025-08-23T23:00:17.3243536Z  b1badc6e5066 Downloading [======================================>            ]  21.69MB/28.23MB
+healthcheck	Run healthcheck	2025-08-23T23:00:17.4067253Z  b1badc6e5066 Verifying Checksum 
+healthcheck	Run healthcheck	2025-08-23T23:00:17.4067828Z  b1badc6e5066 Download complete 
+healthcheck	Run healthcheck	2025-08-23T23:00:17.4341682Z  b1badc6e5066 Extracting [>                                                  ]  294.9kB/28.23MB
+healthcheck	Run healthcheck	2025-08-23T23:00:17.5344654Z  b1badc6e5066 Extracting [===========>                                       ]  6.488MB/28.23MB
+healthcheck	Run healthcheck	2025-08-23T23:00:17.6375642Z  b1badc6e5066 Extracting [=================>                                 ]  10.03MB/28.23MB
+healthcheck	Run healthcheck	2025-08-23T23:00:17.7383239Z  b1badc6e5066 Extracting [============================>                      ]  15.93MB/28.23MB
+healthcheck	Run healthcheck	2025-08-23T23:00:17.8457755Z  b1badc6e5066 Extracting [=========================================>         ]  23.59MB/28.23MB
+healthcheck	Run healthcheck	2025-08-23T23:00:17.9612112Z  b1badc6e5066 Extracting [==========================================>        ]  23.89MB/28.23MB
+healthcheck	Run healthcheck	2025-08-23T23:00:18.0686921Z  b1badc6e5066 Extracting [===============================================>   ]  26.84MB/28.23MB
+healthcheck	Run healthcheck	2025-08-23T23:00:18.3150438Z  b1badc6e5066 Extracting [================================================>  ]  27.43MB/28.23MB
+healthcheck	Run healthcheck	2025-08-23T23:00:18.4174171Z  b1badc6e5066 Extracting [==================================================>]  28.23MB/28.23MB
+healthcheck	Run healthcheck	2025-08-23T23:00:18.4388512Z  b1badc6e5066 Pull complete 
+healthcheck	Run healthcheck	2025-08-23T23:00:18.4403424Z  746f3da5d8fb Extracting [==================================================>]  1.103kB/1.103kB
+healthcheck	Run healthcheck	2025-08-23T23:00:18.4408688Z  746f3da5d8fb Extracting [==================================================>]  1.103kB/1.103kB
+healthcheck	Run healthcheck	2025-08-23T23:00:19.2158975Z  746f3da5d8fb Pull complete 
+healthcheck	Run healthcheck	2025-08-23T23:00:19.2171260Z  1d58eaac926a Extracting [==================================================>]     875B/875B
+healthcheck	Run healthcheck	2025-08-23T23:00:19.2175995Z  1d58eaac926a Extracting [==================================================>]     875B/875B
+healthcheck	Run healthcheck	2025-08-23T23:00:19.2291940Z  1d58eaac926a Pull complete 
+healthcheck	Run healthcheck	2025-08-23T23:00:19.2304558Z  5c06f884d8fa Extracting [=>                                                 ]  32.77kB/1.438MB
+healthcheck	Run healthcheck	2025-08-23T23:00:19.2541085Z  5c06f884d8fa Extracting [==================================================>]  1.438MB/1.438MB
+healthcheck	Run healthcheck	2025-08-23T23:00:19.2545240Z  5c06f884d8fa Extracting [==================================================>]  1.438MB/1.438MB
+healthcheck	Run healthcheck	2025-08-23T23:00:19.2708588Z  5c06f884d8fa Pull complete 
+healthcheck	Run healthcheck	2025-08-23T23:00:19.2730449Z  5ce544915f10 Extracting [>                                                  ]  163.8kB/15.34MB
+healthcheck	Run healthcheck	2025-08-23T23:00:19.3746921Z  5ce544915f10 Extracting [============================>                      ]  8.684MB/15.34MB
+healthcheck	Run healthcheck	2025-08-23T23:00:19.4556356Z  5ce544915f10 Extracting [==================================================>]  15.34MB/15.34MB
+healthcheck	Run healthcheck	2025-08-23T23:00:19.4841147Z  5ce544915f10 Pull complete 
+healthcheck	Run healthcheck	2025-08-23T23:00:19.4854887Z  b547341e3d62 Extracting [==================================================>]      96B/96B
+healthcheck	Run healthcheck	2025-08-23T23:00:19.4858706Z  b547341e3d62 Extracting [==================================================>]      96B/96B
+healthcheck	Run healthcheck	2025-08-23T23:00:19.4936040Z  b547341e3d62 Pull complete 
+healthcheck	Run healthcheck	2025-08-23T23:00:19.4948787Z  4f4fb700ef54 Extracting [==================================================>]      32B/32B
+healthcheck	Run healthcheck	2025-08-23T23:00:19.4952856Z  4f4fb700ef54 Extracting [==================================================>]      32B/32B
+healthcheck	Run healthcheck	2025-08-23T23:00:19.5028034Z  4f4fb700ef54 Pull complete 
+healthcheck	Run healthcheck	2025-08-23T23:00:19.5039074Z  b5cf1c58df65 Extracting [==================================================>]     570B/570B
+healthcheck	Run healthcheck	2025-08-23T23:00:19.5042222Z  b5cf1c58df65 Extracting [==================================================>]     570B/570B
+healthcheck	Run healthcheck	2025-08-23T23:00:19.5206585Z  b5cf1c58df65 Pull complete 
+healthcheck	Run healthcheck	2025-08-23T23:00:19.5269124Z  redis Pulled 
+healthcheck	Run healthcheck	2025-08-23T23:00:19.6331365Z #1 [internal] load local bake definitions
+healthcheck	Run healthcheck	2025-08-23T23:00:19.7577507Z #1 reading from stdin 1.55kB done
+healthcheck	Run healthcheck	2025-08-23T23:00:19.7578036Z #1 DONE 0.0s
+healthcheck	Run healthcheck	2025-08-23T23:00:19.7578223Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:19.7578416Z #2 [archivist internal] load build definition from Dockerfile
+healthcheck	Run healthcheck	2025-08-23T23:00:19.7578798Z #2 transferring dockerfile: 842B done
+healthcheck	Run healthcheck	2025-08-23T23:00:19.7579057Z #2 DONE 0.0s
+healthcheck	Run healthcheck	2025-08-23T23:00:19.7579164Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:19.7579323Z #3 [auth] library/python:pull token for registry-1.docker.io
+healthcheck	Run healthcheck	2025-08-23T23:00:19.9081217Z #3 DONE 0.0s
+healthcheck	Run healthcheck	2025-08-23T23:00:19.9081505Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:19.9081980Z #4 [curator internal] load metadata for docker.io/library/python:3.11-slim
+healthcheck	Run healthcheck	2025-08-23T23:00:20.2064061Z #4 DONE 0.4s
+healthcheck	Run healthcheck	2025-08-23T23:00:20.2064421Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:20.2064614Z #5 [curator internal] load .dockerignore
+healthcheck	Run healthcheck	2025-08-23T23:00:20.2065074Z #5 transferring context: 112B done
+healthcheck	Run healthcheck	2025-08-23T23:00:20.2065568Z #5 DONE 0.0s
+healthcheck	Run healthcheck	2025-08-23T23:00:20.2065738Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:20.2065910Z #6 [curator internal] load build context
+healthcheck	Run healthcheck	2025-08-23T23:00:20.2066421Z #6 transferring context: 28.30kB done
+healthcheck	Run healthcheck	2025-08-23T23:00:20.2066842Z #6 DONE 0.0s
+healthcheck	Run healthcheck	2025-08-23T23:00:20.2067006Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:20.2067740Z #7 [synthesizer base 1/5] FROM docker.io/library/python:3.11-slim@sha256:1d6131b5d479888b43200645e03a78443c7157efbdb730e6b48129740727c312
+healthcheck	Run healthcheck	2025-08-23T23:00:20.2069188Z #7 resolve docker.io/library/python:3.11-slim@sha256:1d6131b5d479888b43200645e03a78443c7157efbdb730e6b48129740727c312 done
+healthcheck	Run healthcheck	2025-08-23T23:00:20.2070578Z #7 sha256:1d6131b5d479888b43200645e03a78443c7157efbdb730e6b48129740727c312 10.37kB / 10.37kB done
+healthcheck	Run healthcheck	2025-08-23T23:00:20.2071676Z #7 sha256:8df0e8faf75b3c17ac33dc90d76787bbbcae142679e11da8c6f16afae5605ea7 1.75kB / 1.75kB done
+healthcheck	Run healthcheck	2025-08-23T23:00:20.2072914Z #7 sha256:2ba2e944f9cd164e42cf5e50da9ddeff526b43886a47738a75ab424624cdc427 5.38kB / 5.38kB done
+healthcheck	Run healthcheck	2025-08-23T23:00:20.2073977Z #7 sha256:396b1da7636e2dcd10565cb4f2f952cbb4a8a38b58d3b86a2cacb172fb70117c 0B / 29.77MB 0.1s
+healthcheck	Run healthcheck	2025-08-23T23:00:20.2075011Z #7 sha256:fcec5a125fd8f69ba9d5c3fd9ecf3810f95775d4d5694ed731adcdeae1cff909 0B / 1.29MB 0.1s
+healthcheck	Run healthcheck	2025-08-23T23:00:20.2076067Z #7 sha256:a27cb4be70170df84ec3045fb7d33b3eb7018cb39fc029037429d9f06362737f 4.19MB / 14.64MB 0.1s
+healthcheck	Run healthcheck	2025-08-23T23:00:20.3068257Z #7 sha256:1d6131b5d479888b43200645e03a78443c7157efbdb730e6b48129740727c312 10.37kB / 10.37kB done
+healthcheck	Run healthcheck	2025-08-23T23:00:20.3069364Z #7 sha256:8df0e8faf75b3c17ac33dc90d76787bbbcae142679e11da8c6f16afae5605ea7 1.75kB / 1.75kB done
+healthcheck	Run healthcheck	2025-08-23T23:00:20.3070442Z #7 sha256:2ba2e944f9cd164e42cf5e50da9ddeff526b43886a47738a75ab424624cdc427 5.38kB / 5.38kB done
+healthcheck	Run healthcheck	2025-08-23T23:00:20.3071388Z #7 sha256:fcec5a125fd8f69ba9d5c3fd9ecf3810f95775d4d5694ed731adcdeae1cff909 1.29MB / 1.29MB 0.1s done
+healthcheck	Run healthcheck	2025-08-23T23:00:20.3072340Z #7 sha256:a27cb4be70170df84ec3045fb7d33b3eb7018cb39fc029037429d9f06362737f 14.64MB / 14.64MB 0.2s done
+healthcheck	Run healthcheck	2025-08-23T23:00:20.3073242Z #7 sha256:1961ca026b04e3e3720545ee5a8e05e60692056663c685c5d2437bf3ad9e6e08 249B / 249B 0.2s done
+healthcheck	Run healthcheck	2025-08-23T23:00:20.5059600Z #7 sha256:396b1da7636e2dcd10565cb4f2f952cbb4a8a38b58d3b86a2cacb172fb70117c 12.58MB / 29.77MB 0.4s
+healthcheck	Run healthcheck	2025-08-23T23:00:20.5061756Z #7 sha256:fcec5a125fd8f69ba9d5c3fd9ecf3810f95775d4d5694ed731adcdeae1cff909 1.29MB / 1.29MB 0.1s done
+healthcheck	Run healthcheck	2025-08-23T23:00:20.5063947Z #7 sha256:a27cb4be70170df84ec3045fb7d33b3eb7018cb39fc029037429d9f06362737f 14.64MB / 14.64MB 0.2s done
+healthcheck	Run healthcheck	2025-08-23T23:00:20.5065758Z #7 sha256:1961ca026b04e3e3720545ee5a8e05e60692056663c685c5d2437bf3ad9e6e08 249B / 249B 0.2s done
+healthcheck	Run healthcheck	2025-08-23T23:00:20.6059755Z #7 sha256:396b1da7636e2dcd10565cb4f2f952cbb4a8a38b58d3b86a2cacb172fb70117c 15.73MB / 29.77MB 0.5s
+healthcheck	Run healthcheck	2025-08-23T23:00:20.7063491Z #7 sha256:396b1da7636e2dcd10565cb4f2f952cbb4a8a38b58d3b86a2cacb172fb70117c 20.97MB / 29.77MB 0.6s
+healthcheck	Run healthcheck	2025-08-23T23:00:20.9055734Z #7 sha256:396b1da7636e2dcd10565cb4f2f952cbb4a8a38b58d3b86a2cacb172fb70117c 29.77MB / 29.77MB 0.8s done
+healthcheck	Run healthcheck	2025-08-23T23:00:21.0141142Z #7 sha256:396b1da7636e2dcd10565cb4f2f952cbb4a8a38b58d3b86a2cacb172fb70117c 29.77MB / 29.77MB 0.8s done
+healthcheck	Run healthcheck	2025-08-23T23:00:21.0143373Z #7 extracting sha256:396b1da7636e2dcd10565cb4f2f952cbb4a8a38b58d3b86a2cacb172fb70117c 0.1s
+healthcheck	Run healthcheck	2025-08-23T23:00:21.9026509Z #7 extracting sha256:396b1da7636e2dcd10565cb4f2f952cbb4a8a38b58d3b86a2cacb172fb70117c 0.9s done
+healthcheck	Run healthcheck	2025-08-23T23:00:21.9027760Z #7 extracting sha256:fcec5a125fd8f69ba9d5c3fd9ecf3810f95775d4d5694ed731adcdeae1cff909 0.1s
+healthcheck	Run healthcheck	2025-08-23T23:00:22.0836203Z #7 extracting sha256:fcec5a125fd8f69ba9d5c3fd9ecf3810f95775d4d5694ed731adcdeae1cff909 0.1s done
+healthcheck	Run healthcheck	2025-08-23T23:00:22.0837649Z #7 extracting sha256:a27cb4be70170df84ec3045fb7d33b3eb7018cb39fc029037429d9f06362737f 0.1s
+healthcheck	Run healthcheck	2025-08-23T23:00:22.6534539Z #7 extracting sha256:a27cb4be70170df84ec3045fb7d33b3eb7018cb39fc029037429d9f06362737f 0.6s done
+healthcheck	Run healthcheck	2025-08-23T23:00:22.6535646Z #7 extracting sha256:1961ca026b04e3e3720545ee5a8e05e60692056663c685c5d2437bf3ad9e6e08
+healthcheck	Run healthcheck	2025-08-23T23:00:22.8285496Z #7 extracting sha256:1961ca026b04e3e3720545ee5a8e05e60692056663c685c5d2437bf3ad9e6e08 done
+healthcheck	Run healthcheck	2025-08-23T23:00:22.8286097Z #7 DONE 2.6s
+healthcheck	Run healthcheck	2025-08-23T23:00:22.8286229Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:22.8287093Z #8 [archivist base 2/5] RUN apt-get update && apt-get install -y redis-tools curl && rm -rf /var/lib/apt/lists/* &&     adduser --disabled-password --gecos "" app && mkdir -p /app && chown -R app:app /app
+healthcheck	Run healthcheck	2025-08-23T23:00:22.8516623Z #8 0.173 Hit:1 http://deb.debian.org/debian trixie InRelease
+healthcheck	Run healthcheck	2025-08-23T23:00:23.0768921Z #8 0.174 Get:2 http://deb.debian.org/debian trixie-updates InRelease [47.1 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:23.0769969Z #8 0.175 Get:3 http://deb.debian.org/debian-security trixie-security InRelease [43.4 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:23.0771137Z #8 0.192 Get:4 http://deb.debian.org/debian trixie/main amd64 Packages [9668 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:23.0772168Z #8 0.248 Get:5 http://deb.debian.org/debian trixie-updates/main amd64 Packages [2432 B]
+healthcheck	Run healthcheck	2025-08-23T23:00:23.0773338Z #8 0.249 Get:6 http://deb.debian.org/debian-security trixie-security/main amd64 Packages [23.9 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:23.7013724Z #8 0.873 Fetched 9784 kB in 1s (13.4 MB/s)
+healthcheck	Run healthcheck	2025-08-23T23:00:24.1401988Z #8 0.873 Reading package lists...
+healthcheck	Run healthcheck	2025-08-23T23:00:24.5211435Z #8 1.312 Reading package lists...
+healthcheck	Run healthcheck	2025-08-23T23:00:24.6393055Z #8 1.745 Building dependency tree...
+healthcheck	Run healthcheck	2025-08-23T23:00:24.6395287Z #8 1.843 Reading state information...
+healthcheck	Run healthcheck	2025-08-23T23:00:24.6396007Z #8 1.961 The following additional packages will be installed:
+healthcheck	Run healthcheck	2025-08-23T23:00:24.7912815Z #8 1.961   bash-completion krb5-locales libatomic1 libbrotli1 libcom-err2 libcurl4t64
+healthcheck	Run healthcheck	2025-08-23T23:00:24.7913695Z #8 1.961   libgnutls30t64 libgssapi-krb5-2 libidn2-0 libjemalloc2 libk5crypto3
+healthcheck	Run healthcheck	2025-08-23T23:00:24.7914330Z #8 1.961   libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2 liblzf1
+healthcheck	Run healthcheck	2025-08-23T23:00:24.7914944Z #8 1.962   libnghttp2-14 libnghttp3-9 libp11-kit0 libpsl5t64 librtmp1 libsasl2-2
+healthcheck	Run healthcheck	2025-08-23T23:00:24.7915573Z #8 1.962   libsasl2-modules libsasl2-modules-db libssh2-1t64 libtasn1-6 libunistring5
+healthcheck	Run healthcheck	2025-08-23T23:00:24.7916051Z #8 1.962   publicsuffix
+healthcheck	Run healthcheck	2025-08-23T23:00:24.7916321Z #8 1.963 Suggested packages:
+healthcheck	Run healthcheck	2025-08-23T23:00:24.7916696Z #8 1.963   gnutls-bin krb5-doc krb5-user libsasl2-modules-gssapi-mit
+healthcheck	Run healthcheck	2025-08-23T23:00:24.7917282Z #8 1.963   | libsasl2-modules-gssapi-heimdal libsasl2-modules-ldap libsasl2-modules-otp
+healthcheck	Run healthcheck	2025-08-23T23:00:24.7918101Z #8 1.963   libsasl2-modules-sql ruby-redis
+healthcheck	Run healthcheck	2025-08-23T23:00:24.8014032Z #8 2.123 The following NEW packages will be installed:
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9748118Z #8 2.124   bash-completion curl krb5-locales libatomic1 libbrotli1 libcom-err2
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9749126Z #8 2.124   libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libidn2-0 libjemalloc2
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9750283Z #8 2.124   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9751244Z #8 2.124   liblzf1 libnghttp2-14 libnghttp3-9 libp11-kit0 libpsl5t64 librtmp1
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9752100Z #8 2.124   libsasl2-2 libsasl2-modules libsasl2-modules-db libssh2-1t64 libtasn1-6
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9752844Z #8 2.124   libunistring5 publicsuffix redis-tools
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9753740Z #8 2.148 0 upgraded, 31 newly installed, 0 to remove and 0 not upgraded.
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9754301Z #8 2.148 Need to get 7239 kB of archives.
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9754904Z #8 2.148 After this operation, 26.4 MB of additional disk space will be used.
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9755829Z #8 2.148 Get:1 http://deb.debian.org/debian trixie/main amd64 bash-completion all 1:2.16.0-7 [319 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9756872Z #8 2.154 Get:2 http://deb.debian.org/debian trixie/main amd64 krb5-locales all 1.21.3-5 [101 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9757985Z #8 2.155 Get:3 http://deb.debian.org/debian trixie/main amd64 libbrotli1 amd64 1.1.0-2+b7 [307 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9758961Z #8 2.157 Get:4 http://deb.debian.org/debian trixie/main amd64 libkrb5support0 amd64 1.21.3-5 [33.0 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9759935Z #8 2.158 Get:5 http://deb.debian.org/debian trixie/main amd64 libcom-err2 amd64 1.47.2-3+b3 [25.0 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9761313Z #8 2.159 Get:6 http://deb.debian.org/debian trixie/main amd64 libk5crypto3 amd64 1.21.3-5 [81.5 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9762377Z #8 2.159 Get:7 http://deb.debian.org/debian trixie/main amd64 libkeyutils1 amd64 1.6.3-6 [9456 B]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9763343Z #8 2.160 Get:8 http://deb.debian.org/debian trixie/main amd64 libkrb5-3 amd64 1.21.3-5 [326 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9764311Z #8 2.161 Get:9 http://deb.debian.org/debian trixie/main amd64 libgssapi-krb5-2 amd64 1.21.3-5 [138 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9765326Z #8 2.162 Get:10 http://deb.debian.org/debian trixie/main amd64 libunistring5 amd64 1.3-2 [477 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9765996Z #8 2.164 Get:11 http://deb.debian.org/debian trixie/main amd64 libidn2-0 amd64 2.3.8-2 [109 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9766811Z #8 2.165 Get:12 http://deb.debian.org/debian trixie/main amd64 libsasl2-modules-db amd64 2.1.28+dfsg1-9 [19.8 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9767592Z #8 2.165 Get:13 http://deb.debian.org/debian trixie/main amd64 libsasl2-2 amd64 2.1.28+dfsg1-9 [57.5 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9768132Z #8 2.166 Get:14 http://deb.debian.org/debian trixie/main amd64 libldap2 amd64 2.6.10+dfsg-1 [194 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9768686Z #8 2.167 Get:15 http://deb.debian.org/debian trixie/main amd64 libnghttp2-14 amd64 1.64.0-1.1 [76.0 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9769245Z #8 2.167 Get:16 http://deb.debian.org/debian trixie/main amd64 libnghttp3-9 amd64 1.8.0-1 [67.7 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9769776Z #8 2.168 Get:17 http://deb.debian.org/debian trixie/main amd64 libpsl5t64 amd64 0.21.2-1.1+b1 [57.2 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9770712Z #8 2.168 Get:18 http://deb.debian.org/debian trixie/main amd64 libp11-kit0 amd64 0.25.5-3 [425 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9771226Z #8 2.170 Get:19 http://deb.debian.org/debian trixie/main amd64 libtasn1-6 amd64 4.20.0-2 [49.9 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9771747Z #8 2.171 Get:20 http://deb.debian.org/debian trixie/main amd64 libgnutls30t64 amd64 3.8.9-3 [1465 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9772332Z #8 2.178 Get:21 http://deb.debian.org/debian trixie/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-2+b5 [58.8 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9772939Z #8 2.179 Get:22 http://deb.debian.org/debian trixie/main amd64 libssh2-1t64 amd64 1.11.1-1 [245 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9773459Z #8 2.180 Get:23 http://deb.debian.org/debian trixie/main amd64 libcurl4t64 amd64 8.14.1-2 [391 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9774164Z #8 2.182 Get:24 http://deb.debian.org/debian trixie/main amd64 curl amd64 8.14.1-2 [269 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9775051Z #8 2.183 Get:25 http://deb.debian.org/debian trixie/main amd64 libatomic1 amd64 14.2.0-19 [9308 B]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9775872Z #8 2.184 Get:26 http://deb.debian.org/debian trixie/main amd64 libjemalloc2 amd64 5.3.0-3 [274 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9776417Z #8 2.185 Get:27 http://deb.debian.org/debian trixie/main amd64 libldap-common all 2.6.10+dfsg-1 [35.1 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9776952Z #8 2.185 Get:28 http://deb.debian.org/debian trixie/main amd64 liblzf1 amd64 3.6-4+b3 [10.1 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9777494Z #8 2.186 Get:29 http://deb.debian.org/debian trixie/main amd64 libsasl2-modules amd64 2.1.28+dfsg1-9 [66.7 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9778220Z #8 2.187 Get:30 http://deb.debian.org/debian trixie/main amd64 publicsuffix all 20250328.1952-0.1 [296 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:24.9778754Z #8 2.188 Get:31 http://deb.debian.org/debian trixie/main amd64 redis-tools amd64 5:8.0.2-3 [1246 kB]
+healthcheck	Run healthcheck	2025-08-23T23:00:25.1308160Z #8 2.297 debconf: unable to initialize frontend: Dialog
+healthcheck	Run healthcheck	2025-08-23T23:00:25.1309189Z #8 2.297 debconf: (TERM is not set, so the dialog frontend is not usable.)
+healthcheck	Run healthcheck	2025-08-23T23:00:25.1314727Z #8 2.297 debconf: falling back to frontend: Readline
+healthcheck	Run healthcheck	2025-08-23T23:00:25.1315590Z #8 2.297 debconf: unable to initialize frontend: Readline
+healthcheck	Run healthcheck	2025-08-23T23:00:25.1318345Z #8 2.297 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.40.1 /usr/local/share/perl/5.40.1 /usr/lib/x86_64-linux-gnu/perl5/5.40 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.40 /usr/share/perl/5.40 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8, <STDIN> line 31.)
+healthcheck	Run healthcheck	2025-08-23T23:00:25.1321335Z #8 2.297 debconf: falling back to frontend: Teletype
+healthcheck	Run healthcheck	2025-08-23T23:00:25.1321851Z #8 2.302 debconf: unable to initialize frontend: Teletype
+healthcheck	Run healthcheck	2025-08-23T23:00:25.1322401Z #8 2.302 debconf: (This frontend requires a controlling tty.)
+healthcheck	Run healthcheck	2025-08-23T23:00:25.1322938Z #8 2.302 debconf: falling back to frontend: Noninteractive
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0305392Z #8 3.181 Fetched 7239 kB in 0s (122 MB/s)
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0306472Z #8 3.195 Selecting previously unselected package bash-completion.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0307181Z #8 3.195 (Reading database ... 
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0307604Z (Reading database ... 5%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0307967Z (Reading database ... 10%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0308331Z (Reading database ... 15%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0308674Z (Reading database ... 20%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0309020Z (Reading database ... 25%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0309358Z (Reading database ... 30%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0309737Z (Reading database ... 35%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0310222Z (Reading database ... 40%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0310577Z (Reading database ... 45%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0310920Z (Reading database ... 50%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0311258Z (Reading database ... 55%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0311623Z (Reading database ... 60%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0311966Z (Reading database ... 65%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0312311Z (Reading database ... 70%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0312652Z (Reading database ... 75%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0313001Z (Reading database ... 80%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0313338Z (Reading database ... 85%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0313682Z (Reading database ... 90%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0314020Z (Reading database ... 95%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0314365Z (Reading database ... 100%
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0314894Z (Reading database ... 5643 files and directories currently installed.)
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0315671Z #8 3.201 Preparing to unpack .../00-bash-completion_1%3a2.16.0-7_all.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.0316326Z #8 3.202 Unpacking bash-completion (1:2.16.0-7) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.1582369Z #8 3.369 Selecting previously unselected package krb5-locales.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.1583162Z #8 3.370 Preparing to unpack .../01-krb5-locales_1.21.3-5_all.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.1583744Z #8 3.371 Unpacking krb5-locales (1.21.3-5) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.1584454Z #8 3.391 Selecting previously unselected package libbrotli1:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.1584917Z #8 3.392 Preparing to unpack .../02-libbrotli1_1.1.0-2+b7_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.1585296Z #8 3.394 Unpacking libbrotli1:amd64 (1.1.0-2+b7) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.1585694Z #8 3.423 Selecting previously unselected package libkrb5support0:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.1586173Z #8 3.424 Preparing to unpack .../03-libkrb5support0_1.21.3-5_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.1586846Z #8 3.425 Unpacking libkrb5support0:amd64 (1.21.3-5) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.1588470Z #8 3.442 Selecting previously unselected package libcom-err2:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.1589275Z #8 3.443 Preparing to unpack .../04-libcom-err2_1.47.2-3+b3_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.1590484Z #8 3.444 Unpacking libcom-err2:amd64 (1.47.2-3+b3) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.1591016Z #8 3.460 Selecting previously unselected package libk5crypto3:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.1591539Z #8 3.461 Preparing to unpack .../05-libk5crypto3_1.21.3-5_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.1592013Z #8 3.462 Unpacking libk5crypto3:amd64 (1.21.3-5) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.2675454Z #8 3.480 Selecting previously unselected package libkeyutils1:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.2676251Z #8 3.481 Preparing to unpack .../06-libkeyutils1_1.6.3-6_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.2676774Z #8 3.482 Unpacking libkeyutils1:amd64 (1.6.3-6) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.2677201Z #8 3.497 Selecting previously unselected package libkrb5-3:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.2677758Z #8 3.498 Preparing to unpack .../07-libkrb5-3_1.21.3-5_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.2678179Z #8 3.499 Unpacking libkrb5-3:amd64 (1.21.3-5) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.2678708Z #8 3.528 Selecting previously unselected package libgssapi-krb5-2:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.2679359Z #8 3.529 Preparing to unpack .../08-libgssapi-krb5-2_1.21.3-5_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.2679861Z #8 3.530 Unpacking libgssapi-krb5-2:amd64 (1.21.3-5) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.2680863Z #8 3.551 Selecting previously unselected package libunistring5:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.2681916Z #8 3.552 Preparing to unpack .../09-libunistring5_1.3-2_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.2682821Z #8 3.553 Unpacking libunistring5:amd64 (1.3-2) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.3820968Z #8 3.590 Selecting previously unselected package libidn2-0:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.3822064Z #8 3.591 Preparing to unpack .../10-libidn2-0_2.3.8-2_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.3822725Z #8 3.592 Unpacking libidn2-0:amd64 (2.3.8-2) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.3823497Z #8 3.611 Selecting previously unselected package libsasl2-modules-db:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.3824268Z #8 3.612 Preparing to unpack .../11-libsasl2-modules-db_2.1.28+dfsg1-9_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.3824821Z #8 3.613 Unpacking libsasl2-modules-db:amd64 (2.1.28+dfsg1-9) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.3825332Z #8 3.628 Selecting previously unselected package libsasl2-2:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.3825867Z #8 3.629 Preparing to unpack .../12-libsasl2-2_2.1.28+dfsg1-9_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.3826500Z #8 3.630 Unpacking libsasl2-2:amd64 (2.1.28+dfsg1-9) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.3827249Z #8 3.646 Selecting previously unselected package libldap2:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.3828115Z #8 3.647 Preparing to unpack .../13-libldap2_2.6.10+dfsg-1_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.3829032Z #8 3.647 Unpacking libldap2:amd64 (2.6.10+dfsg-1) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.3829792Z #8 3.668 Selecting previously unselected package libnghttp2-14:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.3831091Z #8 3.669 Preparing to unpack .../14-libnghttp2-14_1.64.0-1.1_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.3831834Z #8 3.670 Unpacking libnghttp2-14:amd64 (1.64.0-1.1) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.3832567Z #8 3.687 Selecting previously unselected package libnghttp3-9:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.3833253Z #8 3.687 Preparing to unpack .../15-libnghttp3-9_1.8.0-1_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.3833610Z #8 3.688 Unpacking libnghttp3-9:amd64 (1.8.0-1) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.5003676Z #8 3.704 Selecting previously unselected package libpsl5t64:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.5004962Z #8 3.705 Preparing to unpack .../16-libpsl5t64_0.21.2-1.1+b1_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.5005670Z #8 3.706 Unpacking libpsl5t64:amd64 (0.21.2-1.1+b1) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.5006329Z #8 3.722 Selecting previously unselected package libp11-kit0:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.5007059Z #8 3.723 Preparing to unpack .../17-libp11-kit0_0.25.5-3_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.5007669Z #8 3.724 Unpacking libp11-kit0:amd64 (0.25.5-3) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.5008279Z #8 3.752 Selecting previously unselected package libtasn1-6:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.5008975Z #8 3.752 Preparing to unpack .../18-libtasn1-6_4.20.0-2_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.5009593Z #8 3.754 Unpacking libtasn1-6:amd64 (4.20.0-2) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.5010611Z #8 3.770 Selecting previously unselected package libgnutls30t64:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.5011731Z #8 3.770 Preparing to unpack .../19-libgnutls30t64_3.8.9-3_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.5012378Z #8 3.771 Unpacking libgnutls30t64:amd64 (3.8.9-3) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.6085957Z #8 3.823 Selecting previously unselected package librtmp1:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.6086685Z #8 3.824 Preparing to unpack .../20-librtmp1_2.4+20151223.gitfa8646d.1-2+b5_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.6087301Z #8 3.825 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2+b5) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.6087831Z #8 3.841 Selecting previously unselected package libssh2-1t64:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.6088357Z #8 3.842 Preparing to unpack .../21-libssh2-1t64_1.11.1-1_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.6088794Z #8 3.842 Unpacking libssh2-1t64:amd64 (1.11.1-1) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.6089254Z #8 3.863 Selecting previously unselected package libcurl4t64:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.6089765Z #8 3.863 Preparing to unpack .../22-libcurl4t64_8.14.1-2_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.6090479Z #8 3.864 Unpacking libcurl4t64:amd64 (8.14.1-2) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.6090873Z #8 3.891 Selecting previously unselected package curl.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.6091469Z #8 3.892 Preparing to unpack .../23-curl_8.14.1-2_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.6092119Z #8 3.893 Unpacking curl (8.14.1-2) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.6092847Z #8 3.915 Selecting previously unselected package libatomic1:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.6093691Z #8 3.916 Preparing to unpack .../24-libatomic1_14.2.0-19_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.6094412Z #8 3.917 Unpacking libatomic1:amd64 (14.2.0-19) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.6095176Z #8 3.931 Selecting previously unselected package libjemalloc2:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.7222647Z #8 3.932 Preparing to unpack .../25-libjemalloc2_5.3.0-3_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.7223567Z #8 3.933 Unpacking libjemalloc2:amd64 (5.3.0-3) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.7224345Z #8 3.956 Selecting previously unselected package libldap-common.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.7225316Z #8 3.957 Preparing to unpack .../26-libldap-common_2.6.10+dfsg-1_all.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.7226208Z #8 3.958 Unpacking libldap-common (2.6.10+dfsg-1) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.7227009Z #8 3.973 Selecting previously unselected package liblzf1:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.7227911Z #8 3.973 Preparing to unpack .../27-liblzf1_3.6-4+b3_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.7228697Z #8 3.974 Unpacking liblzf1:amd64 (3.6-4+b3) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.7229550Z #8 3.999 Selecting previously unselected package libsasl2-modules:amd64.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.7230887Z #8 4.000 Preparing to unpack .../28-libsasl2-modules_2.1.28+dfsg1-9_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.7231898Z #8 4.005 Unpacking libsasl2-modules:amd64 (2.1.28+dfsg1-9) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.7232795Z #8 4.022 Selecting previously unselected package publicsuffix.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.7233616Z #8 4.023 Preparing to unpack .../29-publicsuffix_20250328.1952-0.1_all.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.7234315Z #8 4.023 Unpacking publicsuffix (20250328.1952-0.1) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.8222765Z #8 4.044 Selecting previously unselected package redis-tools.
+healthcheck	Run healthcheck	2025-08-23T23:00:26.8223719Z #8 4.046 Preparing to unpack .../30-redis-tools_5%3a8.0.2-3_amd64.deb ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.8224491Z #8 4.047 Unpacking redis-tools (5:8.0.2-3) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.8225461Z #8 4.117 Setting up libkeyutils1:amd64 (1.6.3-6) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.8226049Z #8 4.120 Setting up libbrotli1:amd64 (1.1.0-2+b7) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.8226606Z #8 4.122 Setting up libsasl2-modules:amd64 (2.1.28+dfsg1-9) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.8227143Z #8 4.129 Setting up libnghttp2-14:amd64 (1.64.0-1.1) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.8227605Z #8 4.131 Setting up krb5-locales (1.21.3-5) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.8228058Z #8 4.133 Setting up libcom-err2:amd64 (1.47.2-3+b3) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.8228524Z #8 4.135 Setting up libjemalloc2:amd64 (5.3.0-3) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.8228993Z #8 4.137 Setting up libldap-common (2.6.10+dfsg-1) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.8229473Z #8 4.140 Setting up libkrb5support0:amd64 (1.21.3-5) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.8230820Z #8 4.142 Setting up libsasl2-modules-db:amd64 (2.1.28+dfsg1-9) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.9328050Z #8 4.145 Setting up bash-completion (1:2.16.0-7) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.9328866Z #8 4.149 Setting up liblzf1:amd64 (3.6-4+b3) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.9329479Z #8 4.152 Setting up libp11-kit0:amd64 (0.25.5-3) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.9330240Z #8 4.154 Setting up libunistring5:amd64 (1.3-2) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.9330847Z #8 4.157 Setting up libatomic1:amd64 (14.2.0-19) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.9331442Z #8 4.159 Setting up libk5crypto3:amd64 (1.21.3-5) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.9332085Z #8 4.161 Setting up libsasl2-2:amd64 (2.1.28+dfsg1-9) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.9332732Z #8 4.163 Setting up libnghttp3-9:amd64 (1.8.0-1) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.9333181Z #8 4.165 Setting up libtasn1-6:amd64 (4.20.0-2) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.9333684Z #8 4.168 Setting up libkrb5-3:amd64 (1.21.3-5) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.9334031Z #8 4.170 Setting up libssh2-1t64:amd64 (1.11.1-1) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.9334606Z #8 4.172 Setting up publicsuffix (20250328.1952-0.1) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.9335230Z #8 4.174 Setting up libldap2:amd64 (2.6.10+dfsg-1) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.9335802Z #8 4.176 Setting up libidn2-0:amd64 (2.3.8-2) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:26.9336335Z #8 4.178 Setting up redis-tools (5:8.0.2-3) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:27.0445033Z #8 4.255 Setting up libgssapi-krb5-2:amd64 (1.21.3-5) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:27.0445736Z #8 4.259 Setting up libgnutls30t64:amd64 (3.8.9-3) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:27.0446266Z #8 4.261 Setting up libpsl5t64:amd64 (0.21.2-1.1+b1) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:27.0446875Z #8 4.263 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2+b5) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:27.0447461Z #8 4.265 Setting up libcurl4t64:amd64 (8.14.1-2) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:27.0447829Z #8 4.267 Setting up curl (8.14.1-2) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:27.0448114Z #8 4.270 Processing triggers for libc-bin (2.41-12) ...
+healthcheck	Run healthcheck	2025-08-23T23:00:27.0448413Z #8 4.365 usermod: no changes
+healthcheck	Run healthcheck	2025-08-23T23:00:27.2633347Z #8 DONE 4.4s
+healthcheck	Run healthcheck	2025-08-23T23:00:27.2633687Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:27.2633944Z #9 [curator base 3/5] WORKDIR /app
+healthcheck	Run healthcheck	2025-08-23T23:00:27.2634517Z #9 DONE 0.0s
+healthcheck	Run healthcheck	2025-08-23T23:00:27.2634760Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:27.2635024Z #10 [watcher base 4/5] COPY requirements.txt .
+healthcheck	Run healthcheck	2025-08-23T23:00:27.2635670Z #10 DONE 0.0s
+healthcheck	Run healthcheck	2025-08-23T23:00:27.2635945Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:27.2636390Z #11 [watcher base 5/5] RUN pip install --no-cache-dir -r requirements.txt
+healthcheck	Run healthcheck	2025-08-23T23:00:28.4033727Z #11 1.291 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+healthcheck	Run healthcheck	2025-08-23T23:00:28.5034636Z #11 DONE 1.3s
+healthcheck	Run healthcheck	2025-08-23T23:00:28.5034964Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:28.5035137Z #12 [planner app 1/4] WORKDIR /app
+healthcheck	Run healthcheck	2025-08-23T23:00:28.5035555Z #12 DONE 0.0s
+healthcheck	Run healthcheck	2025-08-23T23:00:28.5035720Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:28.5035938Z #13 [curator app 2/4] COPY --chown=app:app src ./src
+healthcheck	Run healthcheck	2025-08-23T23:00:28.5036253Z #13 DONE 0.0s
+healthcheck	Run healthcheck	2025-08-23T23:00:28.5036364Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:28.5036595Z #14 [archivist app 3/4] COPY --chown=app:app schema ./schema
+healthcheck	Run healthcheck	2025-08-23T23:00:28.5037042Z #14 DONE 0.0s
+healthcheck	Run healthcheck	2025-08-23T23:00:28.5037184Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:28.5037412Z #15 [curator app 4/4] COPY --chown=app:app playground.py cli.py ./
+healthcheck	Run healthcheck	2025-08-23T23:00:28.6762146Z #15 DONE 0.0s
+healthcheck	Run healthcheck	2025-08-23T23:00:28.6762465Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:28.6762653Z #16 [synthesizer] exporting to image
+healthcheck	Run healthcheck	2025-08-23T23:00:28.6763086Z #16 exporting layers
+healthcheck	Run healthcheck	2025-08-23T23:00:29.3971482Z #16 exporting layers 0.9s done
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4587962Z #16 writing image sha256:539aa8594290d36c4e39e89fcc1785aee458f616085ce3d24ff3e1840cc17b62 done
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4588820Z #16 naming to docker.io/vpm-mini/app:dev done
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4589265Z #16 DONE 0.9s
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4589445Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4589594Z #17 [archivist] exporting to image
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4590382Z  watcher  Built
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4590692Z  curator  Built
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4591104Z  planner  Built
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4591430Z  synthesizer  Built
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4591956Z  archivist  Built
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4592220Z #17 exporting layers 0.9s done
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4592725Z #17 writing image sha256:539aa8594290d36c4e39e89fcc1785aee458f616085ce3d24ff3e1840cc17b62 done
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4593202Z #17 naming to docker.io/vpm-mini/app:dev done
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4593447Z #17 DONE 0.9s
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4593550Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4593635Z #18 [curator] exporting to image
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4593863Z #18 exporting layers 0.9s done
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4594366Z #18 writing image sha256:539aa8594290d36c4e39e89fcc1785aee458f616085ce3d24ff3e1840cc17b62 done
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4595109Z #18 naming to docker.io/vpm-mini/app:dev done
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4595502Z #18 DONE 0.9s
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4595666Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4595814Z #19 [watcher] exporting to image
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4596222Z #19 exporting layers 0.9s done
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4596927Z #19 writing image sha256:539aa8594290d36c4e39e89fcc1785aee458f616085ce3d24ff3e1840cc17b62 done
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4597703Z #19 naming to docker.io/vpm-mini/app:dev done
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4598115Z #19 DONE 0.9s
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4598272Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4598419Z #20 [planner] exporting to image
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4598791Z #20 exporting layers 0.9s done
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4599491Z #20 writing image sha256:539aa8594290d36c4e39e89fcc1785aee458f616085ce3d24ff3e1840cc17b62 done
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4600419Z #20 naming to docker.io/vpm-mini/app:dev done
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4600779Z #20 DONE 0.9s
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4600942Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4601140Z #21 [watcher] resolving provenance for metadata file
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4601575Z #21 DONE 0.0s
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4601734Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4601936Z #22 [archivist] resolving provenance for metadata file
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4602377Z #22 DONE 0.0s
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4602542Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4602728Z #23 [curator] resolving provenance for metadata file
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4603154Z #23 DONE 0.0s
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4603315Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4603519Z #24 [synthesizer] resolving provenance for metadata file
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4603983Z #24 DONE 0.0s
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4604146Z 
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4604334Z #25 [planner] resolving provenance for metadata file
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4604591Z #25 DONE 0.0s
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4604798Z  Network vpm-mini_default  Creating
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4948378Z  Network vpm-mini_default  Created
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4955721Z  Container vpm-mini-archivist-1  Creating
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4956560Z  Container vpm-mini-synthesizer-1  Creating
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4957241Z  Container vpm-mini-curator-1  Creating
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4957708Z  Container vpm-mini-redis-1  Creating
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4959940Z  Container vpm-mini-watcher-1  Creating
+healthcheck	Run healthcheck	2025-08-23T23:00:29.4960695Z  Container vpm-mini-planner-1  Creating
+healthcheck	Run healthcheck	2025-08-23T23:00:29.5224109Z  Container vpm-mini-curator-1  Created
+healthcheck	Run healthcheck	2025-08-23T23:00:29.5224823Z  Container vpm-mini-watcher-1  Created
+healthcheck	Run healthcheck	2025-08-23T23:00:29.5225307Z  Container vpm-mini-archivist-1  Created
+healthcheck	Run healthcheck	2025-08-23T23:00:29.5225806Z  Container vpm-mini-redis-1  Created
+healthcheck	Run healthcheck	2025-08-23T23:00:29.5344415Z  Container vpm-mini-synthesizer-1  Created
+healthcheck	Run healthcheck	2025-08-23T23:00:29.5345122Z  Container vpm-mini-planner-1  Created
+healthcheck	Run healthcheck	2025-08-23T23:00:29.5359675Z  Container vpm-mini-archivist-1  Starting
+healthcheck	Run healthcheck	2025-08-23T23:00:29.5360782Z  Container vpm-mini-curator-1  Starting
+healthcheck	Run healthcheck	2025-08-23T23:00:29.5361216Z  Container vpm-mini-redis-1  Starting
+healthcheck	Run healthcheck	2025-08-23T23:00:29.5361660Z  Container vpm-mini-synthesizer-1  Starting
+healthcheck	Run healthcheck	2025-08-23T23:00:29.5362120Z  Container vpm-mini-watcher-1  Starting
+healthcheck	Run healthcheck	2025-08-23T23:00:29.5362596Z  Container vpm-mini-planner-1  Starting
+healthcheck	Run healthcheck	2025-08-23T23:00:29.7938587Z  Container vpm-mini-curator-1  Started
+healthcheck	Run healthcheck	2025-08-23T23:00:29.8536215Z  Container vpm-mini-watcher-1  Started
+healthcheck	Run healthcheck	2025-08-23T23:00:29.8886987Z  Container vpm-mini-redis-1  Started
+healthcheck	Run healthcheck	2025-08-23T23:00:29.9256136Z  Container vpm-mini-planner-1  Started
+healthcheck	Run healthcheck	2025-08-23T23:00:29.9410355Z  Container vpm-mini-synthesizer-1  Started
+healthcheck	Run healthcheck	2025-08-23T23:00:29.9864083Z  Container vpm-mini-archivist-1  Started
+healthcheck	Run healthcheck	2025-08-23T23:00:29.9877679Z  Container vpm-mini-archivist-1  Waiting
+healthcheck	Run healthcheck	2025-08-23T23:00:29.9886515Z  Container vpm-mini-redis-1  Waiting
+healthcheck	Run healthcheck	2025-08-23T23:00:29.9887018Z  Container vpm-mini-watcher-1  Waiting
+healthcheck	Run healthcheck	2025-08-23T23:00:29.9887487Z  Container vpm-mini-curator-1  Waiting
+healthcheck	Run healthcheck	2025-08-23T23:00:29.9887957Z  Container vpm-mini-planner-1  Waiting
+healthcheck	Run healthcheck	2025-08-23T23:00:29.9888431Z  Container vpm-mini-synthesizer-1  Waiting
+healthcheck	Run healthcheck	2025-08-23T23:00:34.9900286Z  Container vpm-mini-redis-1  Healthy
+healthcheck	Run healthcheck	2025-08-23T23:00:39.9896947Z  Container vpm-mini-watcher-1  Healthy
+healthcheck	Run healthcheck	2025-08-23T23:00:39.9897982Z  Container vpm-mini-curator-1  Healthy
+healthcheck	Run healthcheck	2025-08-23T23:00:39.9899056Z  Container vpm-mini-planner-1  Healthy
+healthcheck	Run healthcheck	2025-08-23T23:00:40.4897479Z  Container vpm-mini-synthesizer-1  Healthy
+healthcheck	Run healthcheck	2025-08-23T23:00:40.4898035Z  Container vpm-mini-archivist-1  Healthy
+healthcheck	Run healthcheck	2025-08-23T23:00:40.5559823Z time="2025-08-23T23:00:40Z" level=warning msg="/home/runner/work/vpm-mini/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+healthcheck	Run healthcheck	2025-08-23T23:00:40.5630254Z jq: error (at <stdin>:1): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:40.5630940Z jq: error (at <stdin>:2): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:40.5631536Z jq: error (at <stdin>:3): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:40.5631987Z jq: error (at <stdin>:4): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:40.5632345Z jq: error (at <stdin>:5): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:40.5632676Z jq: error (at <stdin>:6): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:40.5665465Z [healthcheck] waiting healthy (1/10)
+healthcheck	Run healthcheck	2025-08-23T23:00:43.6318533Z time="2025-08-23T23:00:43Z" level=warning msg="/home/runner/work/vpm-mini/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+healthcheck	Run healthcheck	2025-08-23T23:00:43.6389248Z jq: error (at <stdin>:1): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:43.6390298Z jq: error (at <stdin>:2): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:43.6390969Z jq: error (at <stdin>:3): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:43.6391565Z jq: error (at <stdin>:4): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:43.6392160Z jq: error (at <stdin>:5): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:43.6392760Z jq: error (at <stdin>:6): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:43.6430423Z [healthcheck] waiting healthy (2/10)
+healthcheck	Run healthcheck	2025-08-23T23:00:46.7073305Z time="2025-08-23T23:00:46Z" level=warning msg="/home/runner/work/vpm-mini/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+healthcheck	Run healthcheck	2025-08-23T23:00:46.7170625Z jq: error (at <stdin>:1): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:46.7171288Z jq: error (at <stdin>:2): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:46.7171858Z jq: error (at <stdin>:3): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:46.7172446Z jq: error (at <stdin>:4): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:46.7173006Z jq: error (at <stdin>:5): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:46.7173561Z jq: error (at <stdin>:6): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:46.7208392Z [healthcheck] waiting healthy (3/10)
+healthcheck	Run healthcheck	2025-08-23T23:00:49.7856524Z time="2025-08-23T23:00:49Z" level=warning msg="/home/runner/work/vpm-mini/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+healthcheck	Run healthcheck	2025-08-23T23:00:49.7930286Z jq: error (at <stdin>:1): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:49.7930993Z jq: error (at <stdin>:2): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:49.7931585Z jq: error (at <stdin>:3): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:49.7932167Z jq: error (at <stdin>:4): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:49.7932734Z jq: error (at <stdin>:5): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:49.7933768Z jq: error (at <stdin>:6): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:49.7965415Z [healthcheck] waiting healthy (4/10)
+healthcheck	Run healthcheck	2025-08-23T23:00:52.8708790Z time="2025-08-23T23:00:52Z" level=warning msg="/home/runner/work/vpm-mini/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+healthcheck	Run healthcheck	2025-08-23T23:00:52.8780491Z jq: error (at <stdin>:1): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:52.8781149Z jq: error (at <stdin>:2): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:52.8781748Z jq: error (at <stdin>:3): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:52.8782215Z jq: error (at <stdin>:4): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:52.8782560Z jq: error (at <stdin>:5): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:52.8782890Z jq: error (at <stdin>:6): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:52.8813888Z [healthcheck] waiting healthy (5/10)
+healthcheck	Run healthcheck	2025-08-23T23:00:55.9511698Z time="2025-08-23T23:00:55Z" level=warning msg="/home/runner/work/vpm-mini/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+healthcheck	Run healthcheck	2025-08-23T23:00:55.9587894Z jq: error (at <stdin>:1): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:55.9589136Z jq: error (at <stdin>:2): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:55.9589751Z jq: error (at <stdin>:3): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:55.9590527Z jq: error (at <stdin>:4): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:55.9591085Z jq: error (at <stdin>:5): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:55.9591413Z jq: error (at <stdin>:6): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:55.9623874Z [healthcheck] waiting healthy (6/10)
+healthcheck	Run healthcheck	2025-08-23T23:00:59.0263878Z time="2025-08-23T23:00:59Z" level=warning msg="/home/runner/work/vpm-mini/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+healthcheck	Run healthcheck	2025-08-23T23:00:59.0340857Z jq: error (at <stdin>:1): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:59.0341540Z jq: error (at <stdin>:2): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:59.0342135Z jq: error (at <stdin>:3): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:59.0342713Z jq: error (at <stdin>:4): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:59.0343287Z jq: error (at <stdin>:5): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:59.0343849Z jq: error (at <stdin>:6): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:00:59.0375540Z [healthcheck] waiting healthy (7/10)
+healthcheck	Run healthcheck	2025-08-23T23:01:02.1037082Z time="2025-08-23T23:01:02Z" level=warning msg="/home/runner/work/vpm-mini/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+healthcheck	Run healthcheck	2025-08-23T23:01:02.1108020Z jq: error (at <stdin>:1): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:01:02.1108681Z jq: error (at <stdin>:2): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:01:02.1109301Z jq: error (at <stdin>:3): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:01:02.1110571Z jq: error (at <stdin>:4): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:01:02.1111163Z jq: error (at <stdin>:5): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:01:02.1111659Z jq: error (at <stdin>:6): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:01:02.1144230Z [healthcheck] waiting healthy (8/10)
+healthcheck	Run healthcheck	2025-08-23T23:01:05.1832148Z time="2025-08-23T23:01:05Z" level=warning msg="/home/runner/work/vpm-mini/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+healthcheck	Run healthcheck	2025-08-23T23:01:05.1909404Z jq: error (at <stdin>:1): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:01:05.1910269Z jq: error (at <stdin>:2): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:01:05.1911107Z jq: error (at <stdin>:3): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:01:05.1911522Z jq: error (at <stdin>:4): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:01:05.1912081Z jq: error (at <stdin>:5): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:01:05.1912677Z jq: error (at <stdin>:6): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:01:05.1946340Z [healthcheck] waiting healthy (9/10)
+healthcheck	Run healthcheck	2025-08-23T23:01:08.2595604Z time="2025-08-23T23:01:08Z" level=warning msg="/home/runner/work/vpm-mini/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+healthcheck	Run healthcheck	2025-08-23T23:01:08.2706299Z jq: error (at <stdin>:1): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:01:08.2707283Z jq: error (at <stdin>:2): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:01:08.2707683Z jq: error (at <stdin>:3): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:01:08.2708056Z jq: error (at <stdin>:4): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:01:08.2708431Z jq: error (at <stdin>:5): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:01:08.2708781Z jq: error (at <stdin>:6): Cannot index string with string "Health"
+healthcheck	Run healthcheck	2025-08-23T23:01:08.2744137Z [healthcheck] waiting healthy (10/10)
+healthcheck	Run healthcheck	2025-08-23T23:01:11.2759179Z [healthcheck] some services are not healthy
+healthcheck	Run healthcheck	2025-08-23T23:01:11.2774894Z ##[error]Process completed with exit code 1.
+healthcheck	Post Run actions/checkout@v4	﻿2025-08-23T23:01:11.2871658Z Post job cleanup.
+healthcheck	Post Run actions/checkout@v4	2025-08-23T23:01:11.3791446Z [command]/usr/bin/git version
+healthcheck	Post Run actions/checkout@v4	2025-08-23T23:01:11.3832204Z git version 2.51.0
+healthcheck	Post Run actions/checkout@v4	2025-08-23T23:01:11.3875048Z Temporarily overriding HOME='/home/runner/work/_temp/23ec4366-8426-41f1-b2e8-e2132ac9ab2f' before making global git config changes
+healthcheck	Post Run actions/checkout@v4	2025-08-23T23:01:11.3876388Z Adding repository directory to the temporary git global config as a safe directory
+healthcheck	Post Run actions/checkout@v4	2025-08-23T23:01:11.3880835Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/vpm-mini/vpm-mini
+healthcheck	Post Run actions/checkout@v4	2025-08-23T23:01:11.3914880Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+healthcheck	Post Run actions/checkout@v4	2025-08-23T23:01:11.3946996Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+healthcheck	Post Run actions/checkout@v4	2025-08-23T23:01:11.4170912Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+healthcheck	Post Run actions/checkout@v4	2025-08-23T23:01:11.4191194Z http.https://github.com/.extraheader
+healthcheck	Post Run actions/checkout@v4	2025-08-23T23:01:11.4203662Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+healthcheck	Post Run actions/checkout@v4	2025-08-23T23:01:11.4234622Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+healthcheck	Complete job	﻿2025-08-23T23:01:11.4558414Z Cleaning up orphan processes

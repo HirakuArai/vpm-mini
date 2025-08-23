@@ -1,0 +1,10 @@
+completed	failure	feat(p1-s03): add redis service and ping check	CI	feat/p1-s03-redis	pull_request	17181102584	1m22s	2025-08-23T23:00:08Z
+completed	failure	feat(p1-s03): add redis service and ping check	healthcheck	feat/p1-s03-redis	pull_request	17181102580	1m4s	2025-08-23T23:00:08Z
+completed	failure	fix(p1-s03): resolve conflicts and keep redis/trace_id/healthz in place	CI	feat/p1-s03-redis	push	17181102470	1m22s	2025-08-23T23:00:07Z
+completed	success	feat(p1-s07): expose Prometheus metrics (/metrics) with requests/json…	CI	feat/p1-s07-prom-metrics	push	17180919830	18s	2025-08-23T22:35:52Z
+completed	success	feat(p1-s05): add trace_id propagation across all 5 roles (#27)	CI	main	push	17180765300	20s	2025-08-23T22:18:20Z
+completed	success	feat(p1-s05): add trace_id propagation across all 5 roles (#27)	healthcheck	main	push	17180765279	18s	2025-08-23T22:18:20Z
+completed	success	feat(p1-s05): add trace_id propagation across all 5 roles	healthcheck	feat/p1-s05-traceid	pull_request	17180762205	11s	2025-08-23T22:18:06Z
+completed	success	feat(p1-s05): add trace_id propagation across all 5 roles	CI	feat/p1-s05-traceid	pull_request	17180762195	26s	2025-08-23T22:18:06Z
+completed	success	feat(p1-s05): add trace_id propagation across all 5 roles	CI	feat/p1-s05-traceid	push	17180753896	16s	2025-08-23T22:17:11Z
+completed	failure	feat(p1-s04): add /healthz endpoints and HTTP healthcheck (compose & CI)	CI	feat/p1-s04-healthz	push	17180530931	54s	2025-08-23T21:50:34Z

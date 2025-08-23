@@ -37,6 +37,7 @@ def main():
         "--hello", action="store_true", help="Print hello message and exit"
     )
     parser.add_argument("--healthz", action="store_true")
+    parser.add_argument("--metrics", action="store_true")
     parser.add_argument("input", nargs="?", default="hello", help="Input text")
     args = parser.parse_args()
 
@@ -56,13 +57,17 @@ def main():
         serve()
         return
 
+    if args.metrics:
+        from src.utils.metrics import serve_metrics
+
+        serve_metrics()
+        return
+
     if args.hello:
         print(f"[hello] role={args.role} trace_id={os.getenv('TRACE_ID')}")
         try:
-            import os
             import shlex
             import subprocess
-            import sys
 
             host = os.getenv("REDIS_HOST")
             if host:
