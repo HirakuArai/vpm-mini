@@ -1,0 +1,73 @@
+time="2025-08-24T06:15:41+09:00" level=warning msg="/Users/hiraku/projects/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+redis-1  | 1:C 23 Aug 2025 21:12:47.884 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+redis-1  | 1:C 23 Aug 2025 21:12:47.884 * Redis version=7.4.5, bits=64, commit=00000000, modified=0, pid=1, just started
+redis-1  | 1:C 23 Aug 2025 21:12:47.884 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+redis-1  | 1:M 23 Aug 2025 21:12:47.885 * monotonic clock: POSIX clock_gettime
+redis-1  | 1:M 23 Aug 2025 21:12:47.886 * Running mode=standalone, port=6379.
+redis-1  | 1:M 23 Aug 2025 21:12:47.886 * Server initialized
+redis-1  | 1:M 23 Aug 2025 21:12:47.886 * Ready to accept connections tcp
+watcher-1  | [hello] role=watcher
+watcher-1  | [hello] role=watcher
+watcher-1  | [hello] role=watcher
+watcher-1  | [hello] role=watcher
+watcher-1  | [hello] role=watcher
+watcher-1  | [hello] role=watcher
+watcher-1  | [hello] role=watcher
+watcher-1  | [hello] role=watcher
+watcher-1  | [hello] role=watcher
+watcher-1  | [hello] role=watcher
+watcher-1  | [hello] role=watcher
+watcher-1  | [hello] role=watcher
+archivist-1  | [hello] role=archivist
+archivist-1  | [hello] role=archivist
+archivist-1  | [hello] role=archivist
+archivist-1  | [hello] role=archivist
+archivist-1  | [hello] role=archivist
+archivist-1  | [hello] role=archivist
+archivist-1  | [hello] role=archivist
+archivist-1  | [hello] role=archivist
+archivist-1  | [hello] role=archivist
+archivist-1  | [hello] role=archivist
+archivist-1  | [hello] role=archivist
+archivist-1  | [hello] role=archivist
+planner-1    | [hello] role=planner
+planner-1    | [hello] role=planner
+planner-1    | [hello] role=planner
+planner-1    | [hello] role=planner
+planner-1    | [hello] role=planner
+planner-1    | [hello] role=planner
+planner-1    | [hello] role=planner
+planner-1    | [hello] role=planner
+planner-1    | [hello] role=planner
+planner-1    | [hello] role=planner
+planner-1    | [hello] role=planner
+planner-1    | [hello] role=planner
+curator-1    | [hello] role=curator
+curator-1    | [hello] role=curator
+curator-1    | [hello] role=curator
+curator-1    | [hello] role=curator
+curator-1    | [hello] role=curator
+curator-1    | [hello] role=curator
+curator-1    | [hello] role=curator
+curator-1    | [hello] role=curator
+curator-1    | [hello] role=curator
+curator-1    | [hello] role=curator
+curator-1    | [hello] role=curator
+curator-1    | [hello] role=curator
+synthesizer-1  | [hello] role=synthesizer
+synthesizer-1  | [hello] role=synthesizer
+synthesizer-1  | [hello] role=synthesizer
+synthesizer-1  | [hello] role=synthesizer
+synthesizer-1  | [hello] role=synthesizer
+synthesizer-1  | [hello] role=synthesizer
+synthesizer-1  | [hello] role=synthesizer
+synthesizer-1  | [hello] role=synthesizer
+synthesizer-1  | [hello] role=synthesizer
+synthesizer-1  | [hello] role=synthesizer
+synthesizer-1  | [hello] role=synthesizer
+synthesizer-1  | [hello] role=synthesizer
+docker: Error response from daemon: failed to set up container networking: network vmp-mini_default not found
+
+Run 'docker run --help' for more information
+[hello] role=evidence
+[redis] ok

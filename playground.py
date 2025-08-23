@@ -38,6 +38,22 @@ def main():
 
     if args.hello:
         print(f"[hello] role={args.role}")
+        try:
+            import os
+            import shlex
+            import subprocess
+            import sys
+
+            host = os.getenv("REDIS_HOST")
+            if host:
+                subprocess.check_call(
+                    shlex.split(f"redis-cli -h {host} ping"),
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                )
+                print("[redis] ok")
+        except Exception as e:
+            print("[redis] check failed:", e, file=sys.stderr)
         sys.exit(0)
 
     run_once(args.input)

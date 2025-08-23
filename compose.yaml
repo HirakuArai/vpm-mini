@@ -1,5 +1,4 @@
 version: "3.9"
-
 x-app: &app
   build:
     context: .
@@ -8,33 +7,43 @@ x-app: &app
   restart: unless-stopped
   environment:
     - ROLE=
+    - REDIS_HOST=redis
   healthcheck:
     # S4で /healthz に差し替え予定。暫定は常に0でOKな軽量チェック
-    test: ["CMD","python","-c","print(200)"]
+    test: ["CMD", "python", "-c", "print(200)"]
     interval: 10s
     timeout: 3s
     retries: 5
   deploy:
     replicas: 1
-
 services:
   watcher:
-    <<: *app
+    !!merge <<: *app
     environment:
       - ROLE=watcher
   curator:
-    <<: *app
+    !!merge <<: *app
     environment:
       - ROLE=curator
   planner:
-    <<: *app
+    !!merge <<: *app
     environment:
       - ROLE=planner
   synthesizer:
-    <<: *app
+    !!merge <<: *app
     environment:
       - ROLE=synthesizer
   archivist:
-    <<: *app
+    !!merge <<: *app
     environment:
       - ROLE=archivist
+  redis:
+    image: redis:7
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      interval: 5s
+      timeout: 3s
+      retries: 10
