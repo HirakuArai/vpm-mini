@@ -71,4 +71,6 @@ flowchart LR
     class PROM,ALERT Phase1;
     class VEC,PCA Phase2;
     class CGH Phase3;
+    
+    %% δ (delta) metrics: Measures gap between EG-Space events and Digest reflection
 ```

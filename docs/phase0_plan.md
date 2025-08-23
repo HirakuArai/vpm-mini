@@ -54,10 +54,10 @@
 * **内容**: 上記 Step を小 PR に分割。各 PR に DoD を記載。Auto-merge 予約。最後に `Phase 0 Complete` Issue を立ててスクショ添付。
 * **DoD**: すべての PR が自動マージ、Issue close。main が常時 green。
 
-## Step 11（任意） — δ の簡易プレースホルダ
+## ✅ Step 11（実施済み） — δ メトリクス実装
 
-* **内容**: `egspace/metrics.py` に δ の簡易計算（例: 未反映イベント数）を追加。coverage.json に出力。
-* **DoD**: Digest に δ(簡易) が注記される。
+* **内容**: `src/metrics/collector.py` に δ 指標（delta_events, delta_reflect_rate）を実装。coverage.json に出力。ドキュメント／図表を更新。
+* **DoD**: coverage.json に δ 指標が出力され、関連ドキュメントが更新済み。
 
 ---
 

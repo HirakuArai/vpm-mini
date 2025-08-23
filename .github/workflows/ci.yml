@@ -14,6 +14,8 @@ jobs:
           echo '{"status":"ci-boot"}' > reports/quality.json
           echo '{"covered":0}'        > reports/coverage.json
           echo '{"p50_ms":0,"p95_ms":0}' > reports/lag.json
+      - name: Healthcheck
+        run: scripts/healthcheck.sh
       - name: Upload reports as artifact
         uses: actions/upload-artifact@v4
         with:
