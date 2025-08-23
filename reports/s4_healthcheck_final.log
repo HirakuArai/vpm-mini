@@ -1,0 +1,97 @@
+[healthcheck] start
+time="2025-08-24T08:40:18+09:00" level=warning msg="/Users/hiraku/projects/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+time="2025-08-24T08:40:18+09:00" level=warning msg="/Users/hiraku/projects/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+ Network vpm-mini_default  Creating
+ Network vpm-mini_default  Created
+ Container vpm-mini-watcher-1  Creating
+ Container vpm-mini-planner-1  Creating
+ Container vpm-mini-curator-1  Creating
+ Container vpm-mini-archivist-1  Creating
+ Container vpm-mini-synthesizer-1  Creating
+ Container vpm-mini-redis-1  Creating
+ Container vpm-mini-watcher-1  Created
+ Container vpm-mini-archivist-1  Created
+ Container vpm-mini-curator-1  Created
+ Container vpm-mini-synthesizer-1  Created
+ Container vpm-mini-planner-1  Created
+ Container vpm-mini-redis-1  Created
+ Container vpm-mini-planner-1  Starting
+ Container vpm-mini-archivist-1  Starting
+ Container vpm-mini-curator-1  Starting
+ Container vpm-mini-synthesizer-1  Starting
+ Container vpm-mini-watcher-1  Starting
+ Container vpm-mini-redis-1  Starting
+ Container vpm-mini-synthesizer-1  Started
+ Container vpm-mini-redis-1  Started
+ Container vpm-mini-archivist-1  Started
+ Container vpm-mini-curator-1  Started
+ Container vpm-mini-watcher-1  Started
+ Container vpm-mini-planner-1  Started
+ Container vpm-mini-watcher-1  Waiting
+ Container vpm-mini-curator-1  Waiting
+ Container vpm-mini-planner-1  Waiting
+ Container vpm-mini-synthesizer-1  Waiting
+ Container vpm-mini-archivist-1  Waiting
+ Container vpm-mini-redis-1  Waiting
+ Container vpm-mini-redis-1  Healthy
+ Container vpm-mini-archivist-1  Healthy
+ Container vpm-mini-watcher-1  Healthy
+ Container vpm-mini-synthesizer-1  Healthy
+ Container vpm-mini-curator-1  Healthy
+ Container vpm-mini-planner-1  Healthy
+time="2025-08-24T08:40:29+09:00" level=warning msg="/Users/hiraku/projects/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+[healthcheck] waiting for healthy (1/10)
+time="2025-08-24T08:40:32+09:00" level=warning msg="/Users/hiraku/projects/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+[healthcheck] waiting for healthy (2/10)
+time="2025-08-24T08:40:35+09:00" level=warning msg="/Users/hiraku/projects/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+[healthcheck] waiting for healthy (3/10)
+time="2025-08-24T08:40:38+09:00" level=warning msg="/Users/hiraku/projects/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+[healthcheck] waiting for healthy (4/10)
+time="2025-08-24T08:40:41+09:00" level=warning msg="/Users/hiraku/projects/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+[healthcheck] waiting for healthy (5/10)
+time="2025-08-24T08:40:45+09:00" level=warning msg="/Users/hiraku/projects/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+[healthcheck] waiting for healthy (6/10)
+time="2025-08-24T08:40:48+09:00" level=warning msg="/Users/hiraku/projects/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+[healthcheck] waiting for healthy (7/10)
+time="2025-08-24T08:40:51+09:00" level=warning msg="/Users/hiraku/projects/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+[healthcheck] waiting for healthy (8/10)
+time="2025-08-24T08:40:54+09:00" level=warning msg="/Users/hiraku/projects/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+[healthcheck] waiting for healthy (9/10)
+time="2025-08-24T08:40:57+09:00" level=warning msg="/Users/hiraku/projects/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+[healthcheck] FAIL: services not healthy after 10 tries
+time="2025-08-24T08:40:57+09:00" level=warning msg="/Users/hiraku/projects/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+NAME                     IMAGE              COMMAND                   SERVICE       CREATED          STATUS                    PORTS
+vpm-mini-archivist-1     vpm-mini/app:dev   "bash -c 'python pla…"   archivist     39 seconds ago   Up 38 seconds (healthy)   0.0.0.0:9005->9005/tcp, [::]:9005->9005/tcp
+vpm-mini-curator-1       vpm-mini/app:dev   "bash -c 'python pla…"   curator       39 seconds ago   Up 38 seconds (healthy)   0.0.0.0:9002->9002/tcp, [::]:9002->9002/tcp
+vpm-mini-planner-1       vpm-mini/app:dev   "bash -c 'python pla…"   planner       39 seconds ago   Up 38 seconds (healthy)   0.0.0.0:9003->9003/tcp, [::]:9003->9003/tcp
+vpm-mini-redis-1         redis:7            "docker-entrypoint.s…"   redis         39 seconds ago   Up 38 seconds (healthy)   6379/tcp
+vpm-mini-synthesizer-1   vpm-mini/app:dev   "bash -c 'python pla…"   synthesizer   39 seconds ago   Up 38 seconds (healthy)   0.0.0.0:9004->9004/tcp, [::]:9004->9004/tcp
+vpm-mini-watcher-1       vpm-mini/app:dev   "bash -c 'python pla…"   watcher       39 seconds ago   Up 38 seconds (healthy)   0.0.0.0:9001->9001/tcp, [::]:9001->9001/tcp
+time="2025-08-24T08:40:57+09:00" level=warning msg="/Users/hiraku/projects/vpm-mini/compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+archivist-1  | [hello] role=watcher trace_id=tr-1755992418895-joscb9
+archivist-1  | 127.0.0.1 - - [23/Aug/2025 23:40:28] "GET /healthz HTTP/1.1" 200 -
+archivist-1  | 127.0.0.1 - - [23/Aug/2025 23:40:38] "GET /healthz HTTP/1.1" 200 -
+archivist-1  | 127.0.0.1 - - [23/Aug/2025 23:40:48] "GET /healthz HTTP/1.1" 200 -
+watcher-1    | [hello] role=watcher trace_id=tr-1755992419056-ojaqnl
+watcher-1    | 127.0.0.1 - - [23/Aug/2025 23:40:28] "GET /healthz HTTP/1.1" 200 -
+watcher-1    | 127.0.0.1 - - [23/Aug/2025 23:40:38] "GET /healthz HTTP/1.1" 200 -
+watcher-1    | 127.0.0.1 - - [23/Aug/2025 23:40:48] "GET /healthz HTTP/1.1" 200 -
+curator-1    | [hello] role=watcher trace_id=tr-1755992419002-669m7m
+curator-1    | 127.0.0.1 - - [23/Aug/2025 23:40:28] "GET /healthz HTTP/1.1" 200 -
+curator-1    | 127.0.0.1 - - [23/Aug/2025 23:40:38] "GET /healthz HTTP/1.1" 200 -
+curator-1    | 127.0.0.1 - - [23/Aug/2025 23:40:48] "GET /healthz HTTP/1.1" 200 -
+planner-1    | [hello] role=watcher trace_id=tr-1755992419070-x825e0
+planner-1    | 127.0.0.1 - - [23/Aug/2025 23:40:28] "GET /healthz HTTP/1.1" 200 -
+planner-1    | 127.0.0.1 - - [23/Aug/2025 23:40:38] "GET /healthz HTTP/1.1" 200 -
+planner-1    | 127.0.0.1 - - [23/Aug/2025 23:40:49] "GET /healthz HTTP/1.1" 200 -
+redis-1      | 1:C 23 Aug 2025 23:40:18.789 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+redis-1      | 1:C 23 Aug 2025 23:40:18.789 * Redis version=7.4.5, bits=64, commit=00000000, modified=0, pid=1, just started
+redis-1      | 1:C 23 Aug 2025 23:40:18.789 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+redis-1      | 1:M 23 Aug 2025 23:40:18.789 * monotonic clock: POSIX clock_gettime
+redis-1      | 1:M 23 Aug 2025 23:40:18.790 * Running mode=standalone, port=6379.
+redis-1      | 1:M 23 Aug 2025 23:40:18.790 * Server initialized
+redis-1      | 1:M 23 Aug 2025 23:40:18.790 * Ready to accept connections tcp
+synthesizer-1  | [hello] role=watcher trace_id=tr-1755992418877-gj679o
+synthesizer-1  | 127.0.0.1 - - [23/Aug/2025 23:40:28] "GET /healthz HTTP/1.1" 200 -
+synthesizer-1  | 127.0.0.1 - - [23/Aug/2025 23:40:38] "GET /healthz HTTP/1.1" 200 -
+synthesizer-1  | 127.0.0.1 - - [23/Aug/2025 23:40:48] "GET /healthz HTTP/1.1" 200 -

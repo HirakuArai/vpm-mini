@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 NAME                     IMAGE              COMMAND                   SERVICE       CREATED         STATUS                          PORTS
 vpm-mini-archivist-1     vpm-mini/app:dev   "sh -c 'python playg…"   archivist     2 minutes ago   Restarting (0) 25 seconds ago   
 vpm-mini-curator-1       vpm-mini/app:dev   "sh -c 'python playg…"   curator       2 minutes ago   Restarting (0) 25 seconds ago   
@@ -5,3 +6,12 @@ vpm-mini-planner-1       vpm-mini/app:dev   "sh -c 'python playg…"   planner  
 vpm-mini-redis-1         redis:7            "docker-entrypoint.s…"   redis         2 minutes ago   Up 2 minutes (healthy)          6379/tcp
 vpm-mini-synthesizer-1   vpm-mini/app:dev   "sh -c 'python playg…"   synthesizer   2 minutes ago   Restarting (0) 25 seconds ago   
 vpm-mini-watcher-1       vpm-mini/app:dev   "sh -c 'python playg…"   watcher       2 minutes ago   Restarting (0) 25 seconds ago   
+=======
+NAME                     IMAGE              COMMAND                   SERVICE       CREATED         STATUS                   PORTS
+vpm-mini-archivist-1     vpm-mini/app:dev   "bash -c 'python pla…"   archivist     6 minutes ago   Up 6 minutes (healthy)   
+vpm-mini-curator-1       vpm-mini/app:dev   "bash -c 'python pla…"   curator       6 minutes ago   Up 6 minutes (healthy)   
+vpm-mini-planner-1       vpm-mini/app:dev   "bash -c 'python pla…"   planner       6 minutes ago   Up 6 minutes (healthy)   
+vpm-mini-redis-1         redis:7            "docker-entrypoint.s…"   redis         6 minutes ago   Up 6 minutes (healthy)   6379/tcp
+vpm-mini-synthesizer-1   vpm-mini/app:dev   "bash -c 'python pla…"   synthesizer   6 minutes ago   Up 6 minutes (healthy)   
+vpm-mini-watcher-1       vpm-mini/app:dev   "bash -c 'python pla…"   watcher       6 minutes ago   Up 6 minutes (healthy)   
+>>>>>>> origin/main

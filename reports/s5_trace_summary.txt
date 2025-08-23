@@ -1,0 +1,49 @@
+=== Trace Collection Summary ===
+Total unique traces: 5
+
+Trace ID: tr-1755987189208-7fk574
+  Roles: watcher
+  Hello messages: 1
+  Redis checks: 0
+  Total logs: 1
+
+Trace ID: tr-1755987189185-5ydudn
+  Roles: watcher
+  Hello messages: 1
+  Redis checks: 0
+  Total logs: 1
+
+Trace ID: tr-1755987189102-n0kfjb
+  Roles: watcher
+  Hello messages: 1
+  Redis checks: 0
+  Total logs: 1
+
+Trace ID: tr-1755987189125-grwk98
+  Roles: watcher
+  Hello messages: 1
+  Redis checks: 0
+  Total logs: 1
+
+Trace ID: tr-1755987189204-p9fu1m
+  Roles: watcher
+  Hello messages: 1
+  Redis checks: 0
+  Total logs: 1
+
+=== Detailed Logs ===
+
+Trace ID: tr-1755987189208-7fk574
+  [hello] role=watcher trace_id=tr-1755987189208-7fk574
+
+Trace ID: tr-1755987189185-5ydudn
+  [hello] role=watcher trace_id=tr-1755987189185-5ydudn
+
+Trace ID: tr-1755987189102-n0kfjb
+  [hello] role=watcher trace_id=tr-1755987189102-n0kfjb
+
+Trace ID: tr-1755987189125-grwk98
+  [hello] role=watcher trace_id=tr-1755987189125-grwk98
+
+Trace ID: tr-1755987189204-p9fu1m
+  [hello] role=watcher trace_id=tr-1755987189204-p9fu1m

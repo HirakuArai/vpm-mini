@@ -31,11 +31,25 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--role", default="watcher", help="Role name")
     parser.add_argument(
+        "--trace-id", dest="trace_id", help="Trace ID for cross-role tracking"
+    )
+    parser.add_argument(
         "--hello", action="store_true", help="Print hello message and exit"
     )
     parser.add_argument("--healthz", action="store_true")
+    parser.add_argument("--metrics", action="store_true")
     parser.add_argument("input", nargs="?", default="hello", help="Input text")
     args = parser.parse_args()
+
+    # Handle trace_id generation and propagation
+    import os
+
+    trace_id = args.trace_id or os.getenv("TRACE_ID")
+    if not trace_id:
+        from src.utils.trace import new_trace_id
+
+        trace_id = new_trace_id()
+    os.environ["TRACE_ID"] = trace_id
 
     if args.healthz:
         from src.utils.healthz import serve
@@ -43,13 +57,17 @@ def main():
         serve()
         return
 
+    if args.metrics:
+        from src.utils.metrics import serve_metrics
+
+        serve_metrics()
+        return
+
     if args.hello:
-        print(f"[hello] role={args.role}")
+        print(f"[hello] role={args.role} trace_id={os.getenv('TRACE_ID')}")
         try:
-            import os
             import shlex
             import subprocess
-            import sys
 
             host = os.getenv("REDIS_HOST")
             if host:
@@ -58,7 +76,7 @@ def main():
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL,
                 )
-                print("[redis] ok")
+                print(f"[redis] ok trace_id={os.getenv('TRACE_ID')}")
         except Exception as e:
             print("[redis] check failed:", e, file=sys.stderr)
         sys.exit(0)
