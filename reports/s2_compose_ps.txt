@@ -1,0 +1,6 @@
+NAME                     IMAGE              COMMAND                   SERVICE       CREATED          STATUS                         PORTS
+vpm-mini-archivist-1     vpm-mini/app:dev   "sh -c 'python playg…"   archivist     12 seconds ago   Restarting (0) 3 seconds ago   
+vpm-mini-curator-1       vpm-mini/app:dev   "sh -c 'python playg…"   curator       12 seconds ago   Restarting (0) 3 seconds ago   
+vpm-mini-planner-1       vpm-mini/app:dev   "sh -c 'python playg…"   planner       12 seconds ago   Restarting (0) 3 seconds ago   
+vpm-mini-synthesizer-1   vpm-mini/app:dev   "sh -c 'python playg…"   synthesizer   12 seconds ago   Restarting (0) 3 seconds ago   
+vpm-mini-watcher-1       vpm-mini/app:dev   "sh -c 'python playg…"   watcher       12 seconds ago   Restarting (0) 3 seconds ago   

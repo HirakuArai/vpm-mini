@@ -11,5 +11,17 @@ fi
 
 # ここから先は S2+ 用（存在するときのみ実行）
 echo "[healthcheck] compose.yaml found -> running docker sanity"
-docker compose config -q
+
+# Check if docker is available
+if ! command -v docker >/dev/null 2>&1; then
+  echo "[healthcheck] ERROR: docker command not found"
+  exit 1
+fi
+
+# Check compose config
+if ! docker compose config -q; then
+  echo "[healthcheck] ERROR: docker compose config validation failed"
+  exit 1
+fi
+
 echo "[healthcheck] OK"

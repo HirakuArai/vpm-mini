@@ -1,0 +1,2 @@
+# Core dependencies (currently using only Python standard library)
+# Add dependencies here as needed
