@@ -8,35 +8,76 @@ x-app: &app
   environment:
     - ROLE=
     - REDIS_HOST=redis
+    - PORT=
+    - TRACE_ID=
   healthcheck:
     # S4で /healthz に差し替え予定。暫定は常に0でOKな軽量チェック
-    test: ["CMD", "python", "-c", "print(200)"]
+    test: [CMD, curl, -fsS, 'http://localhost:8005/healthz']
     interval: 10s
     timeout: 3s
     retries: 5
   deploy:
     replicas: 1
+  command:
+    - bash
+    - -c
+    - python playground.py --role ${ROLE:-watcher} --hello & python playground.py --healthz
 services:
   watcher:
     !!merge <<: *app
     environment:
       - ROLE=watcher
+      - PORT=8001
+      - TRACE_ID=
+    healthcheck:
+      test: ["CMD","curl","-fsS","http://localhost:8001/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
   curator:
     !!merge <<: *app
     environment:
       - ROLE=curator
+      - PORT=8002
+      - TRACE_ID=
+    healthcheck:
+      test: ["CMD","curl","-fsS","http://localhost:8002/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
   planner:
     !!merge <<: *app
     environment:
       - ROLE=planner
+      - PORT=8003
+      - TRACE_ID=
+    healthcheck:
+      test: ["CMD","curl","-fsS","http://localhost:8003/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
   synthesizer:
     !!merge <<: *app
     environment:
       - ROLE=synthesizer
+      - PORT=8004
+      - TRACE_ID=
+    healthcheck:
+      test: ["CMD","curl","-fsS","http://localhost:8004/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
   archivist:
     !!merge <<: *app
     environment:
       - ROLE=archivist
+      - PORT=8005
+      - TRACE_ID=
+    healthcheck:
+      test: ["CMD","curl","-fsS","http://localhost:8005/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
   redis:
     image: redis:7
     healthcheck:

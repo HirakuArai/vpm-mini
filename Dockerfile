@@ -4,7 +4,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 # 非rootユーザー & redis-cli install
-RUN apt-get update && apt-get install -y redis-tools && rm -rf /var/lib/apt/lists/* && \
+RUN apt-get update && apt-get install -y redis-tools curl && rm -rf /var/lib/apt/lists/* && \
     adduser --disabled-password --gecos "" app && mkdir -p /app && chown -R app:app /app
 WORKDIR /app
 COPY requirements.txt .
