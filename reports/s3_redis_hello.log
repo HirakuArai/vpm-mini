@@ -1,0 +1,27 @@
+planner-1    | [hello] role=watcher trace_id=tr-1755989462601-hpczzg
+planner-1    | 127.0.0.1 - - [23/Aug/2025 22:51:12] "GET /healthz HTTP/1.1" 200 -
+planner-1    | 127.0.0.1 - - [23/Aug/2025 22:51:22] "GET /healthz HTTP/1.1" 200 -
+planner-1    | 127.0.0.1 - - [23/Aug/2025 22:51:32] "GET /healthz HTTP/1.1" 200 -
+redis-1      | 1:C 23 Aug 2025 22:51:02.514 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+redis-1      | 1:C 23 Aug 2025 22:51:02.514 * Redis version=7.4.5, bits=64, commit=00000000, modified=0, pid=1, just started
+watcher-1    | [hello] role=watcher trace_id=tr-1755989462512-us491l
+watcher-1    | 127.0.0.1 - - [23/Aug/2025 22:51:12] "GET /healthz HTTP/1.1" 200 -
+watcher-1    | 127.0.0.1 - - [23/Aug/2025 22:51:22] "GET /healthz HTTP/1.1" 200 -
+watcher-1    | 127.0.0.1 - - [23/Aug/2025 22:51:32] "GET /healthz HTTP/1.1" 200 -
+archivist-1  | [hello] role=watcher trace_id=tr-1755989462613-bratwu
+redis-1      | 1:C 23 Aug 2025 22:51:02.514 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+redis-1      | 1:M 23 Aug 2025 22:51:02.515 * monotonic clock: POSIX clock_gettime
+redis-1      | 1:M 23 Aug 2025 22:51:02.518 * Running mode=standalone, port=6379.
+redis-1      | 1:M 23 Aug 2025 22:51:02.519 * Server initialized
+redis-1      | 1:M 23 Aug 2025 22:51:02.521 * Ready to accept connections tcp
+archivist-1  | 127.0.0.1 - - [23/Aug/2025 22:51:12] "GET /healthz HTTP/1.1" 200 -
+archivist-1  | 127.0.0.1 - - [23/Aug/2025 22:51:22] "GET /healthz HTTP/1.1" 200 -
+archivist-1  | 127.0.0.1 - - [23/Aug/2025 22:51:32] "GET /healthz HTTP/1.1" 200 -
+synthesizer-1  | [hello] role=watcher trace_id=tr-1755989462517-3fstgf
+synthesizer-1  | 127.0.0.1 - - [23/Aug/2025 22:51:12] "GET /healthz HTTP/1.1" 200 -
+synthesizer-1  | 127.0.0.1 - - [23/Aug/2025 22:51:22] "GET /healthz HTTP/1.1" 200 -
+synthesizer-1  | 127.0.0.1 - - [23/Aug/2025 22:51:32] "GET /healthz HTTP/1.1" 200 -
+curator-1      | [hello] role=watcher trace_id=tr-1755989462576-3ti2q7
+curator-1      | 127.0.0.1 - - [23/Aug/2025 22:51:12] "GET /healthz HTTP/1.1" 200 -
+curator-1      | 127.0.0.1 - - [23/Aug/2025 22:51:22] "GET /healthz HTTP/1.1" 200 -
+curator-1      | 127.0.0.1 - - [23/Aug/2025 22:51:32] "GET /healthz HTTP/1.1" 200 -
