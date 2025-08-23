@@ -1,27 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
 echo "[healthcheck] start"
-
-# S1: compose 前なので存在しなくてOK。なければ成功で抜ける。
 if [[ ! -f "compose.yaml" ]]; then
-  echo "[healthcheck] compose.yaml not found; S1 stage -> skip docker checks and exit 0"
+  echo "[healthcheck] compose.yaml not found; skip for S1"
   exit 0
 fi
-
-# ここから先は S2+ 用（存在するときのみ実行）
-echo "[healthcheck] compose.yaml found -> running docker sanity"
-
-# Check if docker is available
-if ! command -v docker >/dev/null 2>&1; then
-  echo "[healthcheck] ERROR: docker command not found"
+docker compose up -d --wait
+sleep 3
+docker compose ps
+# 全ての行に 'healthy' を含むか（ヘッダ除外）
+if ! docker compose ps --format json | jq -e 'all(.[]?; .Health == "healthy")' >/dev/null 2>&1; then
+  echo "[healthcheck] some services are not healthy" >&2
   exit 1
 fi
-
-# Check compose config
-if ! docker compose config -q; then
-  echo "[healthcheck] ERROR: docker compose config validation failed"
-  exit 1
-fi
-
 echo "[healthcheck] OK"

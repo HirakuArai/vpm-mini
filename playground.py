@@ -33,8 +33,15 @@ def main():
     parser.add_argument(
         "--hello", action="store_true", help="Print hello message and exit"
     )
+    parser.add_argument("--healthz", action="store_true")
     parser.add_argument("input", nargs="?", default="hello", help="Input text")
     args = parser.parse_args()
+
+    if args.healthz:
+        from src.utils.healthz import serve
+
+        serve()
+        return
 
     if args.hello:
         print(f"[hello] role={args.role}")
