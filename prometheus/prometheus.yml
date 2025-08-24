@@ -1,11 +1,7 @@
 global:
   scrape_interval: 5s
+  evaluation_interval: 5s
 scrape_configs:
   - job_name: 'roles'
     static_configs:
-      - targets:
-          - 'watcher:9001'
-          - 'curator:9002'
-          - 'planner:9003'
-          - 'synthesizer:9004'
-          - 'archivist:9005'
+      - targets: ['watcher:9001','curator:9002','planner:9003','synthesizer:9004','archivist:9005']

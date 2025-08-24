@@ -6,11 +6,10 @@ x-app: &app
   image: vpm-mini/app:dev
   restart: unless-stopped
   environment:
-    - ROLE=
     - REDIS_HOST=redis
     - PORT=
-    - TRACE_ID=
     - METRICS_PORT=
+    - TRACE_ID=
   healthcheck:
     test:
       - CMD
@@ -26,14 +25,18 @@ x-app: &app
     - bash
     - -lc
     - python playground.py --role ${ROLE:-watcher} --hello & python playground.py --healthz & python playground.py --metrics
+
 services:
   watcher:
     !!merge <<: *app
     environment:
       - ROLE=watcher
       - PORT=8001
-      - TRACE_ID=
       - METRICS_PORT=9001
+      - TRACE_ID=
+    ports:
+      - "8001:8001"
+      - "9001:9001"
     healthcheck:
       test:
         - CMD
@@ -43,15 +46,17 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
-    ports:
-      - 9001:9001
+  
   curator:
     !!merge <<: *app
     environment:
       - ROLE=curator
       - PORT=8002
-      - TRACE_ID=
       - METRICS_PORT=9002
+      - TRACE_ID=
+    ports:
+      - "8002:8002"
+      - "9002:9002"
     healthcheck:
       test:
         - CMD
@@ -61,15 +66,17 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
-    ports:
-      - 9002:9002
+  
   planner:
     !!merge <<: *app
     environment:
       - ROLE=planner
       - PORT=8003
-      - TRACE_ID=
       - METRICS_PORT=9003
+      - TRACE_ID=
+    ports:
+      - "8003:8003"
+      - "9003:9003"
     healthcheck:
       test:
         - CMD
@@ -79,15 +86,17 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
-    ports:
-      - 9003:9003
+  
   synthesizer:
     !!merge <<: *app
     environment:
       - ROLE=synthesizer
       - PORT=8004
-      - TRACE_ID=
       - METRICS_PORT=9004
+      - TRACE_ID=
+    ports:
+      - "8004:8004"
+      - "9004:9004"
     healthcheck:
       test:
         - CMD
@@ -97,15 +106,17 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
-    ports:
-      - 9004:9004
+  
   archivist:
     !!merge <<: *app
     environment:
       - ROLE=archivist
       - PORT=8005
-      - TRACE_ID=
       - METRICS_PORT=9005
+      - TRACE_ID=
+    ports:
+      - "8005:8005"
+      - "9005:9005"
     healthcheck:
       test:
         - CMD
@@ -115,8 +126,7 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
-    ports:
-      - 9005:9005
+  
   redis:
     image: redis:7
     healthcheck:
@@ -127,33 +137,30 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+  
   prometheus:
     image: prom/prometheus:v2.52.0
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     ports:
       - "9090:9090"
-    depends_on:
-      - watcher
-      - curator
-      - planner
-      - synthesizer
-      - archivist
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:9090/-/ready"]
+      test:
+        - CMD
+        - wget
+        - -qO-
+        - http://localhost:9090/-/ready
       interval: 5s
       timeout: 3s
       retries: 10
-  grafana:
-    image: grafana/grafana:11.1.0
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning:ro
     depends_on:
-      - prometheus
+      watcher:
+        condition: service_healthy
+      curator:
+        condition: service_healthy
+      planner:
+        condition: service_healthy
+      synthesizer:
+        condition: service_healthy
+      archivist:
+        condition: service_healthy
