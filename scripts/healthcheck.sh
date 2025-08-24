@@ -32,9 +32,22 @@ until docker compose ps --format json | jq -s -e "all(.Health == \"healthy\")" >
   sleep 3
 done
 
-# Check Prometheus readiness if service exists
+# S8: Prometheus targets verification (3 retries)
 if docker compose ps --format json | jq -s -e 'any(.Service == "prometheus")' >/dev/null 2>&1; then
-  curl -fsS http://localhost:9090/-/ready >/dev/null || { echo "[healthcheck] prometheus not ready"; exit 1; }
+  PROM="http://localhost:9090/api/v1/targets"
+  for i in 1 2 3; do
+    echo "[prometheus] checking targets (${i}/3)"
+    if curl -fsS "$PROM" 2>/dev/null | grep -q '"health":"up"'; then
+      echo "[prometheus] targets up"
+      break
+    fi
+    if [[ $i -eq 3 ]]; then
+      echo "[healthcheck] FAIL: prometheus targets not healthy after 3 tries" >&2
+      curl -fsS "$PROM" || echo "[prometheus] targets endpoint failed" >&2
+      exit 1
+    fi
+    sleep 3
+  done
 fi
 
 echo "[healthcheck] OK"
