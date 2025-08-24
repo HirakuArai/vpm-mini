@@ -1,5 +1,8 @@
 import sys
 import argparse
+import time
+import os
+from src.utils.metrics import observe
 
 
 def run_once(input_text: str):
@@ -42,8 +45,6 @@ def main():
     args = parser.parse_args()
 
     # Handle trace_id generation and propagation
-    import os
-
     trace_id = args.trace_id or os.getenv("TRACE_ID")
     if not trace_id:
         from src.utils.trace import new_trace_id
@@ -51,20 +52,28 @@ def main():
         trace_id = new_trace_id()
     os.environ["TRACE_ID"] = trace_id
 
+    if args.metrics:
+        from wsgiref.simple_server import make_server
+        from src.utils.metrics import render_metrics
+
+        with make_server(
+            "", int(os.getenv("METRICS_PORT", "9000")), render_metrics
+        ) as httpd:
+            httpd.serve_forever()
+        return
+
     if args.healthz:
         from src.utils.healthz import serve
 
         serve()
         return
 
-    if args.metrics:
-        from src.utils.metrics import serve_metrics
-
-        serve_metrics()
-        return
-
     if args.hello:
+        _t = time.time()
+        role = args.role
+        ok = True
         print(f"[hello] role={args.role} trace_id={os.getenv('TRACE_ID')}")
+        observe(role, ok, _t)
         try:
             import shlex
             import subprocess

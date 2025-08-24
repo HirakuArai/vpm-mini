@@ -1,106 +1,150 @@
-version: "3.9"
-x-app: &app
-  build:
+version: '3.9'
+x-app:
+  build: &id001
     context: .
     dockerfile: Dockerfile
   image: vpm-mini/app:dev
   restart: unless-stopped
   environment:
-    - ROLE=
-    - REDIS_HOST=redis
-    - PORT=
-    - TRACE_ID=
-    - METRICS_PORT=
+  - ROLE=
+  - REDIS_HOST=redis
+  - PORT=
+  - TRACE_ID=
+  - METRICS_PORT=
   healthcheck:
-    # S4で /healthz に差し替え予定。暫定は常に0でOKな軽量チェック
-    test: [CMD, curl, -fsS, 'http://localhost:8005/healthz']
+    test:
+    - CMD
+    - bash
+    - -lc
+    - curl -fsS http://localhost:${PORT:-8000}/healthz
     interval: 10s
     timeout: 3s
     retries: 5
-  deploy:
+  deploy: &id002
     replicas: 1
-  command:
-    - bash
-    - -c
-    - python playground.py --role ${ROLE:-watcher} --hello & python playground.py --healthz
+  command: &id003
+  - bash
+  - -lc
+  - python playground.py --role ${ROLE:-watcher} --hello & python playground.py --healthz
+    & python playground.py --metrics
 services:
   watcher:
-    !!merge <<: *app
+    build: *id001
+    image: vpm-mini/app:dev
+    restart: unless-stopped
     environment:
-      - ROLE=watcher
-      - PORT=8001
-      - TRACE_ID=
-      - METRICS_PORT=9001
+    - ROLE=watcher
+    - PORT=8001
+    - TRACE_ID=
+    - METRICS_PORT=9001
     healthcheck:
-      test: ["CMD","curl","-fsS","http://localhost:8001/healthz"]
+      test:
+      - CMD
+      - curl
+      - -fsS
+      - http://localhost:8001/healthz
       interval: 10s
       timeout: 3s
       retries: 5
+    deploy: *id002
+    command: *id003
     ports:
-      - "9001:9001"
+    - 9001:9001
   curator:
-    !!merge <<: *app
+    build: *id001
+    image: vpm-mini/app:dev
+    restart: unless-stopped
     environment:
-      - ROLE=curator
-      - PORT=8002
-      - TRACE_ID=
-      - METRICS_PORT=9002
+    - ROLE=curator
+    - PORT=8002
+    - TRACE_ID=
+    - METRICS_PORT=9002
     healthcheck:
-      test: ["CMD","curl","-fsS","http://localhost:8002/healthz"]
+      test:
+      - CMD
+      - curl
+      - -fsS
+      - http://localhost:8002/healthz
       interval: 10s
       timeout: 3s
       retries: 5
+    deploy: *id002
+    command: *id003
     ports:
-      - "9002:9002"
+    - 9002:9002
   planner:
-    !!merge <<: *app
+    build: *id001
+    image: vpm-mini/app:dev
+    restart: unless-stopped
     environment:
-      - ROLE=planner
-      - PORT=8003
-      - TRACE_ID=
-      - METRICS_PORT=9003
+    - ROLE=planner
+    - PORT=8003
+    - TRACE_ID=
+    - METRICS_PORT=9003
     healthcheck:
-      test: ["CMD","curl","-fsS","http://localhost:8003/healthz"]
+      test:
+      - CMD
+      - curl
+      - -fsS
+      - http://localhost:8003/healthz
       interval: 10s
       timeout: 3s
       retries: 5
+    deploy: *id002
+    command: *id003
     ports:
-      - "9003:9003"
+    - 9003:9003
   synthesizer:
-    !!merge <<: *app
+    build: *id001
+    image: vpm-mini/app:dev
+    restart: unless-stopped
     environment:
-      - ROLE=synthesizer
-      - PORT=8004
-      - TRACE_ID=
-      - METRICS_PORT=9004
+    - ROLE=synthesizer
+    - PORT=8004
+    - TRACE_ID=
+    - METRICS_PORT=9004
     healthcheck:
-      test: ["CMD","curl","-fsS","http://localhost:8004/healthz"]
+      test:
+      - CMD
+      - curl
+      - -fsS
+      - http://localhost:8004/healthz
       interval: 10s
       timeout: 3s
       retries: 5
+    deploy: *id002
+    command: *id003
     ports:
-      - "9004:9004"
+    - 9004:9004
   archivist:
-    !!merge <<: *app
+    build: *id001
+    image: vpm-mini/app:dev
+    restart: unless-stopped
     environment:
-      - ROLE=archivist
-      - PORT=8005
-      - TRACE_ID=
-      - METRICS_PORT=9005
+    - ROLE=archivist
+    - PORT=8005
+    - TRACE_ID=
+    - METRICS_PORT=9005
     healthcheck:
-      test: ["CMD","curl","-fsS","http://localhost:8005/healthz"]
+      test:
+      - CMD
+      - curl
+      - -fsS
+      - http://localhost:8005/healthz
       interval: 10s
       timeout: 3s
       retries: 5
+    deploy: *id002
+    command: *id003
     ports:
-      - "9005:9005"
+    - 9005:9005
   redis:
     image: redis:7
     healthcheck:
       test:
-        - CMD
-        - redis-cli
-        - ping
+      - CMD
+      - redis-cli
+      - ping
       interval: 5s
       timeout: 3s
       retries: 10
