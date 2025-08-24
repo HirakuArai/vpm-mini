@@ -32,5 +32,10 @@ until docker compose ps --format json | jq -s -e "all(.Health == \"healthy\")" >
   sleep 3
 done
 
+# Check Prometheus readiness if service exists
+if docker compose ps --format json | jq -s -e 'any(.Service == "prometheus")' >/dev/null 2>&1; then
+  curl -fsS http://localhost:9090/-/ready >/dev/null || { echo "[healthcheck] prometheus not ready"; exit 1; }
+fi
+
 echo "[healthcheck] OK"
 docker compose down -v || true

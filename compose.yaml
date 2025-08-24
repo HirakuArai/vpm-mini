@@ -22,7 +22,7 @@ x-app: &app
   command:
     - bash
     - -c
-    - python playground.py --role ${ROLE:-watcher} --hello & python playground.py --healthz
+    - python playground.py --role ${ROLE:-watcher} --hello & python playground.py --healthz & python playground.py --metrics
 services:
   watcher:
     !!merge <<: *app
@@ -104,3 +104,33 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - watcher
+      - curator
+      - planner
+      - synthesizer
+      - archivist
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9090/-/ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  grafana:
+    image: grafana/grafana:11.1.0
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus

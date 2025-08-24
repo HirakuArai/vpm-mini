@@ -1,0 +1,25 @@
+{
+  "scrapeUrl": "http://curator:9002/metrics",
+  "health": "up",
+  "lastError": ""
+}
+{
+  "scrapeUrl": "http://planner:9003/metrics",
+  "health": "up",
+  "lastError": ""
+}
+{
+  "scrapeUrl": "http://synthesizer:9004/metrics",
+  "health": "up",
+  "lastError": ""
+}
+{
+  "scrapeUrl": "http://archivist:9005/metrics",
+  "health": "up",
+  "lastError": ""
+}
+{
+  "scrapeUrl": "http://watcher:9001/metrics",
+  "health": "up",
+  "lastError": ""
+}
