@@ -1,0 +1,55 @@
+{
+  "metric": {
+    "__name__": "up",
+    "instance": "synthesizer:9004",
+    "job": "vpm-mini"
+  },
+  "value": [
+    1756000948.904,
+    "1"
+  ]
+}
+{
+  "metric": {
+    "__name__": "up",
+    "instance": "watcher:9001",
+    "job": "vpm-mini"
+  },
+  "value": [
+    1756000948.904,
+    "1"
+  ]
+}
+{
+  "metric": {
+    "__name__": "up",
+    "instance": "archivist:9005",
+    "job": "vpm-mini"
+  },
+  "value": [
+    1756000948.904,
+    "1"
+  ]
+}
+{
+  "metric": {
+    "__name__": "up",
+    "instance": "curator:9002",
+    "job": "vpm-mini"
+  },
+  "value": [
+    1756000948.904,
+    "1"
+  ]
+}
+{
+  "metric": {
+    "__name__": "up",
+    "instance": "planner:9003",
+    "job": "vpm-mini"
+  },
+  "value": [
+    1756000948.904,
+    "1"
+  ]
+}

@@ -1,0 +1,6 @@
+# HELP requests_total Total requests
+# TYPE requests_total counter
+# HELP json_invalid_total Invalid JSON
+# TYPE json_invalid_total counter
+# HELP request_latency_seconds Latency seconds
+# TYPE request_latency_seconds histogram

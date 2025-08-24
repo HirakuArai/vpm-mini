@@ -1,12 +1,29 @@
 import http.server
 import os
 import socketserver
+import time
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 
 # Metrics
 REQS = Counter("requests_total", "Total requests", ["role"])
 JSON_ERR = Counter("json_invalid_total", "Invalid JSON", ["role"])
 LAT = Histogram("request_latency_seconds", "Latency seconds", ["role"])
+
+
+def observe(role, ok=True, start=None):
+    """Observe metrics for a role execution."""
+    REQS.labels(role).inc()
+    if not ok:
+        JSON_ERR.labels(role).inc()
+    if start is not None:
+        LAT.labels(role).observe(time.time() - start)
+
+
+def render_metrics(environ, start_response):
+    """WSGI application for metrics endpoint."""
+    data = generate_latest()
+    start_response("200 OK", [("Content-Type", CONTENT_TYPE_LATEST)])
+    return [data]
 
 
 class MetricsHandler(http.server.SimpleHTTPRequestHandler):

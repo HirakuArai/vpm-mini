@@ -1,9 +1,6 @@
-global:
-  scrape_interval: 5s
-  evaluation_interval: 5s
-
+global: { scrape_interval: 5s, evaluation_interval: 5s }
 scrape_configs:
-  - job_name: 'roles'
+  - job_name: vpm-mini
     static_configs:
       - targets:
           - watcher:9001

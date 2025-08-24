@@ -1,0 +1,25 @@
+{
+  "job": "vpm-mini",
+  "instance": "synthesizer:9004",
+  "health": "up"
+}
+{
+  "job": "vpm-mini",
+  "instance": "archivist:9005",
+  "health": "up"
+}
+{
+  "job": "vpm-mini",
+  "instance": "watcher:9001",
+  "health": "up"
+}
+{
+  "job": "vpm-mini",
+  "instance": "curator:9002",
+  "health": "up"
+}
+{
+  "job": "vpm-mini",
+  "instance": "planner:9003",
+  "health": "up"
+}

@@ -1,4 +1,4 @@
-version: "3.9"
+version: '3.9'
 x-app: &app
   build:
     context: .
@@ -12,8 +12,11 @@ x-app: &app
     - TRACE_ID=
     - METRICS_PORT=
   healthcheck:
-    # S4で /healthz に差し替え予定。暫定は常に0でOKな軽量チェック
-    test: [CMD, curl, -fsS, 'http://localhost:8005/healthz']
+    test:
+      - CMD
+      - bash
+      - -lc
+      - curl -fsS http://localhost:${PORT:-8000}/healthz
     interval: 10s
     timeout: 3s
     retries: 5
@@ -21,7 +24,7 @@ x-app: &app
     replicas: 1
   command:
     - bash
-    - -c
+    - -lc
     - python playground.py --role ${ROLE:-watcher} --hello & python playground.py --healthz & python playground.py --metrics
 services:
   watcher:
@@ -32,12 +35,16 @@ services:
       - TRACE_ID=
       - METRICS_PORT=9001
     healthcheck:
-      test: ["CMD","curl","-fsS","http://localhost:8001/healthz"]
+      test:
+        - CMD
+        - curl
+        - -fsS
+        - http://localhost:8001/healthz
       interval: 10s
       timeout: 3s
       retries: 5
     ports:
-      - "9001:9001"
+      - 9001:9001
   curator:
     !!merge <<: *app
     environment:
@@ -46,12 +53,16 @@ services:
       - TRACE_ID=
       - METRICS_PORT=9002
     healthcheck:
-      test: ["CMD","curl","-fsS","http://localhost:8002/healthz"]
+      test:
+        - CMD
+        - curl
+        - -fsS
+        - http://localhost:8002/healthz
       interval: 10s
       timeout: 3s
       retries: 5
     ports:
-      - "9002:9002"
+      - 9002:9002
   planner:
     !!merge <<: *app
     environment:
@@ -60,12 +71,16 @@ services:
       - TRACE_ID=
       - METRICS_PORT=9003
     healthcheck:
-      test: ["CMD","curl","-fsS","http://localhost:8003/healthz"]
+      test:
+        - CMD
+        - curl
+        - -fsS
+        - http://localhost:8003/healthz
       interval: 10s
       timeout: 3s
       retries: 5
     ports:
-      - "9003:9003"
+      - 9003:9003
   synthesizer:
     !!merge <<: *app
     environment:
@@ -74,12 +89,16 @@ services:
       - TRACE_ID=
       - METRICS_PORT=9004
     healthcheck:
-      test: ["CMD","curl","-fsS","http://localhost:8004/healthz"]
+      test:
+        - CMD
+        - curl
+        - -fsS
+        - http://localhost:8004/healthz
       interval: 10s
       timeout: 3s
       retries: 5
     ports:
-      - "9004:9004"
+      - 9004:9004
   archivist:
     !!merge <<: *app
     environment:
@@ -88,12 +107,16 @@ services:
       - TRACE_ID=
       - METRICS_PORT=9005
     healthcheck:
-      test: ["CMD","curl","-fsS","http://localhost:8005/healthz"]
+      test:
+        - CMD
+        - curl
+        - -fsS
+        - http://localhost:8005/healthz
       interval: 10s
       timeout: 3s
       retries: 5
     ports:
-      - "9005:9005"
+      - 9005:9005
   redis:
     image: redis:7
     healthcheck:
