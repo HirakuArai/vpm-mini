@@ -1,0 +1,7 @@
+NAME                     IMAGE              COMMAND                   SERVICE       CREATED          STATUS                    PORTS
+vpm-mini-archivist-1     vpm-mini/app:dev   "bash -c 'python pla…"   archivist     46 seconds ago   Up 45 seconds (healthy)   
+vpm-mini-curator-1       vpm-mini/app:dev   "bash -c 'python pla…"   curator       46 seconds ago   Up 45 seconds (healthy)   
+vpm-mini-planner-1       vpm-mini/app:dev   "bash -c 'python pla…"   planner       46 seconds ago   Up 45 seconds (healthy)   
+vpm-mini-redis-1         redis:7            "docker-entrypoint.s…"   redis         46 seconds ago   Up 45 seconds (healthy)   6379/tcp
+vpm-mini-synthesizer-1   vpm-mini/app:dev   "bash -c 'python pla…"   synthesizer   46 seconds ago   Up 45 seconds (healthy)   
+vpm-mini-watcher-1       vpm-mini/app:dev   "bash -c 'python pla…"   watcher       46 seconds ago   Up 45 seconds (healthy)   

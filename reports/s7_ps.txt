@@ -1,7 +1,7 @@
-NAME                     IMAGE              COMMAND                   SERVICE       CREATED         STATUS                     PORTS
-vpm-mini-archivist-1     vpm-mini/app:dev   "bash -lc 'python pl…"   archivist     2 minutes ago   Up 2 minutes (unhealthy)   0.0.0.0:9005->9005/tcp, [::]:9005->9005/tcp
-vpm-mini-curator-1       vpm-mini/app:dev   "bash -lc 'python pl…"   curator       2 minutes ago   Up 2 minutes (unhealthy)   0.0.0.0:9002->9002/tcp, [::]:9002->9002/tcp
-vpm-mini-planner-1       vpm-mini/app:dev   "bash -lc 'python pl…"   planner       2 minutes ago   Up 2 minutes (unhealthy)   0.0.0.0:9003->9003/tcp, [::]:9003->9003/tcp
-vpm-mini-redis-1         redis:7            "docker-entrypoint.s…"   redis         2 minutes ago   Up 2 minutes (healthy)     6379/tcp
-vpm-mini-synthesizer-1   vpm-mini/app:dev   "bash -lc 'python pl…"   synthesizer   2 minutes ago   Up 2 minutes (unhealthy)   0.0.0.0:9004->9004/tcp, [::]:9004->9004/tcp
-vpm-mini-watcher-1       vpm-mini/app:dev   "bash -lc 'python pl…"   watcher       2 minutes ago   Up 2 minutes (unhealthy)   0.0.0.0:9001->9001/tcp, [::]:9001->9001/tcp
+NAME                     IMAGE              COMMAND                   SERVICE       CREATED              STATUS                        PORTS
+vpm-mini-archivist-1     vpm-mini/app:dev   "bash -lc 'python pl…"   archivist     About a minute ago   Up About a minute (healthy)   0.0.0.0:9005->9005/tcp, [::]:9005->9005/tcp
+vpm-mini-curator-1       vpm-mini/app:dev   "bash -lc 'python pl…"   curator       About a minute ago   Up About a minute (healthy)   0.0.0.0:9002->9002/tcp, [::]:9002->9002/tcp
+vpm-mini-planner-1       vpm-mini/app:dev   "bash -lc 'python pl…"   planner       About a minute ago   Up About a minute (healthy)   0.0.0.0:9003->9003/tcp, [::]:9003->9003/tcp
+vpm-mini-redis-1         redis:7            "docker-entrypoint.s…"   redis         About a minute ago   Up About a minute (healthy)   6379/tcp
+vpm-mini-synthesizer-1   vpm-mini/app:dev   "bash -lc 'python pl…"   synthesizer   About a minute ago   Up About a minute (healthy)   0.0.0.0:9004->9004/tcp, [::]:9004->9004/tcp
+vpm-mini-watcher-1       vpm-mini/app:dev   "bash -lc 'python pl…"   watcher       About a minute ago   Up About a minute (healthy)   0.0.0.0:9001->9001/tcp, [::]:9001->9001/tcp

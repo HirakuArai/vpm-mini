@@ -2,6 +2,7 @@ import sys
 import argparse
 import time
 import os
+from src.utils.metrics import observe
 
 
 def run_once(input_text: str):
@@ -44,7 +45,6 @@ def main():
     args = parser.parse_args()
 
     # Handle trace_id generation and propagation
-
     trace_id = args.trace_id or os.getenv("TRACE_ID")
     if not trace_id:
         from src.utils.trace import new_trace_id
@@ -56,8 +56,9 @@ def main():
         from wsgiref.simple_server import make_server
         from src.utils.metrics import render_metrics
 
-        port = int(os.getenv("METRICS_PORT", "9000"))
-        with make_server("", port, render_metrics) as httpd:
+        with make_server(
+            "", int(os.getenv("METRICS_PORT", "9000")), render_metrics
+        ) as httpd:
             httpd.serve_forever()
         return
 
@@ -71,8 +72,6 @@ def main():
         _t = time.time()
         role = args.role
         ok = True
-        from src.utils.metrics import observe
-
         print(f"[hello] role={args.role} trace_id={os.getenv('TRACE_ID')}")
         observe(role, ok, _t)
         try:
