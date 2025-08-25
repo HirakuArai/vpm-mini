@@ -1,0 +1,9 @@
+NAME                     IMAGE                     COMMAND                   SERVICE       CREATED              STATUS                        PORTS
+vpm-mini-archivist-1     vpm-mini/app:dev          "bash -lc 'python pl…"   archivist     About a minute ago   Up About a minute (healthy)   0.0.0.0:8005->8005/tcp, [::]:8005->8005/tcp, 0.0.0.0:9005->9005/tcp, [::]:9005->9005/tcp
+vpm-mini-curator-1       vpm-mini/app:dev          "bash -lc 'python pl…"   curator       About a minute ago   Up About a minute (healthy)   0.0.0.0:8002->8002/tcp, [::]:8002->8002/tcp, 0.0.0.0:9002->9002/tcp, [::]:9002->9002/tcp
+vpm-mini-grafana-1       grafana/grafana:11.1.0    "/run.sh"                 grafana       About a minute ago   Up About a minute (healthy)   0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+vpm-mini-planner-1       vpm-mini/app:dev          "bash -lc 'python pl…"   planner       About a minute ago   Up About a minute (healthy)   0.0.0.0:8003->8003/tcp, [::]:8003->8003/tcp, 0.0.0.0:9003->9003/tcp, [::]:9003->9003/tcp
+vpm-mini-prometheus-1    prom/prometheus:v2.52.0   "/bin/prometheus --c…"   prometheus    About a minute ago   Up About a minute (healthy)   0.0.0.0:9090->9090/tcp, [::]:9090->9090/tcp
+vpm-mini-redis-1         redis:7                   "docker-entrypoint.s…"   redis         About a minute ago   Up About a minute (healthy)   6379/tcp
+vpm-mini-synthesizer-1   vpm-mini/app:dev          "bash -lc 'python pl…"   synthesizer   About a minute ago   Up About a minute (healthy)   0.0.0.0:8004->8004/tcp, [::]:8004->8004/tcp, 0.0.0.0:9004->9004/tcp, [::]:9004->9004/tcp
+vpm-mini-watcher-1       vpm-mini/app:dev          "bash -lc 'python pl…"   watcher       About a minute ago   Up About a minute (healthy)   0.0.0.0:8001->8001/tcp, [::]:8001->8001/tcp, 0.0.0.0:9001->9001/tcp, [::]:9001->9001/tcp
