@@ -1,0 +1,126 @@
+{
+  "status": "success",
+  "data": {
+    "activeTargets": [
+      {
+        "discoveredLabels": {
+          "__address__": "archivist:9005",
+          "__metrics_path__": "/metrics",
+          "__scheme__": "http",
+          "__scrape_interval__": "5s",
+          "__scrape_timeout__": "5s",
+          "job": "roles"
+        },
+        "labels": {
+          "instance": "archivist:9005",
+          "job": "roles"
+        },
+        "scrapePool": "roles",
+        "scrapeUrl": "http://archivist:9005/metrics",
+        "globalUrl": "http://archivist:9005/metrics",
+        "lastError": "",
+        "lastScrape": "2025-08-25T18:10:10.094748794Z",
+        "lastScrapeDuration": 0.003182417,
+        "health": "up",
+        "scrapeInterval": "5s",
+        "scrapeTimeout": "5s"
+      },
+      {
+        "discoveredLabels": {
+          "__address__": "watcher:9001",
+          "__metrics_path__": "/metrics",
+          "__scheme__": "http",
+          "__scrape_interval__": "5s",
+          "__scrape_timeout__": "5s",
+          "job": "roles"
+        },
+        "labels": {
+          "instance": "watcher:9001",
+          "job": "roles"
+        },
+        "scrapePool": "roles",
+        "scrapeUrl": "http://watcher:9001/metrics",
+        "globalUrl": "http://watcher:9001/metrics",
+        "lastError": "",
+        "lastScrape": "2025-08-25T18:10:07.024515628Z",
+        "lastScrapeDuration": 0.00077525,
+        "health": "up",
+        "scrapeInterval": "5s",
+        "scrapeTimeout": "5s"
+      },
+      {
+        "discoveredLabels": {
+          "__address__": "curator:9002",
+          "__metrics_path__": "/metrics",
+          "__scheme__": "http",
+          "__scrape_interval__": "5s",
+          "__scrape_timeout__": "5s",
+          "job": "roles"
+        },
+        "labels": {
+          "instance": "curator:9002",
+          "job": "roles"
+        },
+        "scrapePool": "roles",
+        "scrapeUrl": "http://curator:9002/metrics",
+        "globalUrl": "http://curator:9002/metrics",
+        "lastError": "",
+        "lastScrape": "2025-08-25T18:10:06.620445042Z",
+        "lastScrapeDuration": 0.003448667,
+        "health": "up",
+        "scrapeInterval": "5s",
+        "scrapeTimeout": "5s"
+      },
+      {
+        "discoveredLabels": {
+          "__address__": "planner:9003",
+          "__metrics_path__": "/metrics",
+          "__scheme__": "http",
+          "__scrape_interval__": "5s",
+          "__scrape_timeout__": "5s",
+          "job": "roles"
+        },
+        "labels": {
+          "instance": "planner:9003",
+          "job": "roles"
+        },
+        "scrapePool": "roles",
+        "scrapeUrl": "http://planner:9003/metrics",
+        "globalUrl": "http://planner:9003/metrics",
+        "lastError": "",
+        "lastScrape": "2025-08-25T18:10:08.190362085Z",
+        "lastScrapeDuration": 0.003509375,
+        "health": "up",
+        "scrapeInterval": "5s",
+        "scrapeTimeout": "5s"
+      },
+      {
+        "discoveredLabels": {
+          "__address__": "synthesizer:9004",
+          "__metrics_path__": "/metrics",
+          "__scheme__": "http",
+          "__scrape_interval__": "5s",
+          "__scrape_timeout__": "5s",
+          "job": "roles"
+        },
+        "labels": {
+          "instance": "synthesizer:9004",
+          "job": "roles"
+        },
+        "scrapePool": "roles",
+        "scrapeUrl": "http://synthesizer:9004/metrics",
+        "globalUrl": "http://synthesizer:9004/metrics",
+        "lastError": "",
+        "lastScrape": "2025-08-25T18:10:10.601137044Z",
+        "lastScrapeDuration": 0.002283916,
+        "health": "up",
+        "scrapeInterval": "5s",
+        "scrapeTimeout": "5s"
+      }
+    ],
+    "droppedTargets": [],
+    "droppedTargetCounts": {
+      "roles": 0
+    }
+  }
+}

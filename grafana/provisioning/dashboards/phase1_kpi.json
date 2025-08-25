@@ -1,0 +1,25 @@
+{
+  "title": "Phase 1 KPIs",
+  "schemaVersion": 39,
+  "time": {"from":"now-1h","to":"now"},
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "JSON error rate",
+      "targets": [{"expr": "sum(rate(json_invalid_total[5m])) / sum(rate(requests_total[5m]))"}],
+      "gridPos": {"x":0,"y":0,"w":12,"h":8}
+    },
+    {
+      "type": "timeseries",
+      "title": "p50 latency",
+      "targets": [{"expr": "histogram_quantile(0.5, sum(rate(request_latency_seconds_bucket[5m])) by (le,role))"}],
+      "gridPos": {"x":12,"y":0,"w":12,"h":8}
+    },
+    {
+      "type": "timeseries",
+      "title": "ROUGE-L (placeholder)",
+      "targets": [{"expr": "avg(rouge_l_score)"}],
+      "gridPos": {"x":0,"y":8,"w":24,"h":8}
+    }
+  ]
+}

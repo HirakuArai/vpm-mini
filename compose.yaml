@@ -24,7 +24,6 @@ x-app: &app
     - bash
     - -lc
     - python playground.py --role ${ROLE:-watcher} --hello & python playground.py --healthz & python playground.py --metrics
-
 services:
   watcher:
     !!merge <<: *app
@@ -45,7 +44,6 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
-  
   curator:
     !!merge <<: *app
     environment:
@@ -65,7 +63,6 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
-  
   planner:
     !!merge <<: *app
     environment:
@@ -85,7 +82,6 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
-  
   synthesizer:
     !!merge <<: *app
     environment:
@@ -105,7 +101,6 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
-  
   archivist:
     !!merge <<: *app
     environment:
@@ -125,7 +120,6 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
-  
   redis:
     image: redis:7
     healthcheck:
@@ -136,7 +130,6 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
-  
   prometheus:
     image: prom/prometheus:v2.52.0
     ports:
@@ -163,3 +156,25 @@ services:
         condition: service_healthy
       archivist:
         condition: service_healthy
+  grafana:
+    image: grafana/grafana:11.1.0
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - bash
+        - -lc
+        - wget -qO- http://localhost:3000/api/health
+      interval: 5s
+      timeout: 3s
+      retries: 20
