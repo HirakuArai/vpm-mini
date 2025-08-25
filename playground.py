@@ -3,6 +3,7 @@ import argparse
 import time
 import os
 from src.utils.metrics import observe
+from src.utils.rouge_exporter import update as rouge_update
 
 
 def run_once(input_text: str):
@@ -80,6 +81,10 @@ def main():
         ok = True
         print(f"[hello] role={args.role} trace_id={os.getenv('TRACE_ID')}")
         observe(role, ok, _t)
+        # --- ROUGE-L (placeholder) ---
+        hyp = f"hello from {role}"
+        ref = "hello from watcher"
+        rouge_update(role, hyp, ref)
         try:
             import shlex
             import subprocess

@@ -1,3 +1,4 @@
 # Core dependencies (currently using only Python standard library)
 # Add dependencies here as needed
 prometheus-client==0.20.0
+rouge-score==0.1.2
