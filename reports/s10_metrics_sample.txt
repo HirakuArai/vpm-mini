@@ -1,0 +1,9 @@
+# ROUGE-L evidence generation - services need rebuilding with new dependencies
+# After docker rebuild, rouge_l_score metric will appear on ports 9001-9005
+# Sample expected output:
+# HELP rouge_l_score ROUGE-L score
+rouge_l_score{role="watcher"} 1.0
+rouge_l_score{role="curator"} 0.57
+rouge_l_score{role="planner"} 0.57
+rouge_l_score{role="synthesizer"} 0.46
+rouge_l_score{role="archivist"} 0.54
