@@ -1,150 +1,165 @@
-version: '3.9'
-x-app:
-  build: &id001
+x-app: &app
+  build:
     context: .
     dockerfile: Dockerfile
   image: vpm-mini/app:dev
   restart: unless-stopped
   environment:
-  - ROLE=
-  - REDIS_HOST=redis
-  - PORT=
-  - TRACE_ID=
-  - METRICS_PORT=
+    - REDIS_HOST=redis
+    - PORT=
+    - METRICS_PORT=
+    - TRACE_ID=
   healthcheck:
     test:
-    - CMD
-    - bash
-    - -lc
-    - curl -fsS http://localhost:${PORT:-8000}/healthz
+      - CMD
+      - bash
+      - -lc
+      - curl -fsS http://localhost:${PORT:-8000}/healthz
     interval: 10s
     timeout: 3s
     retries: 5
-  deploy: &id002
+  deploy:
     replicas: 1
-  command: &id003
-  - bash
-  - -lc
-  - python playground.py --role ${ROLE:-watcher} --hello & python playground.py --healthz
-    & python playground.py --metrics
+  command:
+    - bash
+    - -lc
+    - python playground.py --role ${ROLE:-watcher} --hello & python playground.py --healthz & python playground.py --metrics
+
 services:
   watcher:
-    build: *id001
-    image: vpm-mini/app:dev
-    restart: unless-stopped
+    !!merge <<: *app
     environment:
-    - ROLE=watcher
-    - PORT=8001
-    - TRACE_ID=
-    - METRICS_PORT=9001
+      - ROLE=watcher
+      - PORT=8001
+      - METRICS_PORT=9001
+      - TRACE_ID=
+    ports:
+      - "8001:8001"
+      - "9001:9001"
     healthcheck:
       test:
-      - CMD
-      - curl
-      - -fsS
-      - http://localhost:8001/healthz
+        - CMD
+        - curl
+        - -fsS
+        - http://localhost:8001/healthz
       interval: 10s
       timeout: 3s
       retries: 5
-    deploy: *id002
-    command: *id003
-    ports:
-    - 9001:9001
+  
   curator:
-    build: *id001
-    image: vpm-mini/app:dev
-    restart: unless-stopped
+    !!merge <<: *app
     environment:
-    - ROLE=curator
-    - PORT=8002
-    - TRACE_ID=
-    - METRICS_PORT=9002
+      - ROLE=curator
+      - PORT=8002
+      - METRICS_PORT=9002
+      - TRACE_ID=
+    ports:
+      - "8002:8002"
+      - "9002:9002"
     healthcheck:
       test:
-      - CMD
-      - curl
-      - -fsS
-      - http://localhost:8002/healthz
+        - CMD
+        - curl
+        - -fsS
+        - http://localhost:8002/healthz
       interval: 10s
       timeout: 3s
       retries: 5
-    deploy: *id002
-    command: *id003
-    ports:
-    - 9002:9002
+  
   planner:
-    build: *id001
-    image: vpm-mini/app:dev
-    restart: unless-stopped
+    !!merge <<: *app
     environment:
-    - ROLE=planner
-    - PORT=8003
-    - TRACE_ID=
-    - METRICS_PORT=9003
+      - ROLE=planner
+      - PORT=8003
+      - METRICS_PORT=9003
+      - TRACE_ID=
+    ports:
+      - "8003:8003"
+      - "9003:9003"
     healthcheck:
       test:
-      - CMD
-      - curl
-      - -fsS
-      - http://localhost:8003/healthz
+        - CMD
+        - curl
+        - -fsS
+        - http://localhost:8003/healthz
       interval: 10s
       timeout: 3s
       retries: 5
-    deploy: *id002
-    command: *id003
-    ports:
-    - 9003:9003
+  
   synthesizer:
-    build: *id001
-    image: vpm-mini/app:dev
-    restart: unless-stopped
+    !!merge <<: *app
     environment:
-    - ROLE=synthesizer
-    - PORT=8004
-    - TRACE_ID=
-    - METRICS_PORT=9004
+      - ROLE=synthesizer
+      - PORT=8004
+      - METRICS_PORT=9004
+      - TRACE_ID=
+    ports:
+      - "8004:8004"
+      - "9004:9004"
     healthcheck:
       test:
-      - CMD
-      - curl
-      - -fsS
-      - http://localhost:8004/healthz
+        - CMD
+        - curl
+        - -fsS
+        - http://localhost:8004/healthz
       interval: 10s
       timeout: 3s
       retries: 5
-    deploy: *id002
-    command: *id003
-    ports:
-    - 9004:9004
+  
   archivist:
-    build: *id001
-    image: vpm-mini/app:dev
-    restart: unless-stopped
+    !!merge <<: *app
     environment:
-    - ROLE=archivist
-    - PORT=8005
-    - TRACE_ID=
-    - METRICS_PORT=9005
+      - ROLE=archivist
+      - PORT=8005
+      - METRICS_PORT=9005
+      - TRACE_ID=
+    ports:
+      - "8005:8005"
+      - "9005:9005"
     healthcheck:
       test:
-      - CMD
-      - curl
-      - -fsS
-      - http://localhost:8005/healthz
+        - CMD
+        - curl
+        - -fsS
+        - http://localhost:8005/healthz
       interval: 10s
       timeout: 3s
       retries: 5
-    deploy: *id002
-    command: *id003
-    ports:
-    - 9005:9005
+  
   redis:
     image: redis:7
     healthcheck:
       test:
-      - CMD
-      - redis-cli
-      - ping
+        - CMD
+        - redis-cli
+        - ping
       interval: 5s
       timeout: 3s
       retries: 10
+  
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - -qO-
+        - http://localhost:9090/-/ready
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    depends_on:
+      watcher:
+        condition: service_healthy
+      curator:
+        condition: service_healthy
+      planner:
+        condition: service_healthy
+      synthesizer:
+        condition: service_healthy
+      archivist:
+        condition: service_healthy

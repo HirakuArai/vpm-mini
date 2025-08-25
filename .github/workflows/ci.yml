@@ -8,12 +8,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install curl and jq
+      - name: Install curl & jq
         run: sudo apt-get update && sudo apt-get install -y curl jq
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Validate compose config
-        run: docker compose config -q
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Early compose validation
+        run: docker compose version && docker compose config -q
       - name: Prepare reports/*
         run: |
           mkdir -p reports

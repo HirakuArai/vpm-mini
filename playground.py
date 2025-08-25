@@ -68,6 +68,12 @@ def main():
         serve()
         return
 
+    if args.metrics:
+        from src.utils.metrics import serve_metrics
+
+        serve_metrics()
+        return
+
     if args.hello:
         _t = time.time()
         role = args.role
