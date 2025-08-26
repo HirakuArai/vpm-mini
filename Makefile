@@ -30,3 +30,19 @@ cc:
 	}; \
 	for k,v in vars.items(): tmpl = tmpl.replace(f'<{k}>', v); \
 	print(tmpl)"
+verify:
+	@PR=$${PR:?}; SLUG=$${SLUG:?}; set -e; \
+	echo "== PR 状態 =="; \
+	gh pr view $$PR --json state,mergedAt,mergeCommit,url \
+	  -q '"state=" + .state + " mergedAt=" + (.mergedAt//"") + " mergeCommit=" + (.mergeCommit.abbreviatedOid//"") + " url=" + .url'; \
+	STATE=$$(gh pr view $$PR --json state -q .state); \
+	test "$$STATE" = "MERGED"; \
+	echo "== snapshot on origin/main =="; \
+	git fetch origin main >/dev/null; \
+	git cat-file -e origin/main:reports/snap_$${SLUG}.md \
+	  && echo "OK: reports/snap_$${SLUG}.md" \
+	  || (echo "MISSING: reports/snap_$${SLUG}.md"; exit 1); \
+	echo "== tag on remote =="; \
+	git ls-remote --tags origin | grep -q "refs/tags/$${SLUG}" \
+	  && echo "OK: tag $${SLUG}" \
+	  || (echo "MISSING: tag $${SLUG}"; exit 1)

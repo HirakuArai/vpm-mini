@@ -59,3 +59,35 @@ git push origin main --tags
 - CI red: 修正 → 再push
 - 競合: Auto-merge維持 → 解消コミット → 再push  
 - タイムアウト: 状況要約を出力して停止
+---
+
+<!-- VERIFICATION_SUITE_START: do not remove -->
+### ✅ Verification Suite（MERGED / snapshot / tag）
+
+```bash
+# ---- Verification Suite: MERGED / snapshot / tag ----
+set -euo pipefail
+
+# 1) PR が本当に MERGED になっているか
+PR_NUM="${PR_NUM:?set PR_NUM}"
+gh pr view "$PR_NUM" --json state,mergedAt,mergeCommit,url \
+  -q '"state=" + .state + " mergedAt=" + (.mergedAt//"") + " mergeCommit=" + (.mergeCommit.abbreviatedOid//"") + " url=" + .url'
+STATE=$(gh pr view "$PR_NUM" --json state -q .state)
+test "$STATE" = "MERGED"
+
+# 2) snapshot ファイルが origin/main に存在するか
+SLUG="${SLUG:?set SLUG}"
+git fetch origin main >/dev/null
+git cat-file -e "origin/main:reports/snap_${SLUG}.md" \
+  && echo "OK: reports/snap_${SLUG}.md on origin/main" \
+  || { echo "MISSING: reports/snap_${SLUG}.md on origin/main"; exit 1; }
+
+# 3) タグがリモートに存在するか
+git ls-remote --tags origin | grep -q "refs/tags/${SLUG}" \
+  && echo "OK: tag ${SLUG} on remote" \
+  || { echo "MISSING: tag ${SLUG} on remote"; exit 1; }
+
+echo "✅ Verification passed for ${SLUG}"
+```
+
+<!-- VERIFICATION_SUITE_END -->
