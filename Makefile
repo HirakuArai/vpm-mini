@@ -18,18 +18,15 @@ compose-logs:
 CC_TMPL = ops/claude_templates/standard_pr.md.tmpl
 
 cc:
-	@python - <<'PY'
-import os,sys
-tmpl=open("$(CC_TMPL)","r",encoding="utf-8").read()
-vars={
- "N": os.environ.get("STEP","?"),
- "TITLE": os.environ.get("TITLE","(no title)"),
- "SLUG": os.environ.get("SLUG","slug-missing"),
- "FILES": os.environ.get("FILES","- 変更ファイルを列挙"),
- "FILES_FLAT": " ".join([l.strip(" -") for l in os.environ.get("FILES","").splitlines() if l.strip()]),
- "DOD_TEXT": os.environ.get("DOD","CI green / Auto-merge / MERGED / snapshot+tag"),
-}
-for k,v in vars.items():
-  tmpl = tmpl.replace(f"<{k}>", v)
-print(tmpl)
-PY
+	@python3 -c "import os,sys; \
+	tmpl=open('$(CC_TMPL)','r',encoding='utf-8').read(); \
+	vars={ \
+	 'N': os.environ.get('STEP','?'), \
+	 'TITLE': os.environ.get('TITLE','(no title)'), \
+	 'SLUG': os.environ.get('SLUG','slug-missing'), \
+	 'FILES': os.environ.get('FILES','- Files to be changed'), \
+	 'FILES_FLAT': ' '.join([l.strip(' -') for l in os.environ.get('FILES','').splitlines() if l.strip()]), \
+	 'DOD_TEXT': os.environ.get('DOD','CI green / Auto-merge / MERGED / snapshot+tag') \
+	}; \
+	for k,v in vars.items(): tmpl = tmpl.replace(f'<{k}>', v); \
+	print(tmpl)"
