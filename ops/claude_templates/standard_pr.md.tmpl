@@ -1,0 +1,61 @@
+# Step <N>: <TITLE>（1PR = 1ステップ）
+
+**目的**  
+<TITLE> を実装し、DoDを満たした状態で main に取り込む。
+
+**DoD**  
+- CI green
+- Auto-merge 設定済み
+- MERGED 状態確認
+- `reports/snap_<SLUG>.md` 生成
+- Git tag `<SLUG>` 付与
+
+**変更予定**  
+<FILES>
+
+**実行フロー（Claude Code用）**
+
+1. **作業ブランチ作成**
+```bash
+git checkout -b feat/<SLUG>
+```
+
+2. **ファイル変更**
+（実装詳細に応じてファイル編集）
+
+3. **コミット & PR作成**
+```bash
+git add <FILES_FLAT>
+git commit -m "feat: <SLUG> – <TITLE>"
+git push -u origin HEAD
+gh pr create --title "feat: <SLUG> – <TITLE>" --body "<TITLE>実装完了"
+gh pr edit --add-label "auto-merge,phase2"
+gh pr merge --auto --squash
+```
+
+4. **CI監視 & MERGED確認**
+```bash
+# CI状態チェック
+gh pr checks --watch
+
+# MERGED状態確認
+gh pr view --json state -q .state
+```
+
+5. **main取得 → snapshot生成 → tag**
+```bash
+git fetch origin main && git checkout main && git pull
+python scripts/make_snapshot.py --slug "<SLUG>" \
+  --dod "<DOD_TEXT>" \
+  --changes "<TITLE>完了" \
+  --ci_url "$(gh pr view --json url -q .url)"
+git add reports/snap_<SLUG>.md
+git commit -m "chore: snapshot <SLUG>"
+git tag <SLUG>
+git push origin main --tags
+```
+
+**失敗時ハンドリング**
+- CI red: 修正 → 再push
+- 競合: Auto-merge維持 → 解消コミット → 再push  
+- タイムアウト: 状況要約を出力して停止
