@@ -9,6 +9,7 @@ spec:
       annotations:
         autoscaling.knative.dev/minScale: "0"
         autoscaling.knative.dev/maxScale: "30"
+        autoscaling.knative.dev/target: "100"    # 目標同時リクエスト（デフォルト相当、調整可）
     spec:
       containers:
         - image: gcr.io/knative-samples/helloworld-go
