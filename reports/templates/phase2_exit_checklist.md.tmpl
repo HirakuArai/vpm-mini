@@ -1,0 +1,21 @@
+# Phase 2 Exit Checklist
+
+## Summary
+- Date: {{ts}}
+- Commit: {{commit}}
+- Branch: {{branch}}
+
+## Exit Criteria
+- [{{hello_ready}}] Hello KService READY=True
+- [{{autoscale_ok}}] Autoscale works (min=0 / max=50) and scaled >1 under load
+- [{{monitoring_ok}}] Monitoring stack (Prometheus & Grafana) running
+- [{{perf_ok}}] p50 < 1s / JSON errors < 1% (scope-limited smoke test)
+
+## Evidence
+- Hello URL: {{hello_url}}
+- Max replicas observed: {{max_replicas}}
+- p50: {{p50}}
+- Requests/sec: {{rps}}
+- Non-2xx errors: {{errors}}
+
+Notes: {{notes}}
