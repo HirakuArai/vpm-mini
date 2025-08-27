@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  vpm-mini-dev-overview.json: |
+    {
+      "id": null,
+      "title": "VPM Mini / Dev Overview",
+      "timezone": "browser",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "10s",
+      "panels": [
+        {
+          "type": "stat",
+          "title": "up (targets alive)",
+          "gridPos": {"x":0,"y":0,"w":8,"h":6},
+          "targets": [
+            { "expr": "sum(up)", "legendFormat": "alive" }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "Requests/sec (all jobs)",
+          "gridPos": {"x":8,"y":0,"w":16,"h":6},
+          "targets": [
+            { "expr": "rate(prometheus_tsdb_head_series{job=\"prometheus\"}[1m])", "legendFormat": "prom series rate" }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "Node CPU (kind node, sample)",
+          "gridPos": {"x":0,"y":6,"w":12,"h":7},
+          "targets": [
+            { "expr": "sum(rate(container_cpu_usage_seconds_total{image!=\"\",container!=\"POD\"}[2m]))", "legendFormat": "cpu total" }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "Node Memory (working set)",
+          "gridPos": {"x":12,"y":6,"w":12,"h":7},
+          "targets": [
+            { "expr": "sum(container_memory_working_set_bytes{image!=\"\",container!=\"POD\"})", "legendFormat": "mem working set" }
+          ]
+        }
+      ],
+      "templating": { "list": [] }
+    }
+---
+# Grafana が自動で dashboards/ を読むように、既存 Deployment へ volume をマウント（既存と併用想定）
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      volumes:
+      - name: dashboards
+        configMap:
+          name: grafana-dashboards
+      containers:
+      - name: grafana
+        volumeMounts:
+        - name: dashboards
+          mountPath: /var/lib/grafana/dashboards
+        env:
+        - name: GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH
+          value: /var/lib/grafana/dashboards/vpm-mini-dev-overview.json
+        - name: GF_DASHBOARDS_ENABLE
+          value: "true"
