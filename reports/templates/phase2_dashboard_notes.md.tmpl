@@ -1,0 +1,12 @@
+# Phase 2 - Dashboard Notes
+
+- Timestamp: {{ts}}
+- Access: http://localhost:3000  (port-forward: `bash scripts/port_forward_grafana.sh`)
+- Panels:
+  - up (targets)
+  - Requests/sec (prom series)
+  - Node CPU/Memory (working set)
+
+## Next Ideas
+- Kourier/Knative コンポーネントのメトリクスを追加入力
+- hello ksvc 呼応の RPS / p50 を可視化（次ステップのExporter/面で対応）
