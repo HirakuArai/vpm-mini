@@ -38,5 +38,16 @@ open http://localhost:3000  # (admin/admin)
 - `reports/snap_phase1_query_up.json` – up=1 確認
 - `reports/snap_phase1_compose_ps.txt` – 全8サービス Healthy
 
-## Next
-**Phase 2 Kickoff**: kind + Knative 足場構築
+## Phase 3 完了 → Phase 4 移行
+
+✅ **Phase 3: 監査 & セキュリティ** 完了 (tag: `phase3-complete`)
+- SPIFFE/SPIRE による workload identity 確立
+- OPA Gatekeeper によるポリシー強制
+- W3C PROV 決定ログ（Ed25519 署名付き S3 保存）
+- Chaos エンジニアリング（99% SLO 維持確認）
+
+🚀 **Phase 4: 大規模 Swarm β** 開始
+- Istio + Gateway API による高度ルーティング足場
+- ArgoCD GitOps デプロイメント基盤
+- A/B テスト評価枠組み構築
+- 800 cells/sec 大規模負荷耐性確立
