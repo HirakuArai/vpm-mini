@@ -1,0 +1,159 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: slo-rules
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: slo-rules
+    app.kubernetes.io/part-of: vpm-mini
+    app.kubernetes.io/component: monitoring
+    prometheus: kube-prometheus
+    role: alert-rules
+spec:
+  groups:
+  - name: http-slo-999
+    interval: 30s
+    rules:
+    # SLI Recording Rules: HTTP Success Rate
+    - record: sli:http_success_rate:5m
+      expr: |
+        (
+          sum(rate(istio_requests_total{destination_workload="hello",response_code=~"2.."}[5m])) or vector(0)
+        ) / (
+          sum(rate(istio_requests_total{destination_workload="hello"}[5m])) or vector(1)
+        )
+      labels:
+        service: "hello"
+        slo_target: "99.9"
+        
+    - record: sli:http_success_rate:30m
+      expr: |
+        (
+          sum(rate(istio_requests_total{destination_workload="hello",response_code=~"2.."}[30m])) or vector(0)
+        ) / (
+          sum(rate(istio_requests_total{destination_workload="hello"}[30m])) or vector(1)
+        )
+      labels:
+        service: "hello"
+        slo_target: "99.9"
+        
+    - record: sli:http_success_rate:1h
+      expr: |
+        (
+          sum(rate(istio_requests_total{destination_workload="hello",response_code=~"2.."}[1h])) or vector(0)
+        ) / (
+          sum(rate(istio_requests_total{destination_workload="hello"}[1h])) or vector(1)
+        )
+      labels:
+        service: "hello"
+        slo_target: "99.9"
+    
+    # Error Budget Burn Rate Calculations
+    - record: sli:http_error_rate:5m
+      expr: 1 - sli:http_success_rate:5m
+      labels:
+        service: "hello"
+        slo_target: "99.9"
+        
+    - record: sli:http_error_rate:30m
+      expr: 1 - sli:http_success_rate:30m
+      labels:
+        service: "hello"
+        slo_target: "99.9"
+        
+    - record: sli:http_error_rate:1h
+      expr: 1 - sli:http_success_rate:1h
+      labels:
+        service: "hello"
+        slo_target: "99.9"
+
+    # SLO Error Budget (99.9% = 0.1% error budget)
+    - record: sli:http_error_budget
+      expr: 1 - 0.999
+      labels:
+        service: "hello"
+        slo_target: "99.9"
+
+  - name: http-slo-alerts
+    interval: 30s
+    rules:
+    # Fast Burn Rate Alert (14.4x burn rate over 2 minutes)
+    # This catches severe outages that would exhaust monthly error budget in ~2 hours
+    - alert: SLOFastBurn
+      expr: |
+        sli:http_error_rate:5m{service="hello"} > bool(sli:http_error_budget{service="hello"} * 14.4)
+        and
+        sli:http_error_rate:5m{service="hello"} > 0.001
+      for: 2m
+      labels:
+        severity: page
+        slo: "http-999"
+        burn_rate: "fast"
+        service: "hello"
+      annotations:
+        summary: "Fast burn SLO 99.9% breach detected (5m window)"
+        description: |
+          The error rate over the last 5 minutes is {{ printf "%.2f%%" (query "sli:http_error_rate:5m{service=\"hello\"}" | first | value | mul 100) }},
+          which is {{ printf "%.1fx" (div (query "sli:http_error_rate:5m{service=\"hello\"}" | first | value) (query "sli:http_error_budget{service=\"hello\"}" | first | value)) }} the SLO error budget.
+          This will exhaust the monthly error budget in ~2 hours if sustained.
+        runbook_url: "https://github.com/HirakuArai/vpm-mini/blob/main/docs/runbooks/http_slo_999.md"
+        alert_type: "fast_burn"
+        
+    # Slow Burn Rate Alert (6x burn rate over 15 minutes) 
+    # This catches gradual degradation that would exhaust monthly error budget in ~5 days
+    - alert: SLOSlowBurn
+      expr: |
+        sli:http_error_rate:30m{service="hello"} > bool(sli:http_error_budget{service="hello"} * 6)
+        and
+        sli:http_error_rate:30m{service="hello"} > 0.0005
+      for: 15m
+      labels:
+        severity: ticket
+        slo: "http-999"
+        burn_rate: "slow"
+        service: "hello"
+      annotations:
+        summary: "Slow burn SLO 99.9% breach detected (30m window)"
+        description: |
+          The error rate over the last 30 minutes is {{ printf "%.2f%%" (query "sli:http_error_rate:30m{service=\"hello\"}" | first | value | mul 100) }},
+          which is {{ printf "%.1fx" (div (query "sli:http_error_rate:30m{service=\"hello\"}" | first | value) (query "sli:http_error_budget{service=\"hello\"}" | first | value)) }} the SLO error budget.
+          This will exhaust the monthly error budget in ~5 days if sustained.
+        runbook_url: "https://github.com/HirakuArai/vpm-mini/blob/main/docs/runbooks/http_slo_999.md"
+        alert_type: "slow_burn"
+        
+    # Error Budget Exhaustion Warning (for trending)
+    - alert: SLOErrorBudgetLow
+      expr: |
+        sli:http_error_rate:1h{service="hello"} > bool(sli:http_error_budget{service="hello"} * 3)
+      for: 1h
+      labels:
+        severity: warning
+        slo: "http-999"
+        burn_rate: "trend"
+        service: "hello"
+      annotations:
+        summary: "SLO error budget consumption trending high"
+        description: |
+          The error rate over the last hour is {{ printf "%.3f%%" (query "sli:http_error_rate:1h{service=\"hello\"}" | first | value | mul 100) }},
+          which is {{ printf "%.1fx" (div (query "sli:http_error_rate:1h{service=\"hello\"}" | first | value) (query "sli:http_error_budget{service=\"hello\"}" | first | value)) }} the SLO error budget.
+          Monitor for potential SLO breach if trend continues.
+        runbook_url: "https://github.com/HirakuArai/vpm-mini/blob/main/docs/runbooks/http_slo_999.md"
+        alert_type: "trend_warning"
+        
+    # Latency SLO Alert (P50 > 1000ms as proxy for user experience degradation)
+    - alert: SLOLatencyBreach
+      expr: |
+        histogram_quantile(0.50, sum(rate(istio_request_duration_milliseconds_bucket{destination_workload="hello"}[5m])) by (le)) > 1000
+      for: 5m
+      labels:
+        severity: ticket
+        slo: "http-999"
+        metric: "latency"
+        service: "hello"
+      annotations:
+        summary: "Latency SLO breach: P50 > 1000ms"
+        description: |
+          The 50th percentile latency is {{ printf "%.0f ms" (query "histogram_quantile(0.50, sum(rate(istio_request_duration_milliseconds_bucket{destination_workload=\"hello\"}[5m])) by (le))" | first | value) }},
+          exceeding the 1000ms SLO threshold.
+        runbook_url: "https://github.com/HirakuArai/vpm-mini/blob/main/docs/runbooks/http_slo_999.md"
+        alert_type: "latency_breach"

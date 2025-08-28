@@ -6,3 +6,4 @@ resources:
   - hello/
   - istio/
   - netpol/
+  - observability/

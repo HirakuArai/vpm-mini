@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: observability
+  labels:
+    app.kubernetes.io/name: observability
+    app.kubernetes.io/part-of: vpm-mini
+    app.kubernetes.io/component: monitoring
+
+namespace: monitoring
+
+resources:
+  - prom-rules-slo.yaml
+  - alertmanager-config.yaml
