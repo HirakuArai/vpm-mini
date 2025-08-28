@@ -7,3 +7,4 @@ resources:
   - hello-v2/
   - istio/
   - netpol/
+  - observability/

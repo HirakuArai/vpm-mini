@@ -22,7 +22,7 @@ spec:
         - image: gcr.io/knative-samples/helloworld-go
           env:
             - name: TARGET
-              value: "vpm-mini"
+              value: "vpm-mini-cd-test"
           ports:
             - containerPort: 8080
           resources:
