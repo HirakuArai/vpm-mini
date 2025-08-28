@@ -1,23 +1,38 @@
-# === State Declaration (Single Source of Truth) ===
+# この文書の役割
+本プロジェクトでは、事象目的空間における **現在地（C）**、**ゴール（G）**、および **δ（差分）** を常に把握し、次アクションを明確化する。
 
-**active_repo**: vpm-mini  
-**active_branch**: main  
-**phase**: Phase 2  # Phase 1 完了 → 次フェーズへ  
-**context_header**: "repo=vpm-mini / branch=main / phase=Phase 2"  
-**short_goal**: "Phase 2 Kickoff (kind + Knative) の足場構築"  
+---
 
-## プロジェクトの最終目的
-Hyper-Swarm / VPM を構築し、常時自己進化型の開発運用基盤を確立する。
+## 状態宣言 (SSOT)
+```yaml
+active_repo: vpm-mini
+active_branch: main
+phase: Phase 3
+context_header: "repo=vpm-mini / branch=main / phase=Phase 3"
+short_goal: "SPIFFE/SPIRE 導入（セル固有ID付与）"
+exit_criteria:
+  - "第三者監査シナリオを通過"
+  - "Chaos/監査負荷下で SLO 99% 維持"
+updated_at: 2025-08-29T00:45:44+0900
+```
 
 ## 現在地（C）
-- Phase 1 全タスク (S1–S10) 完了
-- main ブランチには Docker Compose + Prometheus + Grafana が統合済み
-- SSOT Snapshot: `phase1-complete` タグあり
+- Phase 2 完了（tag: phase2-complete）
+- kind + Knative v1.18（Kourier）/ Hello READY
+- Redis / Prometheus / Grafana 稼働
+- Autoscale: min=0 / max=50（簡易負荷 OK）
+- KPI: p50 < 1s / JSON errors < 1%
 
-## ゴール（G）
-- Phase 2 Kickoff: kind + Knative 足場構築
-- 小規模 Swarm (30→150セル) の PoC に備える
+## ゴール（G）— Phase 3
+- SPIFFE/SPIRE によるセル固有 ID 付与
+- OPA Gatekeeper / NetworkPolicy によるポリシー強制
+- W3C PROV 準拠の決定ログ保存（署名付き S3）
+- Chaos/監査シナリオで SLO 99% 維持
 
-## 差分（δ）
-- Docker Compose → Kubernetes への移行
-- 観測ラインを K8s 環境に移植
+## 差分（δ）と次アクション
+- δ: 監査性・セキュリティ制約が未適用
+- 次アクション:
+  - Step 3-1: SPIFFE/SPIRE 導入
+  - Step 3-2: OPA Gatekeeper でスキーマ/ネットワーク制約
+  - Step 3-3: 決定ログ（W3C PROV）保存
+  - Step 3-4: Chaos/監査シナリオ
