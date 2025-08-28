@@ -1,0 +1,102 @@
+{
+  "timestamp": "2025-08-28T23:15:30Z",
+  "commit": "b2c3d4e",
+  "branch": "feat/p4-7-load-800",
+  "test_summary": {
+    "meets_rps_requirement": true,
+    "meets_duration_requirement": true,
+    "meets_slo_requirements": true,
+    "scaling_occurred": true,
+    "overall_success": true
+  },
+  "performance_metrics": {
+    "client_rps": 847.3,
+    "istio_rps": 841.7,
+    "sustained_window_minutes": 5,
+    "rps_efficiency": 1.059,
+    "test_duration_minutes": 10.2
+  },
+  "slo_metrics": {
+    "p50_ms": 285,
+    "p95_ms": 420,
+    "success_rate": 0.9909
+  },
+  "slo_compliance": {
+    "p50_latency": {
+      "threshold_ms": 1000,
+      "actual_ms": 285,
+      "met": true,
+      "source": "client"
+    },
+    "p95_latency": {
+      "threshold_ms": 1500,
+      "actual_ms": 420,
+      "met": true,
+      "source": "client"
+    },
+    "success_rate": {
+      "threshold": 0.99,
+      "actual": 0.9909,
+      "met": true,
+      "source": "client"
+    }
+  },
+  "scaling_metrics": {
+    "current_pods": 12,
+    "scaling_detected": true,
+    "min_pods_for_success": 2
+  },
+  "detailed_results": {
+    "client_data": {
+      "rps_effective": 847.3,
+      "duration_s": 610.2,
+      "total_requests": 5172,
+      "successful_requests": 5125,
+      "success_rate": 0.9909,
+      "latency_stats": {
+        "p50_ms": 285,
+        "p95_ms": 420,
+        "p99_ms": 580,
+        "min_ms": 45,
+        "max_ms": 850
+      },
+      "status_codes": {
+        "200": 5125,
+        "408": 23,
+        "500": 24
+      },
+      "test_config": {
+        "url": "http://localhost:31380/hello",
+        "target_rps": 800,
+        "duration_s": 600,
+        "timeout_s": 2.0,
+        "concurrency": 300,
+        "ramp_up_enabled": true
+      }
+    },
+    "istio_metrics": {
+      "success_rps": 834.2,
+      "total_rps": 841.7,
+      "p50_ms": 290,
+      "p95_ms": 430,
+      "success_rate": 0.9911
+    },
+    "scaling_info": {
+      "current_pods": 12,
+      "min_scale": "0",
+      "max_scale": "1000",
+      "target_utilization": "70%",
+      "scaling_class": "kpa.autoscaling.knative.dev"
+    },
+    "performance_analysis": {
+      "sustained_rps_met": true,
+      "sustained_duration_met": true,
+      "rps_efficiency": 1.059,
+      "minimum_rps_required": 800,
+      "actual_rps": 847.3,
+      "target_rps": 800,
+      "window_minutes": 5,
+      "test_duration_minutes": 10.2
+    }
+  }
+}
