@@ -1,0 +1,24 @@
+# This Pod should be ALLOWED as it meets all constraints
+apiVersion: v1
+kind: Pod
+metadata:
+  name: allow-compliant
+  namespace: hyper-swarm
+spec:
+  serviceAccountName: planner-sa
+  containers:
+  - name: test
+    image: alpine:3.19
+    command:
+    - /bin/sh
+    - -c
+    - "sleep 3600"
+    volumeMounts:
+    - name: spire-agent-socket
+      mountPath: /run/spire/sockets
+      readOnly: true
+  volumes:
+  - name: spire-agent-socket
+    hostPath:
+      path: /run/spire/sockets
+      type: DirectoryOrCreate

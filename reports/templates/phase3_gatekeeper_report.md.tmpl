@@ -1,0 +1,40 @@
+# Phase 3 - Gatekeeper Policy Enforcement Report
+
+**Date:** {{timestamp}}  
+**Cluster:** {{cluster_name}}  
+**Gatekeeper Version:** {{gatekeeper_version}}
+
+## System Status
+- **Controller Manager:** {{controller_status}}
+- **Audit Controller:** {{audit_status}}
+- **Webhook Registration:** {{webhook_status}}
+
+## Policy Templates
+- **RequireServiceAccount:** {{sa_template_status}}
+- **RequireSpireSocket:** {{socket_template_status}}
+- **RequireNetworkPolicy:** {{netpol_template_status}}
+
+## Active Constraints
+- **ServiceAccount Enforcement:** {{sa_constraint_status}}
+- **SPIRE Socket Enforcement:** {{socket_constraint_status}}
+- **NetworkPolicy Enforcement:** {{netpol_constraint_status}}
+
+## Enforcement Testing
+### Denial Tests
+- **Pod without ServiceAccount:** {{deny_sa_test}}
+- **Pod without SPIRE socket:** {{deny_socket_test}}
+
+### Allow Tests
+- **Compliant Pod:** {{allow_compliant_test}}
+- **Existing Workloads:** {{allow_existing_test}}
+
+## Violations Detected
+```
+{{violations_summary}}
+```
+
+## Notes
+{{notes}}
+
+## Next Steps
+{{next_steps}}

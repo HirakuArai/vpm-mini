@@ -1,0 +1,15 @@
+# This Pod should be DENIED by RequireSpireSocket constraint
+apiVersion: v1
+kind: Pod
+metadata:
+  name: deny-no-spire-socket
+  namespace: hyper-swarm
+spec:
+  serviceAccountName: planner-sa
+  containers:
+  - name: test
+    image: alpine:3.19
+    command:
+    - /bin/sh
+    - -c
+    - "sleep 3600"

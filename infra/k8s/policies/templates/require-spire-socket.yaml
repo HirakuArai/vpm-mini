@@ -1,0 +1,48 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: requirespiresocket
+  annotations:
+    metadata.gatekeeper.sh/title: "Require SPIRE Socket"
+    metadata.gatekeeper.sh/version: "1.0.0"
+    description: "Requires Pods to mount SPIRE agent socket at /run/spire/sockets"
+spec:
+  crd:
+    spec:
+      names:
+        kind: RequireSpireSocket
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            exemptNamespaces:
+              description: "List of namespaces to exempt from this policy"
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package requirespiresocket
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Pod"
+          not is_exempt_namespace
+          not has_spire_socket_mount
+          msg := "Pod must mount SPIRE agent socket at /run/spire/sockets"
+        }
+
+        has_spire_socket_mount {
+          some i
+          input.review.object.spec.volumes[i].name == "spire-agent-socket"
+          some j
+          container := input.review.object.spec.containers[j]
+          some k
+          mount := container.volumeMounts[k]
+          mount.name == "spire-agent-socket"
+          mount.mountPath == "/run/spire/sockets"
+        }
+
+        is_exempt_namespace {
+          input.review.object.metadata.namespace == input.parameters.exemptNamespaces[_]
+        }
