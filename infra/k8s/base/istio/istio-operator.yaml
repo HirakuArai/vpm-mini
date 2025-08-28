@@ -1,0 +1,52 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  name: default
+  namespace: istio-system
+spec:
+  # Minimal configuration for kind/dev environment
+  components:
+    pilot:
+      k8s:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 100Mi
+    ingressGateways:
+    - name: istio-ingressgateway
+      enabled: true
+      k8s:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 40Mi
+        service:
+          type: NodePort
+          ports:
+          - port: 15021
+            targetPort: 15021
+            name: status-port
+            protocol: TCP
+          - port: 80
+            targetPort: 8080
+            name: http2
+            protocol: TCP
+            nodePort: 31380
+          - port: 443
+            targetPort: 8443
+            name: https
+            protocol: TCP
+            nodePort: 31390
+  values:
+    global:
+      # Minimal resource allocation for dev
+      proxy:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 40Mi
+    pilot:
+      traceSampling: 1.0
+    gateways:
+      istio-ingressgateway:
+        runAsRoot: true
