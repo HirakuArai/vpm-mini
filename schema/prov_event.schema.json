@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vpm-mini.local/schema/prov-event",
+  "title": "W3C PROV Event Schema for VPM-Mini",
+  "description": "JSON Schema for W3C PROV-compliant decision logging events",
+  "type": "object",
+  "required": ["@context", "@id", "entity", "activity", "agent"],
+  "properties": {
+    "@context": {
+      "description": "JSON-LD context",
+      "oneOf": [
+        {"type": "string"},
+        {"type": "object"},
+        {"type": "array"}
+      ]
+    },
+    "@id": {
+      "type": "string",
+      "pattern": "^prov:[0-9a-f-]+$",
+      "description": "Unique identifier for this PROV record"
+    },
+    "entity": {
+      "type": "object",
+      "description": "Entities used in the decision",
+      "patternProperties": {
+        "^entity:[0-9a-f-]+$": {
+          "type": "object",
+          "required": ["type"],
+          "properties": {
+            "type": {"const": "Entity"},
+            "hash": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "description": "SHA-256 hash of the entity content"
+            },
+            "algorithm": {
+              "type": "string",
+              "enum": ["sha256"],
+              "description": "Hash algorithm used"
+            },
+            "uri": {
+              "type": "string",
+              "format": "uri",
+              "description": "URI reference to the entity"
+            },
+            "label": {
+              "type": "string",
+              "description": "Human-readable label for the entity"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "activity": {
+      "type": "object", 
+      "description": "Activities in the decision process",
+      "patternProperties": {
+        "^activity:[0-9a-f-]+$": {
+          "type": "object",
+          "required": ["type"],
+          "properties": {
+            "type": {"const": "Activity"},
+            "label": {
+              "type": "string",
+              "description": "Human-readable label for the activity"
+            },
+            "startedAtTime": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Activity start time in ISO 8601 format"
+            },
+            "endedAtTime": {
+              "type": "string", 
+              "format": "date-time",
+              "description": "Activity end time in ISO 8601 format"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "agent": {
+      "type": "object",
+      "description": "Agents responsible for the decision",
+      "patternProperties": {
+        "^agent:(spiffe|system|user):[^/]+": {
+          "type": "object",
+          "required": ["type"],
+          "properties": {
+            "type": {"const": "Agent"},
+            "label": {
+              "type": "string",
+              "description": "Human-readable label for the agent"
+            },
+            "spiffe_id": {
+              "type": "string",
+              "pattern": "^spiffe://[^/]+/.*$",
+              "description": "SPIFFE ID of the agent"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "wasGeneratedBy": {
+      "type": "object",
+      "description": "Generation relationships",
+      "patternProperties": {
+        "^_:[0-9a-f-]+$": {
+          "type": "object",
+          "required": ["prov:entity", "prov:activity"],
+          "properties": {
+            "prov:entity": {"type": "string"},
+            "prov:activity": {"type": "string"},
+            "prov:time": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "wasAttributedTo": {
+      "type": "object",
+      "description": "Attribution relationships", 
+      "patternProperties": {
+        "^_:[0-9a-f-]+$": {
+          "type": "object",
+          "required": ["prov:entity", "prov:agent"],
+          "properties": {
+            "prov:entity": {"type": "string"},
+            "prov:agent": {"type": "string"}
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "used": {
+      "type": "object",
+      "description": "Usage relationships",
+      "patternProperties": {
+        "^_:[0-9a-f-]+$": {
+          "type": "object",
+          "required": ["prov:activity", "prov:entity"],
+          "properties": {
+            "prov:activity": {"type": "string"},
+            "prov:entity": {"type": "string"},
+            "prov:time": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "wasAssociatedWith": {
+      "type": "object",
+      "description": "Association relationships",
+      "patternProperties": {
+        "^_:[0-9a-f-]+$": {
+          "type": "object",
+          "required": ["prov:activity", "prov:agent"],
+          "properties": {
+            "prov:activity": {"type": "string"},
+            "prov:agent": {"type": "string"}
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
