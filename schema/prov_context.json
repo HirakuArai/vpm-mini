@@ -1,0 +1,59 @@
+{
+  "@context": {
+    "@vocab": "https://www.w3.org/ns/prov#",
+    "prov": "https://www.w3.org/ns/prov#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "vpm": "https://vpm-mini.local/ns/",
+    "spiffe": "spiffe://",
+    
+    "id": "@id",
+    "type": "@type",
+    
+    "entity": {
+      "@id": "prov:Entity",
+      "@type": "@id"
+    },
+    "activity": {
+      "@id": "prov:Activity",
+      "@type": "@id"
+    },
+    "agent": {
+      "@id": "prov:Agent",
+      "@type": "@id"
+    },
+    
+    "wasGeneratedBy": {
+      "@id": "prov:wasGeneratedBy",
+      "@type": "@id"
+    },
+    "wasAttributedTo": {
+      "@id": "prov:wasAttributedTo", 
+      "@type": "@id"
+    },
+    "used": {
+      "@id": "prov:used",
+      "@type": "@id"
+    },
+    "wasAssociatedWith": {
+      "@id": "prov:wasAssociatedWith",
+      "@type": "@id"
+    },
+    
+    "startedAtTime": {
+      "@id": "prov:startedAtTime",
+      "@type": "xsd:dateTime"
+    },
+    "endedAtTime": {
+      "@id": "prov:endedAtTime", 
+      "@type": "xsd:dateTime"
+    },
+    "generatedAtTime": {
+      "@id": "prov:generatedAtTime",
+      "@type": "xsd:dateTime"
+    },
+    
+    "hash": "vmp:hash",
+    "algorithm": "vmp:algorithm",
+    "uri": "vpm:uri"
+  }
+}
