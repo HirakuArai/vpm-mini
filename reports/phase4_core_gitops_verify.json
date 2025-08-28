@@ -1,0 +1,34 @@
+{
+  "timestamp": "2025-08-28T22:00:00Z",
+  "commit": "c378b35",
+  "branch": "main",
+  "root_app": {
+    "synced": true,
+    "healthy": true,
+    "sync_status": "Synced",
+    "health_status": "Healthy"
+  },
+  "resource_tracking": {
+    "gateway_tracked": true,
+    "netpol_tracked": true,
+    "netpol_count": 2
+  },
+  "external_access": {
+    "reachable": true,
+    "success_rate": 0.967,
+    "p50_ms": 287,
+    "successful_requests": 29,
+    "total_requests": 30
+  },
+  "overall_status": {
+    "synced": true,
+    "healthy": true,
+    "gateway_tracked": true,
+    "netpol_tracked": true,
+    "reachable": true,
+    "success_rate": 0.967,
+    "p50_ms": 287,
+    "all_ok": true
+  },
+  "note": "Core infrastructure successfully migrated to GitOps. Gateway and NetworkPolicy resources tracked by Argo CD with maintained external connectivity."
+}

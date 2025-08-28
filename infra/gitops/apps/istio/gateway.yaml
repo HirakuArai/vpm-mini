@@ -1,0 +1,19 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: vpm-mini-gateway
+  namespace: istio-system
+  labels:
+    app.kubernetes.io/name: vmp-mini-gateway
+    app.kubernetes.io/part-of: vpm-mini
+    app.kubernetes.io/component: ingress
+spec:
+  gatewayClassName: istio
+  listeners:
+  - name: http
+    hostname: "*"
+    port: 80
+    protocol: HTTP
+    allowedRoutes:
+      namespaces:
+        from: All
