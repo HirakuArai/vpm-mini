@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k8s-workload-registrar
+  namespace: spire-system
+data:
+  registrar.conf: |
+    trust_domain = "vpm-mini.local"
+    server_address = "spire-server:8081"
+    cluster = "kind"
+    mode = "reconcile"
+    pod_annotation = "spiffe.io/inject"
+    disabled_namespaces = ["kube-system", "kube-public"]

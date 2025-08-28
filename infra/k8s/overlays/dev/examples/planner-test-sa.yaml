@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: planner-sa
+  namespace: hyper-swarm
+  annotations:
+    spiffe.io/inject: "true"

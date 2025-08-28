@@ -1,0 +1,102 @@
+---
+# ServiceAccount for SPIRE Server
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: spire-server
+  namespace: spire-system
+---
+# ServiceAccount for SPIRE Agent
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: spire-agent
+  namespace: spire-system
+---
+# ServiceAccount for Workload Registrar
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: spire-workload-registrar
+  namespace: spire-system
+---
+# RBAC for SPIRE Server - ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: spire-server-trust-role
+rules:
+- apiGroups: [""]
+  resources: ["nodes", "pods"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["serviceaccounts"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list"]
+---
+# RBAC for SPIRE Server - ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: spire-server-trust-role-binding
+roleRef:
+  kind: ClusterRole
+  name: spire-server-trust-role
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: spire-server
+  namespace: spire-system
+---
+# RBAC for SPIRE Agent - ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: spire-agent-trust-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "nodes"]
+  verbs: ["get", "list"]
+---
+# RBAC for SPIRE Agent - ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: spire-agent-trust-role-binding
+roleRef:
+  kind: ClusterRole
+  name: spire-agent-trust-role
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: spire-agent
+  namespace: spire-system
+---
+# RBAC for Workload Registrar - ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: spire-workload-registrar-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "serviceaccounts", "namespaces", "nodes"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create"]
+---
+# RBAC for Workload Registrar - ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: spire-workload-registrar-role-binding
+roleRef:
+  kind: ClusterRole
+  name: spire-workload-registrar-role
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: spire-workload-registrar
+  namespace: spire-system
