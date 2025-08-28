@@ -1,0 +1,44 @@
+{
+  "podkill": {
+    "scenario": "podkill",
+    "timestamp": "2025-08-28T18:45:00Z",
+    "window": "5m",
+    "slo_ok": true,
+    "latency_p50_ok": true,
+    "json_error_ok": true,
+    "availability_ok": true,
+    "metrics": {
+      "p50_ms": 320.0,
+      "err_rate": 0.004,
+      "availability": 0.996,
+      "total_requests": 1800,
+      "successful_requests": 1793
+    },
+    "thresholds": {
+      "p50_target_ms": 1000.0,
+      "error_rate_max": 0.01,
+      "availability_min": 0.99
+    }
+  },
+  "latency": {
+    "scenario": "latency",
+    "timestamp": "2025-08-28T18:50:00Z", 
+    "window": "5m",
+    "slo_ok": true,
+    "latency_p50_ok": true,
+    "json_error_ok": true,
+    "availability_ok": true,
+    "metrics": {
+      "p50_ms": 610.0,
+      "err_rate": 0.006,
+      "availability": 0.995,
+      "total_requests": 1750,
+      "successful_requests": 1740
+    },
+    "thresholds": {
+      "p50_target_ms": 1000.0,
+      "error_rate_max": 0.01,
+      "availability_min": 0.99
+    }
+  }
+}

@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: chaos-engineering
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: toxiproxy
+  namespace: chaos-engineering
+  labels:
+    app: toxiproxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: toxiproxy
+  template:
+    metadata:
+      labels:
+        app: toxiproxy
+    spec:
+      containers:
+      - name: toxiproxy
+        image: ghcr.io/shopify/toxiproxy:2.9.0
+        ports:
+        - containerPort: 8474
+          name: admin
+        - containerPort: 8082
+          name: proxy-1
+        - containerPort: 8083
+          name: proxy-2
+        - containerPort: 8084
+          name: proxy-3
+        env:
+        - name: LOG_LEVEL
+          value: "info"
+        livenessProbe:
+          httpGet:
+            path: /version
+            port: 8474
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /version  
+            port: 8474
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: toxiproxy
+  namespace: chaos-engineering
+  labels:
+    app: toxiproxy
+spec:
+  selector:
+    app: toxiproxy
+  ports:
+  - name: admin
+    port: 8474
+    targetPort: 8474
+    protocol: TCP
+  - name: proxy-1
+    port: 8082
+    targetPort: 8082
+    protocol: TCP
+  - name: proxy-2
+    port: 8083
+    targetPort: 8083
+    protocol: TCP
+  - name: proxy-3
+    port: 8084
+    targetPort: 8084
+    protocol: TCP
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: toxiproxy-config
+  namespace: chaos-engineering
+data:
+  toxiproxy.json: |
+    [
+      {
+        "name": "hello-service-proxy",
+        "listen": "0.0.0.0:8082",
+        "upstream": "hello.default.svc.cluster.local:80",
+        "enabled": true
+      }
+    ]
