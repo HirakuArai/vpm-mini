@@ -1,0 +1,133 @@
+# Phase 5-3: Post-Promotion SLO Guard Report
+
+## Summary
+**Date**: {{TIMESTAMP}}  
+**Commit**: {{COMMIT}}  
+**Status**: {{STATUS_EMOJI}} {{STATUS}}  
+
+## SLO Guard Configuration
+- **Monitoring Window**: {{WINDOW_MIN}} minutes
+- **Success Rate Threshold**: ≥ {{SUCC_THRESHOLD}}%
+- **Latency Threshold**: < {{P50_THRESHOLD}}ms
+- **Target URL**: {{URL}}
+
+## Guard Results
+- **Observed Success Rate**: {{SUCCESS_RATE}}%
+- **Observed P50 Latency**: {{P50_MS}}ms  
+- **Guard Status**: {{GUARD_STATUS}}
+- **Actions Taken**: {{ACTIONS_TAKEN}}
+
+## Post-Guard Actions
+- **Rolled Back**: {{ROLLED_BACK}}
+- **Deploy Freeze**: {{FREEZE_ON}}
+- **Incident Created**: {{INCIDENT_CREATED}}
+- **Incident URL**: {{ISSUE_URL}}
+
+## Detailed Metrics
+
+### Monitoring Timeline
+- **Total Batches**: {{TOTAL_BATCHES}}
+- **Min Success Rate**: {{MIN_SUCCESS_RATE}}%
+- **Max Success Rate**: {{MAX_SUCCESS_RATE}}%
+- **Min P50 Latency**: {{MIN_P50_MS}}ms
+- **Max P50 Latency**: {{MAX_P50_MS}}ms
+
+### Threshold Analysis
+{{THRESHOLD_ANALYSIS}}
+
+## Safety Net Effectiveness
+
+### ✅ Step 5-3 Complete: Post-Promotion SLO Guard
+- **Window**: {{WINDOW_MIN}}m monitoring after 100% promotion
+- **Success Rate**: {{SUCCESS_RATE}}% (threshold: ≥{{SUCC_THRESHOLD}}%)  
+- **P50 Latency**: {{P50_MS}}ms (threshold: <{{P50_THRESHOLD}}ms)
+- **Guard Result**: {{GUARD_RESULT}}
+- **Rollback**: {{ROLLBACK_STATUS}}
+- **Freeze**: {{FREEZE_STATUS}}
+- **Incident**: {{INCIDENT_STATUS}}
+
+## Operational Impact
+
+### Protection Mechanisms
+{{#if GUARD_PASSED}}
+✅ **Guard Passed** - No intervention required
+- Service metrics remained within SLO thresholds throughout monitoring window
+- Promotion completed successfully with full traffic on new version
+- No rollback or freeze actions triggered
+{{else}}
+🚨 **Guard Failed** - Emergency procedures activated
+- SLO thresholds breached during post-promotion monitoring
+- Automatic rollback initiated to restore service stability  
+- Deploy freeze activated to prevent further deployments
+- Incident tracking enabled for root cause analysis
+{{/if}}
+
+### Rollback Details
+{{#if ROLLED_BACK}}
+- **Rollback Target**: {{ROLLBACK_STAGE}}
+- **Rollback Time**: {{ROLLBACK_TIMESTAMP}}
+- **Traffic Distribution**: Restored to previous canary weights
+- **Verification**: {{ROLLBACK_VERIFICATION}}
+{{else}}
+- No rollback required - service remained stable
+{{/if}}
+
+### Deploy Freeze Status
+{{#if FREEZE_ON}}
+⚠️ **Deploy Freeze ACTIVE**
+- **Reason**: {{FREEZE_REASON}}
+- **Timestamp**: {{FREEZE_TIMESTAMP}}
+- **Resolution**: Manual intervention required
+- **Action**: Update `.ops/deploy_freeze.json` to `{"freeze": false}` when ready
+{{else}}
+✅ **Deploy Freeze OFF** - Deployments continue normally
+{{/if}}
+
+## Technical Implementation
+
+### Guard Monitoring Process
+1. **Post-100% Promotion**: Begin monitoring after traffic reaches 100% new version
+2. **Batch Sampling**: Continuous HTTP probes in configurable batches
+3. **Threshold Evaluation**: Real-time comparison against SLO targets
+4. **Failure Detection**: Immediate response on threshold breach
+5. **Automatic Rollback**: Traffic redistribution to previous stable state
+6. **Deploy Freeze**: CI/CD pipeline protection mechanism
+
+### Key Benefits
+- **Zero Manual Intervention**: Fully automated safety response
+- **Fast Recovery**: Immediate rollback on SLO breach detection
+- **Operational Safety**: Deploy freeze prevents cascade failures
+- **Audit Trail**: Complete incident tracking and documentation
+- **Configurable Thresholds**: Environment-specific SLO targets
+
+## Recommendations
+
+### Immediate Actions
+{{#if GUARD_FAILED}}
+1. **Verify Rollback**: Confirm traffic distribution and service stability
+2. **Root Cause Analysis**: Investigate SLO breach cause
+3. **Service Health**: Monitor current service metrics and logs
+4. **Incident Response**: Follow established incident procedures
+{{else}}
+1. **Monitor Trends**: Continue observing service metrics
+2. **Validate Success**: Confirm sustained performance
+3. **Document Success**: Record successful promotion completion
+{{/if}}
+
+### Long-term Improvements
+- Review SLO thresholds based on operational experience
+- Tune monitoring window duration for optimal detection
+- Enhance rollback verification mechanisms
+- Consider gradual traffic shifting strategies
+- Implement predictive failure detection
+
+## Artifacts & Links
+- **Guard Result**: `reports/phase5_cd_guard_result.json`
+- **Rollback Log**: `reports/phase5_cd_rollback.log`  
+- **Workflow Run**: [GitHub Actions]({{WORKFLOW_URL}})
+- **Incident Tracking**: {{ISSUE_URL}}
+
+---
+**Report Generated**: {{GENERATION_TIME}}  
+**Template Version**: 1.0  
+**Automation**: Post-Promotion SLO Guard

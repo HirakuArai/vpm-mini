@@ -1,0 +1,8 @@
+{
+  "freeze": false,
+  "reason": "initialization",
+  "timestamp": "2025-08-28T00:00:00Z",
+  "auto_created": false,
+  "resolution_required": false,
+  "notes": "Initial deploy freeze configuration - deployments are enabled by default"
+}
