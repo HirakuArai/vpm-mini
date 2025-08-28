@@ -1,0 +1,24 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: RequireNetworkPolicy
+metadata:
+  name: must-have-networkpolicy
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    excludedNamespaces: 
+      - "kube-system"
+      - "kube-public"
+      - "kube-node-lease"
+      - "gatekeeper-system"
+      - "spire-system"
+      - "local-path-storage"
+  parameters:
+    exemptNamespaces:
+      - "kube-system"
+      - "kube-public"
+      - "kube-node-lease"
+      - "gatekeeper-system"
+      - "spire-system"
+      - "local-path-storage"
