@@ -1,0 +1,8 @@
+{
+  "timestamp": "2025-08-29T01:08:30Z",
+  "synced": true,
+  "healthy": true,
+  "a_http_200": true,
+  "b_http_200": true,
+  "multicluster_gitops_ok": true
+}
