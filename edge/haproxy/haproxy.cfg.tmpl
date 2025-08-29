@@ -1,0 +1,27 @@
+global
+  log stdout format raw local0
+
+defaults
+  log global
+  mode http
+  option httplog
+  timeout connect 3s
+  timeout client  30s
+  timeout server  30s
+
+frontend fe_http
+  bind *:30080
+  default_backend be_hello
+
+backend be_hello
+  option httpchk GET /hello
+  http-check expect rstatus 2..
+  # primary: cluster-a (NodePort 31380), backup: cluster-b (NodePort 32380)
+  server cluster-a 127.0.0.1:31380 check fall 2 rise 1
+  server cluster-b 127.0.0.1:32380 check backup fall 2 rise 1
+
+listen stats
+  bind *:30090
+  mode http
+  stats enable
+  stats uri /stats
