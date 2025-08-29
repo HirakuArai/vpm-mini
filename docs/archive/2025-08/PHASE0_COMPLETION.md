@@ -1,3 +1,6 @@
+> **Status: ARCHIVED (Superseded by Phase 6)**  
+> この文書は Phase 0 時点の完了報告です。現行の状態は STATE/current_state.md を参照してください。
+
 # Phase 0 Completion — VPM-Mini (with δ metrics)
 
 ## Scope

@@ -1,3 +1,6 @@
+> **Status: ARCHIVED (Superseded by Phase 6)**  
+> この文書は Phase 0 時点の計画です。現行の状態は STATE/current_state.md を参照してください。
+
 # Phase 0 実行計画（固定版）
 
 本計画は **Claude Code への 1 回指示 = 1 ステップ** として、Phase 0 を完了させるための具体タスクを整理したもの。各ステップには **DoD (完了判定)** を明記。
@@ -24,7 +27,7 @@
 * **内容**: `digest.run()` / `nav.md` 生成ロジックに `vec_id` 逆引きを追加。
 * **DoD**: Digest/Nav に `vec_id` と原文パスが表示。
 
-## Step 5 — 会話 UI / CLI から “ワンコマンド導線” を実装
+## Step 5 — 会話 UI / CLI から "ワンコマンド導線" を実装
 
 * **内容**: UI ボタン/CLI サブコマンドから一括で log→summary→digest→nav→egspace を実行。
 * **DoD**: 1操作で log/memory.json/digest/nav が更新。
