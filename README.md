@@ -58,3 +58,4 @@ open http://localhost:3000  # (admin/admin)
 - A/B テスト評価枠組み構築
 - 800 cells/sec 大規模負荷耐性確立
 - SSOT（運用ループの全体図）: `diagrams/src/ops_single_source_of_truth_v1.md`
+- ドキュメント目次: `docs/README.md`
