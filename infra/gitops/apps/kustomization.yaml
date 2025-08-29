@@ -4,5 +4,6 @@ namespace: hyper-swarm
 resources:
   - gitops-check-cm.yaml
   - hello/
+  - hello-v2/
   - istio/
   - netpol/
