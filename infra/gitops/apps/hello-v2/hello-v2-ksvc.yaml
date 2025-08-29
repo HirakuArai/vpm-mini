@@ -1,0 +1,36 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: hello-v2
+  namespace: hyper-swarm
+  labels:
+    app.kubernetes.io/name: hello-v2
+    app.kubernetes.io/part-of: vpm-mini
+    app.kubernetes.io/component: application
+    app.kubernetes.io/version: v2
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "50"
+        autoscaling.knative.dev/target: "100"
+      labels:
+        app.kubernetes.io/name: hello-v2
+        app.kubernetes.io/part-of: vpm-mini
+        app.kubernetes.io/version: v2
+    spec:
+      containers:
+        - image: gcr.io/knative-samples/helloworld-go
+          env:
+            - name: TARGET
+              value: "v2"
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi

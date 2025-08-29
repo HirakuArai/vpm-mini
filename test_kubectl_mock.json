@@ -1,0 +1,38 @@
+{
+  "apiVersion": "argoproj.io/v1alpha1",
+  "kind": "Application", 
+  "metadata": {
+    "name": "root-app",
+    "namespace": "argocd"
+  },
+  "status": {
+    "sync": {
+      "status": "Synced"
+    },
+    "health": {
+      "status": "Healthy"
+    },
+    "resources": [
+      {
+        "kind": "Gateway",
+        "name": "vpm-mini-gateway",
+        "namespace": "hyper-swarm"
+      },
+      {
+        "kind": "NetworkPolicy", 
+        "name": "allow-istio-ingress-to-hello",
+        "namespace": "hyper-swarm"
+      },
+      {
+        "kind": "NetworkPolicy",
+        "name": "allow-istio-ingress-to-hello-v2", 
+        "namespace": "hyper-swarm"
+      },
+      {
+        "kind": "Service",
+        "name": "hello",
+        "namespace": "hyper-swarm"
+      }
+    ]
+  }
+}
