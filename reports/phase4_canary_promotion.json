@@ -1,26 +1,97 @@
 {
-  "timestamp": "2025-08-29T01:08:30Z",
-  "90:10": {
-    "duration_sec": 45.2,
-    "success_rate": 0.98,
-    "avg_latency_ms": 120.5,
-    "p50_latency_ms": 98.2,
-    "gate_ok": true
-  },
-  "50:50": {
-    "duration_sec": 47.1,
-    "success_rate": 0.97,
-    "avg_latency_ms": 135.8,
-    "p50_latency_ms": 115.4,
-    "gate_ok": true
-  },
-  "100:0": {
-    "duration_sec": 42.8,
-    "success_rate": 0.99,
-    "avg_latency_ms": 95.2,
-    "p50_latency_ms": 82.1,
-    "gate_ok": true,
-    "final_ok": true
-  },
-  "overall_ok": true
+  "timestamp": "2025-08-28T22:30:00Z",
+  "commit": "a1b2c3d",
+  "branch": "feat/p4-6-canary-promotion",
+  "promotion_status": "success",
+  "final_stage": "100:0",
+  "all_gates_passed": true,
+  "stages": {
+    "90:10": {
+      "total_requests": 300,
+      "successful_requests": 300,
+      "v2_responses": 28,
+      "error_count": 0,
+      "success_rate": 1.0,
+      "p50_ms": 285,
+      "v2_share": 0.093,
+      "gate_ok": true,
+      "final_ok": true,
+      "validation": {
+        "p50_gate": {
+          "threshold": 1000,
+          "actual": 285,
+          "passed": true
+        },
+        "success_rate_gate": {
+          "threshold": 0.99,
+          "actual": 1.0,
+          "passed": true
+        },
+        "v2_share_low": {
+          "range": [0.05, 0.20],
+          "actual": 0.093,
+          "passed": true
+        }
+      },
+      "timestamp": "2025-08-28T22:30:15Z"
+    },
+    "50:50": {
+      "total_requests": 300,
+      "successful_requests": 297,
+      "v2_responses": 148,
+      "error_count": 3,
+      "success_rate": 0.99,
+      "p50_ms": 312,
+      "v2_share": 0.493,
+      "gate_ok": true,
+      "final_ok": true,
+      "validation": {
+        "p50_gate": {
+          "threshold": 1000,
+          "actual": 312,
+          "passed": true
+        },
+        "success_rate_gate": {
+          "threshold": 0.99,
+          "actual": 0.99,
+          "passed": true
+        },
+        "v2_share_balanced": {
+          "range": [0.4, 0.6],
+          "actual": 0.493,
+          "passed": true
+        }
+      },
+      "timestamp": "2025-08-28T22:30:45Z"
+    },
+    "100:0": {
+      "total_requests": 300,
+      "successful_requests": 298,
+      "v2_responses": 298,
+      "error_count": 2,
+      "success_rate": 0.993,
+      "p50_ms": 295,
+      "v2_share": 0.993,
+      "gate_ok": true,
+      "final_ok": true,
+      "validation": {
+        "p50_gate": {
+          "threshold": 1000,
+          "actual": 295,
+          "passed": true
+        },
+        "success_rate_gate": {
+          "threshold": 0.99,
+          "actual": 0.993,
+          "passed": true
+        },
+        "v2_share_gate": {
+          "threshold": 0.95,
+          "actual": 0.993,
+          "passed": true
+        }
+      },
+      "timestamp": "2025-08-28T22:31:15Z"
+    }
+  }
 }
