@@ -1,0 +1,122 @@
+# Phase 5-4: Multi-Cluster GitOps (ApplicationSet) - Verification Report
+
+**Date**: {{DATE}}  
+**Commit**: {{COMMIT}}  
+**Verification**: {{VERIFY_JSON}}
+
+## ✅ Step 5-4 完了: Multi-Cluster GitOps（ApplicationSet）
+
+### Implementation Results
+- **Applications**: root-app-cluster-a / root-app-cluster-b → Synced & Healthy
+- **External**: cluster-a(31380) / cluster-b(32380) both serve HTTP 200
+- **ApplicationSet**: Automated multi-cluster application generation and synchronization
+- **Cluster Registration**: Both clusters registered with region labels (a/b)
+
+## Multi-Cluster Architecture
+
+### ApplicationSet Configuration
+- **Generator**: Clusters selector with `region in [a,b]` labels
+- **Template**: Automatic root-app-{{name}} generation for each cluster
+- **Source**: GitOps apps from `infra/gitops/apps/` synchronized to both clusters
+- **Sync Policy**: Automated with prune and selfHeal enabled
+
+### Cluster Differentiation
+- **cluster-a**: 
+  - Context: kind-cluster-a (or configured via A_CTX)
+  - NodePort: 31380 for istio-ingressgateway
+  - Region label: a
+- **cluster-b**: 
+  - Context: kind-cluster-b (or configured via B_CTX)  
+  - NodePort: 32380 for istio-ingressgateway
+  - Region label: b
+
+### GitOps Synchronization
+- **Automated Deployment**: ApplicationSet generates Applications for each registered cluster
+- **Consistent Configuration**: Same GitOps manifests deployed to all clusters
+- **Independent Operations**: Each cluster maintains its own Application sync status
+- **Centralized Management**: Single ApplicationSet controls multi-cluster deployments
+
+## Implementation Steps
+
+### 1. Bootstrap Procedure
+```bash
+# Register clusters and configure ApplicationSet
+bash scripts/phase5_appset_bootstrap.sh
+```
+
+**Actions Performed**:
+- Register cluster-a and cluster-b to ArgoCD
+- Add region=a/b labels to cluster secrets
+- Configure istio-ingressgateway NodePorts (31380/32380)
+- Deploy ApplicationSet resource
+
+### 2. Verification Process
+```bash
+# Verify multi-cluster deployment status
+bash scripts/phase5_appset_verify.sh
+```
+
+**Validation Points**:
+- Cluster registration and connectivity
+- ApplicationSet-generated Applications sync/health status
+- Service reachability on both clusters
+- Comprehensive verification report generation
+
+## Technical Benefits
+
+### Scalable Multi-Cluster Management
+- **Declarative Clusters**: New clusters auto-discovered via label selectors
+- **Consistent Deployments**: Same GitOps configuration across all clusters
+- **Independent Scaling**: Each cluster can be scaled/managed independently
+- **Centralized Observability**: Single ArgoCD instance monitors all clusters
+
+### Operational Advantages
+- **Disaster Recovery**: Traffic can be redirected between clusters
+- **Blue-Green Deployment**: Entire cluster can serve as blue/green environment
+- **Regional Distribution**: Clusters can be geographically distributed
+- **Load Distribution**: Traffic can be split across multiple clusters
+
+### Development Workflow
+- **Unified GitOps**: Single source of truth for all cluster configurations
+- **Environment Parity**: Dev/staging/prod clusters use same manifests
+- **Testing Isolation**: Each cluster can run independent test scenarios
+- **Safe Experimentation**: Isolated clusters for feature validation
+
+## Operational Considerations
+
+### Cluster Management
+- **Registration**: Use `argocd cluster add` or manual secret creation
+- **Labeling**: Region labels enable cluster selection and differentiation
+- **Networking**: NodePort configuration allows external access differentiation
+- **Monitoring**: Each cluster's Application status visible in ArgoCD UI
+
+### Traffic Management
+- **Load Balancing**: External load balancer can distribute traffic
+- **Failover**: DNS/LB can redirect traffic on cluster failure
+- **Circuit Breaking**: Unhealthy clusters can be automatically excluded
+- **Geographical Routing**: Route users to nearest cluster
+
+### Security & Access
+- **Cluster Isolation**: Each cluster maintains independent security boundaries
+- **RBAC**: ArgoCD service accounts have minimal required permissions
+- **Network Policies**: Cluster-specific network security rules
+- **Secret Management**: Cluster-specific secrets and configurations
+
+## Next Steps
+
+### Phase 5-5: Multi-Cluster Operations
+- [ ] Cross-cluster service mesh configuration
+- [ ] Global load balancing and failover automation
+- [ ] Multi-cluster monitoring and alerting
+- [ ] Disaster recovery procedures and testing
+
+### Operational Improvements
+- [ ] Cluster health monitoring and auto-exclusion
+- [ ] Progressive deployment across clusters
+- [ ] Multi-cluster canary deployment strategies
+- [ ] Cross-cluster service discovery and communication
+
+---
+**Report Generated**: {{DATE}}  
+**Template Version**: 1.0  
+**Multi-Cluster GitOps**: ApplicationSet-based deployment

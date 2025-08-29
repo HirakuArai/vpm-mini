@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: root-app-multicluster
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: root-app-multicluster
+    app.kubernetes.io/part-of: vpm-mini
+    app.kubernetes.io/component: applicationset
+spec:
+  generators:
+    - clusters:
+        selector:
+          matchExpressions:
+            - { key: region, operator: In, values: ["a", "b"] }
+  template:
+    metadata:
+      name: root-app-{{name}}
+      namespace: argocd
+      labels:
+        app.kubernetes.io/part-of: vpm-mini
+        app.kubernetes.io/component: root-app
+        cluster: "{{name}}"
+        region: "{{metadata.labels.region}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/HirakuArai/vpm-mini.git
+        targetRevision: main
+        path: infra/gitops/apps
+      destination:
+        server: "{{server}}"
+        namespace: hyper-swarm
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m
+  syncPolicy:
+    preserveResourcesOnDeletion: false
