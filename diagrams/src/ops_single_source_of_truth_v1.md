@@ -114,3 +114,33 @@ flowchart LR
   class O4 wip
   class O5 wip
 ```
+
+### Phase 5+ 追補: CD Guard / Freeze / Failover / Multi-Cluster
+
+下図は Phase 5 以降で加わった運用ループ（Canary→Post-Guard→Freeze／Multi-Cluster GitOps／Edge Failover）を追補したものです。
+
+```mermaid
+flowchart LR
+  subgraph "CD"
+    C1["Canary 90/50/100"]
+    G1["Post-Guard (SLO)"]
+    FZ["Freeze flag (.ops)"]
+  end
+  subgraph "GitOps (Argo/AppSet)"
+    A1["root-app-cluster-a"]
+    A2["root-app-cluster-b"]
+  end
+  subgraph "Edge"
+    E1["HAProxy/DNS (Failover)"]
+  end
+  C1 --> G1 -->|guard_ok| A1 & A2
+  G1 -->|guard_ng| FZ
+  A1 & A2 --> E1
+```
+
+**運用ループ詳細:**
+- **Canary**: 90/10 → 50/50 → 100/0（SLOゲートを通過）
+- **Post-Guard**: 昇格後に監視ウィンドウで SLO を再評価（NG → Rollback + Freeze + Issue）
+- **Multi-Cluster GitOps**: ApplicationSet で a/b 両クラスタを同期（root-app-cluster-*）
+- **Edge Failover**: a→b の自動切替（RTO/品質の監査値は reports に保存）
+

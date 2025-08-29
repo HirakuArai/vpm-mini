@@ -19,6 +19,11 @@ spec:
         type: PathPrefix
         value: /hello
     backendRefs:
-    - name: hello
+    - kind: Service
+      name: hello
       port: 80
-      weight: 100
+      weight: 90
+    - kind: Service
+      name: hello-v2
+      port: 80
+      weight: 10

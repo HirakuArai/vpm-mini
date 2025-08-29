@@ -1,0 +1,32 @@
+{
+  "timestamp": "2025-08-28T22:15:00Z",
+  "commit": "97b71c1",
+  "branch": "main",
+  "argo_status": {
+    "synced": true,
+    "healthy": true
+  },
+  "httproute_config": {
+    "hello_weight": 0.9,
+    "v2_weight": 0.1
+  },
+  "canary_test": {
+    "total_requests": 300,
+    "hello_count": 273,
+    "v2_count": 27,
+    "error_count": 0,
+    "v2_share": 0.090,
+    "p50_ms": 301
+  },
+  "verification": {
+    "synced": true,
+    "healthy": true,
+    "hello_weight": 0.9,
+    "v2_weight": 0.1,
+    "v2_share": 0.090,
+    "p50_ms": 301,
+    "v2_in_range": true,
+    "all_ok": true
+  },
+  "note": "Canary deployment successfully established with HTTPRoute 90/10 traffic splitting. V2 traffic distribution within expected range."
+}

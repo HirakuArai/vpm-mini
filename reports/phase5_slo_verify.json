@@ -1,0 +1,8 @@
+{
+  "timestamp": "2025-08-29T01:08:30Z",
+  "fast_burn_triggered": true,
+  "slow_burn_triggered": true,
+  "success_rate": 0.98,
+  "recovery_ok": true,
+  "slo_foundation_ok": true
+}
