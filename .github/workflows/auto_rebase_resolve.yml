@@ -1,0 +1,91 @@
+name: Auto rebase & resolve
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: "Branch name to normalize (e.g., feat/p4-6-canary-promotion)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target_branch }}
+          fetch-depth: 0
+
+      - name: Set git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch main
+        run: |
+          git fetch origin main
+
+      - name: Merge main into target (non-ff)
+        id: merge
+        run: |
+          set -e
+          if git merge --no-ff origin/main -m "chore: merge main into ${{ inputs.target_branch }}"; then
+            echo "merged=clean" >> $GITHUB_OUTPUT
+          else
+            echo "merged=conflict" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Auto-resolve conflicts (reports=ours, scripts/docs/diagrams=theirs)
+        if: steps.merge.outputs.merged == 'conflict'
+        run: |
+          set -e
+          # reports/** は main 側（ours）
+          git checkout --ours -- reports || true
+          git add reports || true
+
+          # scripts/** は PR 側（theirs）
+          git checkout --theirs -- scripts || true
+          chmod +x scripts/*.sh 2>/dev/null || true
+          git add scripts || true
+
+          # docs/**, diagrams/src/** は PR 側（theirs）
+          git checkout --theirs -- docs diagrams/src 2>/dev/null || true
+          git add docs diagrams/src 2>/dev/null || true
+
+          # ここまでで残る衝突があれば可視化して失敗
+          if ! git diff --name-only --diff-filter=U | grep . >/dev/null 2>&1; then
+            echo "All conflicts staged."
+          else
+            echo "Unresolved conflicts remain:"
+            git diff --name-only --diff-filter=U || true
+            exit 1
+          fi
+
+      - name: Validate JSON under reports/
+        if: always()
+        run: |
+          set -e
+          sudo apt-get update -y >/dev/null
+          sudo apt-get install -y jq >/dev/null
+          if ls reports/*.json >/dev/null 2>&1; then
+            for f in reports/*.json; do
+              jq . "$f" >/dev/null || (echo "Invalid JSON: $f" && exit 1)
+            done
+          fi
+
+      - name: Commit auto-resolve
+        if: steps.merge.outputs.merged == 'conflict'
+        run: |
+          set -e
+          git commit -m "chore: auto-resolve conflicts (reports=ours, scripts/docs/diagrams=theirs)"
+
+      - name: Push changes
+        run: |
+          set -e
+          git push origin HEAD:${{ inputs.target_branch }}
