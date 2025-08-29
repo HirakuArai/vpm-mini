@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-istio-ingress-to-hello-v2
+  namespace: hyper-swarm
+  labels:
+    app.kubernetes.io/name: allow-istio-ingress-to-hello-v2
+    app.kubernetes.io/part-of: vpm-mini
+    app.kubernetes.io/component: security
+spec:
+  podSelector:
+    matchLabels:
+      serving.knative.dev/service: hello-v2
+  policyTypes: ["Ingress"]
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: istio-system
+      podSelector:
+        matchLabels:
+          istio: ingressgateway
+    ports:
+    - protocol: TCP
+      port: 8080
+  # Allow intra-namespace communication for Knative service mesh
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: hyper-swarm
+    ports:
+    - protocol: TCP
+      port: 8080
