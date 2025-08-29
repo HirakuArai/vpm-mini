@@ -1,0 +1,112 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: slo-routing
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: slo-routing
+    app.kubernetes.io/part-of: vpm-mini
+    app.kubernetes.io/component: monitoring
+    alertmanager: main
+spec:
+  route:
+    receiver: dev-log-sink
+    groupBy:
+      - alertname
+      - service
+      - severity
+    groupWait: 5s
+    groupInterval: 30s
+    repeatInterval: 5m
+    routes:
+    # Fast burn alerts - immediate notification
+    - match:
+        burn_rate: fast
+        severity: page
+      receiver: dev-fast-burn
+      groupWait: 0s
+      repeatInterval: 2m
+      
+    # Slow burn alerts - less frequent notification  
+    - match:
+        burn_rate: slow
+        severity: ticket
+      receiver: dev-slow-burn
+      groupWait: 10s
+      repeatInterval: 15m
+      
+    # Trend warnings - periodic notification
+    - match:
+        burn_rate: trend
+        severity: warning
+      receiver: dev-trend-warning
+      groupWait: 30s
+      repeatInterval: 1h
+
+  receivers:
+  # Default receiver - logs all alerts
+  - name: dev-log-sink
+    webhookConfigs:
+    - url: http://prometheus-alert-logger.monitoring.svc.cluster.local:9093/webhook
+      sendResolved: true
+      httpConfig:
+        headers:
+          alert-type: "default"
+      title: 'SLO Alert: {{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+      
+  # Fast burn receiver - high priority alerts
+  - name: dev-fast-burn
+    webhookConfigs:
+    - url: http://prometheus-alert-logger.monitoring.svc.cluster.local:9093/webhook
+      sendResolved: true
+      httpConfig:
+        headers:
+          alert-type: "fast_burn"
+          priority: "high"
+      title: '🚨 FAST BURN: {{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+      
+  # Slow burn receiver - medium priority alerts
+  - name: dev-slow-burn  
+    webhookConfigs:
+    - url: http://prometheus-alert-logger.monitoring.svc.cluster.local:9093/webhook
+      sendResolved: true
+      httpConfig:
+        headers:
+          alert-type: "slow_burn"
+          priority: "medium"
+      title: '⚠️ SLOW BURN: {{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+      
+  # Trend warning receiver - low priority alerts
+  - name: dev-trend-warning
+    webhookConfigs:
+    - url: http://prometheus-alert-logger.monitoring.svc.cluster.local:9093/webhook  
+      sendResolved: true
+      httpConfig:
+        headers:
+          alert-type: "trend_warning"  
+          priority: "low"
+      title: '📈 TREND: {{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+
+  inhibitRules:
+  # Inhibit slow burn when fast burn is firing
+  - sourceMatch:
+      burn_rate: fast
+    targetMatch:
+      burn_rate: slow
+    equal:
+      - service
+      
+  # Inhibit trend warnings when any burn is active
+  - sourceMatch:
+      burn_rate: fast
+    targetMatch:
+      burn_rate: trend
+    equal:
+      - service
+      
+  - sourceMatch:
+      burn_rate: slow  
+    targetMatch:
+      burn_rate: trend
+    equal:
+      - service

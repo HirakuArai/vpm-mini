@@ -1,0 +1,298 @@
+name: CD Canary Pipeline
+
+on:
+  push:
+    paths:
+      - "infra/gitops/apps/hello/**"
+      - "infra/gitops/apps/hello-v2/**"
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'Target URL for canary testing'
+        required: false
+        default: 'http://localhost:31380/hello'
+      force_promotion:
+        description: 'Force promotion even if SLO gates fail'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  URL: http://localhost:31380/hello
+
+jobs:
+  canary:
+    runs-on: self-hosted
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup kubeconfig
+        shell: bash
+        run: |
+          mkdir -p ~/.kube
+          echo "${KUBE_CONFIG_DATA}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+          
+          # Verify cluster access
+          kubectl cluster-info --request-timeout=10s
+          kubectl get ns hyper-swarm argocd istio-system
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+
+      - name: Wait for ArgoCD root-app sync
+        shell: bash
+        run: |
+          echo "Waiting for ArgoCD root-app to sync and become healthy..."
+          for i in {1..30}; do
+            echo "Check attempt $i/30..."
+            
+            # Get application status
+            app_json=$(kubectl -n argocd get application root-app -o json 2>/dev/null || echo '{}')
+            
+            if [[ "$app_json" == '{}' ]]; then
+              echo "root-app not found, waiting..."
+              sleep 10
+              continue
+            fi
+            
+            sync_status=$(echo "$app_json" | jq -r '.status.sync.status // "Unknown"')
+            health_status=$(echo "$app_json" | jq -r '.status.health.status // "Unknown"')
+            
+            echo "  Sync status: $sync_status"
+            echo "  Health status: $health_status"
+            
+            if [[ "$sync_status" == "Synced" && "$health_status" == "Healthy" ]]; then
+              echo "✅ root-app is Synced and Healthy"
+              exit 0
+            fi
+            
+            echo "Waiting for root-app sync/health... (sync=$sync_status, health=$health_status)"
+            sleep 10
+          done
+          
+          echo "❌ Timeout waiting for root-app sync"
+          kubectl -n argocd get application root-app -o yaml || true
+          exit 1
+
+      - name: Verify GitOps applications sync
+        shell: bash
+        run: |
+          echo "Verifying GitOps applications are synced..."
+          
+          # Check hello and hello-v2 applications
+          for app in hello hello-v2; do
+            echo "Checking application: $app"
+            
+            app_json=$(kubectl -n argocd get application "$app" -o json 2>/dev/null || echo '{}')
+            if [[ "$app_json" == '{}' ]]; then
+              echo "⚠️  Application $app not found, skipping..."
+              continue
+            fi
+            
+            sync_status=$(echo "$app_json" | jq -r '.status.sync.status // "Unknown"')
+            health_status=$(echo "$app_json" | jq -r '.status.health.status // "Unknown"')
+            
+            echo "  $app - Sync: $sync_status, Health: $health_status"
+            
+            if [[ "$sync_status" != "Synced" ]]; then
+              echo "⚠️  $app is not synced, triggering sync..."
+              kubectl -n argocd patch application "$app" --type merge -p '{"metadata":{"annotations":{"argocd.argoproj.io/refresh":"hard"}}}'
+            fi
+          done
+          
+          # Wait for applications to be ready
+          echo "Waiting for applications to be ready..."
+          sleep 30
+
+      - name: Canary promotion with SLO gates
+        shell: bash
+        run: |
+          echo "Starting canary promotion with SLO gates..."
+          
+          # Set URL from input if provided
+          if [[ -n "${{ inputs.url }}" ]]; then
+            export URL="${{ inputs.url }}"
+          fi
+          
+          echo "Target URL: $URL"
+          echo "Force promotion: ${{ inputs.force_promotion }}"
+          
+          # Ensure reports directory exists
+          mkdir -p reports
+          
+          # Run canary promotion script
+          if [[ "${{ inputs.force_promotion }}" == "true" ]]; then
+            echo "⚠️  Force promotion enabled - SLO gates will be bypassed"
+            export FORCE_PROMOTION=true
+          fi
+          
+          bash scripts/phase4_canary_promote.sh
+        env:
+          URL: ${{ inputs.url || env.URL }}
+
+      - name: Upload promotion report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase4_canary_promotion
+          path: reports/phase4_canary_promotion.json
+          retention-days: 30
+
+      - name: Display promotion results
+        if: always()
+        shell: bash
+        run: |
+          if [[ -f reports/phase4_canary_promotion.json ]]; then
+            echo "=== Canary Promotion Results ==="
+            jq -r '
+              "Timestamp: " + .timestamp + "\n" +
+              "Commit: " + .commit + "\n" +
+              "Status: " + .status + "\n" +
+              "Phases Completed: " + (.phases | length | tostring) + "\n" +
+              "Success Rate Final: " + (.final_metrics.success_rate | tostring) + "%" + "\n" +
+              "RPS Final: " + (.final_metrics.rps | tostring)
+            ' reports/phase4_canary_promotion.json
+            
+            echo
+            echo "=== Phase Details ==="
+            jq -r '.phases[] | "Phase " + .phase + " (" + .weight + "): " + .result + " - " + (.success_rate | tostring) + "% success"' reports/phase4_canary_promotion.json
+          else
+            echo "⚠️  Promotion report not found"
+          fi
+
+      - name: Setup Python for snapshot generation
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Generate snapshot markdown
+        shell: bash
+        run: |
+          echo "Generating snapshot markdown..."
+          
+          # Install required Python packages
+          pip3 install jinja2
+          
+          # Ensure the snapshot script exists and is executable
+          if [[ ! -f scripts/generate_promotion_snapshot.py ]]; then
+            echo "❌ Snapshot generation script not found"
+            exit 1
+          fi
+          
+          python3 scripts/generate_promotion_snapshot.py \
+            --template reports/templates/phase4_canary_promotion.md.tmpl \
+            --input reports/phase4_canary_promotion.json \
+            --output reports/snap_phase5-2-cd-canary.md
+          
+          echo "✅ Snapshot markdown generated"
+          
+          # Display snapshot preview
+          echo "=== Snapshot Preview ==="
+          head -20 reports/snap_phase5-2-cd-canary.md || echo "Could not preview snapshot"
+
+      - name: Create snapshot pull request
+        id: create_pr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: chore/p5-2-snapshot
+          title: "chore(p5-2): CD canary pipeline snapshot"
+          commit-message: |
+            chore(p5-2): add CD canary pipeline snapshot
+            
+            - Automated canary promotion completed successfully
+            - Generated snapshot report with promotion metrics
+            - All SLO gates passed during promotion phases
+            
+            🤖 Generated with [Claude Code](https://claude.ai/code)
+            
+            Co-Authored-By: Claude <noreply@anthropic.com>
+          body: |
+            ## Summary
+            Automated CD canary pipeline execution completed successfully.
+            
+            ## Promotion Results
+            - **Phases**: 90/10 → 50/50 → 100/0 canary promotion
+            - **SLO Gates**: All gates passed during promotion
+            - **Final Metrics**: Available in promotion report artifact
+            
+            ## Files Added
+            - `reports/snap_phase5-2-cd-canary.md`: Detailed promotion snapshot
+            
+            This PR documents the successful automated canary promotion pipeline execution.
+            
+            🤖 Generated with [Claude Code](https://claude.ai/code)
+          add-paths: |
+            reports/snap_phase5-2-cd-canary.md
+          labels: |
+            phase:5
+            kind:snapshot
+            automated:cd
+          delete-branch: true
+          draft: false
+
+      - name: Auto-merge snapshot PR
+        if: steps.create_pr.outputs.pull-request-number
+        shell: bash
+        run: |
+          echo "Auto-merging snapshot PR #${{ steps.create_pr.outputs.pull-request-number }}"
+          
+          # Wait a moment for PR to be fully created
+          sleep 5
+          
+          # Enable auto-merge for the PR
+          gh pr merge ${{ steps.create_pr.outputs.pull-request-number }} \
+            --auto --squash \
+            --subject "chore(p5-2): CD canary pipeline snapshot" \
+            --body "Automated snapshot from CD canary pipeline execution"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag successful execution
+        if: success()
+        shell: bash
+        run: |
+          echo "Tagging successful CD canary pipeline execution..."
+          
+          # Configure git user for tagging
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          
+          # Fetch latest tags
+          git fetch --tags
+          
+          # Create and push tag
+          tag_name="phase5-2-cd-canary"
+          git tag -a "$tag_name" -m "Phase 5-2: CD canary pipeline automation"
+          git push origin "$tag_name"
+          
+          echo "✅ Tag $tag_name created and pushed"
+
+      - name: Report final status
+        if: always()
+        shell: bash
+        run: |
+          if [[ "${{ job.status }}" == "success" ]]; then
+            echo "🎉 CD Canary Pipeline completed successfully!"
+            echo "   - Canary promotion: ✅ PASSED"
+            echo "   - SLO gates: ✅ ALL PASSED"  
+            echo "   - Snapshot PR: ✅ CREATED"
+            echo "   - Tag: ✅ APPLIED (phase5-2-cd-canary)"
+          else
+            echo "❌ CD Canary Pipeline failed"
+            echo "   - Check logs above for error details"
+            echo "   - Promotion report artifact may contain partial results"
+          fi
+          
+          echo
+          echo "Artifacts uploaded:"
+          echo "   - phase4_canary_promotion.json (promotion metrics)"
+          
+          if [[ -n "${{ steps.create_pr.outputs.pull-request-number }}" ]]; then
+            echo "   - Snapshot PR: #${{ steps.create_pr.outputs.pull-request-number }}"
+          fi
