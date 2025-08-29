@@ -31,6 +31,28 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Check deploy freeze
+        shell: bash
+        run: |
+          echo "Checking deploy freeze status..."
+          
+          if [[ -f .ops/deploy_freeze.json ]]; then
+            echo "Deploy freeze configuration found:"
+            cat .ops/deploy_freeze.json | jq '.'
+            
+            if jq -e '.freeze == true' .ops/deploy_freeze.json >/dev/null 2>&1; then
+              echo "::error::🚫 Deploy freeze is ACTIVE - deployments are blocked"
+              echo "::error::Reason: $(jq -r '.reason // "unknown"' .ops/deploy_freeze.json)"
+              echo "::error::Timestamp: $(jq -r '.timestamp // "unknown"' .ops/deploy_freeze.json)"
+              echo "::error::Resolution: Update .ops/deploy_freeze.json to {\"freeze\": false} to re-enable deployments"
+              exit 1
+            else
+              echo "✅ Deploy freeze is disabled - deployments allowed"
+            fi
+          else
+            echo "✅ No deploy freeze configuration - deployments allowed"
+          fi
+
       - name: Setup kubeconfig
         shell: bash
         run: |
@@ -143,6 +165,17 @@ jobs:
           path: reports/phase4_canary_promotion.json
           retention-days: 30
 
+      - name: Upload guard results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase5_cd_guard_results
+          path: |
+            reports/phase5_cd_guard_result.json
+            reports/phase5_cd_rollback.log
+            reports/phase5_cd_rollback_summary.json
+          retention-days: 30
+
       - name: Display promotion results
         if: always()
         shell: bash
@@ -165,6 +198,106 @@ jobs:
             echo "⚠️  Promotion report not found"
           fi
 
+      - name: Post-promotion SLO guard
+        shell: bash
+        run: |
+          echo "Starting post-promotion SLO guard monitoring..."
+          
+          # Store previous stage for potential rollback
+          # Extract from promotion report or use default
+          if [[ -f reports/phase4_canary_promotion.json ]]; then
+            # Get the second-to-last phase as rollback target
+            PREV_STAGE=$(jq -r '.phases[-2].weight // "50:50"' reports/phase4_canary_promotion.json 2>/dev/null || echo "50:50")
+          else
+            PREV_STAGE="50:50"
+          fi
+          
+          echo "Previous stage for rollback: $PREV_STAGE"
+          echo "PREV_STAGE=$PREV_STAGE" >> $GITHUB_ENV
+          
+          # Run post-promotion SLO guard
+          python3 scripts/cd_guard_post_promotion.py \
+            --out reports/phase5_cd_guard_result.json \
+            --verbose
+        env:
+          URL: ${{ inputs.url || env.URL }}
+          GUARD_WINDOW_MIN: 10
+          GUARD_SUCC_MIN: 0.99
+          GUARD_P50_MAX: 1000
+
+      - name: Guard failure → rollback & freeze
+        if: failure() && steps.*.conclusion == 'failure'
+        shell: bash
+        run: |
+          echo "🚨 Post-promotion SLO guard FAILED - initiating emergency rollback"
+          
+          # Run rollback and freeze procedure
+          bash scripts/cd_guard_rollback.sh
+        env:
+          PREV_STAGE: ${{ env.PREV_STAGE || '50:50' }}
+
+      - name: Open incident issue
+        if: failure() && steps.*.conclusion == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // Create incident issue
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🚨 CD Guard Failure: Auto-rollback + Freeze (${context.sha.substring(0, 7)})`,
+              body: `## CD Guard Failure Report
+            
+            **Commit**: ${context.sha}
+            **Workflow**: ${context.workflow}
+            **Run**: ${context.runNumber}
+            **Timestamp**: ${new Date().toISOString()}
+            
+            ## What Happened
+            The post-promotion SLO guard detected a threshold breach after 100% traffic promotion.
+            Automatic rollback and deploy freeze have been triggered.
+            
+            ## Actions Taken
+            - ✅ Traffic rolled back to previous canary stage
+            - ✅ Deploy freeze activated (all future deployments blocked)
+            - ✅ Incident issue created (this issue)
+            
+            ## Investigation Required
+            1. Review guard results in workflow artifacts: \`reports/phase5_cd_guard_result.json\`
+            2. Check rollback logs: \`reports/phase5_cd_rollback.log\`
+            3. Analyze service metrics during the monitoring window
+            4. Verify current traffic distribution and service health
+            
+            ## Next Steps
+            1. **Immediate**: Verify rollback was successful and service is stable
+            2. **Investigation**: Root cause analysis of SLO guard failure
+            3. **Resolution**: Fix underlying issues
+            4. **Re-enable**: Update \`.ops/deploy_freeze.json\` to \`{"freeze": false}\` when ready
+            
+            ## Artifacts
+            - [Workflow Run](${context.payload.repository.html_url}/actions/runs/${context.runId})
+            - Guard result: Available in workflow artifacts
+            - Rollback logs: Available in workflow artifacts
+            
+            **⚠️ Deploy freeze is ACTIVE - manual resolution required**`,
+              labels: ['incident', 'cd-pipeline', 'slo-guard', 'auto-rollback']
+            });
+            
+            // Update guard result with issue URL if file exists
+            try {
+              if (fs.existsSync('reports/phase5_cd_guard_result.json')) {
+                const guardResult = JSON.parse(fs.readFileSync('reports/phase5_cd_guard_result.json', 'utf8'));
+                guardResult.issue_url = issue.data.html_url;
+                guardResult.issue_number = issue.data.number;
+                fs.writeFileSync('reports/phase5_cd_guard_result.json', JSON.stringify(guardResult, null, 2));
+                console.log(`Issue created: ${issue.data.html_url}`);
+              }
+            } catch (error) {
+              console.log(`Could not update guard result file: ${error.message}`);
+            }
+
       - name: Setup Python for snapshot generation
         uses: actions/setup-python@v5
         with:
@@ -178,61 +311,81 @@ jobs:
           # Install required Python packages
           pip3 install jinja2
           
-          # Ensure the snapshot script exists and is executable
-          if [[ ! -f scripts/generate_promotion_snapshot.py ]]; then
-            echo "❌ Snapshot generation script not found"
+          # Determine which snapshot to generate based on guard results
+          if [[ -f reports/phase5_cd_guard_result.json ]]; then
+            echo "Generating guard snapshot (Step 5-3)..."
+            
+            python3 scripts/generate_guard_snapshot.py \
+              --template reports/templates/phase5_cd_guard_report.md.tmpl \
+              --input reports/phase5_cd_guard_result.json \
+              --output reports/snap_phase5-3-cd-guard.md \
+              --verbose
+            
+            echo "✅ Guard snapshot generated"
+            
+            # Display guard snapshot preview
+            echo "=== Guard Snapshot Preview ==="
+            head -20 reports/snap_phase5-3-cd-guard.md || echo "Could not preview guard snapshot"
+            
+          elif [[ -f reports/phase4_canary_promotion.json ]]; then
+            echo "Generating promotion snapshot (Step 5-2)..."
+            
+            python3 scripts/generate_promotion_snapshot.py \
+              --template reports/templates/phase4_canary_promotion.md.tmpl \
+              --input reports/phase4_canary_promotion.json \
+              --output reports/snap_phase5-2-cd-canary.md
+            
+            echo "✅ Promotion snapshot generated"
+            
+            # Display promotion snapshot preview
+            echo "=== Promotion Snapshot Preview ==="
+            head -20 reports/snap_phase5-2-cd-canary.md || echo "Could not preview promotion snapshot"
+            
+          else
+            echo "❌ No input data found for snapshot generation"
             exit 1
           fi
-          
-          python3 scripts/generate_promotion_snapshot.py \
-            --template reports/templates/phase4_canary_promotion.md.tmpl \
-            --input reports/phase4_canary_promotion.json \
-            --output reports/snap_phase5-2-cd-canary.md
-          
-          echo "✅ Snapshot markdown generated"
-          
-          # Display snapshot preview
-          echo "=== Snapshot Preview ==="
-          head -20 reports/snap_phase5-2-cd-canary.md || echo "Could not preview snapshot"
 
       - name: Create snapshot pull request
         id: create_pr
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: chore/p5-2-snapshot
-          title: "chore(p5-2): CD canary pipeline snapshot"
+          branch: ${{ contains(github.ref, 'guard') && 'chore/p5-3-snapshot' || 'chore/p5-2-snapshot' }}
+          title: ${{ contains(github.ref, 'guard') && 'chore(p5-3): Post-promotion SLO guard snapshot' || 'chore(p5-2): CD canary pipeline snapshot' }}
           commit-message: |
-            chore(p5-2): add CD canary pipeline snapshot
+            ${{ contains(github.ref, 'guard') && 'chore(p5-3): add post-promotion SLO guard snapshot' || 'chore(p5-2): add CD canary pipeline snapshot' }}
             
-            - Automated canary promotion completed successfully
-            - Generated snapshot report with promotion metrics
-            - All SLO gates passed during promotion phases
+            ${{ contains(github.ref, 'guard') && '- Post-promotion SLO guard monitoring completed' || '- Automated canary promotion completed successfully' }}
+            ${{ contains(github.ref, 'guard') && '- Guard results and rollback procedures documented' || '- Generated snapshot report with promotion metrics' }}
+            ${{ contains(github.ref, 'guard') && '- Safety mechanisms validated with monitoring data' || '- All SLO gates passed during promotion phases' }}
             
             🤖 Generated with [Claude Code](https://claude.ai/code)
             
             Co-Authored-By: Claude <noreply@anthropic.com>
           body: |
             ## Summary
-            Automated CD canary pipeline execution completed successfully.
+            ${{ contains(github.ref, 'guard') && 'Post-promotion SLO guard execution completed with automated safety mechanisms.' || 'Automated CD canary pipeline execution completed successfully.' }}
             
-            ## Promotion Results
-            - **Phases**: 90/10 → 50/50 → 100/0 canary promotion
-            - **SLO Gates**: All gates passed during promotion
-            - **Final Metrics**: Available in promotion report artifact
+            ## Results
+            ${{ contains(github.ref, 'guard') && '- **Guard Window**: 10-minute monitoring after 100% promotion' || '- **Phases**: 90/10 → 50/50 → 100/0 canary promotion' }}
+            ${{ contains(github.ref, 'guard') && '- **SLO Thresholds**: Success rate ≥99%, P50 latency <1000ms' || '- **SLO Gates**: All gates passed during promotion' }}
+            ${{ contains(github.ref, 'guard') && '- **Safety Actions**: Automatic rollback and freeze on threshold breach' || '- **Final Metrics**: Available in promotion report artifact' }}
             
             ## Files Added
-            - `reports/snap_phase5-2-cd-canary.md`: Detailed promotion snapshot
+            - ${{ contains(github.ref, 'guard') && '`reports/snap_phase5-3-cd-guard.md`: Detailed guard execution report' || '`reports/snap_phase5-2-cd-canary.md`: Detailed promotion snapshot' }}
             
-            This PR documents the successful automated canary promotion pipeline execution.
+            This PR documents the ${{ contains(github.ref, 'guard') && 'post-promotion SLO guard execution with safety mechanisms.' || 'successful automated canary promotion pipeline execution.' }}
             
             🤖 Generated with [Claude Code](https://claude.ai/code)
           add-paths: |
+            reports/snap_phase5-3-cd-guard.md
             reports/snap_phase5-2-cd-canary.md
           labels: |
             phase:5
             kind:snapshot
             automated:cd
+            ${{ contains(github.ref, 'guard') && 'slo-guard' || 'canary' }}
           delete-branch: true
           draft: false
 
@@ -245,11 +398,20 @@ jobs:
           # Wait a moment for PR to be fully created
           sleep 5
           
+          # Determine PR subject based on guard vs canary
+          if [[ -f reports/phase5_cd_guard_result.json ]]; then
+            pr_subject="chore(p5-3): Post-promotion SLO guard snapshot"
+            pr_body="Automated snapshot from post-promotion SLO guard execution"
+          else
+            pr_subject="chore(p5-2): CD canary pipeline snapshot"  
+            pr_body="Automated snapshot from CD canary pipeline execution"
+          fi
+          
           # Enable auto-merge for the PR
           gh pr merge ${{ steps.create_pr.outputs.pull-request-number }} \
             --auto --squash \
-            --subject "chore(p5-2): CD canary pipeline snapshot" \
-            --body "Automated snapshot from CD canary pipeline execution"
+            --subject "$pr_subject" \
+            --body "$pr_body"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -257,7 +419,7 @@ jobs:
         if: success()
         shell: bash
         run: |
-          echo "Tagging successful CD canary pipeline execution..."
+          echo "Tagging successful execution..."
           
           # Configure git user for tagging
           git config user.name "GitHub Actions"
@@ -266,9 +428,17 @@ jobs:
           # Fetch latest tags
           git fetch --tags
           
+          # Determine tag name based on guard vs canary
+          if [[ -f reports/phase5_cd_guard_result.json ]]; then
+            tag_name="phase5-3-cd-guard"
+            tag_message="Phase 5-3: Post-promotion SLO guard with automatic rollback"
+          else
+            tag_name="phase5-2-cd-canary"
+            tag_message="Phase 5-2: CD canary pipeline automation"
+          fi
+          
           # Create and push tag
-          tag_name="phase5-2-cd-canary"
-          git tag -a "$tag_name" -m "Phase 5-2: CD canary pipeline automation"
+          git tag -a "$tag_name" -m "$tag_message"
           git push origin "$tag_name"
           
           echo "✅ Tag $tag_name created and pushed"
@@ -278,20 +448,48 @@ jobs:
         shell: bash
         run: |
           if [[ "${{ job.status }}" == "success" ]]; then
-            echo "🎉 CD Canary Pipeline completed successfully!"
-            echo "   - Canary promotion: ✅ PASSED"
-            echo "   - SLO gates: ✅ ALL PASSED"  
-            echo "   - Snapshot PR: ✅ CREATED"
-            echo "   - Tag: ✅ APPLIED (phase5-2-cd-canary)"
+            if [[ -f reports/phase5_cd_guard_result.json ]]; then
+              echo "🎉 CD Pipeline with SLO Guard completed successfully!"
+              echo "   - Canary promotion: ✅ PASSED"
+              echo "   - SLO gates: ✅ ALL PASSED"
+              echo "   - Post-promotion guard: ✅ PASSED"
+              echo "   - Snapshot PR: ✅ CREATED"
+              echo "   - Tag: ✅ APPLIED (phase5-3-cd-guard)"
+            else
+              echo "🎉 CD Canary Pipeline completed successfully!"
+              echo "   - Canary promotion: ✅ PASSED"
+              echo "   - SLO gates: ✅ ALL PASSED"  
+              echo "   - Snapshot PR: ✅ CREATED"
+              echo "   - Tag: ✅ APPLIED (phase5-2-cd-canary)"
+            fi
           else
-            echo "❌ CD Canary Pipeline failed"
-            echo "   - Check logs above for error details"
-            echo "   - Promotion report artifact may contain partial results"
+            if [[ -f reports/phase5_cd_guard_result.json ]]; then
+              guard_ok=$(jq -r '.guard_ok // false' reports/phase5_cd_guard_result.json 2>/dev/null || echo "false")
+              if [[ "$guard_ok" == "false" ]]; then
+                echo "🚨 Post-promotion SLO Guard FAILED - Emergency procedures activated"
+                echo "   - Canary promotion: ✅ COMPLETED"
+                echo "   - Post-promotion guard: ❌ FAILED"
+                echo "   - Automatic rollback: ✅ EXECUTED"
+                echo "   - Deploy freeze: 🚫 ACTIVATED"
+                echo "   - Incident issue: ✅ CREATED"
+                echo "   - Snapshot PR: ✅ CREATED (failure report)"
+              else
+                echo "❌ CD Pipeline failed (unknown reason)"
+              fi
+            else
+              echo "❌ CD Canary Pipeline failed"
+              echo "   - Check logs above for error details"
+              echo "   - Promotion report artifact may contain partial results"
+            fi
           fi
           
           echo
           echo "Artifacts uploaded:"
           echo "   - phase4_canary_promotion.json (promotion metrics)"
+          if [[ -f reports/phase5_cd_guard_result.json ]]; then
+            echo "   - phase5_cd_guard_result.json (guard results)"
+            echo "   - phase5_cd_rollback.log (rollback logs)"
+          fi
           
           if [[ -n "${{ steps.create_pr.outputs.pull-request-number }}" ]]; then
             echo "   - Snapshot PR: #${{ steps.create_pr.outputs.pull-request-number }}"
