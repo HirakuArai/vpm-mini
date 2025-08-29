@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-08-29T01:08:30Z",
+  "monitoring_duration_min": 2,
+  "total_requests": 120,
+  "success_count": 119,
+  "success_rate": 0.992,
+  "avg_latency_ms": 145.3,
+  "p50_latency_ms": 123.7,
+  "success_threshold": 0.99,
+  "p50_threshold": 1000,
+  "guard_ok": true
+}

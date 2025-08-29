@@ -1,0 +1,155 @@
+# ⏺ ✅ Step 4-5 完了: Canary（HTTPRoute 90/10）
+
+**Date**: 2025-08-28T22:15:00Z  
+**Commit**: 97b71c1  
+**Verify**: reports/phase4_canary_verify.json
+
+## DoD Status
+Canary 配信基盤構築完了；HTTPRoute による 90/10 重み付けルーティング確立；トラフィック分散検証完了
+
+## Changes Summary
+Canary deployment implementation with HTTPRoute-based traffic splitting for hello/hello-v2 services
+
+## Evidence
+- **root-app Status**: Synced=true / Health=true
+- **HTTPRoute Config**: hello(0.9) / hello-v2(0.1)
+- **Traffic Distribution**: v2_share=0.090 (9.0%) / P50=301ms
+
+## Canary Results
+- **Synced**: true
+- **Healthy**: true
+- **Hello Weight**: 0.9 (90%)
+- **V2 Weight**: 0.1 (10%)
+- **Measured V2 Share**: 0.090 (9.0%)
+- **P50 Latency**: 301ms
+
+## Canary Architecture
+
+### Service Topology
+```
+infra/gitops/apps/
+├── kustomization.yaml        # Root: include hello-v2/
+├── hello/                    # Production service (v1)
+│   ├── hello-ksvc.yaml       # TARGET=vpm-mini
+│   └── hello-httproute.yaml  # Updated: 90/10 routing
+├── hello-v2/                 # NEW: Canary service (v2)
+│   ├── kustomization.yaml    # Canary bundle
+│   └── hello-v2-ksvc.yaml    # TARGET=v2
+└── netpol/                   # Updated: v2 ingress policy
+    └── np-allow-istio-ingress-hello-v2.yaml
+```
+
+### HTTPRoute Configuration
+- **Path**: /hello (PathPrefix match)
+- **Backend References**:
+  - hello: weight 90 (90% traffic)
+  - hello-v2: weight 10 (10% traffic)
+- **Load Balancing**: Gateway API weighted round-robin
+- **Service Discovery**: Knative Service automatic endpoints
+
+### Service Specifications
+#### Hello (Production)
+- **Image**: gcr.io/knative-samples/helloworld-go
+- **Environment**: TARGET=vpm-mini
+- **Scaling**: min=0, max=50, target=100
+- **Resources**: 100m CPU, 128Mi memory
+
+#### Hello-v2 (Canary)  
+- **Image**: gcr.io/knative-samples/helloworld-go
+- **Environment**: TARGET=v2
+- **Scaling**: min=0, max=50, target=100  
+- **Resources**: 100m CPU, 128Mi memory
+
+## Traffic Distribution Analysis
+
+### Test Configuration
+- **Total Requests**: 300
+- **Successful Responses**: 300
+- **Hello (v1) Responses**: 273
+- **Hello-v2 Responses**: 27
+
+### Distribution Metrics
+- **Target Distribution**: 90% hello, 10% hello-v2
+- **Measured V2 Share**: 0.090 (9.0%)
+- **Variance**: Within acceptable range (5-20%)
+- **Latency Impact**: P50 301ms (target: <1000ms)
+
+## Security Integration
+
+### NetworkPolicy Updates
+- **hello-v2 Ingress**: Istio ingressgateway → hello-v2 (port 8080)
+- **Baseline Security**: Default-deny maintained across canary services
+- **Service Mesh**: Intra-namespace communication allowed
+- **Gatekeeper Compliance**: All services have NetworkPolicy coverage
+
+## Canary Deployment Benefits
+
+### Progressive Rollout
+- **Risk Mitigation**: 10% canary traffic limits blast radius
+- **A/B Testing**: Real user traffic validation capability
+- **Instant Rollback**: HTTPRoute weight adjustment for immediate reversion
+- **Monitoring**: Distinct service metrics for performance comparison
+
+### Operational Features
+- **Zero Downtime**: Traffic-splitting without service interruption
+- **Gradual Migration**: Configurable weight adjustment (10% → 50% → 100%)
+- **Health Monitoring**: Independent canary service health checks
+- **Feature Flagging**: Environment-based feature differentiation
+
+## Access Information
+```bash
+# Check canary services
+kubectl -n hyper-swarm get ksvc hello hello-v2
+
+# Verify HTTPRoute configuration
+kubectl -n hyper-swarm get httproute hello-route -o yaml
+
+# Test traffic distribution
+for i in {1..20}; do curl -s http://localhost:31380/hello | grep -o "TARGET=[^[:space:]]*"; done
+
+# Manual canary adjustment (increase v2 to 50%)  
+kubectl -n hyper-swarm patch httproute hello-route --type='json' -p='[{"op": "replace", "path": "/spec/rules/0/backendRefs/0/weight", "value": 50}, {"op": "replace", "path": "/spec/rules/0/backendRefs/1/weight", "value": 50}]'
+
+# Rollback to 100% v1
+kubectl -n hyper-swarm patch httproute hello-route --type='json' -p='[{"op": "replace", "path": "/spec/rules/0/backendRefs/0/weight", "value": 100}, {"op": "replace", "path": "/spec/rules/0/backendRefs/1/weight", "value": 0}]'
+```
+
+## Performance & Reliability
+- **Traffic Distribution**: 9.0% canary traffic achieved
+- **Response Time**: P50 301ms (target: <1000ms) ✅
+- **Error Rate**: Minimal errors during traffic splitting
+- **Service Availability**: Both versions maintaining health
+
+## Recent Commits
+```
+97b71c1 Merge pull request #74 from HirakuArai/chore/p4-4-snapshot
+b31725a chore(p4-4): Core infrastructure GitOps migration snapshot
+7b2f722 Merge pull request #73 from HirakuArai/feat/p4-4-core-gitops
+265ba8f feat(p4-4): migrate Gateway/NetworkPolicy to GitOps
+c378b35 Merge pull request #72 from HirakuArai/chore/p4-3-snapshot
+```
+
+## Changed Files (canary implementation)
+```
+infra/gitops/apps/kustomization.yaml
+infra/gitops/apps/hello/hello-httproute.yaml
+infra/gitops/apps/hello-v2/kustomization.yaml
+infra/gitops/apps/hello-v2/hello-v2-ksvc.yaml
+infra/gitops/apps/netpol/kustomization.yaml
+infra/gitops/apps/netpol/np-allow-istio-ingress-hello-v2.yaml
+scripts/phase4_canary_verify.py
+reports/templates/phase4_canary_report.md.tmpl
+```
+
+## 結果
+- **root-app**: Synced & Healthy
+- **HTTPRoute**: hello(90) / hello-v2(10)  
+- **実測**: v2_share ≈ 9.0% (5–20% 範囲) / p50 < 1000ms
+
+## 次のステップ
+**Phase 4 完了**: A/B テスト評価枠組み & 800 cells/sec 大規模負荷耐性への発展
+
+HTTPRoute による段階的カナリア配信基盤の確立により、リスク制御された新機能デプロイメントパターン実現
+
+---
+*Auto-generated by Phase 4-5 canary verification*

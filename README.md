@@ -1,5 +1,11 @@
 # vpm-mini
 
+## Phase 6 (Current)
+
+- Phase 5 完了: `phase5-complete`（GitOps / Canary / Guard / Failover / 800 RPS）
+- Phase 6 目標: マルチクラスタのグローバル配信 + 30日連続 SLO 99.9%
+- 運用ルール: 1PR=1ステップ=1スナップショット / Auto-merge / タグ
+
 ## Quickstart (10min Repro, Phase 1)
 ```bash
 git clone https://github.com/HirakuArai/vpm-mini.git
@@ -51,3 +57,5 @@ open http://localhost:3000  # (admin/admin)
 - ArgoCD GitOps デプロイメント基盤
 - A/B テスト評価枠組み構築
 - 800 cells/sec 大規模負荷耐性確立
+- SSOT（運用ループの全体図）: `diagrams/src/ops_single_source_of_truth_v1.md`
+- ドキュメント目次: `docs/README.md`
