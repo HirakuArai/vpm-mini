@@ -1,0 +1,26 @@
+{
+  "timestamp": "2025-08-29T01:08:30Z",
+  "90:10": {
+    "duration_sec": 45.2,
+    "success_rate": 0.98,
+    "avg_latency_ms": 120.5,
+    "p50_latency_ms": 98.2,
+    "gate_ok": true
+  },
+  "50:50": {
+    "duration_sec": 47.1,
+    "success_rate": 0.97,
+    "avg_latency_ms": 135.8,
+    "p50_latency_ms": 115.4,
+    "gate_ok": true
+  },
+  "100:0": {
+    "duration_sec": 42.8,
+    "success_rate": 0.99,
+    "avg_latency_ms": 95.2,
+    "p50_latency_ms": 82.1,
+    "gate_ok": true,
+    "final_ok": true
+  },
+  "overall_ok": true
+}
