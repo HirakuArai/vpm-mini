@@ -1,5 +1,11 @@
 # vpm-mini
 
+## Phase 6 (Current)
+
+- Phase 5 完了: `phase5-complete`（GitOps / Canary / Guard / Failover / 800 RPS）
+- Phase 6 目標: マルチクラスタのグローバル配信 + 30日連続 SLO 99.9%
+- 運用ルール: 1PR=1ステップ=1スナップショット / Auto-merge / タグ
+
 ## Quickstart (10min Repro, Phase 1)
 ```bash
 git clone https://github.com/HirakuArai/vpm-mini.git

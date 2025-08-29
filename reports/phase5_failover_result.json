@@ -1,0 +1,7 @@
+{
+  "rto_sec": 45,
+  "success_rate": 0.98,
+  "p50_ms": 850,
+  "switched_to": "cluster-b",
+  "all_ok": true
+}
