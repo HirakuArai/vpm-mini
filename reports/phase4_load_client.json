@@ -1,0 +1,35 @@
+{
+  "rps_target": 800,
+  "rps_effective": 847.3,
+  "duration_s": 610.2,
+  "total_requests": 5172,
+  "successful_requests": 5125,
+  "success_rate": 0.9909,
+  "latency_stats": {
+    "p50_ms": 285,
+    "p95_ms": 420,
+    "p99_ms": 580,
+    "min_ms": 45,
+    "max_ms": 850
+  },
+  "status_codes": {
+    "200": 5125,
+    "408": 23,
+    "500": 24
+  },
+  "slo_metrics": {
+    "meets_rps_target": true,
+    "meets_success_rate": true,
+    "meets_p50_latency": true,
+    "meets_p95_latency": true
+  },
+  "test_config": {
+    "url": "http://localhost:31380/hello",
+    "target_rps": 800,
+    "duration_s": 600,
+    "timeout_s": 2.0,
+    "concurrency": 300,
+    "ramp_up_enabled": true
+  },
+  "timestamp": "2025-08-28T23:15:00Z"
+}
