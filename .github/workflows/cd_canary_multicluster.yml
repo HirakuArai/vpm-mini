@@ -47,6 +47,12 @@ jobs:
           echo "skip=false" >> $GITHUB_OUTPUT
         shell: bash
 
+      - name: Require secrets
+        if: steps.freeze.outputs.skip == 'false' && (!secrets.KUBECONFIG_A_BASE64 || !secrets.KUBECONFIG_B_BASE64)
+        run: |
+          echo "::error::Missing KUBECONFIG_A_BASE64 / KUBECONFIG_B_BASE64. Repo Settings > Secrets > Actions で登録してください。"
+          exit 1
+
       - name: Install deps (kubectl/jq)
         if: steps.freeze.outputs.skip == 'false'
         run: |
