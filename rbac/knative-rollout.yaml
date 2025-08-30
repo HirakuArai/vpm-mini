@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata: { name: cd-runner, namespace: hyper-swarm }
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: { name: knative-rollout, namespace: hyper-swarm }
+rules:
+  - apiGroups: ["serving.knative.dev"]
+    resources: ["services"]
+    verbs: ["get","list","watch","patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: { name: knative-rollout, namespace: hyper-swarm }
+subjects:
+  - kind: ServiceAccount
+    name: cd-runner
+    namespace: hyper-swarm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: knative-rollout
