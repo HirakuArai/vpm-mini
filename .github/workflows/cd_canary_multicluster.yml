@@ -1,0 +1,125 @@
+name: CD Canary (Multi-Cluster)
+
+on:
+  push:
+    paths:
+      - 'hello/**'
+      - 'infra/k8s/**/hello-ksvc.yaml'
+      - '.ops/deploy_freeze.json'
+  workflow_dispatch:
+    inputs:
+      canaryRatio:
+        description: 'Initial canary traffic percent'
+        required: false
+        default: '10'
+      namespace:
+        description: 'Kubernetes namespace'
+        required: false
+        default: 'hyper-swarm'
+
+permissions:
+  contents: write  # for committing reports
+  actions: read
+
+env:
+  NS: ${{ github.event.inputs.namespace || 'hyper-swarm' }}
+  CANARY: ${{ github.event.inputs.canaryRatio || '10' }}
+  KSVCA_NAME: hello
+
+jobs:
+  cd:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check Freeze
+        id: freeze
+        run: |
+          if [ -f .ops/deploy_freeze.json ]; then
+            FZ=$(cat .ops/deploy_freeze.json | jq -r '.freeze')
+            if [ "$FZ" = "true" ]; then
+              echo "[FREEZE] .ops/deploy_freeze.json.freeze==true → skip deploy." | tee -a freeze.log
+              echo "skip=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          fi
+          echo "skip=false" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Install deps (kubectl/jq)
+        if: steps.freeze.outputs.skip == 'false'
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y jq
+          curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl
+          chmod +x kubectl && sudo mv kubectl /usr/local/bin/kubectl
+
+      - name: Prepare scripts
+        if: steps.freeze.outputs.skip == 'false'
+        run: |
+          chmod +x scripts/knative_canary.sh
+
+      - name: Decode kubeconfigs
+        if: steps.freeze.outputs.skip == 'false'
+        run: |
+          echo "$KUBECONFIG_A_BASE64" | base64 -d > /tmp/kubeconfig-a
+          echo "$KUBECONFIG_B_BASE64" | base64 -d > /tmp/kubeconfig-b
+        env:
+          KUBECONFIG_A_BASE64: ${{ secrets.KUBECONFIG_A_BASE64 }}
+          KUBECONFIG_B_BASE64: ${{ secrets.KUBECONFIG_B_BASE64 }}
+
+      - name: Cluster A | Canary -> Promote -> PostGuard
+        if: steps.freeze.outputs.skip == 'false'
+        id: cluster_a
+        run: |
+          set -euo pipefail
+          start_ts=$(date +%s)
+          ./scripts/knative_canary.sh /tmp/kubeconfig-a "${NS}" "${KSVCA_NAME}" "${CANARY}"
+          end_ts=$(date +%s)
+          echo "duration=$((end_ts-start_ts))" >> $GITHUB_OUTPUT
+
+      - name: Cluster B | Canary -> Promote -> PostGuard
+        if: steps.freeze.outputs.skip == 'false'
+        id: cluster_b
+        run: |
+          set -euo pipefail
+          start_ts=$(date +%s)
+          ./scripts/knative_canary.sh /tmp/kubeconfig-b "${NS}" "${KSVCA_NAME}" "${CANARY}"
+          end_ts=$(date +%s)
+          echo "duration=$((end_ts-start_ts))" >> $GITHUB_OUTPUT
+
+      - name: Build report JSON
+        if: steps.freeze.outputs.skip == 'false'
+        id: report
+        run: |
+          mkdir -p reports
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          SHA="${{ github.sha }}"
+          ASEC="${{ steps.cluster_a.outputs.duration || '0' }}"
+          BSEC="${{ steps.cluster_b.outputs.duration || '0' }}"
+          cat > reports/cd_multicluster_result.json <<EOF
+          {
+            "runId": "${{ github.run_id }}",
+            "runUrl": "${RUN_URL}",
+            "sha": "${SHA}",
+            "namespace": "${NS}",
+            "ksvc": "${KSVCA_NAME}",
+            "canary": ${CANARY},
+            "clusters": {
+              "A": { "duration_sec": ${ASEC} },
+              "B": { "duration_sec": ${BSEC} }
+            },
+            "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          }
+          EOF
+          cat reports/cd_multicluster_result.json
+
+      - name: Commit report
+        if: steps.freeze.outputs.skip == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/cd_multicluster_result.json
+          git commit -m "chore(reports): record multi-cluster canary result (run ${{ github.run_id }})" || echo "no changes"
+          git push
