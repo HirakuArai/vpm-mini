@@ -34,13 +34,7 @@ jobs:
             if (missing.length > 0) {
               const missingList = missing.map(item => `- ${item}`).join('\n')
               
-              core.setFailed(`❌ DoD Compliance Failed!
-              
-Missing required DoD items:
-${missingList}
-
-Please update your PR description to include all required DoD items.
-Reference: .ops/dod/policy.yml`)
+              core.setFailed(`❌ DoD Compliance Failed!\\n\\nMissing required DoD items:\\n${missingList}\\n\\nPlease update your PR description to include all required DoD items.\\nReference: .ops/dod/policy.yml`)
               
               // Add comment to PR
               try {
@@ -48,16 +42,7 @@ Reference: .ops/dod/policy.yml`)
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: context.payload.pull_request.number,
-                  body: `🚨 **DoD Compliance Check Failed**
-                  
-This PR is missing required DoD items:
-${missingList}
-
-**Action Required**: Please update your PR description to include all mandatory DoD checklist items.
-
-**Reference**: \`.ops/dod/policy.yml\` - Common DoD requirements
-
-Once updated, the DoD Enforcer will re-run automatically.`
+                  body: `🚨 **DoD Compliance Check Failed**\n\nThis PR is missing required DoD items:\n${missingList}\n\n**Action Required**: Please update your PR description to include all mandatory DoD checklist items.\n\n**Reference**: \`.ops/dod/policy.yml\` - Common DoD requirements\n\nOnce updated, the DoD Enforcer will re-run automatically.`
                 })
                 core.notice("Added compliance failure comment to PR")
               } catch (error) {
@@ -72,12 +57,7 @@ Once updated, the DoD Enforcer will re-run automatically.`
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: context.payload.pull_request.number,
-                  body: `✅ **DoD Compliance Check Passed**
-                  
-All required DoD items are present in this PR:
-${required.map(item => `- ✅ ${item}`).join('\n')}
-
-This PR meets the mandatory DoD requirements defined in \`.ops/dod/policy.yml\`.`
+                  body: `✅ **DoD Compliance Check Passed**\\n\\nAll required DoD items are present in this PR:\\n${required.map(item => `- ✅ ${item}`).join('\\n')}\\n\\nThis PR meets the mandatory DoD requirements defined in \\`.ops/dod/policy.yml\\`.`
                 })
                 core.notice("Added compliance success comment to PR")  
               } catch (error) {
@@ -103,30 +83,14 @@ This PR meets the mandatory DoD requirements defined in \`.ops/dod/policy.yml\`.
             if (workflowChanges.length > 0) {
               const changedWorkflows = workflowChanges.map(f => f.filename).join('\n- ')
               
-              core.warning(`🚧 G1 Gate Triggered: Workflow Changes Detected
-              
-Changed workflow files:
-- ${changedWorkflows}
-
-⚠️  These changes require manual approval and cannot use auto-merge.
-Reference: .ops/dod/policy.yml - G1 Gate Rule`)
+              core.warning(`🚧 G1 Gate Triggered: Workflow Changes Detected\n\nChanged workflow files:\n- ${changedWorkflows}\n\n⚠️  These changes require manual approval and cannot use auto-merge.\nReference: .ops/dod/policy.yml - G1 Gate Rule`)
               
               // Comment on PR about workflow changes
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.payload.pull_request.number,
-                body: `🚧 **G1 Gate Triggered: Workflow Changes Detected**
-                
-This PR modifies workflow files:
-- ${changedWorkflows}
-
-**G1 Gate Rule**: Changes to \`.github/workflows/**\` require:
-- Manual approval from CODEOWNERS  
-- Auto-merge is disabled for this PR
-- Human review and merge required
-
-**Reference**: \`.ops/dod/policy.yml\` - G1 Gate enforcement`
+                body: `🚧 **G1 Gate Triggered: Workflow Changes Detected**\n\nThis PR modifies workflow files:\n- ${changedWorkflows}\n\n**G1 Gate Rule**: Changes to \`.github/workflows/**\` require:\n- Manual approval from CODEOWNERS\n- Auto-merge is disabled for this PR\n- Human review and merge required\n\n**Reference**: \`.ops/dod/policy.yml\` - G1 Gate enforcement`
               })
             }
 
