@@ -14,4 +14,4 @@
 
 <!-- DoD Enforcer test run -->
 
-実行実績用テスト
+DoD Enforcer 最終テスト
