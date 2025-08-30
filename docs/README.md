@@ -11,3 +11,5 @@
 - **CD Canary Pipeline**: docs/cd/canary_pipeline.md
 - **Multi-Cluster (ApplicationSet)**: docs/multicluster/apps.md
 - **Edge Failover (HAProxy/dev)**: docs/edge/failover.md
+
+<!-- DoD Enforcer test run -->
