@@ -1,0 +1,15 @@
+# CODEOWNERS file for vpm-mini
+# Defines who must approve changes to critical files
+
+# Workflow changes require owner approval (G1 Gate)
+.github/workflows/* @HirakuArai
+
+# DoD policy changes require owner approval
+.ops/dod/* @HirakuArai
+
+# Branch protection and security settings
+.github/CODEOWNERS @HirakuArai
+
+# Core operational files
+STATE/current_state.md @HirakuArai
+diagrams/src/ops_single_source_of_truth_v1.md @HirakuArai
