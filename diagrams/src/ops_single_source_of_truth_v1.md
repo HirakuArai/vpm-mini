@@ -1,3 +1,10 @@
+> **Status: CURRENT (Phase 6)**  
+> **SSOT: STATE/current_state.md**
+
+# Operations Single Source of Truth v1
+
+この図は Phase 6 における運用ループの唯一の真実（SSOT）を表します。全てのoperational decisionsはこの図とSTATE/current_state.mdに基づいて行われます。
+
 ```mermaid
 flowchart LR
   %% ==== Environments ====
@@ -29,6 +36,7 @@ flowchart LR
     COV["coverage.json（δ指標: 被覆ギャップ分析）"]
     LAG["lag.json（p50／p95）"]
     QLT["quality.json（≤400字／JSON妥当）"]
+    FRZ[".ops/deploy_freeze.json（緊急停止）"]
   end
 
   subgraph CHAT["Chat（あなた ↔ Assistant）"]
@@ -67,7 +75,7 @@ flowchart LR
     O2["2. PR作成（テンプレ／DoD記入, Auto-merge予約）"]
     O3["3. CI実行 → Artifacts確認（≤400字要約, memory.json先頭追記, digest/nav生成）"]
     O4["4. Chatで[Check-in]共有 → 合意"]
-    O5["5. Greenなら自動Merge → STATE更新（P0-2/P0-3クリア, Phase 0開始）"]
+    O5["5. Greenなら自動Merge → STATE更新（Phase 6運用継続）"]
     O1 --> O2 --> O3 --> O4 --> O5
   end
   TST --> O1
@@ -81,7 +89,7 @@ flowchart LR
   classDef wip fill:#FFF3BF,stroke:#E6A700,color:#7A5E00;
   classDef todo fill:#E9ECEF,stroke:#ADB5BD,color:#495057;
 
-  %% ==== 現状の進捗反映 ====
+  %% ==== Phase 6 現状の進捗反映 ====
   class CLI done
   class LOG done
   class SUM done
@@ -89,8 +97,8 @@ flowchart LR
   class TST done
 
   class BR done
-  class ISS todo
-  class ST wip
+  class ISS done
+  class ST done
 
   class HC done
   class ART done
@@ -99,25 +107,26 @@ flowchart LR
   class COV done
   class LAG done
   class QLT done
+  class FRZ done
 
-  class CK wip
-  class DEC wip
+  class CK done
+  class DEC done
 
   class PRT done
-  class DoD todo
+  class DoD done
   class STATE_INIT done
   class ARTS done
 
   class O1 done
   class O2 done
   class O3 done
-  class O4 wip
-  class O5 wip
+  class O4 done
+  class O5 done
 ```
 
-### Phase 5+ 追補: CD Guard / Freeze / Failover / Multi-Cluster
+### Phase 6 統合機能: CD Guard / Freeze / Failover / Multi-Cluster
 
-下図は Phase 5 以降で加わった運用ループ（Canary→Post-Guard→Freeze／Multi-Cluster GitOps／Edge Failover）を追補したものです。
+下図は Phase 6 に統合された高度運用機能（Canary→Post-Guard→Freeze／Multi-Cluster GitOps／Edge Failover）を示しています。これらは Phase 5 で開発され、Phase 6 で正式統合されました。
 
 ```mermaid
 flowchart LR
