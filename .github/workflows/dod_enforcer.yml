@@ -1,0 +1,160 @@
+name: DoD Enforcer
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+  
+permissions:
+  contents: read
+  pull-requests: read
+  
+jobs:
+  enforce:
+    runs-on: ubuntu-latest
+    name: "Enforce DoD Compliance"
+    
+    steps:
+      - name: Check DoD compliance in PR body
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body || ""
+            
+            // Required DoD items from .ops/dod/policy.yml
+            const required = [
+              "Auto-merge (squash) 有効化",
+              "CI 必須チェック Green（test-and-artifacts, healthcheck）",
+              "merged == true を API で確認", 
+              "PR に最終コメント（✅ merged / commit hash / CI run URL / evidence）",
+              "必要な証跡（例: reports/*）を更新"
+            ]
+            
+            // Check for presence of each required item
+            const missing = required.filter(item => !body.includes(item))
+            
+            if (missing.length > 0) {
+              const missingList = missing.map(item => `- ${item}`).join('\n')
+              
+              core.setFailed(`❌ DoD Compliance Failed!
+              
+Missing required DoD items:
+${missingList}
+
+Please update your PR description to include all required DoD items.
+Reference: .ops/dod/policy.yml`)
+              
+              // Add comment to PR
+              try {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.payload.pull_request.number,
+                  body: `🚨 **DoD Compliance Check Failed**
+                  
+This PR is missing required DoD items:
+${missingList}
+
+**Action Required**: Please update your PR description to include all mandatory DoD checklist items.
+
+**Reference**: \`.ops/dod/policy.yml\` - Common DoD requirements
+
+Once updated, the DoD Enforcer will re-run automatically.`
+                })
+                core.notice("Added compliance failure comment to PR")
+              } catch (error) {
+                core.warning(`Failed to add comment: ${error.message}`)
+              }
+            } else {
+              core.notice("✅ DoD Compliance Check Passed - All required items found")
+              
+              // Add success comment (optional)
+              try {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.payload.pull_request.number,
+                  body: `✅ **DoD Compliance Check Passed**
+                  
+All required DoD items are present in this PR:
+${required.map(item => `- ✅ ${item}`).join('\n')}
+
+This PR meets the mandatory DoD requirements defined in \`.ops/dod/policy.yml\`.`
+                })
+                core.notice("Added compliance success comment to PR")  
+              } catch (error) {
+                core.warning(`Failed to add success comment: ${error.message}`)
+              }
+            }
+
+      - name: Check for workflow changes (G1 Gate)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Get list of changed files
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number
+            })
+            
+            const workflowChanges = files.filter(file => 
+              file.filename.startsWith('.github/workflows/')
+            )
+            
+            if (workflowChanges.length > 0) {
+              const changedWorkflows = workflowChanges.map(f => f.filename).join('\n- ')
+              
+              core.warning(`🚧 G1 Gate Triggered: Workflow Changes Detected
+              
+Changed workflow files:
+- ${changedWorkflows}
+
+⚠️  These changes require manual approval and cannot use auto-merge.
+Reference: .ops/dod/policy.yml - G1 Gate Rule`)
+              
+              // Comment on PR about workflow changes
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: `🚧 **G1 Gate Triggered: Workflow Changes Detected**
+                
+This PR modifies workflow files:
+- ${changedWorkflows}
+
+**G1 Gate Rule**: Changes to \`.github/workflows/**\` require:
+- Manual approval from CODEOWNERS  
+- Auto-merge is disabled for this PR
+- Human review and merge required
+
+**Reference**: \`.ops/dod/policy.yml\` - G1 Gate enforcement`
+              })
+            }
+
+      - name: Validate DoD structure
+        uses: actions/github-script@v7  
+        with:
+          script: |
+            const body = context.payload.pull_request.body || ""
+            
+            // Check for proper DoD section structure
+            const hasDoDSection = body.includes("DoD（共通／必須）") || body.includes("## DoD")
+            const hasPolicyReference = body.includes(".ops/dod/policy.yml")
+            const hasEvidenceSection = body.includes("証跡") || body.includes("Evidence")
+            
+            let warnings = []
+            
+            if (!hasDoDSection) {
+              warnings.push("Missing proper DoD section header")
+            }
+            if (!hasPolicyReference) {
+              warnings.push("Missing reference to .ops/dod/policy.yml")  
+            }
+            if (!hasEvidenceSection) {
+              warnings.push("Missing Evidence/証跡 tracking section")
+            }
+            
+            if (warnings.length > 0) {
+              core.warning(`DoD Structure Issues:\n- ${warnings.join('\n- ')}`)
+            } else {
+              core.notice("✅ DoD structure validation passed")
+            }
