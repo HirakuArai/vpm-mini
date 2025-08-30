@@ -1,0 +1,50 @@
+version: 1
+description: "共通DoD（Definition of Done）ポリシー - 全PRで必須遵守"
+
+common_DoD:
+  - "Auto-merge (squash) を有効化"
+  - "CI 必須チェック（test-and-artifacts, healthcheck）が Green"
+  - "merged == true を API で確認"
+  - "PR に最終コメント（✅ merged / commit hash / CI run URL / evidence path）"
+  - "必要な証跡ファイル（例: reports/*）を更新"
+
+mandatory_process:
+  - step: "PR作成"
+    requirement: "DoD チェックリスト必須記載"
+  - step: "CI実行"
+    requirement: "全必須チェックがGreenになるまで待機"
+  - step: "Auto-merge"
+    requirement: "squash strategyで自動マージ有効化"
+  - step: "完了確認"  
+    requirement: "merged == true をAPI確認後、最終コメント投稿"
+  - step: "証跡更新"
+    requirement: "reports/* 等の証跡ファイル更新"
+
+gates:
+  - name: G0_start
+    rule: "開始宣言＆承認待ち"
+    description: "タスク開始前に明確な宣言と承認を必須とする"
+  - name: G1_workflow
+    rule: ".github/workflows/** に変更があるPRは承認必須・自動マージ禁止"
+    description: "ワークフロー変更は人的承認なしに自動マージされない"
+  - name: G2_conflict
+    rule: "機械解決不可なら停止し最小パッチ案のdiff提示"
+    description: "競合解決できない場合は必ず停止し解決案提示"
+  - name: G3_verify_fail
+    rule: "Verify失敗は停止し理由・ログ・修正案提示"
+    description: "検証失敗時は原因分析と修正案提示を義務化"
+  - name: G4_final
+    rule: "最終サマリ提示→承認があるまで完了と記さない"
+    description: "タスク完了は必ず承認確認後に宣言"
+
+enforcement:
+  pr_template: "必須DoDチェックリストをPRテンプレートに統合"
+  ci_check: "DoD Enforcerワークフローで自動チェック"
+  branch_rules: "Required checksにDoD Enforcerを追加"
+  codeowners: ".github/workflows/*はオーナー承認必須"
+
+operational_principles:
+  - "1PR = 1ステップ = 1スナップショット"
+  - "Claude Code は「マージ完了確認まで責任を負う」"
+  - "投げっぱなし禁止 - 必ず最後まで完遂"
+  - "全ての変更に完全な証跡を残す"
