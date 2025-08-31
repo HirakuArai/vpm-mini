@@ -58,6 +58,11 @@ jobs:
             exit 1
           fi
 
+      - name: Install python3 (for summary)
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y python3
+
       - name: Install deps (kubectl/jq)
         if: steps.freeze.outputs.skip == 'false'
         run: |
@@ -158,8 +163,7 @@ jobs:
           # Build NDJSON line (compact single line)
           echo "{\"runId\":\"${{ github.run_id }}\",\"runUrl\":\"${RUN_URL}\",\"sha\":\"${SHA}\",\"timestamp\":\"${TS}\",\"namespace\":\"${{ env.NS }}\",\"ksvc\":\"${{ env.KSVCA_NAME }}\",\"canary\":${{ env.CANARY }},\"status\":\"${STATUS}\",\"clusters\":{\"A\":{\"duration_sec\":${ASEC},\"result\":\"${A_RESULT}\"},\"B\":{\"duration_sec\":${BSEC},\"result\":\"${B_RESULT}\"}}}" >> reports/cd_runs.ndjson
           
-          # Install Python if needed and generate summary
-          which python3 || sudo apt-get update -y && sudo apt-get install -y python3
+          # Generate summary
           python3 scripts/cd_report_summary.py
 
       - name: Commit reports

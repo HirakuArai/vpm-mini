@@ -14,6 +14,10 @@ def load_ndjson_runs(filepath: str, limit: int = 100) -> List[Dict[str, Any]]:
     """Load last N runs from NDJSON file"""
     runs = []
     if not os.path.exists(filepath):
+        # Create empty NDJSON file if it doesn't exist
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        with open(filepath, "w") as f:
+            pass  # Create empty file
         return runs
 
     with open(filepath, "r") as f:
