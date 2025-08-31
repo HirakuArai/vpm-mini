@@ -144,4 +144,6 @@ done
 
 - **Rotation:** NDJSON file auto-rotates after 10,000 lines (future enhancement)
 - **Backup:** Reports are committed to git for permanent record
+
+> CI tickle: ensure required checks run for PR #124
 - **Cleanup:** Old entries beyond 90 days can be archived
