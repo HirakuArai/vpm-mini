@@ -2,6 +2,7 @@ name: DoD Enforcer
 on:
   pull_request:
     types: [opened, edited, synchronize, ready_for_review, reopened]
+  workflow_dispatch:
 
 permissions:
   contents: read            # ← 読み取りのみ（コメント投稿はしない）
