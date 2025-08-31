@@ -12,6 +12,9 @@
 - **Multi-Cluster (ApplicationSet)**: docs/multicluster/apps.md
 - **Edge Failover (HAProxy/dev)**: docs/edge/failover.md
 
+## 🏆 Phase 6 進捗ステータス
+- **P6-1**: Multi-Cluster Canary Deploy **[GREEN]** ✅
+
 <!-- DoD Enforcer test run -->
 
 実行実績用テスト
