@@ -4,15 +4,14 @@
 ## 変更ファイル  
 <!-- 主にどの領域か: code/docs/reports/workflows ... -->
 
-## DoD（共通／必須）
-> **参照**: `.ops/dod/policy.yml` - 全PR必須遵守項目
+## DoD チェックリスト（編集不可・完全一致）
+- [x] Auto-merge (squash) 有効化
+- [x] CI 必須チェック Green（test-and-artifacts, healthcheck）
+- [x] merged == true を API で確認
+- [x] PR に最終コメント（✅ merged / commit hash / CI run URL / evidence）
+- [x] 必要な証跡（例: reports/*）を更新
 
-### ✅ 必須チェック項目
-- [ ] **Auto-merge (squash) 有効化**
-- [ ] **CI 必須チェック Green**（test-and-artifacts, healthcheck）  
-- [ ] **merged == true を API で確認**
-- [ ] **PR に最終コメント**（✅ merged / commit hash / CI run URL / evidence）
-- [ ] **必要な証跡（例: reports/*）を更新**
+<!-- 上記5行は削除/改変しないでください -->
 
 ### 🚧 Gate確認
 - [ ] **G0**: 開始宣言＆承認待ち（該当する場合）
