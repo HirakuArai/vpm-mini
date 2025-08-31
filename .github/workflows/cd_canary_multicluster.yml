@@ -129,7 +129,11 @@ jobs:
             "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
           }
           EOF
-          cat reports/cd_multicluster_result.json
+          if [ -f reports/cd_multicluster_result.json ]; then
+            cat reports/cd_multicluster_result.json
+          else
+            echo "[INFO] cd_multicluster_result.json not generated (freeze or failure)."
+          fi
 
       - name: Append report line (ndjson) & build summary
         if: always()
@@ -171,6 +175,19 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/cd_runs.ndjson reports/cd_summary.json reports/cd_multicluster_result.json || true
-          git commit -m "chore(reports): append cd run and update summary (run ${{ github.run_id }})" || echo "no changes"
-          git push
+          
+          # 生成物が無くても失敗しないように -A でステージング
+          git add -A reports || true
+          
+          echo "[INFO] Git status after add:"
+          git status --porcelain
+          
+          # 何かしら stage されていれば commit/push
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(reports): append cd run and update summary (run ${{ github.run_id }})"
+            # 衝突回避（並走を考慮）
+            git pull --rebase || true
+            git push
+          else
+            echo "[INFO] No staged changes; skipping commit."
+          fi
