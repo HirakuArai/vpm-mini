@@ -11,7 +11,7 @@ spec:
         autoscaling.knative.dev/maxScale: "50"
         autoscaling.knative.dev/target: "100"
         # rollout-hash: "<to-be-filled-after-secrets>"
-        rollout-hash: "rev-1756600669"
+        rollout-hash: "rev-1756670218"
     spec:
       containers:
         - image: gcr.io/knative-samples/helloworld-go
