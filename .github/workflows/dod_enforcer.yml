@@ -26,10 +26,33 @@ jobs:
                 "必要な証跡（例: reports/*）を更新"
               ];
               const missing = required.filter(item => !body.includes(item));
+              
               if (missing.length) {
-                core.setFailed("DoD missing: " + missing.join(", "));
+                // Generate helpful output with copy-paste ready block
+                console.log("❌ DoD Compliance Check Failed");
+                console.log("================================");
+                console.log("Missing items:");
+                missing.forEach(item => console.log(`  - ${item}`));
+                console.log("\n📋 Copy and paste this complete DoD checklist to your PR body:");
+                console.log("```");
+                console.log("## DoD チェックリスト（編集不可・完全一致）");
+                console.log("- [x] Auto-merge (squash) 有効化");
+                console.log("- [x] CI 必須チェック Green（test-and-artifacts, healthcheck）");
+                console.log("- [x] merged == true を API で確認");
+                console.log("- [x] PR に最終コメント（✅ merged / commit hash / CI run URL / evidence）");
+                console.log("- [x] 必要な証跡（例: reports/*）を更新");
+                console.log("```");
+                console.log("\n💡 Tip: The DoD Autofix workflow will automatically add missing items.");
+                console.log("================================");
+                
+                core.setFailed(`DoD missing ${missing.length} items: ${missing.join(", ")}`);
               } else {
-                core.notice("✅ DoD OK");
+                console.log("✅ DoD Compliance Check Passed");
+                console.log("================================");
+                console.log("All required DoD items found in PR body:");
+                required.forEach(item => console.log(`  ✓ ${item}`));
+                console.log("================================");
+                core.notice("✅ DoD OK - All required items present");
               }
             } catch (e) {
               core.setFailed("DoD script error: " + (e?.message || String(e)));

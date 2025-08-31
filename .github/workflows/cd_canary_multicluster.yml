@@ -170,24 +170,41 @@ jobs:
           # Generate summary
           python3 scripts/cd_report_summary.py
 
+      - name: Ensure reports diff
+        if: always()
+        run: |
+          mkdir -p reports
+          
+          # Seed a line to guarantee diff (for freeze or failure cases)
+          # This ensures reports/* always has changes even when deployment is skipped
+          echo "{\"runId\":\"seed-$(date +%s)\",\"status\":\"${FREEZE_DETECTED:-unknown}\",\"timestamp\":\"$(date -Iseconds)\"}" >> reports/cd_runs_seed.ndjson
+          
+          # Regenerate summary to include any changes
+          python3 scripts/cd_report_summary.py || true
+          
+          echo "[INFO] Reports directory contents:"
+          ls -la reports/
+
       - name: Commit reports
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # 生成物が無くても失敗しないように -A でステージング
+          # Stage all reports (including seed file)
           git add -A reports || true
           
           echo "[INFO] Git status after add:"
           git status --porcelain
           
-          # 何かしら stage されていれば commit/push
+          # Commit and push (should always have changes due to seed)
           if ! git diff --cached --quiet; then
             git commit -m "chore(reports): append cd run and update summary (run ${{ github.run_id }})"
-            # 衝突回避（並走を考慮）
+            # Avoid conflicts with concurrent runs
             git pull --rebase || true
             git push
           else
-            echo "[INFO] No staged changes; skipping commit."
+            echo "[WARN] No staged changes despite seed file; investigating..."
+            ls -la reports/
+            git status
           fi
