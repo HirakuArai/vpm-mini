@@ -126,11 +126,47 @@ jobs:
           EOF
           cat reports/cd_multicluster_result.json
 
-      - name: Commit report
-        if: steps.freeze.outputs.skip == 'false'
+      - name: Append report line (ndjson) & build summary
+        if: always()
+        run: |
+          mkdir -p reports
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          SHA="${{ github.sha }}"
+          TS="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          
+          # Status determination
+          if [ "${{ steps.freeze.outputs.skip }}" = "true" ]; then
+            STATUS="freeze"
+            ASEC=0
+            BSEC=0
+            A_RESULT="skipped"
+            B_RESULT="skipped"
+          elif [ "${{ steps.cluster_a.outcome }}" = "success" ] && [ "${{ steps.cluster_b.outcome }}" = "success" ]; then
+            STATUS="success"
+            ASEC="${{ steps.cluster_a.outputs.duration || '0' }}"
+            BSEC="${{ steps.cluster_b.outputs.duration || '0' }}"
+            A_RESULT="success"
+            B_RESULT="success"
+          else
+            STATUS="failed"
+            ASEC="${{ steps.cluster_a.outputs.duration || '0' }}"
+            BSEC="${{ steps.cluster_b.outputs.duration || '0' }}"
+            A_RESULT="${{ steps.cluster_a.outcome || 'failed' }}"
+            B_RESULT="${{ steps.cluster_b.outcome || 'failed' }}"
+          fi
+          
+          # Build NDJSON line (compact single line)
+          echo "{\"runId\":\"${{ github.run_id }}\",\"runUrl\":\"${RUN_URL}\",\"sha\":\"${SHA}\",\"timestamp\":\"${TS}\",\"namespace\":\"${{ env.NS }}\",\"ksvc\":\"${{ env.KSVCA_NAME }}\",\"canary\":${{ env.CANARY }},\"status\":\"${STATUS}\",\"clusters\":{\"A\":{\"duration_sec\":${ASEC},\"result\":\"${A_RESULT}\"},\"B\":{\"duration_sec\":${BSEC},\"result\":\"${B_RESULT}\"}}}" >> reports/cd_runs.ndjson
+          
+          # Install Python if needed and generate summary
+          which python3 || sudo apt-get update -y && sudo apt-get install -y python3
+          python3 scripts/cd_report_summary.py
+
+      - name: Commit reports
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/cd_multicluster_result.json
-          git commit -m "chore(reports): record multi-cluster canary result (run ${{ github.run_id }})" || echo "no changes"
+          git add reports/cd_runs.ndjson reports/cd_summary.json reports/cd_multicluster_result.json || true
+          git commit -m "chore(reports): append cd run and update summary (run ${{ github.run_id }})" || echo "no changes"
           git push

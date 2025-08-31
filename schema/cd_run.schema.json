@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "cd_run",
+  "type": "object",
+  "required": ["runId","sha","timestamp","clusters","namespace","ksvc","canary","status"],
+  "properties": {
+    "runId": {"type":"string"},
+    "sha": {"type":"string"},
+    "runUrl": {"type":"string"},
+    "timestamp": {"type":"string", "format":"date-time"},
+    "namespace": {"type":"string"},
+    "ksvc": {"type":"string"},
+    "canary": {"type":"integer"},
+    "status": {"type":"string","enum":["success","freeze","failed"]},
+    "clusters": {
+      "type":"object",
+      "properties": {
+        "A":{"type":"object","properties":{"duration_sec":{"type":"integer"},"result":{"type":"string"}}},
+        "B":{"type":"object","properties":{"duration_sec":{"type":"integer"},"result":{"type":"string"}}}
+      }
+    }
+  }
+}
