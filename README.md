@@ -1,5 +1,7 @@
 # vpm-mini
 
+**context_header:** repo=vpm-mini / branch=main / phase=Phase 2
+
 ## Phase 6 (Current)
 
 - Phase 5 完了: `phase5-complete`（GitOps / Canary / Guard / Failover / 800 RPS）
