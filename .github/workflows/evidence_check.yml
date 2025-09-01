@@ -85,9 +85,13 @@ jobs:
           # Convert to JSON array
           jq -Rs 'split("\n") | map(select(length > 0))' diff.txt > diff.json
           
-          # Output for next step
-          echo "paths=$(cat diff.json)" >> $GITHUB_OUTPUT
-          echo "count=$(cat diff.json | jq 'length')" >> $GITHUB_OUTPUT
+          # Output for next step（multi-line safe）
+          {
+            echo "paths<<__JSON__"
+            cat diff.json
+            echo "__JSON__"
+          } >> "$GITHUB_OUTPUT"
+          echo "count=$(jq 'length' diff.json)" >> "$GITHUB_OUTPUT"
 
       - name: Compare evidence with actual changes
         uses: actions/github-script@v7
