@@ -26,8 +26,8 @@ jobs:
             try {
               const body = context.payload.pull_request?.body || "";
               
-              // Look for ```evidence block
-              const evidenceMatch = body.match(/```evidence\s*\n([\s\S]*?)```/i);
+              // Look for ```evidence block (line-start fences only)
+              const evidenceMatch = body.match(/^```evidence[ \t]*\r?\n([\s\S]*?)^```/im);
               
               if (!evidenceMatch) {
                 console.log("No ```evidence block found in PR body");
