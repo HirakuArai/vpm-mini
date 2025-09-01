@@ -1,0 +1,155 @@
+name: Evidence Check
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  check:
+    name: Validate Evidence Files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract file paths from PR body
+        uses: actions/github-script@v7
+        id: body
+        with:
+          script: |
+            try {
+              const body = context.payload.pull_request?.body || "";
+              
+              // Extract paths from backticks (single, double, or triple)
+              // Look for patterns like `file.txt`, `path/to/file.yml`, ```path/to/file```
+              const pathMatches = [...body.matchAll(/`{1,3}([^`]+)`{1,3}/g)]
+                .map(m => m[1].trim())
+                .filter(p => {
+                  // Filter for actual file paths (contains / or has extension)
+                  return (p.includes('/') || p.includes('.')) && 
+                         !p.includes(' ') && 
+                         !p.includes('://') &&
+                         !p.startsWith('$') &&
+                         !p.startsWith('#');
+                });
+              
+              // Also look for explicit file references after "Evidence:" or "Files:"
+              const evidenceSection = body.match(/(?:Evidence|Files|Changed files):[^#]*/gi);
+              if (evidenceSection) {
+                const evidencePaths = evidenceSection[0]
+                  .split('\n')
+                  .flatMap(line => {
+                    // Extract paths from lines like "- path/to/file" or "* path/to/file"
+                    const match = line.match(/^[\s\-\*]+(.+?)(?:\s|$)/);
+                    if (match) {
+                      const path = match[1].replace(/[`'"]/g, '').trim();
+                      if ((path.includes('/') || path.includes('.')) && !path.includes('://')) {
+                        return [path];
+                      }
+                    }
+                    return [];
+                  });
+                pathMatches.push(...evidencePaths);
+              }
+              
+              // Remove duplicates
+              const uniquePaths = [...new Set(pathMatches)];
+              
+              console.log(`Found ${uniquePaths.length} file paths in PR body:`);
+              uniquePaths.forEach(p => console.log(`  - ${p}`));
+              
+              core.setOutput('paths', JSON.stringify(uniquePaths));
+              core.setOutput('count', uniquePaths.length);
+            } catch (e) {
+              console.error("Error extracting paths:", e);
+              core.setOutput('paths', '[]');
+              core.setOutput('count', 0);
+            }
+
+      - name: Get actual diff paths
+        id: diff
+        run: |
+          # Fetch base branch
+          git fetch origin ${{ github.base_ref }} --depth=1
+          
+          # Get list of changed files
+          git diff --name-only origin/${{ github.base_ref }}...HEAD > diff.txt
+          
+          echo "Files changed in this PR:"
+          cat diff.txt | sed 's/^/  - /'
+          
+          # Convert to JSON array
+          jq -Rs 'split("\n") | map(select(length > 0))' diff.txt > diff.json
+          
+          # Output for next step
+          echo "paths=$(cat diff.json)" >> $GITHUB_OUTPUT
+          echo "count=$(cat diff.json | jq 'length')" >> $GITHUB_OUTPUT
+
+      - name: Compare evidence with actual changes
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const bodyPaths = JSON.parse('${{ steps.body.outputs.paths }}');
+            const diffPaths = JSON.parse('${{ steps.diff.outputs.paths }}');
+            
+            console.log("================================");
+            console.log("Evidence Check Results");
+            console.log("================================");
+            
+            // Check for paths mentioned in body but not in diff
+            const notInDiff = bodyPaths.filter(p => {
+              // Allow some flexibility for partial paths
+              return !diffPaths.some(d => d.includes(p) || p.includes(d));
+            });
+            
+            // Check for important changed files not mentioned in body
+            const importantExtensions = ['.yml', '.yaml', '.json', '.md', '.py', '.js', '.ts'];
+            const importantPaths = ['reports/', 'docs/', '.github/'];
+            
+            const notMentioned = diffPaths.filter(d => {
+              // Check if this is an important file
+              const isImportant = importantExtensions.some(ext => d.endsWith(ext)) ||
+                                  importantPaths.some(path => d.includes(path));
+              
+              if (!isImportant) return false;
+              
+              // Check if it's mentioned in body
+              return !bodyPaths.some(p => d.includes(p) || p.includes(d));
+            });
+            
+            let hasErrors = false;
+            
+            if (notInDiff.length > 0) {
+              console.log("❌ Files mentioned in PR body but NOT in actual diff:");
+              notInDiff.forEach(p => console.log(`  - ${p}`));
+              console.log("\n⚠️  These files may be typos or incorrect references.");
+              hasErrors = true;
+            }
+            
+            if (notMentioned.length > 0) {
+              console.log("\n⚠️  Important files changed but NOT mentioned in PR body:");
+              notMentioned.forEach(p => console.log(`  - ${p}`));
+              console.log("\n💡 Consider adding these files to your PR description for clarity.");
+            }
+            
+            if (!hasErrors && notMentioned.length === 0) {
+              console.log("✅ All evidence files match the actual diff!");
+              console.log(`  - ${bodyPaths.length} files mentioned in PR body`);
+              console.log(`  - ${diffPaths.length} files changed in diff`);
+            }
+            
+            console.log("================================");
+            
+            if (hasErrors) {
+              core.setFailed("PR body references files that are not in the actual diff. Please correct the file paths.");
+            } else if (notMentioned.length > 0) {
+              core.warning(`${notMentioned.length} important files changed but not mentioned in PR body`);
+            } else {
+              core.notice("✅ Evidence check passed - all files properly documented");
+            }
