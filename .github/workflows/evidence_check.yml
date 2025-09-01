@@ -94,68 +94,67 @@ jobs:
           echo "count=$(jq 'length' diff.json)" >> "$GITHUB_OUTPUT"
 
       - name: Compare evidence with actual changes
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const hasEvidenceBlock = ${{ steps.body.outputs.has_evidence_block }};
-            const bodyPaths = JSON.parse('${{ steps.body.outputs.paths }}');
-            const diffPaths = JSON.parse('${{ steps.diff.outputs.paths }}');
-            
-            console.log("================================");
-            console.log("Evidence Check Results");
-            console.log("================================");
-            
-            // If no evidence block, pass with notice
-            if (!hasEvidenceBlock) {
-              console.log("ℹ️  No ```evidence block found in PR body");
-              console.log("This check is skipped for PRs without an evidence block.");
-              console.log("To enable strict file path validation, add an evidence block:");
-              console.log("```evidence");
-              console.log("path/to/file1.yml");
-              console.log("path/to/file2.md");
-              console.log("```");
-              console.log("================================");
-              core.notice("No evidence block found; skipping strict validation.");
-              return;
-            }
-            
-            // If evidence block exists but is empty
-            if (bodyPaths.length === 0) {
-              console.log("⚠️  Evidence block exists but contains no file paths");
-              console.log("Files changed in this PR:");
-              diffPaths.forEach(p => console.log(`  - ${p}`));
-              console.log("================================");
-              core.warning("Evidence block is empty. Consider listing changed files.");
-              return;
-            }
-            
-            // Check for paths mentioned in evidence block but not in diff
-            const notInDiff = bodyPaths.filter(p => {
-              // Exact match required for evidence block
-              return !diffPaths.includes(p);
-            });
-            
-            let hasErrors = false;
-            
-            if (notInDiff.length > 0) {
-              console.log("❌ Files in evidence block but NOT in actual diff:");
-              notInDiff.forEach(p => console.log(`  - ${p}`));
-              console.log("\n⚠️  These files may be typos or were not actually changed.");
-              hasErrors = true;
-            } else {
-              console.log("✅ All files in evidence block match the actual diff!");
-              console.log(`  - ${bodyPaths.length} files in evidence block`);
-              console.log(`  - ${diffPaths.length} files changed in diff`);
-              
-              // Show which evidence files were validated
-              console.log("\nValidated evidence files:");
-              bodyPaths.forEach(p => console.log(`  ✓ ${p}`));
-            }
-            
-            console.log("================================");
-            
-            if (hasErrors) {
-              core.setFailed("Evidence block contains files that are not in the actual diff. Please correct the file paths.");
-            } else {
-              core.notice("✅ Evidence check passed - all listed files are in the diff");
-            }
+        run: |
+          # Check if evidence block exists
+          HAS_EVIDENCE_BLOCK='${{ steps.body.outputs.has_evidence_block }}'
+          
+          echo "================================"
+          echo "Evidence Check Results"
+          echo "================================"
+          
+          # If no evidence block, pass with notice
+          if [ "$HAS_EVIDENCE_BLOCK" != "true" ]; then
+            echo "ℹ️  No \`\`\`evidence block found in PR body"
+            echo "This check is skipped for PRs without an evidence block."
+            echo "To enable strict file path validation, add an evidence block:"
+            echo "\`\`\`evidence"
+            echo "path/to/file1.yml"
+            echo "path/to/file2.md"
+            echo "\`\`\`"
+            echo "================================"
+            echo "::notice::No evidence block found; skipping strict validation."
+            exit 0
+          fi
+          
+          # BODY: PR 本文から抽出した evidence パス一覧（JSON配列）
+          BODY_JSON='${{ steps.body.outputs.paths }}'
+          
+          # 正規化関数: 前後空白・CR除去、空行は除外
+          norm() { sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/\r$//' | awk 'length>0'; }
+          
+          echo "$BODY_JSON" | jq -r '.[]?' | norm | sort -u > _body.txt
+          jq -r '.[]' diff.json | norm | sort -u > _diff.txt
+          
+          echo '--- BODY (normalized) ---'; cat _body.txt || true
+          echo '--- DIFF (normalized) ---'; cat _diff.txt || true
+          
+          # If evidence block exists but is empty
+          if [ ! -s _body.txt ]; then
+            echo "⚠️  Evidence block exists but contains no file paths"
+            echo "Files changed in this PR:"
+            cat _diff.txt | sed 's/^/  - /'
+            echo "================================"
+            echo "::warning::Evidence block is empty. Consider listing changed files."
+            exit 0
+          fi
+          
+          # Check for missing files
+          MISS=$(comm -23 _body.txt _diff.txt || true)
+          if [ -n "$MISS" ]; then
+            echo "❌ Files in evidence block but NOT in actual diff:"
+            echo "$MISS" | sed 's/^/  - /'
+            echo ""
+            echo "⚠️  These files may be typos or were not actually changed."
+            echo "================================"
+            echo "::error::Evidence block contains files that are not in the actual diff. Please correct the file paths."
+            exit 1
+          else
+            echo "✅ All files in evidence block match the actual diff!"
+            echo "  - $(wc -l < _body.txt) files in evidence block"
+            echo "  - $(wc -l < _diff.txt) files changed in diff"
+            echo ""
+            echo "Validated evidence files:"
+            cat _body.txt | sed 's/^/  ✓ /'
+            echo "================================"
+            echo "::notice::✅ Evidence check passed - all listed files are in the diff"
+          fi
