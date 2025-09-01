@@ -30,6 +30,12 @@ cc:
 	}; \
 	for k,v in vars.items(): tmpl = tmpl.replace(f'<{k}>', v); \
 	print(tmpl)"
+.PHONY: test phase0-sanity
+phase0-sanity:
+	python scripts/phase0_sanity/playground.py
+test:
+	pytest -q
+
 verify:
 	@PR=$${PR:?}; SLUG=$${SLUG:?}; set -e; \
 	echo "== PR 状態 =="; \
