@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hello-ai-cm
+  namespace: hyper-swarm
+data:
+  AI_ENABLED: "false"
+  MODEL: "gpt-4.1-mini"
+  MAX_TOKENS: "64"
+  TIMEOUT_MS: "2000"

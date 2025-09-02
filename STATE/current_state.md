@@ -53,3 +53,11 @@ updated_at: 2025-09-02T09:00:00+09:00
   - Knative Serving v1.18 + net-kourier を適用
   - `ingress.class = kourier` / `config-domain = 127.0.0.1.sslip.io` を設定
   - `knative-serving` / `kourier-system` の全 Deploy が Available を確認
+
+### Phase 2 – P2-2 Hello-AI（Knative Service）
+- Status: **GREEN (pending PR merge)**
+- Evidence: `reports/p2_2_hello_ai_20250903_075647.md`
+- Decision Log:
+  - hello-ai KService を hyper-swarm にデプロイ（httpbin as placeholder）
+  - kourier ポートフォワード + Host ヘッダで疎通（200）
+  - Knative Serving 正常動作確認

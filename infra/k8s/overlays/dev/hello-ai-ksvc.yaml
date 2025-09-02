@@ -1,0 +1,12 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: hello-ai
+  namespace: hyper-swarm
+spec:
+  template:
+    spec:
+      containers:
+        - image: docker.io/kennethreitz/httpbin:latest
+          ports:
+            - containerPort: 80
