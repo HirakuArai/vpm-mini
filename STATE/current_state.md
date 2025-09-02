@@ -45,3 +45,11 @@ updated_at: 2025-09-02T09:00:00+09:00
 
 ## 決定（2025-09-02）
 - 「本質的処理（AI中心の5ロール循環・READYなKService）」が未実証であったため、**Phase 0 / 2 へ立ち戻って証跡を先に揃える**。Freeze は READY 証跡が揃ったタイミングで解除し、#125 を進める。
+### Phase 2 Kickoff – P2-1 足場構築（kind + Knative v1.18）
+- Status: **GREEN**
+- Evidence: `reports/p2_1_bootstrap_20250903_045206.md`
+- Decision Log:
+  - kind クラスタを作成（既存時は再利用）
+  - Knative Serving v1.18 + net-kourier を適用
+  - `ingress.class = kourier` / `config-domain = 127.0.0.1.sslip.io` を設定
+  - `knative-serving` / `kourier-system` の全 Deploy が Available を確認
