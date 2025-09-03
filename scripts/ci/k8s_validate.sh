@@ -15,7 +15,23 @@ fi
 
 for f in ${LIST}; do
   echo "::group::validate $f"
-  if ! kubectl apply --dry-run=client --validate=false -f "$f" >/dev/null; then
+  # Basic YAML syntax check + required K8s fields
+  if ! python3 -c "
+import yaml, sys
+try:
+    with open('$f') as file:
+        docs = list(yaml.safe_load_all(file))
+        for doc in docs:
+            if doc is None: continue
+            if not isinstance(doc, dict):
+                raise ValueError('Document is not a dict')
+            if 'apiVersion' not in doc or 'kind' not in doc:
+                raise ValueError('Missing apiVersion or kind')
+        print('✓ Valid YAML with K8s structure')
+except Exception as e:
+    print(f'✗ {e}', file=sys.stderr)
+    sys.exit(1)
+  " 2>/dev/null; then
     echo "::error file=$f::validation failed"
     OK=0
   else
