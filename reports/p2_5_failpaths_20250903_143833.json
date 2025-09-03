@@ -1,0 +1,26 @@
+{
+  "ns": "hyper-swarm",
+  "app": "hello-ai-test",
+  "cases": {
+    "invalid_key": {
+      "status": "200",
+      "x_fallback": "true",
+      "ok": 1
+    },
+    "ai_disabled": {
+      "status": "200",
+      "x_fallback": "true",
+      "ok": 1
+    },
+    "invalid_model": {
+      "status": "200",
+      "x_fallback": "true",
+      "ok": 1
+    }
+  },
+  "summary": {
+    "total": 3,
+    "pass": 3
+  },
+  "generated_at": "2025-09-03T05:38:51Z"
+}
