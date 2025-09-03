@@ -64,3 +64,17 @@ updated_at: 2025-09-02T09:00:00+09:00
 
 #### Phase 2 – P2-3 CI/SSOT 結線（着手）
 - 追加: k8s-manifests-validate（kubectl --dry-run=client）+ reports/*.json Artifact
+
+### Phase 2 – P2-4 Observability（最小）
+- Status: **GREEN**
+- Evidence: `reports/p2_4_obs_20250903_140653.json`
+- Decision Log:
+  - hello-ai を N=12 回呼び出し、`X-Dur-Ms` と `X-Fallback` を集計（p50/p95/avg）
+  - 結果: 12/12 成功、fallback_false=12、p50=974ms、p95=3543ms
+
+### Phase 2 – P2-5 Hardening（最小）
+- Status: **GREEN**
+- Evidence: `reports/p2_5_failpaths_20250903_143833.json`
+- Decision Log:
+  - invalid_key / ai_disabled / invalid_model の3系統で **外形200 + X-Fallback:true** を確認
+  - 全ケース成功 (3/3 PASS) - graceful fallback動作確認済み
