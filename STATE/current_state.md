@@ -56,7 +56,7 @@ updated_at: 2025-09-02T09:00:00+09:00
 
 ### Phase 2 – P2-2 Hello-AI（Knative Service）
 - Status: **GREEN**
-- Evidence: `reports/p2_2_ai_enabled_success.md`
+- Evidence: `reports/p2_2_ai_enabled_success.md` / `reports/p2_2_openai_proof_20250903_125848.json`
 - Decision Log:
   - 画像を `ko.local/hello-ai:dev` に固定（tag-resolve skip + kind load）
   - .env の `OPENAI_API_KEY` を Secret 取り込み
