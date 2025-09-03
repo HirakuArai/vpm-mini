@@ -85,3 +85,9 @@ updated_at: 2025-09-02T09:00:00+09:00
 - Decision Log:
   - Phase 2（P2-1..P2-5）の証跡を集約し、タグで復元ポイントを作成
   - Evidence: 15件のレポートファイル（bootstrap/AI/CI/obs/hardening）
+
+### Course Correction Log – Phase 0/2 回帰（本質稼働の証跡確保）
+- 背景: 計器先行により Phase 5 相当に見えていたが、Phase 0/2 の証跡が欠落
+- 判断: Phase 0 サニティ → Phase 2 の **縦スライス** を先に通す方針へ切替
+- 実施: **P2-1..P2-6** を完了し、タグ `p2-vs-complete-20250903` を付与（復元点）
+- Evidence: `reports/retro_phase2_course_correction_20250903_153645.md`
