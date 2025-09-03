@@ -35,7 +35,7 @@ def hello_ai(msg: str = "ping"):
     rid = str(uuid.uuid4())
     t0 = time.time()
     ai_enabled = os.getenv("AI_ENABLED", "false").lower() == "true"
-    model = os.getenv("MODEL", "gpt-4.1-mini")
+    model = os.getenv("MODEL", "gpt-4o-mini")
     max_tokens = int(os.getenv("MAX_TOKENS", "64"))
     timeout_ms = int(os.getenv("TIMEOUT_MS", "2000"))
 
@@ -46,16 +46,21 @@ def hello_ai(msg: str = "ping"):
         client = get_client()
         if client:
             try:
-                r = client.responses.create(
+                r = client.chat.completions.create(
                     model=model,
-                    input=f"Reply shortly to: {msg}",
-                    max_output_tokens=max_tokens,
+                    messages=[{"role": "user", "content": f"Reply shortly to: {msg}"}],
+                    max_tokens=max_tokens,
                     timeout=timeout_ms / 1000.0,
                 )
                 # OpenAI 1.x のシンプルな取り出し
-                text = getattr(r, "output_text", "").strip() or "(fallback) hello"
+                text = (
+                    r.choices[0].message.content.strip()
+                    if r.choices
+                    else "(fallback) hello"
+                )
                 fb = "false" if text and text != "(fallback) hello" else "true"
-            except Exception:
+            except Exception as e:
+                print(f"OpenAI API error: {e}")
                 text = "(fallback) hello"
                 fb = "true"
         else:

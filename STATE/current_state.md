@@ -55,9 +55,9 @@ updated_at: 2025-09-02T09:00:00+09:00
   - `knative-serving` / `kourier-system` の全 Deploy が Available を確認
 
 ### Phase 2 – P2-2 Hello-AI（Knative Service）
-- Status: **GREEN (pending PR merge)**
-- Evidence: `reports/p2_2_hello_ai_20250903_075647.md`
+- Status: **GREEN**
+- Evidence: `reports/p2_2_ai_enabled_success.md`
 - Decision Log:
-  - hello-ai KService を hyper-swarm にデプロイ（httpbin as placeholder）
-  - kourier ポートフォワード + Host ヘッダで疎通（200）
-  - Knative Serving 正常動作確認
+  - 画像を `ko.local/hello-ai:dev` に固定（tag-resolve skip + kind load）
+  - .env の `OPENAI_API_KEY` を Secret 取り込み
+  - `AI_ENABLED=true` で 200 応答・**X-Fallback:false** を確認（OpenAI 実コール成立）
