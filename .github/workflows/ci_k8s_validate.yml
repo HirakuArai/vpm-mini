@@ -1,0 +1,20 @@
+name: k8s-manifests-validate
+on:
+  pull_request:
+  push:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'latest'
+      - name: Validate Manifests (client dry-run)
+        run: scripts/ci/k8s_validate.sh
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: p2_3_ci_reports
+          path: reports/*.json
