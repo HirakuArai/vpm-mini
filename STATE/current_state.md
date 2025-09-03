@@ -60,4 +60,4 @@ updated_at: 2025-09-02T09:00:00+09:00
 - Decision Log:
   - 画像を `ko.local/hello-ai:dev` に固定（tag-resolve skip + kind load）
   - .env の `OPENAI_API_KEY` を Secret 取り込み
-  - `AI_ENABLED=true` で 200 応答・**X-Fallback:false** を確認（OpenAI 実コール成立）
+  - `AI_ENABLED=true` で 200 応答・**X-Fallback:false** を確認（Pod内実コール: `reports/p2_2_openai_proof_20250903_125848.json`）

@@ -47,3 +47,7 @@ X-Fallback: false
 - Used standalone deployment for testing due to Knative webhook issues
 - Successfully integrated with OpenAI GPT-4o-mini model
 - Environment variables properly injected via ConfigMap and Secret
+## OpenAI 実コール証跡 (20250903_125804)
+
+- JSON: `reports/p2_2_openai_proof_20250903_125804.json`
+{"id": "chatcmpl-CBYvyUFwUOjRjMlWkreYL2AXqvxfU", "model": "gpt-4.1-mini-2025-04-14", "text": "Ok", "usage": {"prompt_tokens": 9, "completion_tokens": 1, "total_tokens": 10}} <!-- pragma: allowlist secret -->

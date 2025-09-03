@@ -1,0 +1,1 @@
+{"id": "chatcmpl-CBYvyUFwUOjRjMlWkreYL2AXqvxfU", "model": "gpt-4.1-mini-2025-04-14", "text": "Ok", "usage": {"prompt_tokens": 9, "completion_tokens": 1, "total_tokens": 10}} # pragma: allowlist secret
