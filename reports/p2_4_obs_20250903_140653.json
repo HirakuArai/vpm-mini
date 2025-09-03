@@ -1,0 +1,13 @@
+{
+  "ns": "hyper-swarm",
+  "app": "hello-ai-test",
+  "total": 12,
+  "http200": 12,
+  "fallback_true": 0,
+  "fallback_false": 12,
+  "p50_ms": 974,
+  "p95_ms": 3543,
+  "avg_ms": 1574,
+  "url_host": "hello-ai-test.hyper-swarm.svc.cluster.local",
+  "generated_at": "2025-09-03T05:06:53Z"
+}
