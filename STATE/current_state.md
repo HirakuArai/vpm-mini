@@ -78,3 +78,10 @@ updated_at: 2025-09-02T09:00:00+09:00
 - Decision Log:
   - invalid_key / ai_disabled / invalid_model の3系統で **外形200 + X-Fallback:true** を確認
   - 全ケース成功 (3/3 PASS) - graceful fallback動作確認済み
+
+### Phase 2 – P2-6 Snapshot & Tag
+- Status: **GREEN**
+- Evidence: `reports/p2_6_snapshot_20250903_150554.md`
+- Decision Log:
+  - Phase 2（P2-1..P2-5）の証跡を集約し、タグで復元ポイントを作成
+  - Evidence: 15件のレポートファイル（bootstrap/AI/CI/obs/hardening）
