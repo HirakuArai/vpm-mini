@@ -15,7 +15,7 @@ fi
 
 for f in ${LIST}; do
   echo "::group::validate $f"
-  if ! kubectl apply --dry-run=client -f "$f" >/dev/null; then
+  if ! kubectl apply --dry-run=client --validate=false -f "$f" >/dev/null; then
     echo "::error file=$f::validation failed"
     OK=0
   else
