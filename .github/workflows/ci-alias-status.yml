@@ -1,0 +1,29 @@
+name: ci-alias-status
+on:
+  pull_request:
+    types: [opened, edited, synchronize, ready_for_review]
+permissions:
+  statuses: write
+  contents: read
+jobs:
+  alias:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create legacy alias statuses when real checks are green
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sha = context.payload.pull_request.head.sha
+            const prurl = context.payload.pull_request.html_url
+            const runs = await github.rest.checks.listForRef({ ...context.repo, ref: sha })
+            const ok = n => runs.data.check_runs.some(r => r.name.includes(n) && r.conclusion === 'success')
+            const need = [['test-and-artifacts','test-and-artifacts'], ['healthcheck','healthcheck']]
+            for (const [needle, ctx] of need) {
+              if (ok(needle)) {
+                await github.rest.repos.createCommitStatus({
+                  ...context.repo, sha,
+                  state: 'success', context: ctx,
+                  target_url: prurl, description: 'alias status to satisfy DoD'
+                })
+              }
+            }
