@@ -1,10 +1,18 @@
-# E2E Human Review (worst 5 of 10)
+# E2E Human Review v2 (worst 5 of 10)
+
+**含まれる情報**: ソース抜粋 / GitHubリンク / 期待要約 / 差分 / 判定欄
 
 ## 1. id=ex09 (sim≈0.333)
 
-**raw**
+**Source**: `scripts/annotate_sources.py` L6-10  [🔗open](https://github.com/HirakuArai/vpm-mini/blob/feat/p0-semantics-sanity/scripts/annotate_sources.py#L6-L10)
 
-> 計測: X-Dur-Ms の中央値が 1s 未満かを監視する（p50 < 1s）。
+```text
+STOP_DIRS = {".git","node_modules",".venv","venv","__pycache__",".pytest_cache",".DS_Store",".idea",".vscode",".mypy_cache"}
+TEXT_EXT  = {".md",".txt",".py",".sh",".yaml",".yml",".json",".mdx",".ini",".cfg",".toml",".sql",".go",".ts",".js",".tsx",".jsx"}
+EXTRA_KEYS = {"knative","kservice","hello","ko.local","kourier","serving","configmap","secret","x-dur-ms","p50","p95","avg","gatekeeper","spiffe","do d","auto-merge","--dry-run=client",":latest"}
+
+def iter_files(root: pathlib.Path):
+```
 
 **expected**
 
@@ -29,11 +37,21 @@
 +を監視。
 ```
 
+- [ ] Accept  /  - [ ] Revise
+
+---
+
 ## 2. id=ex05 (sim≈0.370)
 
-**raw**
+**Source**: `scripts/annotate_sources.py` L6-10  [🔗open](https://github.com/HirakuArai/vpm-mini/blob/feat/p0-semantics-sanity/scripts/annotate_sources.py#L6-L10)
 
-> 運用: reports に X-Dur-Ms の p50/p95/avg を集計して保存する。
+```text
+STOP_DIRS = {".git","node_modules",".venv","venv","__pycache__",".pytest_cache",".DS_Store",".idea",".vscode",".mypy_cache"}
+TEXT_EXT  = {".md",".txt",".py",".sh",".yaml",".yml",".json",".mdx",".ini",".cfg",".toml",".sql",".go",".ts",".js",".tsx",".jsx"}
+EXTRA_KEYS = {"knative","kservice","hello","ko.local","kourier","serving","configmap","secret","x-dur-ms","p50","p95","avg","gatekeeper","spiffe","do d","auto-merge","--dry-run=client",":latest"}
+
+def iter_files(root: pathlib.Path):
+```
 
 **expected**
 
@@ -56,11 +74,21 @@
 +に保存。
 ```
 
+- [ ] Accept  /  - [ ] Revise
+
+---
+
 ## 3. id=ex07 (sim≈0.540)
 
-**raw**
+**Source**: `scripts/annotate_sources.py` L6-10  [🔗open](https://github.com/HirakuArai/vpm-mini/blob/feat/p0-semantics-sanity/scripts/annotate_sources.py#L6-L10)
 
-> 検証: kubectl apply を --dry-run=client で実行し、manifest の妥当性を検査。
+```text
+STOP_DIRS = {".git","node_modules",".venv","venv","__pycache__",".pytest_cache",".DS_Store",".idea",".vscode",".mypy_cache"}
+TEXT_EXT  = {".md",".txt",".py",".sh",".yaml",".yml",".json",".mdx",".ini",".cfg",".toml",".sql",".go",".ts",".js",".tsx",".jsx"}
+EXTRA_KEYS = {"knative","kservice","hello","ko.local","kourier","serving","configmap","secret","x-dur-ms","p50","p95","avg","gatekeeper","spiffe","do d","auto-merge","--dry-run=client",":latest"}
+
+def iter_files(root: pathlib.Path):
+```
 
 **expected**
 
@@ -85,11 +113,21 @@
 +で妥当性確認済み。
 ```
 
+- [ ] Accept  /  - [ ] Revise
+
+---
+
 ## 4. id=ex01 (sim≈0.582)
 
-**raw**
+**Source**: `scripts/annotate_sources.py` L6-10  [🔗open](https://github.com/HirakuArai/vpm-mini/blob/feat/p0-semantics-sanity/scripts/annotate_sources.py#L6-L10)
 
-> 会議: Phase 2 の完了報告。Knative と Hello KService の READY を確認。
+```text
+STOP_DIRS = {".git","node_modules",".venv","venv","__pycache__",".pytest_cache",".DS_Store",".idea",".vscode",".mypy_cache"}
+TEXT_EXT  = {".md",".txt",".py",".sh",".yaml",".yml",".json",".mdx",".ini",".cfg",".toml",".sql",".go",".ts",".js",".tsx",".jsx"}
+EXTRA_KEYS = {"knative","kservice","hello","ko.local","kourier","serving","configmap","secret","x-dur-ms","p50","p95","avg","gatekeeper","spiffe","do d","auto-merge","--dry-run=client",":latest"}
+
+def iter_files(root: pathlib.Path):
+```
 
 **expected**
 
@@ -119,11 +157,21 @@
 +禁止）。
 ```
 
+- [ ] Accept  /  - [ ] Revise
+
+---
+
 ## 5. id=ex06 (sim≈0.704)
 
-**raw**
+**Source**: `scripts/annotate_sources.py` L6-10  [🔗open](https://github.com/HirakuArai/vpm-mini/blob/feat/p0-semantics-sanity/scripts/annotate_sources.py#L6-L10)
 
-> 検証: kourier-system/knative-serving の全DeploymentがAvailableかを確認した。
+```text
+STOP_DIRS = {".git","node_modules",".venv","venv","__pycache__",".pytest_cache",".DS_Store",".idea",".vscode",".mypy_cache"}
+TEXT_EXT  = {".md",".txt",".py",".sh",".yaml",".yml",".json",".mdx",".ini",".cfg",".toml",".sql",".go",".ts",".js",".tsx",".jsx"}
+EXTRA_KEYS = {"knative","kservice","hello","ko.local","kourier","serving","configmap","secret","x-dur-ms","p50","p95","avg","gatekeeper","spiffe","do d","auto-merge","--dry-run=client",":latest"}
+
+def iter_files(root: pathlib.Path):
+```
 
 **expected**
 
@@ -144,4 +192,8 @@
 +が全て
 +Available。
 ```
+
+- [ ] Accept  /  - [ ] Revise
+
+---
 
