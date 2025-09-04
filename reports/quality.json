@@ -1,0 +1,58 @@
+{
+  "ts": 1756964487,
+  "samples": 10,
+  "avg_sim_proxy": 0.676,
+  "len_le400_ok": true,
+  "items": [
+    {
+      "id": "ex01",
+      "len": 86,
+      "sim_proxy": 0.5816
+    },
+    {
+      "id": "ex02",
+      "len": 45,
+      "sim_proxy": 0.835
+    },
+    {
+      "id": "ex03",
+      "len": 52,
+      "sim_proxy": 0.8727
+    },
+    {
+      "id": "ex04",
+      "len": 57,
+      "sim_proxy": 0.8689
+    },
+    {
+      "id": "ex05",
+      "len": 34,
+      "sim_proxy": 0.3704
+    },
+    {
+      "id": "ex06",
+      "len": 44,
+      "sim_proxy": 0.7037
+    },
+    {
+      "id": "ex07",
+      "len": 41,
+      "sim_proxy": 0.54
+    },
+    {
+      "id": "ex08",
+      "len": 41,
+      "sim_proxy": 0.8723
+    },
+    {
+      "id": "ex09",
+      "len": 19,
+      "sim_proxy": 0.3333
+    },
+    {
+      "id": "ex10",
+      "len": 42,
+      "sim_proxy": 0.7826
+    }
+  ]
+}

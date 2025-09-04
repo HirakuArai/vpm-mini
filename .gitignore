@@ -12,3 +12,4 @@ __pycache__/
 # Diagram exports (artifacts)
 diagrams/export/
 \!diagrams/export/.gitkeep
+venv/
