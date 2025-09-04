@@ -1,0 +1,17 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata: { name: k8snolatesttag }
+spec:
+  crd:
+    spec:
+      names: { kind: K8sNoLatestTag }
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8snolatesttag
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Pod"
+          c := input.review.object.spec.containers[_]
+          endswith(c.image, ":latest")
+          msg := sprintf("latest tag is not allowed: %q", [c.image])
+        }
