@@ -1,0 +1,27 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: hello-ai
+  namespace: hyper-swarm
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "10"
+    spec:
+      containers:
+      - name: user-container
+        image: hello-ai:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PORT
+          value: "8080"
+        envFrom:
+        - configMapRef:
+            name: hello-ai-cm
+        - secretRef:
+            name: openai-secret
+            optional: false

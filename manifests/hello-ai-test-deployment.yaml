@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-ai-test
+  namespace: hyper-swarm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-ai-test
+  template:
+    metadata:
+      labels:
+        app: hello-ai-test
+    spec:
+      containers:
+      - name: hello-ai
+        image: ko.local/hello-ai:dev
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PORT
+          value: "8080"
+        envFrom:
+        - configMapRef:
+            name: hello-ai-cm
+        - secretRef:
+            name: openai-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-ai-test
+  namespace: hyper-swarm
+spec:
+  selector:
+    app: hello-ai-test
+  ports:
+  - port: 8080
+    targetPort: 8080
