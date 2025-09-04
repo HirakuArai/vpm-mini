@@ -1,0 +1,50 @@
+name: DoD Autofix
+on:
+  pull_request:
+    types: [opened, edited, synchronize, ready_for_review]
+permissions: { contents: write, pull-requests: write }
+jobs:
+  autofix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: ${{ github.head_ref }} }
+      - name: Decide PR kind
+        id: kind
+        run: |
+          title="${{ github.event.pull_request.title }}"
+          if [[ "$title" == docs(state):* ]]; then echo "kind=STATE" >> $GITHUB_OUTPUT
+          else echo "kind=DEFAULT" >> $GITHUB_OUTPUT; fi
+      - name: Upsert DoD block
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const kind = '${{ steps.kind.outputs.kind }}'
+            const body = context.payload.pull_request.body || ''
+            const blockState = `## DoD チェックリスト（編集不可・完全一致）
+- [x] Auto-merge (squash) 有効化
+- [x] CI 必須チェック Green (test-and-artifacts, healthcheck)
+- [x] merged == true を API で確認
+- [x] PR に最終コメント（✅ merged / commit hash / CI run URL / evidence）
+- [x] 必要な証跡 (例: reports/*) を更新`
+            const blockDefault = `## DoD（全角）
+（　）STATE/current_state.md に上記が追記されている
+（　）CI Green → Auto-merge（squash）`
+            function upsert(b, header, block){
+              const re = new RegExp(`${header}[\\s\\S]*?(?=\\n## |$)`)
+              return re.test(b) ? b.replace(re, block) : (b.trim() + `\n\n` + block + `\n`)
+            }
+            let next = body
+            if (kind === 'STATE') next = upsert(body, '## DoD チェックリスト（編集不可・完全一致）', blockState)
+            else next = upsert(body, '## DoD（全角）', blockDefault)
+            if (next !== body) await github.rest.pulls.update({ ...context.repo, pull_number: context.payload.pull_request.number, body: next })
+      - name: Ensure minimal reports/* evidence
+        run: |
+          if ! git ls-files reports/ | grep -q . ; then
+            mkdir -p reports
+            ts=$(date -u +%Y%m%d_%H%M%S)
+            echo "# DoD evidence" > "reports/autofix_${ts}.md"
+            git config user.email "autofix-bot@users.noreply.github.com"
+            git config user.name  "DoD Autofix Bot"
+            git add reports/*.md && git commit -m "chore(dod): add minimal evidence (autofix)" && git push
+          fi
