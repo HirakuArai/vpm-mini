@@ -1,10 +1,12 @@
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
-metadata: { name: k8sallowedrepos }
+metadata:
+  name: k8sallowedrepos
 spec:
   crd:
     spec:
-      names: { kind: K8sAllowedRepos }
+      names:
+        kind: K8sAllowedRepos
       validation:
         openAPIV3Schema:
           type: object
@@ -17,10 +19,15 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package k8sallowedrepos
+
+        allowed_repo(image, repos) {
+          some i
+          startswith(image, repos[i])
+        }
+
         violation[{"msg": msg}] {
           input.review.kind.kind == "Pod"
           c := input.review.object.spec.containers[_]
-          allowed := {r | r := input.parameters.repos[_]}
-          not any(startswith(c.image, allowed[_]))
-          msg := sprintf("image %q is not in allowed repos", [c.image])
+          not allowed_repo(c.image, input.parameters.repos)
+          msg := sprintf("image %q not in allowed repos %v", [c.image, input.parameters.repos])
         }
