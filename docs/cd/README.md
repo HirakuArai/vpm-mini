@@ -140,10 +140,51 @@ cat reports/cd_runs.ndjson | while read line; do
 done
 ```
 
+## Live Metrics (Prometheus/Grafana)
+
+### Architecture
+
+The CD workflow pushes metrics to a Prometheus Pushgateway after each run:
+
+```
+GitHub Actions → Pushgateway → Prometheus → Grafana
+                 (push)        (scrape)     (visualize)
+```
+
+### Metrics Exported
+
+- `cd_canary_status`: Run status (1=success, 0=failure)
+- `cd_canary_freeze`: Freeze indicator (1=frozen, 0=active)
+- `cd_canary_duration_seconds`: Deployment duration per cluster
+- `cd_canary_last_run_timestamp`: Timestamp of the last run
+
+### Prometheus Configuration
+
+The Pushgateway is scraped by Prometheus with job name `pushgateway`:
+
+```yaml
+- job_name: 'pushgateway'
+  static_configs:
+    - targets: ['pushgateway.hyper-swarm.svc.cluster.local:9091']
+  honor_labels: true
+```
+
+### Grafana Dashboard
+
+Access the CD Canary dashboard at:
+- **Dashboard ID**: `cd-canary-metrics`
+- **Location**: `/dashboards/uid/cd-canary-metrics`
+
+Key panels:
+- Success rate (24h)
+- Run distribution (success/failed/frozen)
+- Deployment duration by cluster
+- Last run status
+- Freeze count
+- Average and max duration
+
 ## Maintenance
 
 - **Rotation:** NDJSON file auto-rotates after 10,000 lines (future enhancement)
 - **Backup:** Reports are committed to git for permanent record
-
-> CI tickle: ensure required checks run for PR #124
 - **Cleanup:** Old entries beyond 90 days can be archived

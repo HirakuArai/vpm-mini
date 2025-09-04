@@ -208,3 +208,45 @@ jobs:
             ls -la reports/
             git status
           fi
+
+      - name: Push metrics to Pushgateway
+        if: always()
+        env:
+          PGW_URL: http://pushgateway.hyper-swarm.svc.cluster.local:9091/metrics/job/cd_canary/instance/${{ github.run_id }}
+          RUN_STATUS: ${{ job.status }}
+          IS_FREEZE: ${{ steps.freeze.outputs.skip || 'false' }}
+          ASEC: ${{ steps.cluster_a.outputs.duration || '0' }}
+          BSEC: ${{ steps.cluster_b.outputs.duration || '0' }}
+        run: |
+          # Determine numeric status value
+          if [ "${RUN_STATUS}" = "success" ]; then
+            STATUS_VALUE=1
+          else
+            STATUS_VALUE=0
+          fi
+          
+          # Determine freeze value
+          if [ "${IS_FREEZE}" = "true" ]; then
+            FREEZE_VALUE=1
+          else
+            FREEZE_VALUE=0
+          fi
+          
+          # Create metrics file
+          cat <<EOF > /tmp/metrics.txt
+          # CD Canary run status (1=success, 0=failure/cancelled)
+          cd_canary_status{status="${RUN_STATUS}",run_id="${{ github.run_id }}"} ${STATUS_VALUE}
+          
+          # CD Canary freeze indicator (1=frozen, 0=not frozen)
+          cd_canary_freeze{run_id="${{ github.run_id }}"} ${FREEZE_VALUE}
+          
+          # CD Canary deployment duration in seconds
+          cd_canary_duration_seconds{cluster="A",run_id="${{ github.run_id }}"} ${ASEC}
+          cd_canary_duration_seconds{cluster="B",run_id="${{ github.run_id }}"} ${BSEC}
+          
+          # Timestamp of this run
+          cd_canary_last_run_timestamp{run_id="${{ github.run_id }}"} $(date +%s)
+          EOF
+          
+          # Push to Pushgateway (ignore failures to not break workflow)
+          curl -s --data-binary @/tmp/metrics.txt "${PGW_URL}" || echo "[WARN] Failed to push metrics to Pushgateway"
