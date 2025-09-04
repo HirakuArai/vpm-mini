@@ -93,3 +93,4 @@ updated_at: 2025-09-02T09:00:00+09:00
 - Evidence: `reports/retro_phase2_course_correction_20250903_153645.md`
 - P0 semantics sanity ✅（10 samples / human OK / source-anchored v2） — 2025-09-05
 - P0 semantics sanity ✅（30 samples / human OK / source-anchored v2） — 2025-09-05
+- P3-1 Gatekeeper ✅（allowed-repos + no-latest、DENY証跡あり、hello-ai READY=True） — 2025-09-05
