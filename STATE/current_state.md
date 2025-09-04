@@ -91,3 +91,4 @@ updated_at: 2025-09-02T09:00:00+09:00
 - 判断: Phase 0 サニティ → Phase 2 の **縦スライス** を先に通す方針へ切替
 - 実施: **P2-1..P2-6** を完了し、タグ `p2-vs-complete-20250903` を付与（復元点）
 - Evidence: `reports/retro_phase2_course_correction_20250903_153645.md`
+- P0 semantics sanity ✅（10 samples / human OK / source-anchored v2） — 2025-09-05
