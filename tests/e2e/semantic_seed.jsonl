@@ -8,3 +8,23 @@
 {"id":"ex08","raw":"方針: main は Auto-merge(squash)。PR本文の DoD はテンプレ通りに記入する。","digest_expected":"main は Auto-merge(squash)。PR DoD はテンプレ通り。"}
 {"id":"ex09","raw":"計測: X-Dur-Ms の中央値が 1s 未満かを監視する（p50 < 1s）。","digest_expected":"レイテンシ p50 < 1s を監視。"}
 {"id":"ex10","raw":"計画: P3-1 で Gatekeeper を導入し、外部レジストリと :latest を禁止する。","digest_expected":"P3-1: Gatekeeper 導入（外部レジストリ禁止・:latest 禁止）。"}
+{"id":"ex11","raw":"運用: PR の DoD ブロックは全角カッコで統一する。","digest_expected":"PR DoD は全角カッコで統一。"}
+{"id":"ex12","raw":"検証: Evidence Check で reports/* の更新が 1 件以上ないと失敗する。","digest_expected":"Evidence Check は reports/* 1 件以上の更新を必須。"}
+{"id":"ex13","raw":"検証: k8s マニフェストは kubectl --dry-run=client で妥当性を確認する。","digest_expected":"kubectl --dry-run=client で manifest 妥当性確認。"}
+{"id":"ex14","raw":"実装: Hello-AI は既定で ko.local/hello-ai:dev を使う。","digest_expected":"Hello-AI 既定イメージは ko.local/hello-ai:dev。"}
+{"id":"ex15","raw":"方針: P3-1 で Gatekeeper を導入し、外部レジストリと :latest を禁止する。","digest_expected":"P3-1: Gatekeeper で外部レジストリ/ :latest を禁止。"}
+{"id":"ex16","raw":"設定: config-domain に 127.0.0.1.sslip.io が登録されている。","digest_expected":"config-domain は 127.0.0.1.sslip.io を含む。"}
+{"id":"ex17","raw":"CI: healthcheck は pytest と図のエクスポートを実行する。","digest_expected":"healthcheck は pytest＋diagram export を実行。"}
+{"id":"ex18","raw":"規約: :latest タグの使用は禁止する。","digest_expected":":latest の使用は禁止。"}
+{"id":"ex19","raw":"運用: main は Auto-merge（squash）を標準とする。","digest_expected":"main は Auto-merge（squash）標準。"}
+{"id":"ex20","raw":"運用: main への直 push はブランチ保護で防止可能。","digest_expected":"ブランチ保護で main 直 push を防止。"}
+{"id":"ex21","raw":"計測: X-Dur-Ms の p50/p95/avg を集計してレポートに保存。","digest_expected":"X-Dur-Ms の p50/p95/avg を集計し reports に保存。"}
+{"id":"ex22","raw":"観測: X-Fallback:false は OpenAI への実コールを示す。","digest_expected":"X-Fallback:false は実コールの証跡。"}
+{"id":"ex23","raw":"挙動: 無効キーや不正モデル時は 200 応答のフォールバックで外形は成功に見える。","digest_expected":"無効キー/不正モデルは 200 フォールバック（外形成功）。"}
+{"id":"ex24","raw":"設定: OpenAI の Secret は Kubernetes の Secret で注入する。","digest_expected":"OpenAI キーは Kubernetes Secret で注入。"}
+{"id":"ex25","raw":"検証: kubectl get ksvc hello-ai で READY=True を確認する。","digest_expected":"kubectl get ksvc hello-ai → READY=True を確認。"}
+{"id":"ex26","raw":"CI必須: test-and-artifacts, healthcheck, k8s-manifests-validate, Evidence Check, DoD Enforcer を通過する。","digest_expected":"必須チェックは test-and-artifacts/healthcheck/k8s-validate/Evidence/DoD Enforcer。"}
+{"id":"ex27","raw":"ビルド: ko.local は tag-resolve をスキップしてローカル解決する。","digest_expected":"ko.local は tag-resolve をスキップ。"}
+{"id":"ex28","raw":"ログ: 会話は logs/*.jsonl に保存し、memory.json は先頭追記（≤400字）。","digest_expected":"logs/*.jsonl 保存、memory.json は先頭追記 ≤400字。"}
+{"id":"ex29","raw":"要約: digest.run は docs/sessions/*_digest.md を出力する。","digest_expected":"digest.run → docs/sessions/*_digest.md を出力。"}
+{"id":"ex30","raw":"図: diagrams/src/*_nav.md にナビ図をエクスポートする。","digest_expected":"ナビ図は diagrams/src/*_nav.md にエクスポート。"}

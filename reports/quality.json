@@ -1,7 +1,7 @@
 {
-  "ts": 1756964487,
-  "samples": 10,
-  "avg_sim_proxy": 0.676,
+  "ts": 1757007341,
+  "samples": 30,
+  "avg_sim_proxy": 0.7435,
   "len_le400_ok": true,
   "items": [
     {
@@ -53,6 +53,106 @@
       "id": "ex10",
       "len": 42,
       "sim_proxy": 0.7826
+    },
+    {
+      "id": "ex11",
+      "len": 17,
+      "sim_proxy": 0.7391
+    },
+    {
+      "id": "ex12",
+      "len": 39,
+      "sim_proxy": 0.7273
+    },
+    {
+      "id": "ex13",
+      "len": 42,
+      "sim_proxy": 0.6882
+    },
+    {
+      "id": "ex14",
+      "len": 39,
+      "sim_proxy": 0.8193
+    },
+    {
+      "id": "ex15",
+      "len": 39,
+      "sim_proxy": 0.809
+    },
+    {
+      "id": "ex16",
+      "len": 39,
+      "sim_proxy": 0.8046
+    },
+    {
+      "id": "ex17",
+      "len": 40,
+      "sim_proxy": 0.625
+    },
+    {
+      "id": "ex18",
+      "len": 15,
+      "sim_proxy": 0.7895
+    },
+    {
+      "id": "ex19",
+      "len": 28,
+      "sim_proxy": 0.875
+    },
+    {
+      "id": "ex20",
+      "len": 24,
+      "sim_proxy": 0.5818
+    },
+    {
+      "id": "ex21",
+      "len": 40,
+      "sim_proxy": 0.775
+    },
+    {
+      "id": "ex22",
+      "len": 26,
+      "sim_proxy": 0.697
+    },
+    {
+      "id": "ex23",
+      "len": 30,
+      "sim_proxy": 0.75
+    },
+    {
+      "id": "ex24",
+      "len": 33,
+      "sim_proxy": 0.7654
+    },
+    {
+      "id": "ex25",
+      "len": 43,
+      "sim_proxy": 0.913
+    },
+    {
+      "id": "ex26",
+      "len": 74,
+      "sim_proxy": 0.7558
+    },
+    {
+      "id": "ex27",
+      "len": 29,
+      "sim_proxy": 0.7945
+    },
+    {
+      "id": "ex28",
+      "len": 40,
+      "sim_proxy": 0.8571
+    },
+    {
+      "id": "ex29",
+      "len": 43,
+      "sim_proxy": 0.913
+    },
+    {
+      "id": "ex30",
+      "len": 35,
+      "sim_proxy": 0.8649
     }
   ]
 }

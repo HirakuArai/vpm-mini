@@ -1,10 +1,10 @@
-# E2E Human Review v2 (worst 5 of 10)
+# E2E Human Review v2 (worst 5 of 30)
 
 **含まれる情報**: ソース抜粋 / GitHubリンク / 期待要約 / 差分 / 判定欄
 
 ## 1. id=ex09 (sim≈0.333)
 
-**Source**: `scripts/annotate_sources.py` L6-10  [🔗open](https://github.com/HirakuArai/vpm-mini/blob/feat/p0-semantics-sanity/scripts/annotate_sources.py#L6-L10)
+**Source**: `reports/e2e_human_review.md` L10-14  [🔗open](https://github.com/HirakuArai/vpm-mini/blob/feat/p0-semantics-30/reports/e2e_human_review.md#L10-L14)
 
 ```text
 STOP_DIRS = {".git","node_modules",".venv","venv","__pycache__",".pytest_cache",".DS_Store",".idea",".vscode",".mypy_cache"}
@@ -43,7 +43,7 @@ def iter_files(root: pathlib.Path):
 
 ## 2. id=ex05 (sim≈0.370)
 
-**Source**: `scripts/annotate_sources.py` L6-10  [🔗open](https://github.com/HirakuArai/vpm-mini/blob/feat/p0-semantics-sanity/scripts/annotate_sources.py#L6-L10)
+**Source**: `reports/e2e_human_review.md` L10-14  [🔗open](https://github.com/HirakuArai/vpm-mini/blob/feat/p0-semantics-30/reports/e2e_human_review.md#L10-L14)
 
 ```text
 STOP_DIRS = {".git","node_modules",".venv","venv","__pycache__",".pytest_cache",".DS_Store",".idea",".vscode",".mypy_cache"}
@@ -80,7 +80,7 @@ def iter_files(root: pathlib.Path):
 
 ## 3. id=ex07 (sim≈0.540)
 
-**Source**: `scripts/annotate_sources.py` L6-10  [🔗open](https://github.com/HirakuArai/vpm-mini/blob/feat/p0-semantics-sanity/scripts/annotate_sources.py#L6-L10)
+**Source**: `reports/e2e_human_review.md` L10-14  [🔗open](https://github.com/HirakuArai/vpm-mini/blob/feat/p0-semantics-30/reports/e2e_human_review.md#L10-L14)
 
 ```text
 STOP_DIRS = {".git","node_modules",".venv","venv","__pycache__",".pytest_cache",".DS_Store",".idea",".vscode",".mypy_cache"}
@@ -119,7 +119,7 @@ def iter_files(root: pathlib.Path):
 
 ## 4. id=ex01 (sim≈0.582)
 
-**Source**: `scripts/annotate_sources.py` L6-10  [🔗open](https://github.com/HirakuArai/vpm-mini/blob/feat/p0-semantics-sanity/scripts/annotate_sources.py#L6-L10)
+**Source**: `reports/e2e_human_review.md` L10-14  [🔗open](https://github.com/HirakuArai/vpm-mini/blob/feat/p0-semantics-30/reports/e2e_human_review.md#L10-L14)
 
 ```text
 STOP_DIRS = {".git","node_modules",".venv","venv","__pycache__",".pytest_cache",".DS_Store",".idea",".vscode",".mypy_cache"}
@@ -161,9 +161,9 @@ def iter_files(root: pathlib.Path):
 
 ---
 
-## 5. id=ex06 (sim≈0.704)
+## 5. id=ex20 (sim≈0.582)
 
-**Source**: `scripts/annotate_sources.py` L6-10  [🔗open](https://github.com/HirakuArai/vpm-mini/blob/feat/p0-semantics-sanity/scripts/annotate_sources.py#L6-L10)
+**Source**: `reports/e2e_human_review.md` L10-14  [🔗open](https://github.com/HirakuArai/vpm-mini/blob/feat/p0-semantics-30/reports/e2e_human_review.md#L10-L14)
 
 ```text
 STOP_DIRS = {".git","node_modules",".venv","venv","__pycache__",".pytest_cache",".DS_Store",".idea",".vscode",".mypy_cache"}
@@ -175,22 +175,22 @@ def iter_files(root: pathlib.Path):
 
 **expected**
 
-> kourier/serving の Deployments が全て Available。
+> ブランチ保護で main 直 push を防止。
 
 **diff (raw vs expected)**
 
 ```diff
 --- 
 +++ 
-@@ -1,3 +1,5 @@
--検証:
--kourier-system/knative-serving
--の全DeploymentがAvailableかを確認した。
-+kourier/serving
-+の
-+Deployments
-+が全て
-+Available。
+@@ -1,5 +1,5 @@
+-運用:
++ブランチ保護で
+ main
+-への直
++直
+ push
+-はブランチ保護で防止可能。
++を防止。
 ```
 
 - [ ] Accept  /  - [ ] Revise
