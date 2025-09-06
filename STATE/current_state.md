@@ -95,3 +95,4 @@ updated_at: 2025-09-02T09:00:00+09:00
 - P0 semantics sanity ✅（30 samples / human OK / source-anchored v2） — 2025-09-05
 - P3-1 Gatekeeper ✅（allowed-repos + no-latest、DENY証跡あり、hello-ai READY=True） — 2025-09-05
 - P3-2.1 SPIRE 最小導入 ✅（server/agent 稼働・証跡あり） — 2025-09-07
+- P3-2.2 hello-ai SVID 付与 ✅（SPIFFE ID 設定・evidenceあり） — 2025-09-07
