@@ -1,0 +1,1 @@
+https://raw.githubusercontent.com/spiffe/spire/main/support/k8s/quickstart/spire.yaml
