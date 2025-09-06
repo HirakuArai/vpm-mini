@@ -1,0 +1,61 @@
+{
+  "@context": {
+    "prov": "http://www.w3.org/ns/prov#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "id": "@id",
+    "type": "@type"
+  },
+  "id": "urn:prov:report:p3_2_3_1757201972",
+  "type": [
+    "prov:Bundle"
+  ],
+  "prov:wasGeneratedBy": {
+    "id": "urn:activity:generate-prov",
+    "type": [
+      "prov:Activity"
+    ],
+    "prov:startedAtTime": "2025-09-06T23:39:32Z",
+    "prov:endedAtTime": "2025-09-06T23:39:32Z"
+  },
+  "prov:entity": [
+    {
+      "id": "urn:entity:pr:152",
+      "type": [
+        "prov:Entity"
+      ],
+      "prov:label": "docs(state): P3-2.2 GREEN",
+      "prov:location": "https://github.com/HirakuArai/vpm-mini/pull/152",
+      "prov:generatedAtTime": "2025-09-06T22:49:12Z"
+    },
+    {
+      "id": "urn:entity:commit:c5b7726da3cae0b65b8d381f429a1949d159db8c",
+      "type": [
+        "prov:Entity"
+      ],
+      "prov:label": "docs(state): mark P3-2.2 GREEN (2025-09-07) (#152)",
+      "prov:location": "",
+      "prov:generatedAtTime": "2025-09-06T23:39:32Z"
+    }
+  ],
+  "prov:agent": [
+    {
+      "id": "urn:agent:user:HirakuArai",
+      "type": [
+        "prov:Agent"
+      ],
+      "prov:label": "HirakuArai"
+    }
+  ],
+  "prov:wasDerivedFrom": [
+    {
+      "prov:generatedEntity": "urn:entity:commit:c5b7726da3cae0b65b8d381f429a1949d159db8c",
+      "prov:usedEntity": "urn:entity:pr:152"
+    }
+  ],
+  "prov:wasAttributedTo": [
+    {
+      "prov:entity": "urn:entity:pr:152",
+      "prov:agent": "urn:agent:user:HirakuArai"
+    }
+  ]
+}
