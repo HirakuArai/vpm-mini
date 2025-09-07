@@ -1,0 +1,94 @@
+{
+  "@context": {
+    "prov": "http://www.w3.org/ns/prov#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "id": "@id",
+    "type": "@type"
+  },
+  "id": "urn:prov:report:p3_2_4_1757205840",
+  "type": [
+    "prov:Bundle"
+  ],
+  "prov:entity": [
+    {
+      "id": "urn:entity:pr:154",
+      "type": [
+        "prov:Entity"
+      ],
+      "prov:label": "docs(state): P3-2.3 GREEN",
+      "prov:location": "https://github.com/HirakuArai/vpm-mini/pull/154",
+      "prov:generatedAtTime": "2025-09-07T00:31:49Z"
+    },
+    {
+      "id": "urn:entity:commit:5e4eb36b0025f489dd137ec21bb282187c43ad02",
+      "type": [
+        "prov:Entity"
+      ],
+      "prov:label": "docs(state): mark P3-2.3 GREEN (2025-09-07) (#154)",
+      "prov:generatedAtTime": "2025-09-07T00:31:49Z"
+    },
+    {
+      "id": "urn:entity:ci-run:17521491162",
+      "type": [
+        "prov:Entity"
+      ],
+      "prov:label": "ci-alias-status",
+      "prov:location": "https://github.com/HirakuArai/vpm-mini/actions/runs/17521491162",
+      "prov:generatedAtTime": "2025-09-07T00:34:02Z"
+    },
+    {
+      "id": "urn:entity:file:STATE",
+      "type": [
+        "prov:Entity"
+      ],
+      "prov:label": "STATE/current_state.md"
+    }
+  ],
+  "prov:agent": [
+    {
+      "id": "urn:agent:user:HirakuArai",
+      "type": [
+        "prov:Agent"
+      ],
+      "prov:label": "HirakuArai"
+    }
+  ],
+  "prov:activity": [
+    {
+      "id": "urn:activity:merge",
+      "type": [
+        "prov:Activity"
+      ],
+      "prov:label": "Merge PR",
+      "prov:startedAtTime": "2025-09-07T00:31:49Z",
+      "prov:endedAtTime": "2025-09-07T00:31:49Z"
+    },
+    {
+      "id": "urn:activity:ci",
+      "type": [
+        "prov:Activity"
+      ],
+      "prov:label": "CI Run",
+      "prov:startedAtTime": "2025-09-07T00:34:02Z",
+      "prov:endedAtTime": "2025-09-07T00:34:02Z"
+    }
+  ],
+  "prov:wasGeneratedBy": [
+    {
+      "prov:entity": "urn:entity:ci-run:17521491162",
+      "prov:activity": "urn:activity:ci"
+    }
+  ],
+  "prov:wasAssociatedWith": [
+    {
+      "prov:activity": "urn:activity:merge",
+      "prov:agent": "urn:agent:user:HirakuArai"
+    }
+  ],
+  "prov:wasDerivedFrom": [
+    {
+      "prov:generatedEntity": "urn:entity:commit:5e4eb36b0025f489dd137ec21bb282187c43ad02",
+      "prov:usedEntity": "urn:entity:pr:154"
+    }
+  ]
+}
