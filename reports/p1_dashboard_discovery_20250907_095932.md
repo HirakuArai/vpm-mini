@@ -1,0 +1,58 @@
+# P1-0 Dashboard Discovery (2025-09-07 00:59:03Z)
+### Grafana 関連パス
+- `grafana/`
+- `grafana/provisioning`
+- `grafana/provisioning/dashboards`
+- `grafana/provisioning/dashboards/dash.yml`
+- `grafana/provisioning/dashboards/phase1_kpi.json`
+- `grafana/provisioning/datasources`
+- `grafana/provisioning/datasources/ds.yml`
+
+### ダッシュボード JSON
+- `grafana/provisioning/dashboards/phase1_kpi.json`
+
+### Prometheus 関連パス
+- `infra/k8s/overlays/dev/monitoring/prometheus.yaml`
+- `prometheus/`
+- `prometheus/prometheus.yml`
+
+### 既存 JSON レポート（quality/lag 等）
+- `reports/cd_summary.json`
+- `reports/docs_consistency.json`
+- `reports/merge_verifications.json`
+- `reports/p2_2_openai_proof_20250903_125734.json`
+- `reports/p2_2_openai_proof_20250903_125848.json`
+- `reports/p2_3_ci_validate_20250903_134242.json`
+- `reports/p2_4_obs_20250903_140011.json`
+- `reports/p2_4_obs_20250903_140522.json`
+- `reports/p2_4_obs_20250903_140653.json`
+- `reports/p2_5_failpaths_20250903_143833.json`
+- `reports/phase0_sanity_metrics.json`
+- `reports/phase0_sanity_result.json`
+- `reports/phase3_chaos_result.json`
+- `reports/phase3_exit_result.json`
+- `reports/phase3_prov_verify.json`
+- `reports/phase4_argocd_verify.json`
+- `reports/phase4_canary_promotion.json`
+- `reports/phase4_canary_verify.json`
+- `reports/phase4_core_gitops_verify.json`
+- `reports/phase4_exit_result.json`
+- `reports/phase4_istio_verify.json`
+- `reports/phase4_load_client.json`
+- `reports/phase4_migration_verify.json`
+- `reports/phase4_scale_verify.json`
+- `reports/phase5_appset_verify.json`
+- `reports/phase5_cd_guard_result.json`
+- `reports/phase5_exit_result.json`
+- `reports/phase5_failover_result.json`
+- `reports/phase5_slo_verify.json`
+- `reports/quality.json`
+- `reports/s8_prometheus_query.json`
+- `reports/s8_prometheus_targets.json`
+- `reports/s8_query_up.json`
+- `reports/s8_targets.json`
+- `reports/s9_grafana_health.json`
+- `reports/snap_phase1_query_up.json`
+- `reports/snap_phase1_targets.json`
+- `reports/snap_query_up.json`
+- `reports/snap_targets.json`
