@@ -11,7 +11,11 @@
       "title": "JSON error rate",
       "targets": [
         {
-          "expr": "sum(rate(json_invalid_total[5m])) / sum(rate(requests_total[5m]))"
+          "expr": "vector(0)",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prom-k8s"
+          }
         }
       ],
       "gridPos": {
@@ -19,6 +23,10 @@
         "y": 0,
         "w": 12,
         "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prom-k8s"
       }
     },
     {
