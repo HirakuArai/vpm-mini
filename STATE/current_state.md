@@ -99,3 +99,4 @@ updated_at: 2025-09-02T09:00:00+09:00
 - P3-2.3 PROV 決定ログ（最小） ✅（reports/prov_*.jsonld 生成・証跡あり） — 2025-09-07
 - P3-2.4 PROV 決定ログ（拡張） ✅（reports/prov_p3_2_4_*.jsonld 生成・証跡あり） — 2025-09-07
 - P1-3 Grafana K8s datasource ✅（prom-k8s 追加・p50 panel 連携・証跡あり） — 2025-09-07
+- P1 KPI 基盤 ✅（p50=Prometheus実配線、JSON error rate=revision_app_request_count 実配線、ROUGE-L=vpm_rouge_l_score） — 2025-09-08
