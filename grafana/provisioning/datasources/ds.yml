@@ -5,3 +5,12 @@ datasources:
     access: proxy
     url: http://prometheus:9090
     isDefault: true
+
+  - name: PrometheusK8s
+    uid: prom-k8s
+    type: prometheus
+    access: proxy
+    url: http://prometheus.monitoring.svc:9090
+    isDefault: false
+    jsonData:
+      timeInterval: 5s
