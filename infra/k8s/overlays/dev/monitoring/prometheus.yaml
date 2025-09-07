@@ -42,6 +42,9 @@ data:
       - job_name: 'kubernetes-pods-knative-hello-ai'
         kubernetes_sd_configs:
         - role: pod
+          namespaces:
+            names:
+            - hyper-swarm
         relabel_configs:
         - action: keep
           source_labels: [__meta_kubernetes_pod_label_serving_knative_dev_service]
