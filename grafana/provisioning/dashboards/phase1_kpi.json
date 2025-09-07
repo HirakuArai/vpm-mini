@@ -11,7 +11,7 @@
       "title": "JSON error rate",
       "targets": [
         {
-          "expr": "vector(0)",
+          "expr": "sum(rate(revision_app_request_count{response_code_class=\"5xx\"}[5m])) / sum(rate(revision_app_request_count[5m]))",
           "datasource": {
             "type": "prometheus",
             "uid": "prom-k8s"
