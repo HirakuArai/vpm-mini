@@ -1,5 +1,5 @@
 name: DoD Autofix
-true:
+on:
   pull_request:
     types:
     - opened
