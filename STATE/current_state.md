@@ -102,3 +102,4 @@ updated_at: 2025-09-02T09:00:00+09:00
 - P1 KPI 基盤 ✅（p50=Prometheus実配線、JSON error rate=revision_app_request_count 実配線、ROUGE-L=vpm_rouge_l_score） — 2025-09-08
 - P3-3 Chaos（pod-kill最小） ✅（Ready=True継続／p50≈0.05s／証跡あり） — 2025-09-08
 - P2 最小オートスケール ✅（1→3 pods / 200並行×120s / p50≈0.05s / 証跡あり） — 2025-09-08
+- P2 コールドスタート ✅（cold≈84ms / warm≈16ms / 証跡あり） — 2025-09-08
