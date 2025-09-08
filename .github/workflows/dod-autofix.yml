@@ -1,7 +1,11 @@
 name: DoD Autofix
-on:
+true:
   pull_request:
-    types: [opened, edited, synchronize, ready_for_review]
+    types:
+    - opened
+    - edited
+    - synchronize
+    - ready_for_review
 permissions:
   contents: write
   pull-requests: write
@@ -9,29 +13,59 @@ jobs:
   autofix:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-      - uses: actions/github-script@v7
-        with:
-          script: |
-            const body = context.payload.pull_request.body || ''
-            const block = `## DoD チェックリスト（編集不可・完全一致）
-            - [x] Auto-merge (squash) 有効化
-            - [x] CI 必須チェック Green (test-and-artifacts, healthcheck)
-            - [x] merged == true を API で確認
-            - [x] PR に最終コメント（✅ merged / commit hash / CI run URL / evidence）
-            - [x] 必要な証跡 (例: reports/*) を更新`
-            const re = /##\s*DoD チェックリスト（編集不可・完全一致）[\s\S]*?(?=\n## |\Z)/
-            const next = re.test(body) ? body.replace(re, block) : (body.trim() + `\n\n` + block + `\n`)
-            if (next !== body) await github.rest.pulls.update({ ...context.repo, pull_number: context.payload.pull_request.number, body: next })
-      - name: Ensure minimal reports evidence
-        run: |
-          if ! git ls-files reports/ | grep -q . ; then
-            mkdir -p reports
-            ts=$(date -u +%Y%m%d_%H%M%S)
-            echo "# DoD evidence (autofix ${ts})" > reports/autofix_${ts}.md
-            git config user.email "autofix-bot@users.noreply.github.com"
-            git config user.name  "DoD Autofix Bot"
-            git add reports/*.md && git commit -m "chore(dod): add minimal evidence (autofix)" && git push
-          fi
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.head_ref }}
+    - uses: actions/github-script@v7
+      with:
+        script: "const body = context.payload.pull_request.body || ''\nconst block\
+          \ = `## DoD \u30C1\u30A7\u30C3\u30AF\u30EA\u30B9\u30C8\uFF08\u7DE8\u96C6\
+          \u4E0D\u53EF\u30FB\u5B8C\u5168\u4E00\u81F4\uFF09\n- [x] Auto-merge (squash)\
+          \ \u6709\u52B9\u5316\n- [x] CI \u5FC5\u9808\u30C1\u30A7\u30C3\u30AF Green\
+          \ (test-and-artifacts, healthcheck)\n- [x] merged == true \u3092 API \u3067\
+          \u78BA\u8A8D\n- [x] PR \u306B\u6700\u7D42\u30B3\u30E1\u30F3\u30C8\uFF08\u2705\
+          \ merged / commit hash / CI run URL / evidence\uFF09\n- [x] \u5FC5\u8981\
+          \u306A\u8A3C\u8DE1 (\u4F8B: reports/*) \u3092\u66F4\u65B0`\nconst re = /##\\\
+          s*DoD \u30C1\u30A7\u30C3\u30AF\u30EA\u30B9\u30C8\uFF08\u7DE8\u96C6\u4E0D\
+          \u53EF\u30FB\u5B8C\u5168\u4E00\u81F4\uFF09[\\s\\S]*?(?=\\n## |\\Z)/\nconst\
+          \ next = re.test(body) ? body.replace(re, block) : (body.trim() + `\\n\\\
+          n` + block + `\\n`)\nif (next !== body) await github.rest.pulls.update({\
+          \ ...context.repo, pull_number: context.payload.pull_request.number, body:\
+          \ next })\n"
+    - name: Ensure minimal reports evidence
+      run: "if ! git ls-files reports/ | grep -q . ; then\n  mkdir -p reports\n  ts=$(date\
+        \ -u +%Y%m%d_%H%M%S)\n  echo \"# DoD evidence (autofix ${ts})\" > reports/autofix_${ts}.md\n\
+        \  git config user.email \"autofix-bot@users.noreply.github.com\"\n  git config\
+        \ user.name  \"DoD Autofix Bot\"\n  git add reports/*.md && git commit -m\
+        \ \"chore(dod): add minimal evidence (autofix)\" && git push\nfi"
+    - name: Upsert Audit Links (PROV/Dashboards/Evidence)
+      uses: actions/github-script@v7
+      env:
+        GRAFANA_BASE_URL: ${{ secrets.GRAFANA_BASE_URL || vars.GRAFANA_BASE_URL }}
+      with:
+        script: "\nconst pr = context.payload.pull_request;\nif (!pr) { core.info('No\
+          \ PR payload'); return; }\n\n// 1) \u5909\u66F4\u30D5\u30A1\u30A4\u30EB\u304B\
+          \u3089 reports/* \u3092\u62BD\u51FA\uFF08\u6700\u59273\uFF09\nconst files\
+          \ = await github.paginate(github.rest.pulls.listFiles, {\n  ...context.repo,\
+          \ pull_number: pr.number, per_page: 100\n});\nconst evid = files.filter(f\
+          \ => f.filename.startsWith('reports/'))\n                  .slice(0,3).map(f\
+          \ => `- ${f.filename}`).join('\\n') || '(none)';\n\n// 2) \u6700\u65B0\u306E\
+          \ PROV\nconst fs = require('fs'), path = require('path');\nlet prov = '(none)';\n\
+          try {\n  const walk = dir => fs.readdirSync(dir).flatMap(n => {\n    const\
+          \ p = path.join(dir,n), st=fs.statSync(p);\n    return st.isDirectory()?walk(p):[p];\n\
+          \  });\n  const all = walk(process.cwd())\n    .filter(p => p.replace(/\\\
+          \\/g,'/').match(/^reports\\/prov_.*\\.jsonld$/))\n    .sort();\n  if (all.length)\
+          \ prov = all[all.length-1];\n} catch (_) {}\n\n// 3) Dashboards URL\uFF08\
+          \u74B0\u5883\u306B\u3088\u308A\u53EF\u5909\u3002\u672A\u8A2D\u5B9A\u306A\
+          \u3089\u30D7\u30EC\u30FC\u30B9\u30DB\u30EB\u30C0\uFF09\nconst base = process.env.GRAFANA_BASE_URL\
+          \ || '<GRAFANA_BASE_URL>';\nconst dashKpi   = `${base}/d/phase1_kpi`;\n\
+          const dashChaos = `${base}/d/chaos_audit`;\n\n// 4) Audit Links \u30D6\u30ED\
+          \u30C3\u30AF\u3092\u4F5C\u6210\nconst auditBlock =\n`## Audit Links\n- PROV:\
+          \ ${prov}\n- Dashboards:\n  - Phase-1 KPI:  ${dashKpi}\n  - Chaos Audit:\
+          \  ${dashChaos}\n- Evidence (this PR):\n${evid}\n`;\n\n// 5) PR\u672C\u6587\
+          \u306E\u672B\u5C3E\u306B Upsert\uFF08\u65E2\u5B58\u304C\u3042\u308C\u3070\
+          \u7F6E\u63DB\uFF09\nlet body = pr.body || '';\nconst re = /##\\s*Audit Links[\\\
+          s\\S]*?$/m;\nif (re.test(body)) body = body.replace(re, auditBlock);\nelse\
+          \ body = (body.trim() + '\\n\\n' + auditBlock + '\\n');\n\nawait github.rest.pulls.update({\n\
+          \  ...context.repo, pull_number: pr.number, body\n});\ncore.info('Audit\
+          \ Links upserted.');\n"
