@@ -1,0 +1,4 @@
+psycopg[binary]>=3.2
+numpy>=1.26
+# optional (環境で入らない場合は自動フォールバック)
+sentence-transformers>=3.0
