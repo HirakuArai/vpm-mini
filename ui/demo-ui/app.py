@@ -62,3 +62,60 @@ if st.button("この提案でPR作成"):
     ).strip()
     subprocess.run(["gh", "pr", "merge", pr_url.split("/")[-1], "--auto", "--squash"])
     st.success(f"PR created: {pr_url}")
+
+
+st.divider()
+st.subheader("意味の理由（寄与トップ±3）")
+colA, colB = st.columns(2)
+with colA:
+    if st.button("Explain δ (理由を表示)"):
+        try:
+            out = subprocess.check_output(
+                ["python3", "scripts/egspace_reason_v1.py"], text=True, timeout=20
+            )
+            data = json.loads(out)
+            if data.get("ok"):
+                st.caption(
+                    f"embeddings={data.get('embeddings')}  goal={data.get('goal')}"
+                )
+                st.write("**近づけた（Top+3）**")
+                st.json(data.get("closer", []))
+                st.write("**遠ざけた（Top-3）**")
+                st.json(data.get("farther", []))
+                st.write("**δ** = " + str(data.get("stat", {}).get("delta")))
+            else:
+                st.error("理由計算に失敗: " + str(data))
+        except Exception as e:
+            st.error(f"reason error: {e}")
+
+with colB:
+    st.write("**提案の自動ドラフト（寄与に基づく）**")
+    suggestion = st.text_input(
+        "Suggested change (1行)", "STATEを更新: 最近のGREEN達成を明記"
+    )
+    if st.button("寄与ベースの提案をPRにする"):
+        from datetime import datetime, timezone
+
+        ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        rp = pathlib.Path(f"reports/egspace_reason_action_{ts}.md")
+        rp.write_text(
+            f"# EG-Space reason action {ts}\n- note: {suggestion}\n", encoding="utf-8"
+        )
+        pr_url = subprocess.check_output(
+            [
+                "gh",
+                "pr",
+                "create",
+                "--base",
+                "main",
+                "--title",
+                f"feat(p3-6c): egspace reason action {ts}",
+                "--body",
+                "Auto-created from Demo UI (P3-6c)",
+            ],
+            text=True,
+        ).strip()
+        subprocess.run(
+            ["gh", "pr", "merge", pr_url.split("/")[-1], "--auto", "--squash"]
+        )
+        st.success(f"PR created: {pr_url}")
