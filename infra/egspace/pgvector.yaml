@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Namespace
+metadata: { name: egspace }
+---
+apiVersion: v1
+kind: Secret
+metadata: { name: pgvector-secret, namespace: egspace }
+type: Opaque
+stringData:
+  POSTGRES_DB: egspace
+  POSTGRES_USER: egspace
+  POSTGRES_PASSWORD: egspace-pass  # pragma: allowlist secret
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: { name: pgvector-init, namespace: egspace }
+data:
+  init.sql: |
+    CREATE EXTENSION IF NOT EXISTS vector;
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: pgvector, namespace: egspace, labels: { app: pgvector } }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: pgvector } }
+  template:
+    metadata: { labels: { app: pgvector } }
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16
+        ports: [ { containerPort: 5432, name: pg } ]
+        envFrom:
+          - secretRef: { name: pgvector-secret }
+        volumeMounts:
+          - name: data
+            mountPath: /var/lib/postgresql/data
+          - name: init
+            mountPath: /docker-entrypoint-initdb.d
+        readinessProbe:
+          exec: { command: ["pg_isready","-U","egspace"] }
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+        - name: data
+          emptyDir: {}   # dev only
+        - name: init
+          configMap: { name: pgvector-init }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: pgvector, namespace: egspace }
+spec:
+  type: ClusterIP
+  selector: { app: pgvector }
+  ports:
+    - name: pg
+      port: 5432
+      targetPort: 5432
