@@ -1,0 +1,126 @@
+{
+  "title": "Chaos Audit (P3-4)",
+  "schemaVersion": 39,
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "annotations": {
+    "list": []
+  },
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "p50 latency",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prom-k8s"
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.5, sum by (le)(rate(prometheus_http_request_duration_seconds_bucket[5m])))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prom-k8s"
+          }
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "JSON error rate",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prom-k8s"
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(revision_app_request_count{response_code_class=\"5xx\"}[5m])) / sum(rate(revision_app_request_count[5m]))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prom-k8s"
+          }
+        }
+      ],
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "ROUGE-L",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prom-k8s"
+      },
+      "targets": [
+        {
+          "expr": "vpm_rouge_l_score",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prom-k8s"
+          }
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Chaos marker (vpm_chaos_event)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prom-k8s"
+      },
+      "targets": [
+        {
+          "expr": "vpm_chaos_event",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prom-k8s"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "points",
+            "lineWidth": 0
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 0.5
+              }
+            ]
+          }
+        }
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      }
+    }
+  ]
+}
