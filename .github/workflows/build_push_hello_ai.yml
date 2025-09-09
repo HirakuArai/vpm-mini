@@ -12,6 +12,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      HELLO_CONTEXT: services/hello-ai
     steps:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx
@@ -22,11 +24,17 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build & Push
+      - name: Derive lowercase owner
+        id: who
+        shell: bash
         run: |
-          IMAGE=ghcr.io/HirakuArai/hello-ai:${{ github.event.inputs.tag }}
-          docker build -t $IMAGE ./services/hello-ai
-          docker push $IMAGE
+          echo "owner_lc=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_OUTPUT
+      - name: Build & Push
+        shell: bash
+        run: |
+          IMAGE=ghcr.io/${{ steps.who.outputs.owner_lc }}/hello-ai:${{ github.event.inputs.tag }}
+          echo "IMAGE=$IMAGE"
+          docker buildx build --progress=plain -t "$IMAGE" -f "$HELLO_CONTEXT/Dockerfile" "$HELLO_CONTEXT" --push
       - name: Evidence
         run: |
-          echo "pushed=ghcr.io/HirakuArai/hello-ai:${{ github.event.inputs.tag }}" | tee -a reports/ghcr_publish.txt
+          echo "pushed=ghcr.io/${{ steps.who.outputs.owner_lc }}/hello-ai:${{ github.event.inputs.tag }}" | tee -a reports/ghcr_publish.txt
