@@ -4,7 +4,7 @@ metadata:
   name: vpm-mini-hello-ai
   namespace: argocd
   annotations:
-    argocd-image-updater.argoproj.io/image-list: "hello-ai=ghcr.io/HirakuArai/hello-ai"
+    argocd-image-updater.argoproj.io/image-list: "hello-ai=ghcr.io/hirakuarai/hello-ai"
     argocd-image-updater.argoproj.io/hello-ai.update-strategy: "semver:~1"
     argocd-image-updater.argoproj.io/hello-ai.allow-tags: "regexp:^1\\..*"
 spec:
