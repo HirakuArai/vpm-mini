@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vpm-mini-hello-ai
+  namespace: argocd
+spec:
+  project: vpm-mini-dev
+  source:
+    repoURL: https://github.com/HirakuArai/vpm-mini.git
+    targetRevision: main
+    path: infra/k8s/overlays/dev/hello
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: hyper-swarm
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

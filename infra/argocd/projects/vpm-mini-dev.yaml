@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: vpm-mini-dev
+  namespace: argocd
+spec:
+  description: vpm-mini dev project (ns and repo whitelisted)
+  sourceRepos:
+  - https://github.com/HirakuArai/vpm-mini.git
+  destinations:
+  - namespace: hyper-swarm
+    server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+  - group: "*"
+    kind: "*"
