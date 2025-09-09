@@ -1,4 +1,4 @@
-name: Build & Push hello-ai (GHCR)
+name: Build & Push hello-ai (GHCR) v2
 on:
   workflow_dispatch:
     inputs:
@@ -9,32 +9,70 @@ on:
 permissions:
   contents: read
   packages: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      HELLO_CONTEXT: services/hello-ai
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Derive lowercase owner
         id: who
         shell: bash
-        run: |
-          echo "owner_lc=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_OUTPUT
-      - name: Build & Push
+        run: echo "owner_lc=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+
+      # デバッグ：レポ構造を必ず出力
+      - name: Debug repository layout
         shell: bash
         run: |
-          IMAGE=ghcr.io/${{ steps.who.outputs.owner_lc }}/hello-ai:${{ github.event.inputs.tag }}
-          echo "IMAGE=$IMAGE"
-          docker buildx build --progress=plain -t "$IMAGE" -f "$HELLO_CONTEXT/Dockerfile" "$HELLO_CONTEXT" --push
-      - name: Evidence
+          echo "pwd=$(pwd)"
+          git status --porcelain || true
+          echo "---- top files"; ls -la
+          echo "---- Dockerfiles"; git ls-files | grep -Ei '(^|/)(Dockerfile)$' || true
+          echo "---- hello-ai candidates"; git ls-files | grep -Ei '(^|/)(hello[-_]ai)(/|$)' || true
+
+      # *hello-ai*/Dockerfile を自動検出（無ければよくある場所を試行）
+      - name: Discover Dockerfile for hello-ai
+        id: find
+        shell: bash
         run: |
-          echo "pushed=ghcr.io/${{ steps.who.outputs.owner_lc }}/hello-ai:${{ github.event.inputs.tag }}" | tee -a reports/ghcr_publish.txt
+          set -euo pipefail
+          mapfile -t CANDS < <(git ls-files | grep -Ei '(^|/)(hello[-_]ai)(/|$)' \
+            | xargs -I{} dirname {} | sort -u \
+            | xargs -I{} bash -lc 'if [ -f "{}/Dockerfile" ]; then echo {}; fi')
+          if [ "${#CANDS[@]}" -eq 0 ]; then
+            for d in services/hello-ai apps/hello-ai src/hello-ai hello-ai; do
+              [ -f "$d/Dockerfile" ] && CANDS+=("$d") && break
+            done
+          fi
+          if [ "${#CANDS[@]}" -eq 0 ]; then
+            echo "::error ::Dockerfile for hello-ai not found. Please add *hello-ai*/Dockerfile."
+            exit 1
+          fi
+          CONTEXT="${CANDS[0]}"
+          echo "context=$CONTEXT" >> "$GITHUB_OUTPUT"
+          echo "dockerfile=$CONTEXT/Dockerfile" >> "$GITHUB_OUTPUT"
+          echo "::notice ::USING CONTEXT=$CONTEXT DOCKERFILE=$CONTEXT/Dockerfile"
+
+      - name: Build & Push (hello-ai)
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMAGE="ghcr.io/${{ steps.who.outputs.owner_lc }}/hello-ai:${{ github.event.inputs.tag }}"
+          echo "::notice ::IMAGE=$IMAGE"
+          echo "::notice ::CONTEXT=${{ steps.find.outputs.context }}"
+          echo "::notice ::DOCKERFILE=${{ steps.find.outputs.dockerfile }}"
+          docker buildx build --progress=plain \
+            -t "$IMAGE" \
+            -f "${{ steps.find.outputs.dockerfile }}" "${{ steps.find.outputs.context }}" \
+            --push
