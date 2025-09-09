@@ -14,19 +14,90 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Auto-discover hello-ai Dockerfile
+        id: discover
+        shell: bash
+        run: |
+          echo "🔍 Auto-discovering hello-ai Dockerfile and context..."
+          
+          # Search for hello-ai Dockerfile in common locations
+          CANDIDATES=(
+            "services/hello-ai/Dockerfile"
+            "apps/hello-ai/Dockerfile"
+            "src/hello-ai/Dockerfile"
+            "hello-ai/Dockerfile"
+          )
+          
+          FOUND_DOCKERFILE=""
+          FOUND_CONTEXT=""
+          
+          for candidate in "${CANDIDATES[@]}"; do
+            if [[ -f "$candidate" ]]; then
+              FOUND_DOCKERFILE="$candidate"
+              FOUND_CONTEXT="$(dirname "$candidate")"
+              echo "✅ Found Dockerfile: $candidate"
+              echo "📁 Context: $FOUND_CONTEXT"
+              break
+            fi
+          done
+          
+          if [[ -z "$FOUND_DOCKERFILE" ]]; then
+            echo "❌ ERROR: hello-ai Dockerfile not found!"
+            echo ""
+            echo "🔧 ACTIONABLE STEPS:"
+            echo "1. Ensure hello-ai service has a Dockerfile in one of these locations:"
+            for candidate in "${CANDIDATES[@]}"; do
+              echo "   - $candidate"
+            done
+            echo "2. Or update this workflow to search additional paths"
+            echo ""
+            echo "📂 Current repo structure:"
+            find . -name "Dockerfile" -type f | head -10
+            exit 1
+          fi
+          
+          # Export for next steps
+          echo "dockerfile_path=$FOUND_DOCKERFILE" >> $GITHUB_OUTPUT
+          echo "context_path=$FOUND_CONTEXT" >> $GITHUB_OUTPUT
+          
+          echo ""
+          echo "🎯 Discovery complete:"
+          echo "   Dockerfile: $FOUND_DOCKERFILE"
+          echo "   Context: $FOUND_CONTEXT"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+      
+      - name: Derive lowercase owner
+        id: who
+        shell: bash
+        run: |
+          echo "owner_lc=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_OUTPUT
+          
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Build & Push
+        shell: bash
         run: |
-          IMAGE=ghcr.io/HirakuArai/hello-ai:${{ github.event.inputs.tag }}
-          docker build -t $IMAGE ./services/hello-ai
-          docker push $IMAGE
+          IMAGE=ghcr.io/${{ steps.who.outputs.owner_lc }}/hello-ai:${{ github.event.inputs.tag }}
+          
+          echo "🏗️  Building and pushing:"
+          echo "   Image: $IMAGE"
+          echo "   Context: ${{ steps.discover.outputs.context_path }}"
+          echo "   Dockerfile: ${{ steps.discover.outputs.dockerfile_path }}"
+          
+          docker buildx build \
+            --progress=plain \
+            -t "$IMAGE" \
+            -f "${{ steps.discover.outputs.dockerfile_path }}" \
+            "${{ steps.discover.outputs.context_path }}" \
+            --push
+            
       - name: Evidence
         run: |
-          echo "pushed=ghcr.io/HirakuArai/hello-ai:${{ github.event.inputs.tag }}" | tee -a reports/ghcr_publish.txt
+          echo "pushed=ghcr.io/${{ steps.who.outputs.owner_lc }}/hello-ai:${{ github.event.inputs.tag }}" | tee -a reports/ghcr_publish.txt
