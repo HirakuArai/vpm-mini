@@ -101,21 +101,40 @@ with colB:
         rp.write_text(
             f"# EG-Space reason action {ts}\n- note: {suggestion}\n", encoding="utf-8"
         )
-        pr_url = subprocess.check_output(
-            [
-                "gh",
-                "pr",
-                "create",
-                "--base",
-                "main",
-                "--title",
-                f"feat(p3-6c): egspace reason action {ts}",
-                "--body",
-                "Auto-created from Demo UI (P3-6c)",
-            ],
-            text=True,
-        ).strip()
-        subprocess.run(
-            ["gh", "pr", "merge", pr_url.split("/")[-1], "--auto", "--squash"]
-        )
-        st.success(f"PR created: {pr_url}")
+        try:
+            # 1) main 直下なら作業ブランチを切る（既に別ブランチならそのまま）
+            branch = subprocess.check_output(
+                ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
+            ).strip()
+            if branch == "main":
+                subprocess.check_call(
+                    ["git", "switch", "-c", f"feat/p3-6c-reason-{ts}"]
+                )
+            # 2) add / commit / push
+            subprocess.check_call(["git", "add", str(rp)])
+            subprocess.check_call(
+                ["git", "commit", "-m", f"feat(p3-6c): egspace reason action {ts}"]
+            )
+            subprocess.check_call(["git", "push", "-u", "origin", "HEAD"])
+            # 3) PR 作成 → 自動マージ
+            pr_url = subprocess.check_output(
+                [
+                    "gh",
+                    "pr",
+                    "create",
+                    "--base",
+                    "main",
+                    "--title",
+                    f"feat(p3-6c): egspace reason action {ts}",
+                    "--body",
+                    "Auto-created from Demo UI (P3-6c)",
+                ],
+                text=True,
+            ).strip()
+            subprocess.run(
+                ["gh", "pr", "merge", pr_url.split("/")[-1], "--auto", "--squash"],
+                check=False,
+            )
+            st.success(f"PR created: {pr_url}")
+        except Exception as e:
+            st.error(f"PR creation failed: {e}")
