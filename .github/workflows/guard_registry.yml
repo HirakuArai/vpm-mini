@@ -1,0 +1,15 @@
+name: Guard: Registry & Annotations
+on: [push, pull_request]
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: No ko.local in overlays/dev
+        run: |
+          ! git grep -n "ko\\.local" -- infra/k8s/overlays/dev || \
+            (echo "::error::ko.local found under overlays/dev" && exit 1)
+      - name: hello-ai app has image-updater annotations
+        run: |
+          test -f infra/argocd/apps/hello-ai-app.yaml
+          grep -q 'argocd-image-updater.argoproj.io/image-list' infra/argocd/apps/hello-ai-app.yaml
