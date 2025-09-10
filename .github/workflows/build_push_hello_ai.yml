@@ -9,30 +9,36 @@ on:
 permissions:
   contents: read
   packages: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Derive lowercase owner
         id: who
         shell: bash
         run: echo "owner_lc=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+
       - name: Debug repository layout
         shell: bash
         run: |
           echo "pwd=$(pwd)"
           git status --porcelain || true
-          echo "---- Dockerfiles"; git ls-files | grep -Ei '(^|/)Dockerfile' || true
+          echo "---- Dockerfiles"; git ls-files | grep -Ei '(^|/)(Dockerfile)$' || true
           echo "---- hello-ai candidates"; git ls-files | grep -Ei '(^|/)(hello[-_]ai)(/|$)' || true
+
       - name: Discover Dockerfile for hello-ai
         id: find
         shell: bash
@@ -54,6 +60,7 @@ jobs:
           echo "context=$CONTEXT" >> "$GITHUB_OUTPUT"
           echo "dockerfile=$CONTEXT/Dockerfile" >> "$GITHUB_OUTPUT"
           echo "::notice ::USING CONTEXT=$CONTEXT DOCKERFILE=$CONTEXT/Dockerfile"
+
       - name: Build & Push (hello-ai)
         shell: bash
         run: |
