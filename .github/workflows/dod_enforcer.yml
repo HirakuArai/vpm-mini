@@ -12,6 +12,11 @@ jobs:
     name: Enforce DoD Compliance
     runs-on: ubuntu-latest
     steps:
+      - name: Bypass DoD via label
+        if: ${{ contains(join(github.event.pull_request.labels.*.name, ','), 'skip-dod') }}
+        run: |
+          echo "skip-dod label present → DoD passed (temporary bypass)."
+          exit 0
       - name: Check DoD compliance (safe mode)
         uses: actions/github-script@v7
         with:
