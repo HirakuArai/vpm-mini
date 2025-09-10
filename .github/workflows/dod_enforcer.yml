@@ -1,7 +1,7 @@
 name: DoD Enforcer
 on:
   pull_request:
-    types: [opened, edited, synchronize, ready_for_review, reopened]
+    types: [opened, edited, synchronize, ready_for_review, reopened, labeled]
   workflow_dispatch:
 
 permissions:
