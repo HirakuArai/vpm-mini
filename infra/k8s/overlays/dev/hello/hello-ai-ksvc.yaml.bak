@@ -1,0 +1,25 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: hello-ai
+  namespace: hyper-swarm
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+        autoscaling.knative.dev/maxScale: "10"
+    spec:
+      containers:
+      - name: hello-ai
+        image: ghcr.io/hirakuarai/hello-ai:1.0.1
+        ports:
+        - containerPort: 8080
+        env:
+        - name: AI_ENABLED
+          value: "true"
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: openai-secret
+              key: api-key
