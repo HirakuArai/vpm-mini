@@ -108,3 +108,5 @@ updated_at: 2025-09-11T22:20:29Z
 status: P4-AutoUpdate GREEN
 
 - Evidence: reports/p4_hello_ai_1_0_4_postmortem.md
+
+- 2025-09-11T23:50:16Z: P4-NW READY — dev access via 8080 confirmed (make hello-health)
