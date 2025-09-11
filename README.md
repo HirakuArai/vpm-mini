@@ -1,3 +1,4 @@
+**Dev URL (kind/8080):** `make hello-health` → 200 OK
 # vpm-mini
 
 **context_header:** repo=vpm-mini / branch=main / phase=Phase 2

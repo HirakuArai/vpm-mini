@@ -30,6 +30,13 @@ cc:
 	}; \
 	for k,v in vars.items(): tmpl = tmpl.replace(f'<{k}>', v); \
 	print(tmpl)"
+.PHONY: hello-url hello-health test phase0-sanity
+hello-url:
+	@kubectl -n hyper-swarm get ksvc hello-ai -o jsonpath='{.status.url}{"\n"}'
+hello-health:
+	@URL=$$(kubectl -n hyper-swarm get ksvc hello-ai -o jsonpath='{.status.url}{"\n"}'); \
+	curl -s -H "Host: hello-ai.hyper-swarm.127.0.0.1.sslip.io" http://127.0.0.1:8080/healthz
+
 .PHONY: test phase0-sanity
 phase0-sanity:
 	python scripts/phase0_sanity/playground.py
