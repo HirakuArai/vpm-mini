@@ -4,7 +4,7 @@ metadata:
   name: vpm-mini-image-updater
   namespace: argocd
 spec:
-  project: vpm-mini-dev
+  project: default
   source:
     repoURL: https://github.com/argoproj-labs/argocd-image-updater
     targetRevision: HEAD
