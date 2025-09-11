@@ -1,13 +1,13 @@
 # === State Declaration (Single Source of Truth) ===
 active_repo: vpm-mini
 active_branch: main
-phase: Phase 2   # Phase 1 完了 → 小規模 Swarm Kickoffへ
-context_header: "repo=vpm-mini / branch=main / phase=Phase 2"
-short_goal: "Phase 2 Kickoff（kind + Knative 足場構築）"
+phase: Phase 4: AutoUpdate GREEN
+context_header: "repo=vpm-mini / branch=main / phase=Phase 4: AutoUpdate GREEN"
+short_goal: "GHCR v3 (multi-arch) + ArgoCD Image Updater semver~1 + Knative READY"
 exit_criteria:
   - "P2-1 GREEN: kind + Knative (v1.18) 足場構築スクリプトが動作"
   - "P2-2 GREEN: Hello KService デプロイ成功（kubectl get ksvc hello → READY=True / curl→HTTP 200）"
-updated_at: 2025-09-02T09:00:00+09:00
+updated_at: 2025-09-11T22:20:29Z
 
 ---
 
@@ -105,3 +105,6 @@ updated_at: 2025-09-02T09:00:00+09:00
 - P2 コールドスタート ✅（cold≈84ms / warm≈16ms / 証跡あり） — 2025-09-08
 - Demo v1 ✅（UI→EG-Space→PR 自動反映） — 2025-09-08
 - P3-6 EG-Space v1 ✅（寄与±3表示・提案PR・pgvector/embeddings 稼働） — 2025-09-09
+status: P4-AutoUpdate GREEN
+
+- Evidence: reports/p4_hello_ai_1_0_4_postmortem.md
