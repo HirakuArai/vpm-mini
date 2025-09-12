@@ -1,0 +1,82 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: hello-ai-routes
+  namespace: monitoring
+  labels:
+    alertmanagerConfig: hello-ai
+    release: vpm-mini-kube-prometheus-stack
+spec:
+  route:
+    groupBy: ['alertname', 'cluster', 'service']
+    groupWait: 10s
+    groupInterval: 10s
+    repeatInterval: 12h
+    receiver: 'slack-hello-ai'
+    matchers:
+    - matchType: "=~"
+      name: alertname
+      value: "HelloAI.*"
+    routes:
+    - receiver: 'slack-critical'
+      matchers:
+      - matchType: "="
+        name: severity
+        value: "critical"
+      continue: true
+    - receiver: 'slack-warning'
+      matchers:
+      - matchType: "="
+        name: severity
+        value: "warning"
+      continue: false
+      
+  receivers:
+  - name: 'slack-hello-ai'
+    slackConfigs:
+    - apiURL:
+        name: am-slack-receiver
+        key: SLACK_WEBHOOK_URL
+      channel: '#alerts'
+      sendResolved: true
+      title: '[{{ .Status | toUpper }}] Hello-AI: {{ .GroupLabels.alertname }}'
+      text: |
+        {{ range .Alerts }}
+        *Alert:* {{ .Labels.alertname }}
+        *Severity:* {{ .Labels.severity }}
+        *Summary:* {{ .Annotations.summary }}
+        *Description:* {{ .Annotations.description }}
+        *Details:*
+        {{ range .Labels.SortedPairs }} • *{{ .Name }}:* {{ .Value }}
+        {{ end }}
+        {{ end }}
+      shortFields: false
+      
+  - name: 'slack-critical'
+    slackConfigs:
+    - apiURL:
+        name: am-slack-receiver
+        key: SLACK_WEBHOOK_URL
+      channel: '#alerts-critical'
+      sendResolved: true
+      title: '🚨 [CRITICAL] {{ .GroupLabels.alertname }}'
+      color: 'danger'
+      
+  - name: 'slack-warning'
+    slackConfigs:
+    - apiURL:
+        name: am-slack-receiver
+        key: SLACK_WEBHOOK_URL
+      channel: '#alerts'
+      sendResolved: true
+      title: '⚠️ [WARNING] {{ .GroupLabels.alertname }}'
+      color: 'warning'
+      
+  inhibitRules:
+  - sourceMatch:
+    - name: severity
+      value: "critical"
+    targetMatch:
+    - name: severity
+      value: "warning"
+    equal: ['alertname', 'cluster', 'service']
