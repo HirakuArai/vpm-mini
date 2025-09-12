@@ -1,0 +1,41 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: archivist
+  namespace: hyper-swarm
+  labels:
+    app: archivist
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/metric: concurrency
+        autoscaling.knative.dev/target: '10'
+        autoscaling.knative.dev/minScale: '0'
+        autoscaling.knative.dev/maxScale: '30'
+    spec:
+      containers:
+      - name: archivist
+        image: ghcr.io/hirakuarai/hello-ai:1.0.3
+        ports:
+        - containerPort: 8005
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8005
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: false
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: '1'
+            memory: 512Mi
+        envFrom:
+        - configMapRef:
+            name: archivist-config

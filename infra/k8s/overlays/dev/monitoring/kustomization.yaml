@@ -6,3 +6,7 @@ resources:
   - grafana-dashboard-hello-ai.yaml
   - promrule-hello-ai.yaml
   - servicemonitor-watcher.yaml
+  - servicemonitor-curator.yaml
+  - servicemonitor-planner.yaml
+  - servicemonitor-synthesizer.yaml
+  - servicemonitor-archivist.yaml
