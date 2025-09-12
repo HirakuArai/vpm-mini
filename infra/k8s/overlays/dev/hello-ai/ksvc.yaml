@@ -8,9 +8,24 @@ spec:
     metadata:
       labels:
         app: hello-ai
+      annotations:
+        autoscaling.knative.dev/metric: concurrency
+        autoscaling.knative.dev/target: '10'
+        autoscaling.knative.dev/minScale: '0'
+        autoscaling.knative.dev/maxScale: '30'
+        autoscaling.knative.dev/scale-down-delay: 30s
+        autoscaling.knative.dev/stable-window: 60s
     spec:
       containers:
-      - image: ghcr.io/hirakuarai/vpm-mini/hello-ai:latest
+      - image: ghcr.io/hirakuarai/hello-ai:1.0.3
         ports:
         - containerPort: 8080
           name: http1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+      containerConcurrency: 100
