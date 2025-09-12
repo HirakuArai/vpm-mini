@@ -3,7 +3,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY app.py .
-ARG PORT=8002
+ARG PORT=8000
 ENV PORT=${PORT}
 EXPOSE ${PORT}
 CMD ["sh","-c","uvicorn app:app --host 0.0.0.0 --port ${PORT}"]

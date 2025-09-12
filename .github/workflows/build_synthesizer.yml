@@ -12,7 +12,8 @@ jobs:
     permissions:
       packages: write
       contents: read
-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'push' }}
+    env:
+      PORT_SYNTHESIZER: 8004
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3

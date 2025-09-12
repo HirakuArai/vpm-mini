@@ -10,15 +10,12 @@ from prometheus_client import (
 import time
 
 app = FastAPI()
-registry = CollectorRegistry()
+reg = CollectorRegistry()
 REQ = Counter(
-    "hello_ai_requests_total",
-    "Requests",
-    ["route", "method", "code"],
-    registry=registry,
+    "hello_ai_requests_total", "Requests", ["route", "method", "code"], registry=reg
 )
-DUR = Histogram("hello_ai_request_duration_seconds", "Duration", registry=registry)
-UP = Gauge("hello_ai_up", "Up", registry=registry)
+DUR = Histogram("hello_ai_request_duration_seconds", "Duration", registry=reg)
+UP = Gauge("hello_ai_up", "Up", registry=reg)
 UP.set(1)
 
 
@@ -38,4 +35,4 @@ async def mw(req: Request, call_next):
 
 @app.get("/metrics")
 def metrics():
-    return generate_latest(registry), 200, {"Content-Type": CONTENT_TYPE_LATEST}
+    return generate_latest(reg), 200, {"Content-Type": CONTENT_TYPE_LATEST}
