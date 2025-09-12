@@ -110,3 +110,44 @@ status: P4-AutoUpdate GREEN
 - Evidence: reports/p4_hello_ai_1_0_4_postmortem.md
 
 - 2025-09-11T23:50:16Z: P4-NW READY — dev access via 8080 confirmed (make hello-health)
+
+## Phase 4: Observability & Secrets ✅
+**Completed**: 2025-09-13
+
+### Achievements
+- **Metrics**: /metrics → Prometheus (targets up==1) → Grafana "Hello AI / SLO" dashboard
+- **Alerts**: PrometheusRule with 3 SLO-based alerts (Down/Latency/ErrorRate)
+- **Secrets**: ESO + SOPS platform deployed, AlertmanagerConfig wired
+- **Evidence**: Comprehensive reports in `reports/p4_*`
+
+### Production Status
+- ServiceMonitor: ✅ Auto-detected and configured
+- Prometheus scraping: ✅ Active and healthy
+- Grafana dashboard: ✅ Visualizing metrics
+- Alert rules: ✅ Loaded and evaluated
+- ESO: ✅ 3/3 pods running
+- SecretStore: ✅ Ready with RBAC
+- ExternalSecret: ✅ Synced
+
+### Key Deliverables
+- Scripts: `p4_metrics_auto_setup.sh`, `p4_b_alerts_oneshot.sh`, `p4_c_secrets_oneshot.sh`
+- PRs: #235 (metrics + alerts), #236 (secrets platform)
+- Tag: p4-complete-20250913
+
+## Phase 5: Scaling & Migration (Next)
+**Target**: Q1 2025
+
+### Objectives
+- **P5-1**: Knative Autoscaling (HPA/KPA) with scale-to-zero
+- **P5-2**: SLO formalization and runbook creation
+- **P5-3**: First Compose service migration to Knative
+- **P5-4**: Secrets platform production hardening
+
+### Success Criteria
+- [ ] Autoscaling demonstrated under load (evidence captured)
+- [ ] SLO targets defined and measured
+- [ ] At least one service successfully migrated
+- [ ] Cloud secret backend integrated
+
+---
+*Last Updated: 2025-09-12 20:23:08 UTC*
