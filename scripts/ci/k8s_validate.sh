@@ -7,7 +7,8 @@ OK=1
 
 # 対象: overlays/dev と base（存在するもの）
 LIST=$(ls -1 infra/k8s/overlays/dev/*.yaml 2>/dev/null || true)
-LIST="$LIST "$(ls -1 infra/k8s/base/**/*.yaml 2>/dev/null || true)
+LIST="$LIST "$(find infra/k8s/overlays/dev -name "*.yaml" 2>/dev/null || true)
+LIST="$LIST "$(find infra/k8s/base -name "*.yaml" 2>/dev/null || true)
 
 if [ -z "${LIST// }" ]; then
   echo "[!] no manifests found under infra/k8s"; exit 0
@@ -39,6 +40,22 @@ except Exception as e:
   fi
   echo "::endgroup::"
 done
+
+# Kustomize validation for hello-ai
+if [ -d "infra/k8s/overlays/dev/hello" ]; then
+  echo "::group::kustomize validate infra/k8s/overlays/dev/hello"
+  if command -v kustomize >/dev/null 2>&1; then
+    if kustomize build infra/k8s/overlays/dev/hello > /dev/null; then
+      echo "✓ kustomize build succeeded for hello"
+    else
+      echo "::error::kustomize build failed for hello"
+      OK=0
+    fi
+  else
+    echo "::warning::kustomize not available, skipping kustomize validation"
+  fi
+  echo "::endgroup::"
+fi
 
 TS=$(date +%Y%m%d_%H%M%S)
 OUT="reports/p2_3_ci_validate_${TS}.json"

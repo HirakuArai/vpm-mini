@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vpm-mini-grafana
+  namespace: argocd
+spec:
+  project: vpm-mini-dev
+  source:
+    repoURL: https://grafana.github.io/helm-charts
+    chart: grafana
+    targetRevision: 8.5.9
+    helm:
+      values: |
+        adminUser: admin
+        adminPassword: admin # pragma: allowlist secret
+        service:
+          type: NodePort
+          nodePort: 31300
+        persistence:
+          enabled: false
+        testFramework:
+          enabled: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
