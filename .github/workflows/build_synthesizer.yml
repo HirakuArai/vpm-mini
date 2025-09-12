@@ -12,6 +12,7 @@ jobs:
     permissions:
       packages: write
       contents: read
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'push' }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -30,6 +31,6 @@ jobs:
           build-args: |
             PORT=8004
           tags: |
-            ghcr.io/HirakuArai/synthesizer:0.2.0
-            ghcr.io/HirakuArai/synthesizer:latest
+            ghcr.io/${{ github.repository_owner }}/synthesizer:0.2.0
+            ghcr.io/${{ github.repository_owner }}/synthesizer:latest
           push: true

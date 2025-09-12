@@ -12,6 +12,7 @@ jobs:
     permissions:
       packages: write
       contents: read
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'push' }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -30,6 +31,6 @@ jobs:
           build-args: |
             PORT=8005
           tags: |
-            ghcr.io/HirakuArai/archivist:0.2.0
-            ghcr.io/HirakuArai/archivist:latest
+            ghcr.io/${{ github.repository_owner }}/archivist:0.2.0
+            ghcr.io/${{ github.repository_owner }}/archivist:latest
           push: true
