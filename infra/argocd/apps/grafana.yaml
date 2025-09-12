@@ -4,7 +4,7 @@ metadata:
   name: vpm-mini-grafana
   namespace: argocd
 spec:
-  project: vpm-mini-dev
+  project: default
   source:
     repoURL: https://grafana.github.io/helm-charts
     chart: grafana
@@ -20,6 +20,15 @@ spec:
           enabled: false
         testFramework:
           enabled: false
+        datasources:
+          "datasources.yaml": |
+            apiVersion: 1
+            datasources:
+              - name: Prometheus
+                type: prometheus
+                access: proxy
+                url: http://vpm-mini-kube-prometheus-s-prometheus.monitoring.svc:9090
+                isDefault: true
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
