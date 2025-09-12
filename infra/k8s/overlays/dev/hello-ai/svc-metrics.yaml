@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-ai-metrics
+  namespace: hyper-swarm
+  labels:
+    app: hello-ai
+spec:
+  selector:
+    app: hello-ai
+  ports:
+  - name: http-metrics
+    port: 9090
+    targetPort: 8080
+    protocol: TCP
