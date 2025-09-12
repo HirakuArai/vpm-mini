@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: hello-ai
+  namespace: monitoring
+  labels:
+    release: vpm-mini-kube-prometheus-stack
+spec:
+  namespaceSelector:
+    matchNames: 
+    - hyper-swarm
+  selector:
+    matchLabels:
+      app: hello-ai
+  endpoints:
+  - port: http-metrics
+    interval: 15s
+    scrapeTimeout: 10s
+    path: /metrics
