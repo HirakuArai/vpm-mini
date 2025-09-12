@@ -5,3 +5,4 @@ resources:
   - servicemonitor.yaml
   - grafana-dashboard-hello-ai.yaml
   - promrule-hello-ai.yaml
+  - servicemonitor-watcher.yaml
