@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
       - name: hello-ai
-        image: ghcr.io/hirakuarai/hello-ai:1.0.3
+        image: ghcr.io/hirakuarai/hello-ai:1.0.5
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080

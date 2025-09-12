@@ -5,6 +5,8 @@ namespace: hyper-swarm
 
 resources:
 - hello-ai-ksvc.yaml
+- hello-ai-svc-metrics.yaml
+- hello-ai-servicemonitor.yaml
 
 commonLabels:
   app: hello-ai
