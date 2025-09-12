@@ -9,25 +9,33 @@ spec:
   template:
     metadata:
       annotations:
-        autoscaling.knative.dev/metric: "concurrency"
-        autoscaling.knative.dev/target: "10"
-        autoscaling.knative.dev/minScale: "0"
-        autoscaling.knative.dev/maxScale: "30"
+        autoscaling.knative.dev/metric: concurrency
+        autoscaling.knative.dev/target: '10'
+        autoscaling.knative.dev/minScale: '0'
+        autoscaling.knative.dev/maxScale: '30'
     spec:
       containers:
-        - name: watcher
-          image: ghcr.io/hirakuarai/hello-ai:1.0.3
-          ports:
-            - containerPort: 8001
-          env: [] # Existing compose env will be migrated in next PR via Secrets
-          securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: false
-            runAsNonRoot: false
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "128Mi"
-            limits:
-              cpu: "1"
-              memory: "512Mi"
+      - name: watcher
+        image: ghcr.io/hirakuarai/hello-ai:1.0.3
+        ports:
+        - containerPort: 8001
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8001
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: false
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: '1'
+            memory: 512Mi
+        envFrom:
+        - configMapRef:
+            name: watcher-config

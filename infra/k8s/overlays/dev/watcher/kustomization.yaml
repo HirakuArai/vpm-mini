@@ -1,5 +1,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+  - svc-metrics.yaml
+
+  - configmap.yaml
+
   - ksvc.yaml
 # Additional Service / ServiceMonitor will be added in next PR or follow-up

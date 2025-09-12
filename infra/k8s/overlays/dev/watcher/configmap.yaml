@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: watcher-config
+  namespace: hyper-swarm
+data:
+  ROLE: "watcher"
+  PORT: "8001"
+  METRICS_PORT: "9001"
+  TRACE_ID: ""

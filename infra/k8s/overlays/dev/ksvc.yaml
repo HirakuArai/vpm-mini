@@ -1,0 +1,34 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: 
+  namespace: 
+  labels:
+    app: 
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/metric: "concurrency"
+        autoscaling.knative.dev/target: "10"
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "30"
+    spec:
+      containers:
+      - name: 
+        image: 
+        ports:
+        - containerPort: 
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: false
+        resources:
+          requests: { cpu: "100m", memory: "128Mi" }
+          limits:   { cpu: "1",    memory: "512Mi" }
