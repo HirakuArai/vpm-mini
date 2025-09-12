@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: planner-config
+  namespace: hyper-swarm
+data:
+  ROLE: "planner"
+  PORT: "8003"
+  METRICS_PORT: "9003"
+  TRACE_ID: ""
+  REDIS_HOST: "redis"

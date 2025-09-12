@@ -8,3 +8,7 @@ resources:
   - monitoring/kustomization.yaml
   - secrets/kustomization.yaml
   - watcher/kustomization.yaml
+  - curator/kustomization.yaml
+  - planner/kustomization.yaml
+  - synthesizer/kustomization.yaml
+  - archivist/kustomization.yaml

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: archivist-config
+  namespace: hyper-swarm
+data:
+  ROLE: "archivist"
+  PORT: "8005"
+  METRICS_PORT: "9005"
+  TRACE_ID: ""
+  REDIS_HOST: "redis"

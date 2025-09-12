@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: synthesizer-config
+  namespace: hyper-swarm
+data:
+  ROLE: "synthesizer"
+  PORT: "8004"
+  METRICS_PORT: "9004"
+  TRACE_ID: ""
+  REDIS_HOST: "redis"

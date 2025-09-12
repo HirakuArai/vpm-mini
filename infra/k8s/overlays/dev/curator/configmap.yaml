@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: curator-config
+  namespace: hyper-swarm
+data:
+  ROLE: "curator"
+  PORT: "8002"
+  METRICS_PORT: "9002"
+  TRACE_ID: ""
+  REDIS_HOST: "redis"
