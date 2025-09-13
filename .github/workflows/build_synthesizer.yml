@@ -1,0 +1,37 @@
+name: build_synthesizer
+on:
+  push:
+    paths:
+      - "services/synthesizer/**"
+      - ".github/workflows/build_synthesizer.yml"
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    env:
+      PORT_SYNTHESIZER: 8004
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build & Push
+        uses: docker/build-push-action@v6
+        with:
+          context: services/synthesizer
+          file: services/synthesizer/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            PORT=8004
+          tags: |
+            ghcr.io/hirakuarai/synthesizer:0.2.0
+            ghcr.io/hirakuarai/synthesizer:latest
+          push: true
