@@ -32,6 +32,6 @@ jobs:
           build-args: |
             PORT=8003
           tags: |
-            ghcr.io/${{ github.repository_owner }}/planner:0.2.0
-            ghcr.io/${{ github.repository_owner }}/planner:latest
+            ghcr.io/hirakuarai/planner:0.2.0
+            ghcr.io/hirakuarai/planner:latest
           push: true
