@@ -62,3 +62,12 @@ open http://localhost:3000  # (admin/admin)
 - 800 cells/sec 大規模負荷耐性確立
 - SSOT（運用ループの全体図）: `diagrams/src/ops_single_source_of_truth_v1.md`
 - ドキュメント目次: `docs/README.md`
+
+## Quick Start (Trial)
+1. フォームで `title/detail/project_id/priority` を投稿
+2. `status_query` で C/G/δ/Next を取得
+3. 日次5分: ダッシュボード→1改善PR（Evidence必須）
+
+- project_id: `vpm-core`
+- decision template: 結論 / 根拠（出典+時刻） / 次の一手 / 信頼度
+- scope: STATE / reports / PR(DoD) / Prometheus（意味軸/RAGなし）
