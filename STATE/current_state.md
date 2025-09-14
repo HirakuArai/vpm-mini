@@ -1,13 +1,14 @@
 # === State Declaration (Single Source of Truth) ===
 active_repo: vpm-mini
 active_branch: main
-phase: Phase 4: AutoUpdate GREEN
-context_header: "repo=vpm-mini / branch=main / phase=Phase 4: AutoUpdate GREEN"
-short_goal: "GHCR v3 (multi-arch) + ArgoCD Image Updater semver~1 + Knative READY"
+phase: Phase 5: Scaling & Migration
+context_header: "repo=vpm-mini / branch=main / phase=Phase 5: Scaling & Migration"
+short_goal: "Knative Autoscaling + SLO formalization + First Compose service migration"
 exit_criteria:
-  - "P2-1 GREEN: kind + Knative (v1.18) 足場構築スクリプトが動作"
-  - "P2-2 GREEN: Hello KService デプロイ成功（kubectl get ksvc hello → READY=True / curl→HTTP 200）"
-updated_at: 2025-09-11T22:20:29Z
+  - "P5-1 GREEN: Knative Autoscaling (HPA/KPA) with scale-to-zero demonstrated"
+  - "P5-2 GREEN: SLO targets defined and measured with runbooks"
+  - "P5-3 GREEN: At least one Compose service successfully migrated to Knative"
+updated_at: 2025-09-15T00:00:00Z
 
 ---
 
@@ -134,20 +135,59 @@ status: P4-AutoUpdate GREEN
 - PRs: #235 (metrics + alerts), #236 (secrets platform)
 - Tag: p4-complete-20250913
 
-## Phase 5: Scaling & Migration (Next)
-**Target**: Q1 2025
+## Phase 5: Scaling & Migration (Current)
+**Status**: In Progress (2025-09-13 ~ )
 
 ### Objectives
-- **P5-1**: Knative Autoscaling (HPA/KPA) with scale-to-zero
-- **P5-2**: SLO formalization and runbook creation
-- **P5-3**: First Compose service migration to Knative
+- **P5-1**: Knative Autoscaling (HPA/KPA) with scale-to-zero ✅
+- **P5-2**: SLO formalization and runbook creation ✅
+- **P5-3**: First Compose service migration to Knative ✅
 - **P5-4**: Secrets platform production hardening
 
 ### Success Criteria
-- [ ] Autoscaling demonstrated under load (evidence captured)
-- [ ] SLO targets defined and measured
-- [ ] At least one service successfully migrated
+- [x] Autoscaling demonstrated under load (evidence captured)
+- [x] SLO targets defined and measured
+- [x] At least one service successfully migrated (watcher + 4 bulk services)
 - [ ] Cloud secret backend integrated
 
+### Completed P5 Milestones
+- **P5-1 Autoscale**: Scale-to-zero achieved, 14,272 RPS sustained (reports/p5_1_autoscale_20250913_055540.md)
+- **P5-2 SLO**: 99.9% availability, P95<500ms latency targets defined (reports/p5_2_slo_20250913_060915.md)
+- **P5-3 Migration**: 5 services migrated with full observability (watcher, curator, planner, synthesizer, archivist)
+
+## Trial Mode (実験的運用)
+**Status**: Active
+**Started**: 2025-09-15
+
+### Scope
+- **Purpose**: 高速実験・検証サイクルを回すための一時的な運用モード
+- **Duration**: 必要に応じて有効化/無効化（通常は1-2週間単位）
+- **Authority**: STATE/current_state.md が最優先の真実源
+
+### Template (Trial Mode時の構造)
+```yaml
+trial_mode:
+  active: true
+  focus: "特定の実験目標"
+  experiments:
+    - name: "実験名"
+      status: "planning|running|completed|failed"
+      evidence: "reports/trial_*.md"
+  constraints:
+    - "main branch の安定性維持"
+    - "既存CI/CDパイプラインへの影響最小化"
+```
+
+### WIP (Work In Progress)
+- [ ] Trial Mode テンプレート定義
+- [ ] 実験ブランチ命名規則: `trial/*`
+- [ ] Evidence: `reports/trial_*.md` 形式で記録
+
+### Operating Rules
+1. **Fast Iteration**: 完璧さより速度優先（後で本実装）
+2. **Evidence First**: 全実験に証跡必須
+3. **Rollback Ready**: いつでも main に戻せる状態維持
+4. **Time-boxed**: 各実験は最大2週間
+
 ---
-*Last Updated: 2025-09-12 20:23:08 UTC*
+*Last Updated: 2025-09-15 00:00:00 UTC*
