@@ -1,4 +1,7 @@
 **Dev URL (kind/8080):** `make hello-health` → 200 OK
+
+> 📎 Attachments: `docs/attachments_index.md`（ChatGPT の添付はこの1枚に集約）
+
 # vpm-mini
 
 **context_header:** repo=vpm-mini / branch=main / phase=Phase 2
