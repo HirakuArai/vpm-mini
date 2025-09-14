@@ -21,11 +21,11 @@ updated_at: 2025-09-15T00:00:00Z
 ## フェーズ構成と現在地
 - **Phase 0**：ローカル venv で 5ロール（対話→要約→プラン→エコー）一周の証跡化
 - **Phase 1**：Compose + 監視土台（完了）
-- **Phase 2（←現在地）**：kind + Knative（v1.18）足場 → Hello KService `READY=True / HTTP 200` の証跡化
+- **Phase 5（←現在地）**：kind + Knative（v1.18）足場 → Hello KService `READY=True / HTTP 200` の証跡化
 - 以降：サービス移植・Autoscale・観測ラインのK8s移行
 
 ## 現在地（C）
-- Phase 1 までの環境は main で安定
+- Phase 5 に移行：P5-1〜3 完了、P5-4（Secrets本番化）進行中
 - #128 により **Evidence Check（PR本文↔差分の不整合検知）** 導入済み
 - `.ops/deploy_freeze.json` は **true 維持**（不要なCDを抑止）
 - **欠落**：Phase 0 サニティ（5ロール一周の実行証跡）／ Phase 2 `hello-ksvc` READY 証跡
@@ -136,6 +136,12 @@ status: P4-AutoUpdate GREEN
 - Tag: p4-complete-20250913
 
 ## Phase 5: Scaling & Migration (Current)
+
+### Phase 5 Summary
+- 状態: In Progress（P5-1〜3 ✅ / P5-4 進行中）
+- 目的: Autoscale 反映、SLO/Runbook 定着、移植の継続、Secretsの本番化
+- 参照: reports/p5_* / SLOダッシュボード
+
 **Status**: In Progress (2025-09-13 ~ )
 
 ### Objectives
