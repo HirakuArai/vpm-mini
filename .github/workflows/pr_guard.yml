@@ -1,0 +1,18 @@
+name: PR Guard (pre-DoD)
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check PR body for required sections
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BODY=$(gh pr view ${{ github.event.pull_request.number }} --json body -q .body)
+          reqs=("context_header:" "## Exit Criteria" "## Evidence" "## DoD チェックリスト（編集不可・完全一致）")
+          for r in "${reqs[@]}"; do
+            echo "$BODY" | grep -F "$r" >/dev/null || { echo "::error::Missing [$r] in PR body"; exit 1; }
+          done
