@@ -1,7 +1,8 @@
 name: auto-pr
 on:
   push:
-    branches-ignore: [ main ]
+    branches-ignore:
+    - main
 permissions:
   contents: write
   pull-requests: write
@@ -9,20 +10,15 @@ jobs:
   create-pr:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/github-script@v7
-        with:
-          script: |
-            const branch = context.ref.replace('refs/heads/','')
-            const { owner, repo } = context.repo
-            const prs = await github.rest.pulls.list({ owner, repo, head: `${owner}:${branch}`, state: 'open' })
-            if (prs.data.length === 0) {
-              const { data: pr } = await github.rest.pulls.create({
-                owner, repo, base: 'main', head: branch,
-                title: `auto: ${branch}`,
-                body: 'Auto-created PR (branch pushed without PR).'
-              })
-              core.info(`PR #${pr.number} created for ${branch}`)
-            } else {
-              core.info(`PR already exists for ${branch}`)
-            }
+    - uses: actions/checkout@v4
+    - uses: actions/github-script@v7
+      with:
+        script: "const branch = context.ref.replace('refs/heads/','')\nconst { owner,\
+          \ repo } = context.repo\nconst prs = await github.rest.pulls.list({ owner,\
+          \ repo, head: `${owner}:${branch}`, state: 'open' })\nif (prs.data.length\
+          \ === 0) {\n  const { data: pr } = await github.rest.pulls.create({\n  \
+          \  owner, repo, base: 'main', head: branch,\n    title: `auto: ${branch}`,\n\
+          \    body: 'Auto-created PR (branch pushed without PR).'\n  })\n  core.info(`PR\
+          \ #${pr.number} created for ${branch}`)\n} else {\n  core.info(`PR already\
+          \ exists for ${branch}`)\n}\n"
+    if: github.event_name == "push" && startsWith(github.ref, "refs/heads/main")
