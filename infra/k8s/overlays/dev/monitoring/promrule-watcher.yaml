@@ -1,0 +1,33 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: watcher-slo
+  namespace: monitoring
+  labels: { release: vmp-mini-kube-prometheus-stack }
+spec:
+  groups:
+  - name: watcher-availability
+    rules:
+    - alert: Watcher_ServiceDown
+      expr: avg_over_time(hello_ai_up{job="watcher"}[5m]) < 0.5
+      for: 5m
+      labels: { severity: critical }
+      annotations:
+        summary: "watcher down"
+        description: "hello_ai_up < 0.5 (5m)"
+  - name: watcher-performance
+    rules:
+    - alert: Watcher_HighLatency
+      expr: histogram_quantile(0.95, sum by (le) (rate(hello_ai_request_duration_seconds_bucket{job="watcher"}[5m]))) > 1
+      for: 10m
+      labels: { severity: warning }
+      annotations:
+        summary: "watcher p95 latency high"
+        description: "p95 > 1s for 10m"
+    - alert: Watcher_HighErrorRate
+      expr: (sum(rate(hello_ai_requests_total{job="watcher",code=~"5.."}[5m])) / sum(rate(hello_ai_requests_total{job="watcher"}[5m]))) * 100 > 1
+      for: 10m
+      labels: { severity: warning }
+      annotations:
+        summary: "watcher error rate high"
+        description: "5xx error > 1% (5m)"
