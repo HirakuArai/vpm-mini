@@ -3,7 +3,7 @@ kind: PrometheusRule
 metadata:
   name: synthesizer-slo
   namespace: monitoring
-  labels: { release: vmp-mini-kube-prometheus-stack }
+  labels: { release: vpm-mini-kube-prometheus-stack }
 spec:
   groups:
   - name: synthesizer-availability
