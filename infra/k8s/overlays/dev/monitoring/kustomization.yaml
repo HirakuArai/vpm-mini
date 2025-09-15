@@ -10,3 +10,8 @@ resources:
   - servicemonitor-planner.yaml
   - servicemonitor-synthesizer.yaml
   - servicemonitor-archivist.yaml
+  - promrule-watcher.yaml
+  - promrule-curator.yaml
+  - promrule-planner.yaml
+  - promrule-synthesizer.yaml
+  - promrule-archivist.yaml

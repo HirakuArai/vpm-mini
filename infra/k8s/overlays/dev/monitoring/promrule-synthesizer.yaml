@@ -1,0 +1,33 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: synthesizer-slo
+  namespace: monitoring
+  labels: { release: vmp-mini-kube-prometheus-stack }
+spec:
+  groups:
+  - name: synthesizer-availability
+    rules:
+    - alert: Synthesizer_ServiceDown
+      expr: avg_over_time(hello_ai_up{job="synthesizer"}[5m]) < 0.5
+      for: 5m
+      labels: { severity: critical }
+      annotations:
+        summary: "synthesizer down"
+        description: "hello_ai_up < 0.5 (5m)"
+  - name: synthesizer-performance
+    rules:
+    - alert: Synthesizer_HighLatency
+      expr: histogram_quantile(0.95, sum by (le) (rate(hello_ai_request_duration_seconds_bucket{job="synthesizer"}[5m]))) > 1
+      for: 10m
+      labels: { severity: warning }
+      annotations:
+        summary: "synthesizer p95 latency high"
+        description: "p95 > 1s for 10m"
+    - alert: Synthesizer_HighErrorRate
+      expr: (sum(rate(hello_ai_requests_total{job="synthesizer",code=~"5.."}[5m])) / sum(rate(hello_ai_requests_total{job="synthesizer"}[5m]))) * 100 > 1
+      for: 10m
+      labels: { severity: warning }
+      annotations:
+        summary: "synthesizer error rate high"
+        description: "5xx error > 1% (5m)"
