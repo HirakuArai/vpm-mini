@@ -74,3 +74,12 @@ trial-ui-smoke:
 	 -H 'content-type: application/json' \
 	 -d '{"title":"smoke","description":"auto","priority":"low"}' \
 	| jq -r '.trace_id' | xargs -I{} echo "TRACE={}"
+
+PORT ?= 8000
+
+# 可変ポート版（例: make trial-ui-smoke-port PORT=8000）
+trial-ui-smoke-port:
+	@curl -s -X POST http://127.0.0.1:$(PORT)/api/v1/tasks \
+	 -H 'content-type: application/json' \
+	 -d '{"title":"smoke","description":"auto","priority":"low"}' \
+	| jq -r '.trace_id' | xargs -I{} echo "TRACE={}"
