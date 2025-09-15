@@ -74,3 +74,11 @@ open http://localhost:3000  # (admin/admin)
 - project_id: `vpm-core`
 - decision template: 結論 / 根拠（出典+時刻） / 次の一手 / 信頼度
 - scope: STATE / reports / PR(DoD) / Prometheus（意味軸/RAGなし）
+
+### Trial Daily (5分レビュー)
+```
+make trial-daily
+```
+- KService / PR / Targets / Alerts を表示
+- `reports/daily_status_*.md` にEvidence保存
+
