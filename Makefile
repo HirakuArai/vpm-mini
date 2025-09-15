@@ -59,3 +59,11 @@ verify:
 	git ls-remote --tags origin | grep -q "refs/tags/$${SLUG}" \
 	  && echo "OK: tag $${SLUG}" \
 	  || (echo "MISSING: tag $${SLUG}"; exit 1)
+
+# === Trial Mode ===
+trial-daily:
+	@chmod +x tools/vpm_trial_status.sh tools/vpm_daily_capture.sh 2>/dev/null || true
+	@echo "== Trial Daily Status =="
+	@tools/vpm_trial_status.sh || true
+	@echo "== Capture Evidence =="
+	@tools/vpm_daily_capture.sh
