@@ -35,7 +35,7 @@ hello-url:
 	@kubectl -n hyper-swarm get ksvc hello-ai -o jsonpath='{.status.url}{"\n"}'
 hello-health:
 	@URL=$$(kubectl -n hyper-swarm get ksvc hello-ai -o jsonpath='{.status.url}{"\n"}'); \
-	curl -s -H "Host: hello-ai.hyper-swarm.127.0.0.1.sslip.io" http://127.0.0.1:8080/healthz
+	curl -s -H "Host: hello-ai.hyper-swarm.127.0.0.1.sslip.io" http://127.0.0.1:$(PORT)/healthz
 
 .PHONY: test phase0-sanity
 phase0-sanity:
@@ -70,7 +70,7 @@ trial-daily:
 
 # === Trial UI smoke ===
 trial-ui-smoke:
-	curl -s -X POST http://127.0.0.1:8080/api/v1/tasks \
+	curl -s -X POST http://127.0.0.1:$(PORT)/api/v1/tasks \
 	 -H 'content-type: application/json' \
 	 -d '{"title":"smoke","description":"auto","priority":"low"}' \
 	| jq -r '.trace_id' | xargs -I{} echo "TRACE={}"
