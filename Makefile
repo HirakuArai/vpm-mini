@@ -67,3 +67,10 @@ trial-daily:
 	@tools/vpm_trial_status.sh || true
 	@echo "== Capture Evidence =="
 	@tools/vpm_daily_capture.sh
+
+# === Trial UI smoke ===
+trial-ui-smoke:
+	curl -s -X POST http://127.0.0.1:8080/api/v1/tasks \
+	 -H 'content-type: application/json' \
+	 -d '{"title":"smoke","description":"auto","priority":"low"}' \
+	| jq -r '.trace_id' | xargs -I{} echo "TRACE={}"

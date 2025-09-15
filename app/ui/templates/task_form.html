@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+  <head><meta charset="utf-8"><title>Trial Task</title></head>
+  <body>
+    <h1>Trial Task</h1>
+    <form method="post" action="/api/v1/tasks" onsubmit="return submitTask(event)">
+      <div><input name="title" placeholder="title" required /></div>
+      <div><textarea name="description" placeholder="description"></textarea></div>
+      <div>
+        <label>priority:</label>
+        <select name="priority">
+          <option>low</option><option selected>mid</option><option>high</option>
+        </select>
+      </div>
+      <div><input name="tags" placeholder="tag1,tag2" /></div>
+      <button type="submit">Create</button>
+    </form>
+    <h3>Response</h3>
+    <pre id="res"></pre>
+    <script>
+      async function submitTask(e){
+        e.preventDefault();
+        const f=e.target;
+        const payload={
+          title:f.title.value,
+          description:f.description.value,
+          priority:f.priority.value,
+          tags:(f.tags.value||"").split(",").map(s=>s.trim()).filter(Boolean)
+        };
+        const r=await fetch("/api/v1/tasks",{
+          method:"POST",
+          headers:{"content-type":"application/json"},
+          body:JSON.stringify(payload)
+        });
+        document.getElementById('res').textContent=await r.text();
+        return false;
+      }
+    </script>
+  </body>
+</html>
