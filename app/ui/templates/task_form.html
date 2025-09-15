@@ -13,20 +13,35 @@
         </select>
       </div>
       <div><input name="tags" placeholder="tag1,tag2" /></div>
-      <button type="submit">Create</button>
+      <button id="createBtn" type="submit">Create</button>
     </form>
     <h3>Response</h3>
     <pre id="res"></pre>
     <script>
       async function submitTask(e){
-        e.preventDefault();
-        const f=e.target;
-        const payload={
-          title:f.title.value,
-          description:f.description.value,
-          priority:f.priority.value,
-          tags:(f.tags.value||"").split(",").map(s=>s.trim()).filter(Boolean)
-        };
+  e.preventDefault();
+  const f=e.target;
+  const btn=document.getElementById('createBtn');
+  if(btn){ btn.disabled=true; const t=btn.textContent; btn.dataset._t=t; btn.textContent='Creating...'; }
+  try{
+    const payload={
+      title:f.title.value,
+      description:f.description.value,
+      priority:f.priority.value,
+      tags:(f.tags.value||"").split(",").map(s=>s.trim()).filter(Boolean)
+    };
+    const r=await fetch("/api/v1/tasks",{
+      method:"POST",
+      headers:{"content-type":"application/json"},
+      body:JSON.stringify(payload)
+    });
+    document.getElementById('res').textContent=await r.text();
+  } finally {
+    if(btn){ btn.disabled=false; btn.textContent=btn.dataset._t||'Create'; }
+  }
+  return false;
+}
+;
         const r=await fetch("/api/v1/tasks",{
           method:"POST",
           headers:{"content-type":"application/json"},
