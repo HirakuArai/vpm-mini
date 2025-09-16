@@ -1,0 +1,34 @@
+{
+  "title": "ESO Sync Overview",
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Ready Ratio (5m)",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "eso:externalsecret_ready_ratio_5m", "legendFormat": "{{namespace}}"}
+      ],
+      "options": {"reduceOptions":{"calcs":["lastNotNull"]}}
+    },
+    {
+      "type": "graph",
+      "title": "Reconcile Rate (5m)",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "eso:reconcile_rate_5m", "legendFormat": "{{controller}}"}
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Raw Ready Flags (last 5m)",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "max_over_time(externalsecret_status_condition{type=\"Ready\",status=\"True\"}[5m])", "legendFormat": "{{namespace}}/{{name}}"}
+      ],
+      "styles": []
+    }
+  ],
+  "schemaVersion": 30,
+  "version": 1
+}
