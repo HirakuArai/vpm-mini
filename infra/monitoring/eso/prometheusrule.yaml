@@ -1,0 +1,33 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: eso-observability
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/component: observability
+spec:
+  groups:
+    - name: eso.status
+      rules:
+        # Ready率（5分窓）: externalsecret_status_condition が 1(True) の割合
+        - record: eso:externalsecret_ready_ratio_5m
+          expr: |
+            avg by (namespace) (
+              max_over_time(externalsecret_status_condition{type="Ready",status="True"}[5m])
+            )
+        # 同期待ち検出（10分連続でReady=Falseのものがある）
+        - alert: ExternalSecretNotReady
+          expr: |
+            min_over_time(externalsecret_status_condition{type="Ready",status="True"}[10m]) < 1
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "ExternalSecret not Ready in namespace {{ $labels.namespace }}"
+            description: "ExternalSecret {{ $labels.name }} has not been Ready=True for 10m."
+    - name: eso.reconcile
+      rules:
+        # 直近5分のReconcileレート（あれば）
+        - record: eso:reconcile_rate_5m
+          expr: |
+            sum by (controller) (rate(controller_runtime_reconcile_total{controller=~"external-secrets.*|externalsecret.*"}[5m]))
