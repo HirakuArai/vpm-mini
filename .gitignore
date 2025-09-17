@@ -13,3 +13,7 @@ __pycache__/
 diagrams/export/
 \!diagrams/export/.gitkeep
 venv/
+
+# hand-off: 最新指示は追跡しない、巨大ログは追跡しない
+ops/agent_handoff/task.json
+reports/codex_run_*.log
