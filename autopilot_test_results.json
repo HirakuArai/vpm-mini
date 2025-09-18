@@ -1,0 +1,8 @@
+{
+  "timestamp": "2025-09-18T21:41:12Z",
+  "max_changes": 5,
+  "changes_found": 5,
+  "target_areas": "docs,comments",
+  "dry_run": true,
+  "changes": [{"type":"docs","file":"infra/k8s/overlays/dev/monitoring/README.md","description":"Convert TODO comments to proper TODO section"},{"type":"docs","file":"README.md","description":"Add title header to README"},{"type":"docs","file":"reports/_templates.md","description":"Convert TODO comments to proper TODO section"},{"type":"comments","file":"cells/hello-ai/app.py","description":"Add missing function docstrings"},{"type":"comments","file":"tools/create_docs_pr.sh","description":"Add script purpose comment"}]
+}
