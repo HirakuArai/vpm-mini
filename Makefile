@@ -85,6 +85,8 @@ trial-ui-smoke-port:
 	| jq -r '.trace_id' | xargs -I{} echo "TRACE={}"
 
 # === State View ===
+PROJECT ?= vpm-mini
+
 .PHONY: state-view
 state-view:
-	python3 scripts/state_view.py
+	python3 scripts/state_view.py --project $(PROJECT)

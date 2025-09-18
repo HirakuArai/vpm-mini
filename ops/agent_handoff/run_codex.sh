@@ -1,11 +1,32 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Default project namespace
+PROJECT="vpm-mini"
+
+# Parse --project argument
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --project=*)
+            PROJECT="${1#*=}"
+            shift
+            ;;
+        --project)
+            PROJECT="$2"
+            shift 2
+            ;;
+        *)
+            # Pass through other arguments
+            shift
+            ;;
+    esac
+done
+
 ROOT="$(git rev-parse --show-toplevel)"
 HANDOFF="$ROOT/ops/agent_handoff/task.json"
 HISTDIR="$ROOT/ops/agent_handoff/history"
 RUNLOGS="$ROOT/ops/agent_handoff/task_runs.ndjson"
-REPODIR="$ROOT/reports"
+REPODIR="$ROOT/reports/$PROJECT"
 
 TS=$(date -u +%Y%m%d_%H%M%S)
 RUN_ID="run_${TS}"
@@ -21,7 +42,7 @@ mkdir -p "$HISTDIR" "$REPODIR"
 DRY=$(jq -r '.meta.dry_run // false' "$HANDOFF" || echo false)
 USE_CODEX=$(jq -r '.meta.use_codex // false' "$HANDOFF" || echo false)
 
-echo "[INFO] executing: dry_run=$DRY use_codex=$USE_CODEX run_id=$RUN_ID"
+echo "[INFO] executing: project=$PROJECT dry_run=$DRY use_codex=$USE_CODEX run_id=$RUN_ID"
 
 if [[ "$USE_CODEX" == "true" ]] && command -v codex >/dev/null; then
   # codex CLI を使って実行
@@ -58,7 +79,7 @@ jq -n --arg id "$RUN_ID" \
       --arg ts "$TS" \
       --arg dry "$DRY" \
       --arg snap "ops/agent_handoff/history/$(basename "$SNAP")" \
-      --arg log "reports/$(basename "$LOG")" \
+      --arg log "reports/$PROJECT/$(basename "$LOG")" \
       --arg status "$STATUS" \
       '{run_id:$id, ts:$ts, dry_run:($dry=="true"), snapshot:$snap, log:$log, status:$status}' \
    >> "$RUNLOGS"
@@ -70,7 +91,7 @@ INDEX="$REPODIR/_latest_index.md"
   echo "- run_id: $RUN_ID"
   echo "- timestamp (UTC): $TS"
   echo "- snapshot: ops/agent_handoff/history/$(basename "$SNAP")"
-  echo "- log: reports/$(basename "$LOG")"
+  echo "- log: reports/$PROJECT/$(basename "$LOG")"
   echo "- status: $STATUS"
 } > "$INDEX"
 
