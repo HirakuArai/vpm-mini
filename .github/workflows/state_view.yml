@@ -1,0 +1,82 @@
+name: State View Generator
+
+on:
+  workflow_dispatch:
+    inputs:
+      state_file:
+        description: 'State file path (relative to repo root)'
+        required: false
+        default: 'STATE/current_state.md'
+        type: string
+
+jobs:
+  generate-state-view:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Verify state file exists
+      run: |
+        if [ ! -f "${{ github.event.inputs.state_file }}" ]; then
+          echo "State file not found: ${{ github.event.inputs.state_file }}"
+          exit 1
+        fi
+        echo "State file found: ${{ github.event.inputs.state_file }}"
+        echo "File size: $(wc -c < "${{ github.event.inputs.state_file }}") bytes"
+
+    - name: Generate state view report
+      run: |
+        # Make script executable
+        chmod +x scripts/state_view.py
+
+        # Generate report
+        python3 scripts/state_view.py --in "${{ github.event.inputs.state_file }}"
+
+        # Show generation results
+        echo "Generated files:"
+        ls -la reports/p2_state_view_*.md 2>/dev/null || echo "No files generated"
+
+    - name: Display generated report
+      run: |
+        LATEST_REPORT=$(ls -t reports/p2_state_view_*.md 2>/dev/null | head -1)
+        if [ -n "$LATEST_REPORT" ]; then
+          echo "=== Generated Report Content ==="
+          cat "$LATEST_REPORT"
+        else
+          echo "No report file found"
+          exit 1
+        fi
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: state-view-report
+        path: |
+          reports/p2_state_view_*.md
+        retention-days: 30
+
+    - name: Summary
+      run: |
+        LATEST_REPORT=$(ls -t reports/p2_state_view_*.md 2>/dev/null | head -1)
+        if [ -n "$LATEST_REPORT" ]; then
+          echo "## State View Generation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **State File**: ${{ github.event.inputs.state_file }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Generated Report**: $LATEST_REPORT" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ✅ Success" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Report Preview" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`markdown" >> $GITHUB_STEP_SUMMARY
+          head -20 "$LATEST_REPORT" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "## State View Generation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ❌ Failed - No report generated" >> $GITHUB_STEP_SUMMARY
+        fi
