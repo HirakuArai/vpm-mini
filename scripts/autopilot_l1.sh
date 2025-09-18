@@ -8,6 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Configuration
+PROJECT="vpm-mini"
 MAX_CHANGES=3
 DRY_RUN=true
 TARGET_AREAS="docs,comments"
@@ -54,6 +55,7 @@ usage() {
 Usage: $0 [OPTIONS]
 
 Options:
+    --project NAME       Project namespace (default: vpm-mini)
     --max-changes N      Maximum number of changes to make (default: 3)
     --dry-run BOOL       Dry run mode - no actual changes (default: true)
     --target-areas LIST  Comma-separated areas: docs,comments,formatting (default: docs,comments)
@@ -62,7 +64,7 @@ Options:
     --help              Show this help
 
 Examples:
-    $0 --dry-run=true --max-changes=5
+    $0 --project=other-sample --dry-run=true --max-changes=5
     $0 --target-areas=docs,formatting --apply-changes
 EOF
     exit 1
@@ -71,6 +73,10 @@ EOF
 parse_args() {
     while [[ $# -gt 0 ]]; do
         case $1 in
+            --project=*)
+                PROJECT="${1#*=}"
+                shift
+                ;;
             --max-changes=*)
                 MAX_CHANGES="${1#*=}"
                 shift
@@ -321,6 +327,7 @@ generate_output() {
         cat > "$OUTPUT_JSON" << EOF
 {
   "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "project": "$PROJECT",
   "max_changes": $MAX_CHANGES,
   "changes_found": $CHANGES_COUNT,
   "target_areas": "$TARGET_AREAS",
@@ -336,7 +343,7 @@ main() {
     cd "$REPO_ROOT"
 
     log "Starting Autopilot L1 scan..."
-    log "Config: max_changes=$MAX_CHANGES, dry_run=$DRY_RUN, areas=$TARGET_AREAS"
+    log "Config: project=$PROJECT, max_changes=$MAX_CHANGES, dry_run=$DRY_RUN, areas=$TARGET_AREAS"
 
     # Scan for improvements based on target areas
     IFS=',' read -ra AREAS <<< "$TARGET_AREAS"

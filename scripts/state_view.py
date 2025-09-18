@@ -52,18 +52,43 @@ def as_list(v):
 def main():
     ap = argparse.ArgumentParser(description="Generate C/G/δ view from STATE")
     ap.add_argument(
+        "--project",
+        dest="project",
+        default="vpm-mini",
+        help="Project namespace (default: vpm-mini)",
+    )
+    ap.add_argument(
         "--in",
         dest="inp",
-        default="STATE/current_state.md",
-        help="Input STATE file (default: STATE/current_state.md)",
+        default=None,
+        help="Input STATE file (default: STATE/<project>/current_state.md)",
     )
     ap.add_argument(
         "--out",
         dest="outp",
         default=None,
-        help="Output file (default: reports/p2_state_view_YYYYMMDD_HHMM.md)",
+        help="Output file (default: reports/<project>/state_view_YYYYMMDD_HHMM.md)",
     )
     args = ap.parse_args()
+
+    # Set default input path based on project
+    if args.inp is None:
+        args.inp = f"STATE/{args.project}/current_state.md"
+
+    # Validate project namespace exists
+    project_state_dir = pathlib.Path(f"STATE/{args.project}")
+    if not project_state_dir.exists():
+        print(
+            f"[state-view] project namespace not found: {args.project}", file=sys.stderr
+        )
+        print(f"[state-view] directory missing: {project_state_dir}", file=sys.stderr)
+        print("[state-view] available projects:", file=sys.stderr)
+        state_dir = pathlib.Path("STATE")
+        if state_dir.exists():
+            for p in state_dir.iterdir():
+                if p.is_dir():
+                    print(f"  - {p.name}", file=sys.stderr)
+        sys.exit(1)
 
     src = pathlib.Path(args.inp)
     if not src.exists():
@@ -88,7 +113,7 @@ def main():
     outp = (
         pathlib.Path(args.outp)
         if args.outp
-        else pathlib.Path(f"reports/p2_state_view_{now}.md")
+        else pathlib.Path(f"reports/{args.project}/state_view_{now}.md")
     )
 
     # Ensure reports directory exists
@@ -137,6 +162,7 @@ def main():
             "",
             "---",
             f"Generated: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            f"Project: {args.project}",
             f"Source: {src}",
             f"Total tasks: {len(tasks)}",
         ]
