@@ -1,10 +1,13 @@
-# VPM-Mini Trial State
-
+# === State Declaration (Single Source of Truth) ===
 active_repo: vpm-mini
 active_branch: main
-phase: Phase 5 (Scaling & Migration)
-context_header: repo=vpm-mini / branch=main / phase=Phase 5 Trial
-short_goal: Complete P5-5 Consumer Injection and advance to P5-6 Observability
+phase: Phase 2
+context_header: "repo=vpm-mini / branch=main / phase=Phase 2"
+short_goal: "Phase 2 Kickoff (kind + Knative 足場構築)"
+exit_criteria:
+  - "P2-1 GREEN: kind + Knative (v1.18) 足場構築スクリプトが動作"
+  - "P2-2 GREEN: Hello KService デプロイ成功 (kubectl get ksvc hello → READY=True)"
+updated_at: 2025-09-19T00:00+09:00
 
 ## Phase Progress
 - **P1** (Foundation): ✅ GREEN  
@@ -31,17 +34,9 @@ short_goal: Complete P5-5 Consumer Injection and advance to P5-6 Observability
 - P5-2 UI: reports/ui_manual_evidence_20250916_153047.md
 - P5-4 Vault: reports/p5_4_secrets_vault_verify_20250916_171916.md
 
-## exit_criteria
-- P5-5 Consumer Injection completed with evidence
-- Secret consumption verified in running pods
-- KService secretKeyRef integration tested
-- P5-6 Observability Line ready for execution
 
 ## 優先タスク
-- Consumer workload selection: Identify which service needs secrets
-- Secret preparation: Create production secret in Vault (API keys, DB credentials)
-- KService injection: Add secretKeyRef to selected service
-- End-to-end test: Verify secret available in pod environment
-- Evidence collection: Document consumption via pod exec
+- P2-1: kind + Knative 足場構築（infra/kind-dev/kind-cluster.yaml、scripts/p2_bootstrap_kind_knative.sh、CIバリデーション）
+- P2-2: Hello KService デプロイ（infra/k8s/overlays/dev/hello-ksvc.yaml、READY=True証跡）
 
 Updated: 2025-09-16T20:23:15Z

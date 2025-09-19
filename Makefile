@@ -86,7 +86,12 @@ trial-ui-smoke-port:
 
 # === State View ===
 PROJECT ?= vpm-mini
+PYTHON  ?= python3
 
-.PHONY: state-view
+.PHONY: state-view phase-guard
+
 state-view:
-	python3 scripts/state_view.py --project $(PROJECT)
+	$(PYTHON) scripts/state_view.py --project $(PROJECT)
+
+phase-guard:
+	PHASE_ALLOWED="Phase 2" $(PYTHON) scripts/phase_guard.py --project $(PROJECT)

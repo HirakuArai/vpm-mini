@@ -1,0 +1,43 @@
+name: Phase Guard - Drift Detection
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'STATE/**'
+      - 'scripts/phase_guard.py'
+      - '.github/workflows/phase_guard.yml'
+
+jobs:
+  phase-guard:
+    runs-on: ubuntu-latest
+    name: Detect Phase Drift
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Run phase guard
+      run: make phase-guard
+
+    - name: Summary
+      if: always()
+      run: |
+        echo "## Phase Guard Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        if [ $? -eq 0 ]; then
+          echo "✅ **Phase validation passed**" >> $GITHUB_STEP_SUMMARY
+          echo "- Current phase is within allowed values" >> $GITHUB_STEP_SUMMARY
+          echo "- No phase drift detected" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Phase drift detected**" >> $GITHUB_STEP_SUMMARY
+          echo "- Phase validation failed" >> $GITHUB_STEP_SUMMARY
+          echo "- Check the logs above for details" >> $GITHUB_STEP_SUMMARY
+          echo "- Fix the phase in STATE file before merging" >> $GITHUB_STEP_SUMMARY
+        fi
