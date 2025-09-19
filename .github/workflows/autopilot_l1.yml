@@ -19,6 +19,21 @@ on:
         default: 'vpm-mini'
         type: string
 
+  workflow_call:
+    inputs:
+      project:
+        required: false
+        type: string
+        default: 'vpm-mini'
+      dry_run:
+        required: false
+        type: boolean
+        default: true
+      max_lines:
+        required: false
+        type: string
+        default: '3'
+
   # Schedule for automated runs (disabled by default)
   # schedule:
   #   - cron: '0 9 * * 1-5'  # Weekdays at 9 AM UTC
