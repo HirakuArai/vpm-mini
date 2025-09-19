@@ -90,3 +90,8 @@ PROJECT ?= vpm-mini
 .PHONY: state-view
 state-view:
 	python3 scripts/state_view.py --project $(PROJECT)
+
+# === Phase Guard ===
+.PHONY: phase-guard
+phase-guard:
+	python3 scripts/phase_guard.py --project $(PROJECT)

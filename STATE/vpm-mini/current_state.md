@@ -2,8 +2,8 @@
 
 active_repo: vpm-mini
 active_branch: main
-phase: Phase 5 (Scaling & Migration)
-context_header: repo=vpm-mini / branch=main / phase=Phase 5 Trial
+phase: Phase 2
+context_header: repo=vpm-mini / branch=main / phase=Phase 2
 short_goal: Complete P5-5 Consumer Injection and advance to P5-6 Observability
 
 ## Phase Progress
