@@ -46,6 +46,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      actions: read
       issues: read
 
     steps:
@@ -70,11 +71,11 @@ jobs:
         # Make script executable
         chmod +x scripts/autopilot_l1.sh
 
-        # Run autopilot with input parameters
+        # Run autopilot with input parameters (unified dispatch/call)
         ./scripts/autopilot_l1.sh \
-          --project="${{ github.event.inputs.project || 'vpm-mini' }}" \
-          --dry-run="${{ github.event.inputs.dry_run || 'true' }}" \
-          --max-lines="${{ github.event.inputs.max_lines || '3' }}"
+          --project="${{ inputs.project || github.event.inputs.project || 'vpm-mini' }}" \
+          --dry-run="${{ inputs.dry_run || github.event.inputs.dry_run || 'true' }}" \
+          --max-lines="${{ inputs.max_lines || github.event.inputs.max_lines || '3' }}"
 
     - name: Check scan results
       id: results
@@ -107,19 +108,21 @@ print(data.get('scan_results', {}).get('changes_identified', 0))
     - name: Upload scan results
       uses: actions/upload-artifact@v4
       with:
-        name: autopilot-l1-results
+        name: autopilot-l1-${{ inputs.project || github.event.inputs.project || 'vpm-mini' }}-${{ github.run_id }}
         path: |
           reports/autopilot_l1_*.md
           reports/autopilot_l1_*.json
+          reports/${{ inputs.project || github.event.inputs.project || 'vpm-mini' }}/state_view_*.md
         retention-days: 30
+        if-no-files-found: warn
 
     - name: Summary
       run: |
         echo "## Autopilot L1 Execution Summary" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "- **Mode**: ${{ github.event.inputs.dry_run == 'true' && 'Dry Run' || 'Live Execution' }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Project**: ${{ github.event.inputs.project || 'vpm-mini' }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Max Lines**: ${{ github.event.inputs.max_lines || '3' }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Mode**: ${{ (inputs.dry_run || github.event.inputs.dry_run || 'true') == 'true' && 'Dry Run' || 'Live Execution' }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Project**: ${{ inputs.project || github.event.inputs.project || 'vpm-mini' }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Max Lines**: ${{ inputs.max_lines || github.event.inputs.max_lines || '3' }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Changes Found**: ${{ steps.results.outputs.changes_found }}" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         if [ -n "${{ steps.results.outputs.json_file }}" ]; then
