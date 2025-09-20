@@ -44,8 +44,11 @@ on:
 
 jobs:
   autopilot-scan:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-22.04
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_call'
+    defaults:
+      run:
+        shell: bash
 
     permissions:
       contents: write
@@ -57,21 +60,28 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        fetch-depth: 50  # Sufficient history for change analysis
+        fetch-depth: 0  # Full history for consistency with debug
 
     - name: Preflight (env&inputs)
       run: |
         set -euxo pipefail
+        echo "=== Environment Info ==="
         echo "whoami=$(whoami)"
         echo "pwd=$(pwd)"
         echo "runner.os=${{ runner.os }}"
         echo "git version: $(git --version)"
         echo "python version: $(python3 --version)"
+        echo ""
+        echo "=== Input Resolution ==="
         echo "inputs.project=${{ inputs.project || github.event.inputs.project || 'vpm-mini' }}"
         echo "inputs.dry_run=${{ inputs.dry_run || github.event.inputs.dry_run || true }}"
         echo "inputs.max_lines=${{ inputs.max_lines || github.event.inputs.max_lines || 3 }}"
+        echo ""
+        echo "=== Git Configuration ==="
         git config --global core.autocrlf input
         git status --porcelain || true
+        echo ""
+        echo "=== Directory Structure ==="
         ls -la
         ls -la scripts || true
 
@@ -91,12 +101,16 @@ jobs:
         set -euxo pipefail
         chmod +x scripts/autopilot_l1.sh scripts/run_codex.sh || true
         mkdir -p reports/${{ inputs.project || github.event.inputs.project || 'vpm-mini' }}
+        mkdir -p reports/_runner_logs
 
-        # Run autopilot with input parameters (unified dispatch/call)
+        # Run autopilot with input parameters (unified dispatch/call) - tee to capture stdout
+        echo "=== Autopilot L1 Execution Starting ==="
         ./scripts/autopilot_l1.sh \
           --project="${{ inputs.project || github.event.inputs.project || 'vpm-mini' }}" \
           --dry-run="${{ inputs.dry_run || github.event.inputs.dry_run || 'true' }}" \
-          --max-lines="${{ inputs.max_lines || github.event.inputs.max_lines || '3' }}"
+          --max-lines="${{ inputs.max_lines || github.event.inputs.max_lines || '3' }}" \
+          | tee reports/_runner_logs/autopilot_l1_stdout.log
+        echo "=== Autopilot L1 Execution Complete ==="
 
     - name: Check scan results
       id: results
@@ -130,8 +144,14 @@ print(data.get('scan_results', {}).get('changes_identified', 0))
       if: always()
       run: |
         mkdir -p reports/_runner_logs
+        echo "=== Collecting All Logs and Reports ==="
         cp -r reports/* reports/_runner_logs/ 2>/dev/null || true
         echo "job.conclusion=${{ job.status }}" > reports/_runner_logs/summary.txt
+        echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> reports/_runner_logs/summary.txt
+        echo "runner=ubuntu-22.04" >> reports/_runner_logs/summary.txt
+        echo "project=${{ inputs.project || github.event.inputs.project || 'vpm-mini' }}" >> reports/_runner_logs/summary.txt
+        echo "dry_run=${{ inputs.dry_run || github.event.inputs.dry_run || 'true' }}" >> reports/_runner_logs/summary.txt
+        echo "max_lines=${{ inputs.max_lines || github.event.inputs.max_lines || '3' }}" >> reports/_runner_logs/summary.txt
 
     - name: Upload scan results
       uses: actions/upload-artifact@v4
