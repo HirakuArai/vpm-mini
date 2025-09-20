@@ -1,81 +1,102 @@
-name: Autopilot L1 — Manual Shim
-
-defaults:
-  run:
-    shell: bash
+name: Autopilot L1 — Manual Shim (direct)
 
 on:
   workflow_dispatch:
     inputs:
       project:
+        type: string
+        default: "vpm-mini"
         description: 'Project namespace'
-        required: false
-        default: 'vpm-mini'
-        type: string
       dry_run:
-        description: 'Do not create PR (preview only)'
-        required: false
-        default: true
         type: boolean
+        default: true
+        description: 'Dry run mode'
       max_lines:
-        description: 'Maximum lines per run'
-        required: false
-        default: '3'
         type: string
+        default: "3"
+        description: 'Maximum lines per run'
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
-  call-l1:
-    # Reusable workflow 呼び出しをフル参照（repo@main）に切替
-    uses: HirakuArai/vpm-mini/.github/workflows/autopilot_l1.yml@main
-    with:
-      project: ${{ inputs.project }}
-      dry_run: ${{ inputs.dry_run }}
-      max_lines: ${{ inputs.max_lines }}
-    # 呼び出し側→呼び出され側へシークレットを引き継ぐ
-    secrets: inherit  # pragma: allowlist secret
-
-  # === Plan-B: 直接実行（reusable を使わず本体手順をここで回す） ===
-  call-direct:
-    if: ${{ always() && true }}  # 直接実行を有効化
+  run:
     runs-on: ubuntu-22.04
-    permissions:
-      contents: write
-      pull-requests: write
-      actions: read
-    defaults:
-      run:
-        shell: bash
     steps:
       - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
+        with:
+          fetch-depth: 0
+
       - uses: actions/setup-python@v5
-        with: { python-version: '3.x' }
-      - name: Preflight (env&inputs)
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install PyYAML requests
+
+      - name: Preflight (env & inputs)
         run: |
           set -euxo pipefail
-          echo "project=${{ inputs.project }}"
-          echo "dry_run=${{ inputs.dry_run }}"
-          echo "max_lines=${{ inputs.max_lines }}"
+          echo "=== Environment Info ==="
+          echo "whoami=$(whoami)"
+          echo "pwd=$(pwd)"
+          echo "runner.os=${{ runner.os }}"
+          echo "git version: $(git --version)"
+          echo "python version: $(python3 --version)"
+          echo ""
+          echo "=== Input Resolution ==="
+          echo "project=${{ github.event.inputs.project }}"
+          echo "dry_run=${{ github.event.inputs.dry_run }}"
+          echo "max_lines=${{ github.event.inputs.max_lines }}"
+          echo ""
+          echo "=== Git Configuration ==="
           git config --global core.autocrlf input
-          ls -la; ls -la scripts || true
-      - name: Run Autopilot L1 (inline)
+          echo ""
+          echo "=== Directory Structure ==="
+          ls -la
+          ls -la scripts || true
+          ls -la prompts || true
+
+      - name: Run Autopilot L1 (direct)
         run: |
           set -euxo pipefail
           chmod +x scripts/autopilot_l1.sh scripts/run_codex.sh || true
-          mkdir -p reports/${{ inputs.project }}
+          mkdir -p "reports/${{ github.event.inputs.project }}"
           mkdir -p reports/_runner_logs
           ./scripts/autopilot_l1.sh \
-            --project   "${{ inputs.project }}" \
-            --dry-run   "${{ inputs.dry_run }}" \
-            --max-lines "${{ inputs.max_lines }}" | tee reports/_runner_logs/autopilot_l1_stdout.log
+            --project   "${{ github.event.inputs.project }}" \
+            --dry-run   "${{ github.event.inputs.dry_run }}" \
+            --max-lines "${{ github.event.inputs.max_lines }}" \
+          | tee reports/_runner_logs/autopilot_l1_stdout.log
+
+      - name: Collect logs
+        if: always()
+        run: |
+          mkdir -p reports/_runner_logs
+          echo "job.conclusion=${{ job.status }}" > reports/_runner_logs/summary.txt
+          echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> reports/_runner_logs/summary.txt
+          echo "runner=ubuntu-22.04" >> reports/_runner_logs/summary.txt
+          echo "project=${{ github.event.inputs.project }}" >> reports/_runner_logs/summary.txt
+          echo "dry_run=${{ github.event.inputs.dry_run }}" >> reports/_runner_logs/summary.txt
+          echo "max_lines=${{ github.event.inputs.max_lines }}" >> reports/_runner_logs/summary.txt
+
       - name: Upload Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: autopilot-l1-direct-${{ github.run_id }}
+          name: autopilot-l1-manual-${{ github.run_id }}
           path: |
             reports/autopilot_l1_update_*.md
-            reports/${{ inputs.project }}/state_view_*.md
+            reports/${{ github.event.inputs.project }}/state_view_*.md
             reports/autopilot_l1_*.json
             reports/_runner_logs/**
+          retention-days: 7
           if-no-files-found: warn
