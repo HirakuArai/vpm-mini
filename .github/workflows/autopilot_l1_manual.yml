@@ -36,7 +36,7 @@ jobs:
 
   # === Plan-B: 直接実行（reusable を使わず本体手順をここで回す） ===
   call-direct:
-    if: ${{ always() && false }} # ← まずは無効。必要になったら true に切替
+    if: ${{ always() && true }}  # 直接実行を有効化
     runs-on: ubuntu-22.04
     permissions:
       contents: write
@@ -63,6 +63,7 @@ jobs:
           set -euxo pipefail
           chmod +x scripts/autopilot_l1.sh scripts/run_codex.sh || true
           mkdir -p reports/${{ inputs.project }}
+          mkdir -p reports/_runner_logs
           ./scripts/autopilot_l1.sh \
             --project   "${{ inputs.project }}" \
             --dry-run   "${{ inputs.dry_run }}" \
