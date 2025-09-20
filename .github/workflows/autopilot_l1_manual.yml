@@ -21,6 +21,10 @@ on:
 
 jobs:
   call-l1:
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: read
     uses: ./.github/workflows/autopilot_l1.yml
     with:
       project: ${{ inputs.project }}
