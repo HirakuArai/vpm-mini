@@ -1,0 +1,154 @@
+name: Autopilot L1 — Debug
+
+on:
+  workflow_dispatch:
+    inputs:
+      project:
+        type: string
+        description: 'Project namespace'
+        default: 'vpm-mini'
+        required: false
+      dry_run:
+        type: boolean
+        description: 'Dry run mode'
+        default: true
+        required: false
+      max_lines:
+        type: string
+        description: 'Max lines per run'
+        default: '3'
+        required: false
+
+jobs:
+  debug:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+      actions: read
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Environment Diagnostics
+        run: |
+          set -euxo pipefail
+          echo "=== Environment Info ==="
+          echo "Runner OS: ${{ runner.os }}"
+          echo "Runner: ubuntu-22.04 (fixed)"
+          echo "GitHub Event Name: ${{ github.event_name }}"
+          echo "GitHub Ref: ${{ github.ref }}"
+          echo "GitHub SHA: ${{ github.sha }}"
+          echo ""
+          echo "=== System Info ==="
+          echo "whoami: $(whoami)"
+          echo "pwd: $(pwd)"
+          echo "git version: $(git --version)"
+          echo "python version: $(python3 --version)"
+          echo "bash version: $(bash --version | head -1)"
+          echo ""
+          echo "=== Input Resolution ==="
+          echo "project=${{ github.event.inputs.project }}"
+          echo "dry_run=${{ github.event.inputs.dry_run }}"
+          echo "max_lines=${{ github.event.inputs.max_lines }}"
+          echo ""
+          echo "=== Directory Structure ==="
+          ls -la
+          echo ""
+          echo "=== Scripts Directory ==="
+          ls -la scripts/ || echo "scripts/ directory not found"
+          echo ""
+          echo "=== STATE Directory ==="
+          ls -la STATE/ || echo "STATE/ directory not found"
+          ls -la STATE/${{ github.event.inputs.project }}/ || echo "STATE/${{ github.event.inputs.project }}/ not found"
+
+      - name: Git Configuration
+        run: |
+          set -euxo pipefail
+          echo "=== Git Configuration ==="
+          git config --global core.autocrlf input
+          git config --global --list | grep -E "(core|user)" || true
+          echo ""
+          echo "=== Repository Status ==="
+          git status --porcelain || true
+          git rev-parse HEAD
+
+      - name: Python Dependencies Check
+        run: |
+          set -euxo pipefail
+          echo "=== Python Environment ==="
+          which python3
+          python3 -m pip list | head -20
+          echo ""
+          echo "=== Check Required Python Modules ==="
+          python3 -c "import sys; print('Python path:', sys.path)"
+          python3 -c "import os; print('Environment:', dict(os.environ))" | head -50
+
+      - name: Preflight-only (Phase Guard & State View)
+        run: |
+          set -euxo pipefail
+          echo "=== Phase Guard Execution ==="
+          echo "Running: make phase-guard PROJECT=${{ github.event.inputs.project }}"
+          make phase-guard PROJECT="${{ github.event.inputs.project }}" || {
+            echo "ERROR: Phase guard failed with exit code $?"
+            echo "Checking if Makefile exists:"
+            ls -la Makefile || echo "Makefile not found!"
+            echo "Checking if phase_guard.py exists:"
+            ls -la scripts/phase_guard.py || echo "scripts/phase_guard.py not found!"
+            exit 1
+          }
+
+          echo ""
+          echo "=== State View Execution ==="
+          echo "Running: make state-view PROJECT=${{ github.event.inputs.project }}"
+          make state-view PROJECT="${{ github.event.inputs.project }}" || {
+            echo "ERROR: State view failed with exit code $?"
+            echo "Checking if state_view.py exists:"
+            ls -la scripts/state_view.py || echo "scripts/state_view.py not found!"
+            exit 1
+          }
+
+          echo ""
+          echo "=== Copy Results to Debug Directory ==="
+          mkdir -p reports/_debug
+          echo "Copying state_view files..."
+          cp -rv reports/${{ github.event.inputs.project }}/state_view_* reports/_debug/ 2>&1 || {
+            echo "WARNING: No state_view files found to copy"
+            echo "Listing reports directory:"
+            ls -la reports/ || echo "reports/ not found"
+            ls -la reports/${{ github.event.inputs.project }}/ || echo "reports/${{ github.event.inputs.project }}/ not found"
+          }
+
+      - name: Collect All Debug Info
+        if: always()
+        run: |
+          mkdir -p reports/_debug
+          echo "=== Debug Summary ===" > reports/_debug/debug_summary.txt
+          echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> reports/_debug/debug_summary.txt
+          echo "Job Status: ${{ job.status }}" >> reports/_debug/debug_summary.txt
+          echo "Runner: ubuntu-22.04" >> reports/_debug/debug_summary.txt
+          echo "Project: ${{ github.event.inputs.project }}" >> reports/_debug/debug_summary.txt
+          echo "Dry Run: ${{ github.event.inputs.dry_run }}" >> reports/_debug/debug_summary.txt
+          echo "Max Lines: ${{ github.event.inputs.max_lines }}" >> reports/_debug/debug_summary.txt
+          echo "" >> reports/_debug/debug_summary.txt
+          echo "=== Directory Tree ===" >> reports/_debug/debug_summary.txt
+          find . -type f -name "*.py" -o -name "*.sh" -o -name "*.yml" -o -name "*.yaml" | head -100 >> reports/_debug/debug_summary.txt || true
+
+      - name: Upload Debug Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autopilot-l1-debug-${{ github.run_id }}
+          path: reports/**
+          retention-days: 7
+          if-no-files-found: warn
