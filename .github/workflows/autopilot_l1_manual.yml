@@ -67,8 +67,7 @@ jobs:
           ./scripts/autopilot_l1.sh \
             --project   "${{ inputs.project }}" \
             --dry-run   "${{ inputs.dry_run }}" \
-            --max-lines "${{ inputs.max_lines }}" \
-          | tee reports/_runner_logs/autopilot_l1_stdout.log
+            --max-lines "${{ inputs.max_lines }}" | tee reports/_runner_logs/autopilot_l1_stdout.log
       - name: Upload Artifacts
         if: always()
         uses: actions/upload-artifact@v4
