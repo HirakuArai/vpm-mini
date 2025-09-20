@@ -1,5 +1,9 @@
 name: Autopilot L1 (preflight)
 
+defaults:
+  run:
+    shell: bash
+
 on:
   workflow_dispatch:
     inputs:
@@ -55,6 +59,22 @@ jobs:
       with:
         fetch-depth: 50  # Sufficient history for change analysis
 
+    - name: Preflight (env&inputs)
+      run: |
+        set -euxo pipefail
+        echo "whoami=$(whoami)"
+        echo "pwd=$(pwd)"
+        echo "runner.os=${{ runner.os }}"
+        echo "git version: $(git --version)"
+        echo "python version: $(python3 --version)"
+        echo "inputs.project=${{ inputs.project || github.event.inputs.project || 'vpm-mini' }}"
+        echo "inputs.dry_run=${{ inputs.dry_run || github.event.inputs.dry_run || true }}"
+        echo "inputs.max_lines=${{ inputs.max_lines || github.event.inputs.max_lines || 3 }}"
+        git config --global core.autocrlf input
+        git status --porcelain || true
+        ls -la
+        ls -la scripts || true
+
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
@@ -68,8 +88,9 @@ jobs:
     - name: Run autopilot scan
       id: scan
       run: |
-        # Make script executable
-        chmod +x scripts/autopilot_l1.sh
+        set -euxo pipefail
+        chmod +x scripts/autopilot_l1.sh scripts/run_codex.sh || true
+        mkdir -p reports/${{ inputs.project || github.event.inputs.project || 'vpm-mini' }}
 
         # Run autopilot with input parameters (unified dispatch/call)
         ./scripts/autopilot_l1.sh \
@@ -101,9 +122,16 @@ print(data.get('scan_results', {}).get('changes_identified', 0))
       run: |
         echo "🚧 Autopilot L1 placeholder: PR creation disabled until real implementation"
         echo "Changes would have been applied with:"
-        echo "- Project: ${{ github.event.inputs.project || 'vpm-mini' }}"
-        echo "- Max Lines: ${{ github.event.inputs.max_lines || '3' }}"
+        echo "- Project: ${{ inputs.project || github.event.inputs.project || 'vpm-mini' }}"
+        echo "- Max Lines: ${{ inputs.max_lines || github.event.inputs.max_lines || '3' }}"
         echo "- Changes Found: ${{ steps.results.outputs.changes_found }}"
+
+    - name: Collect logs
+      if: always()
+      run: |
+        mkdir -p reports/_runner_logs
+        cp -r reports/* reports/_runner_logs/ 2>/dev/null || true
+        echo "job.conclusion=${{ job.status }}" > reports/_runner_logs/summary.txt
 
     - name: Upload scan results
       uses: actions/upload-artifact@v4
@@ -113,6 +141,7 @@ print(data.get('scan_results', {}).get('changes_identified', 0))
           reports/autopilot_l1_*.md
           reports/autopilot_l1_*.json
           reports/${{ inputs.project || github.event.inputs.project || 'vpm-mini' }}/state_view_*.md
+          reports/_runner_logs/
         retention-days: 30
         if-no-files-found: warn
 
