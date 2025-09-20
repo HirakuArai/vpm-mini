@@ -25,13 +25,57 @@ on:
 
 jobs:
   call-l1:
-    permissions:
-      contents: write
-      pull-requests: write
-      actions: read
-    uses: ./.github/workflows/autopilot_l1.yml
+    # Reusable workflow 呼び出しをフル参照（repo@main）に切替
+    uses: HirakuArai/vpm-mini/.github/workflows/autopilot_l1.yml@main
     with:
       project: ${{ inputs.project }}
       dry_run: ${{ inputs.dry_run }}
       max_lines: ${{ inputs.max_lines }}
+    # 呼び出し側→呼び出され側へシークレットを引き継ぐ
     secrets: inherit  # pragma: allowlist secret
+
+  # === Plan-B: 直接実行（reusable を使わず本体手順をここで回す） ===
+  call-direct:
+    if: ${{ always() && false }} # ← まずは無効。必要になったら true に切替
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: read
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.x' }
+      - name: Preflight (env&inputs)
+        run: |
+          set -euxo pipefail
+          echo "project=${{ inputs.project }}"
+          echo "dry_run=${{ inputs.dry_run }}"
+          echo "max_lines=${{ inputs.max_lines }}"
+          git config --global core.autocrlf input
+          ls -la; ls -la scripts || true
+      - name: Run Autopilot L1 (inline)
+        run: |
+          set -euxo pipefail
+          chmod +x scripts/autopilot_l1.sh scripts/run_codex.sh || true
+          mkdir -p reports/${{ inputs.project }}
+          ./scripts/autopilot_l1.sh \
+            --project   "${{ inputs.project }}" \
+            --dry-run   "${{ inputs.dry_run }}" \
+            --max-lines "${{ inputs.max_lines }}" \
+          | tee reports/_runner_logs/autopilot_l1_stdout.log
+      - name: Upload Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autopilot-l1-direct-${{ github.run_id }}
+          path: |
+            reports/autopilot_l1_update_*.md
+            reports/${{ inputs.project }}/state_view_*.md
+            reports/autopilot_l1_*.json
+            reports/_runner_logs/**
+          if-no-files-found: warn
