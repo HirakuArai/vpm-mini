@@ -45,7 +45,7 @@ on:
 jobs:
   autopilot-scan:
     runs-on: ubuntu-22.04
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_call'
     defaults:
       run:
         shell: bash
