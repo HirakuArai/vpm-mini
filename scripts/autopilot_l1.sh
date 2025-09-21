@@ -157,21 +157,43 @@ JSON
   exit 0
 fi
 
-# 4-1) ブランチ作成
-BR="autopilot/l1-${PROJECT}-${RUN_AT}"
-git switch -c "$BR"
+# 4-1) Git config (CI環境向け)
+git config --local user.email "autopilot@example.com"
+git config --local user.name "Autopilot L1"
 
-# 4-2) パッチ適用（安全に）
+# 4-2) ユニークなブランチ名
+SAFE_TS="$(date +%Y%m%d_%H%M%S)"
+BR="autopilot/l1-${PROJECT}-${SAFE_TS}"
+
+# 4-3) ベースブランチを最新化
+git fetch origin main
+git pull origin main --rebase || true
+
+# 4-4) ブランチ作成（すでに存在したらチェックアウト）
+if git show-ref --verify --quiet "refs/heads/${BR}"; then
+  echo "[autopilot_l1] branch ${BR} already exists; checking out"
+  git switch "$BR"
+else
+  git switch -c "$BR"
+fi
+
+# 4-5) パッチ適用（事前チェック + 本適用）
+if ! git apply --check "$PATCH"; then
+  echo "[autopilot_l1] patch validation failed; aborting"
+  git switch -
+  exit 1
+fi
+
 if ! git apply --index "$PATCH"; then
   echo "[autopilot_l1] git apply failed; aborting"
   git switch -
   exit 1
 fi
 
-# 4-3) コミット
+# 4-6) コミット
 git commit -m "chore(autopilot-l1): small maintenance (≤${MAX_LINES} lines, ${PROJECT})"
 
-# 4-4) Evidence 追記
+# 4-7) Evidence 追記
 {
   echo "# Autopilot L1 Update (live)"
   echo "- project: ${PROJECT}"
@@ -187,8 +209,13 @@ git commit -m "chore(autopilot-l1): small maintenance (≤${MAX_LINES} lines, ${
 git add "$EVID_MD"
 git commit -m "docs(reports): add L1 live evidence ${RUN_AT}" || true
 
-# 4-5) Push & PR 作成（gh CLI）
-git push -u origin "$BR"
+# 4-8) Push（リモート存在チェック込み）
+if git ls-remote --exit-code origin "$BR" >/dev/null 2>&1; then
+  echo "[autopilot_l1] remote branch ${BR} already exists; force-pushing"
+  git push --force-with-lease origin "$BR"
+else
+  git push -u origin "$BR"
+fi
 
 PR_TITLE="chore(autopilot-l1): ${PROJECT} small maintenance (≤${MAX_LINES} lines)"
 PR_BODY="$(cat <<EOF
