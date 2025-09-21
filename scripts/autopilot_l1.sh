@@ -253,6 +253,15 @@ EOF
 
 PR_URL=$(gh pr create --title "$PR_TITLE" --body "$PR_BODY" --base main --head "$BR" || echo "")
 
+# Try to read PR URL; if empty, fallback to REST API
+if [[ -z "$PR_URL" ]]; then
+  echo "[autopilot_l1] gh pr create returned no URL, trying REST fallback..."
+  REPO_FULL="$(git config --get remote.origin.url | sed -E 's#^.+github.com[:/](.+/.+)\.git$#\1#')"
+  PR_URL="$(gh api "repos/$REPO_FULL/pulls" \
+    -f title="$PR_TITLE" -f body="$PR_BODY" -f base="main" -f head="$BR" \
+    --jq .html_url 2>/dev/null || echo "")"
+fi
+
 # Record PR creation in JSON
 cat > "$EVID_JSON" <<JSON
 {
@@ -269,4 +278,4 @@ cat > "$EVID_JSON" <<JSON
 }
 JSON
 
-echo "[autopilot_l1] live: PR created → $PR_URL"
+echo "[autopilot_l1] live: PR created → ${PR_URL:-"(URL unknown)"}"

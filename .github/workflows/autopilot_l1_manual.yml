@@ -67,13 +67,14 @@ jobs:
 
       - name: Run Autopilot L1 (direct)
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # BOT_TOKEN があれば優先。無ければ既定の GITHUB_TOKEN を使用
+          GH_TOKEN: ${{ secrets.BOT_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           set -euxo pipefail
           chmod +x scripts/autopilot_l1.sh scripts/run_codex.sh || true
           mkdir -p "reports/${{ github.event.inputs.project }}"
           mkdir -p reports/_runner_logs
-          echo "[auth] gh auth status (expect: Logged in to github.com as github-actions[bot])"
+          echo "[auth] gh auth status (expect: Logged in)"
           gh auth status || true
           ./scripts/autopilot_l1.sh \
             --project   "${{ github.event.inputs.project }}" \
