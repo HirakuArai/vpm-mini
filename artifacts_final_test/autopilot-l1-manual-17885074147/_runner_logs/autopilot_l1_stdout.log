@@ -1,0 +1,2 @@
+PHASE_ALLOWED="Phase 2" python3 scripts/phase_guard.py --project vpm-mini
+python3 scripts/state_view.py --project vpm-mini

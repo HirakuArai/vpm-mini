@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-09-21T01:06:13Z",
+  "project": "vpm-mini",
+  "dry_run": false,
+  "max_lines": 3,
+  "preflight": {
+    "phase_guard": "PASSED",
+    "state_view": "reports/vpm-mini/state_view_20250921_0106.md"
+  },
+  "scan_results": {
+    "changes_identified": 0,
+    "changes_applied": 0,
+    "status": "simulated"
+  }
+}
