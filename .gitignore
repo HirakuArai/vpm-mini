@@ -17,3 +17,8 @@ venv/
 # hand-off: 最新指示は追跡しない、巨大ログは追跡しない
 ops/agent_handoff/task.json
 reports/codex_run_*.log
+
+# demo artifacts
+reports/*.png
+reports/mna_update_*.md
+reports/icr_history.csv
