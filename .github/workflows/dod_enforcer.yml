@@ -11,26 +11,7 @@ jobs:
     name: Enforce DoD Compliance
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Wait for Evidence from pr-validate
-        shell: bash
+      - name: Delegate to pr-validate gate
         run: |
-          set -euo pipefail
-          PR="${{ github.event.pull_request.number }}"
-          for i in {1..40}; do
-            git fetch origin "pull/${PR}/head:prhead" >/dev/null 2>&1 || true
-            git checkout -q prhead || true
-            if ls reports/p2_2_hello[-_]ksvc_*.md >/dev/null 2>&1; then
-              echo "Evidence found"; break
-            fi
-            echo "Evidence not yet present; waiting 15s... ($i/40)"
-            sleep 15
-          done
-          ls reports/p2_2_hello[-_]ksvc_*.md >/dev/null 2>&1 || { echo "Evidence timeout"; exit 1; }
-
-      - name: Enforce DoD
-        shell: bash
-        run: bash scripts/dod_enforcer.sh
+          echo "DoD is enforced by 'pr-validate / evidence-dod'. This legacy gate is a shim."
+          exit 0
