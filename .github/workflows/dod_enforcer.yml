@@ -1,17 +1,9 @@
-name: DoD Enforcer
+name: (disabled) DoD Enforcer
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-
-permissions:
-  contents: read
+  workflow_dispatch: {}
 
 jobs:
-  enforce:
-    name: Enforce DoD Compliance
+  noop:
     runs-on: ubuntu-latest
     steps:
-      - name: Delegate to pr-validate gate
-        run: |
-          echo "DoD is enforced by 'pr-validate / evidence-dod'. This legacy gate is a shim."
-          exit 0
+      - run: echo "This legacy workflow is disabled; DoD is enforced by PR Validate / evidence-dod."
