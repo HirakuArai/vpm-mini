@@ -1,4 +1,4 @@
-name: PR Validate - Heavy Verification
+name: pr-validate
 
 on:
   pull_request:
@@ -11,7 +11,8 @@ permissions:
   checks: write
 
 jobs:
-  k8s-dry-run:
+  k8s-validate:
+    name: k8s-validate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,7 +30,9 @@ jobs:
           echo "✅ Kustomize build passed ($(wc -l < /tmp/manifest.yaml) lines)"
           echo "Note: kubectl apply --dry-run skipped (requires cluster)"
 
-  knative-ready-check:
+  knative-ready:
+    name: knative-ready
+    needs: [k8s-validate]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -119,8 +122,9 @@ jobs:
           path: /tmp/ksvc_ready.yaml
           if-no-files-found: ignore
 
-  evidence-and-dod:
-    needs: [k8s-dry-run, knative-ready-check]
+  evidence-dod:
+    name: evidence-dod
+    needs: [knative-ready]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
