@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened]
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
   statuses: write
 
@@ -203,7 +203,8 @@ jobs:
             const contexts = [
               {context: 'knative-ready', description: 'Knative READY=True verified'},
               {context: 'Evidence Evidence Files', description: 'Evidence generated'},
-              {context: 'DoD Enforcer Compliance', description: 'DoD passed'}
+              {context: 'DoD Enforcer Compliance', description: 'DoD passed'},
+              {context: 'DoD Enforcer / Enforce DoD Compliance', description: 'DoD passed (evidence-dod)', target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`}
             ];
             for (const c of contexts) {
               await github.rest.repos.createCommitStatus({
@@ -212,6 +213,7 @@ jobs:
                 sha,
                 state: 'success',
                 context: c.context,
-                description: c.description
+                description: c.description,
+                target_url: c.target_url || ''
               });
             }
