@@ -1,0 +1,216 @@
+name: Kai Apply - Plan to PR
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  parse-and-apply:
+    if: |
+      github.event.issue.pull_request == null &&
+      contains(github.event.comment.body, '/approve plan:')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Parse Plan YAML
+        id: parse
+        run: |
+          set -euo pipefail
+
+          COMMENT_BODY=$(cat <<'EOF'
+          ${{ github.event.comment.body }}
+          EOF
+          )
+
+          echo "Parsing plan from comment..."
+          PLAN_YAML=$(echo "$COMMENT_BODY" | sed -n '/```yaml/,/```/p' | sed '1d;$d')
+
+          if [ -z "$PLAN_YAML" ]; then
+            echo "::error::No YAML plan found in comment"
+            exit 1
+          fi
+
+          echo "$PLAN_YAML" > /tmp/plan.yaml
+          cat /tmp/plan.yaml
+
+          PLAN_ID=$(echo "$PLAN_YAML" | grep '^plan_id:' | cut -d: -f2- | xargs)
+          CONTEXT_HEADER=$(echo "$PLAN_YAML" | grep '^context_header:' | cut -d: -f2- | xargs)
+
+          echo "plan_id=$PLAN_ID" >> $GITHUB_OUTPUT
+          echo "context_header=$CONTEXT_HEADER" >> $GITHUB_OUTPUT
+
+      - name: Apply Changes
+        id: apply
+        run: |
+          set -euo pipefail
+
+          PLAN_ID="${{ steps.parse.outputs.plan_id }}"
+          BRANCH_NAME="kai-apply/${PLAN_ID}"
+
+          echo "Creating branch: $BRANCH_NAME"
+          git checkout -b "$BRANCH_NAME"
+
+          python3 << 'PYEOF'
+          import yaml
+          import os
+          import sys
+
+          with open('/tmp/plan.yaml', 'r') as f:
+              plan = yaml.safe_load(f)
+
+          allowed_paths = plan.get('scope', {}).get('allowed_paths', [])
+          changes = plan.get('changes', [])
+
+          applied = []
+          failed = []
+
+          for change in changes:
+              path = change.get('path', '')
+              op = change.get('op', '')
+              payload = change.get('payload', '')
+
+              allowed = any(path.startswith(ap) for ap in allowed_paths)
+              if not allowed:
+                  failed.append(f"{path}: not in allowed_paths")
+                  continue
+
+              try:
+                  os.makedirs(os.path.dirname(path) or '.', exist_ok=True)
+
+                  if op == 'append_top':
+                      if os.path.exists(path):
+                          with open(path, 'r') as f:
+                              content = f.read()
+                          with open(path, 'w') as f:
+                              f.write(payload + '\n' + content)
+                      else:
+                          with open(path, 'w') as f:
+                              f.write(payload)
+                  elif op == 'upsert':
+                      with open(path, 'w') as f:
+                          f.write(payload)
+                  elif op == 'append':
+                      with open(path, 'a') as f:
+                          f.write('\n' + payload)
+                  else:
+                      failed.append(f"{path}: unknown op={op}")
+                      continue
+
+                  applied.append(path)
+              except Exception as e:
+                  failed.append(f"{path}: {str(e)}")
+
+          print(f"Applied: {applied}")
+          print(f"Failed: {failed}")
+
+          with open('/tmp/apply_result.txt', 'w') as f:
+              f.write(f"Applied: {len(applied)}\n")
+              for p in applied:
+                  f.write(f"  ✅ {p}\n")
+              if failed:
+                  f.write(f"\nFailed: {len(failed)}\n")
+                  for p in failed:
+                      f.write(f"  ❌ {p}\n")
+
+          if failed:
+              sys.exit(1)
+          PYEOF
+
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+
+      - name: Commit and Push
+        run: |
+          set -euo pipefail
+
+          git add -A
+          git commit -m "kai-apply: ${{ steps.parse.outputs.plan_id }}
+
+          context_header: ${{ steps.parse.outputs.context_header }}
+
+          Applied from issue #${{ github.event.issue.number }}"
+
+          git push origin "${{ steps.apply.outputs.branch_name }}"
+
+      - name: Create PR
+        id: create_pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          APPLY_RESULT=$(cat /tmp/apply_result.txt)
+
+          PR_BODY=$(cat <<EOF
+          ## Kai Apply - Plan Automated PR
+
+          **Plan ID**: \`${{ steps.parse.outputs.plan_id }}\`
+          **Context**: ${{ steps.parse.outputs.context_header }}
+          **Source Issue**: #${{ github.event.issue.number }}
+
+          ### Changes Applied
+
+          \`\`\`
+          $APPLY_RESULT
+          \`\`\`
+
+          ### Next Steps
+
+          - pr_validate.yml will run verification (k8s dry-run, Knative READY check)
+          - Evidence will be generated in reports/
+          - DoD enforcer will validate
+          - If all checks pass, ready to merge
+
+          ---
+          🤖 Auto-generated by Kai Apply workflow
+          EOF
+          )
+
+          PR_URL=$(gh pr create \
+            --base main \
+            --head "${{ steps.apply.outputs.branch_name }}" \
+            --title "kai-apply: ${{ steps.parse.outputs.plan_id }}" \
+            --body "$PR_BODY")
+
+          echo "pr_url=$PR_URL" >> $GITHUB_OUTPUT
+          echo "✅ PR created: $PR_URL"
+
+      - name: Comment on Issue
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ steps.create_pr.outputs.pr_url }}" != "" ]; then
+            gh issue comment ${{ github.event.issue.number }} --body \
+              "✅ Kai Apply succeeded!
+
+          PR created: ${{ steps.create_pr.outputs.pr_url }}
+
+          The PR will now go through automated validation (pr_validate.yml)."
+          else
+            APPLY_RESULT=$(cat /tmp/apply_result.txt 2>/dev/null || echo "Apply failed")
+            gh issue comment ${{ github.event.issue.number }} --body \
+              "❌ Kai Apply failed
+
+          \`\`\`
+          $APPLY_RESULT
+          \`\`\`
+
+          Please check the workflow logs for details."
+          fi

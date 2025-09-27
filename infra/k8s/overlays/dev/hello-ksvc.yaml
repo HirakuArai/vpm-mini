@@ -17,4 +17,4 @@ spec:
         - image: gcr.io/knative-samples/helloworld-go
           env:
             - name: TARGET
-              value: "vpm-mini"
+              value: "Knative"
