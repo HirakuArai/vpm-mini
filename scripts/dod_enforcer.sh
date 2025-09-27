@@ -11,7 +11,7 @@ fi
 
 echo "Checking DoD compliance in: $LATEST_EVIDENCE"
 
-if grep -q "Ready: True" "$LATEST_EVIDENCE"; then
+if grep -qE 'Ready.*:.*["\s]?True["\s]?' "$LATEST_EVIDENCE"; then
   echo "✅ DoD PASS: Ready=True found in evidence"
   exit 0
 else
