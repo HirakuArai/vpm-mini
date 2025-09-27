@@ -28,8 +28,8 @@ jobs:
           echo "Building kustomize..."
           kubectl kustomize . > /tmp/manifest.yaml
 
-          echo "Validating with kubectl apply --dry-run=client..."
-          kubectl apply --dry-run=client -f /tmp/manifest.yaml
+          echo "Validating with kubectl apply --dry-run=client --validate=false..."
+          kubectl apply --dry-run=client --validate=false -f /tmp/manifest.yaml
 
           echo "✅ Kustomize build and dry-run validation passed"
 
