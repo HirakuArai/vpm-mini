@@ -5,7 +5,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   enforce:
@@ -16,20 +15,22 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Wait for Evidence commit from pr-validate
+      - name: Wait for Evidence from pr-validate
+        shell: bash
         run: |
           set -euo pipefail
-          BR="${{ github.event.pull_request.head.ref }}"
+          PR="${{ github.event.pull_request.number }}"
           for i in {1..40}; do
-            if ls reports/p2_2_hello_ksvc_*.md >/dev/null 2>&1; then
+            git fetch origin "pull/${PR}/head:prhead" >/dev/null 2>&1 || true
+            git checkout -q prhead || true
+            if ls reports/p2_2_hello[-_]ksvc_*.md >/dev/null 2>&1; then
               echo "Evidence found"; break
             fi
-            echo "Evidence not yet present; waiting 15s..."
+            echo "Evidence not yet present; waiting 15s... ($i/40)"
             sleep 15
-            git fetch origin "$BR"
-            git checkout -q FETCH_HEAD
           done
-          ls reports/p2_2_hello_ksvc_*.md >/dev/null 2>&1 || { echo "Evidence timeout"; exit 1; }
+          ls reports/p2_2_hello[-_]ksvc_*.md >/dev/null 2>&1 || { echo "Evidence timeout"; exit 1; }
 
       - name: Enforce DoD
+        shell: bash
         run: bash scripts/dod_enforcer.sh
