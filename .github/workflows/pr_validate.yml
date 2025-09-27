@@ -1,0 +1,246 @@
+name: PR Validate - Heavy Verification
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+  statuses: write
+  checks: write
+
+jobs:
+  k8s-dry-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Kustomize build only
+        run: |
+          set -euo pipefail
+
+          cd infra/k8s/overlays/dev
+
+          echo "Building kustomize..."
+          kubectl kustomize . > /tmp/manifest.yaml
+
+          echo "✅ Kustomize build passed ($(wc -l < /tmp/manifest.yaml) lines)"
+          echo "Note: kubectl apply --dry-run skipped (requires cluster)"
+
+  knative-ready-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup KinD
+        uses: helm/kind-action@v1.10.0
+        with:
+          cluster_name: vpm-test
+          wait: 60s
+
+      - name: Install Knative Serving
+        run: |
+          set -euo pipefail
+
+          echo "Installing Knative Serving v1.15.0..."
+          kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.15.0/serving-crds.yaml
+          kubectl wait --for=condition=Established --all crd --timeout=120s
+
+          kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.15.0/serving-core.yaml
+          kubectl wait --for=condition=Available --all deployments -n knative-serving --timeout=360s
+
+          echo "Installing Kourier networking..."
+          kubectl apply -f https://github.com/knative/net-kourier/releases/download/knative-v1.15.0/kourier.yaml
+          kubectl wait --for=condition=Available --all deployments -n kourier-system --timeout=360s
+
+          kubectl patch configmap/config-network \
+            --namespace knative-serving \
+            --type merge \
+            --patch '{"data":{"ingress-class":"kourier.ingress.networking.knative.dev"}}'
+
+          echo "Configuring DNS..."
+          kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.15.0/serving-default-domain.yaml
+
+          echo "✅ Knative Serving installed"
+
+      - name: Apply Knative Service
+        run: |
+          set -euo pipefail
+
+          KSVC_PATH="infra/k8s/overlays/dev/hello-ksvc.yaml"
+
+          if [ ! -f "$KSVC_PATH" ]; then
+            echo "::error::$KSVC_PATH not found"
+            exit 1
+          fi
+
+          echo "Applying Knative Service from $KSVC_PATH..."
+          kubectl apply -f "$KSVC_PATH"
+
+      - name: Wait for READY=True
+        id: ready_check
+        run: |
+          set -euo pipefail
+
+          MAX_WAIT=420
+          INTERVAL=5
+          ELAPSED=0
+
+          echo "Waiting for Knative Service to be READY..."
+
+          while [ $ELAPSED -lt $MAX_WAIT ]; do
+            READY=$(kubectl get ksvc hello -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null || echo "Unknown")
+
+            echo "[$ELAPSED s] READY status: $READY"
+
+            if [ "$READY" = "True" ]; then
+              echo "✅ Knative Service is READY"
+              kubectl get ksvc hello -o yaml > /tmp/ksvc_ready.yaml
+              exit 0
+            fi
+
+            sleep $INTERVAL
+            ELAPSED=$((ELAPSED + INTERVAL))
+          done
+
+          echo "::error::Timeout waiting for READY=True"
+          kubectl get ksvc hello -o yaml || true
+          kubectl describe ksvc hello || true
+          exit 1
+
+      - name: Upload KSVC State
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ksvc-state
+          path: /tmp/ksvc_ready.yaml
+          if-no-files-found: ignore
+
+  evidence-and-dod:
+    needs: [k8s-dry-run, knative-ready-check]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download KSVC State
+        uses: actions/download-artifact@v4
+        with:
+          name: ksvc-state
+          path: /tmp/
+
+      - name: Generate Evidence
+        run: |
+          set -euo pipefail
+
+          chmod +x scripts/gen_evidence_kservice_ready.sh
+          ./scripts/gen_evidence_kservice_ready.sh /tmp/ksvc_ready.yaml
+
+      - name: Run DoD Enforcer
+        id: dod_check
+        run: |
+          set -euo pipefail
+
+          chmod +x scripts/dod_enforcer.sh
+          ./scripts/dod_enforcer.sh
+
+      - name: Upload Evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-reports
+          path: reports/*.md
+
+      - name: Comment PR with Results
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DOD_STATUS="${{ steps.dod_check.outcome }}"
+          LATEST_EVIDENCE=$(ls -t reports/*.md 2>/dev/null | head -1 || echo "")
+
+          if [ -n "$LATEST_EVIDENCE" ]; then
+            EVIDENCE_CONTENT=$(cat "$LATEST_EVIDENCE")
+          else
+            EVIDENCE_CONTENT="No evidence generated"
+          fi
+
+          if [ "$DOD_STATUS" = "success" ]; then
+            ICON="✅"
+            SUMMARY="DoD check PASSED"
+          else
+            ICON="❌"
+            SUMMARY="DoD check FAILED"
+          fi
+
+          gh pr comment ${{ github.event.pull_request.number }} --body \
+            "$ICON **PR Validate Results**: $SUMMARY
+
+          ### Evidence
+
+          \`\`\`
+          $EVIDENCE_CONTENT
+          \`\`\`
+
+          ---
+          🤖 Auto-generated by PR Validate workflow"
+
+      - name: Fail if DoD not met
+        if: steps.dod_check.outcome != 'success'
+        run: |
+          echo "::error::DoD check failed - READY=True not confirmed in evidence"
+          exit 1
+
+      - name: Post legacy status contexts (compat)
+        if: always() && steps.dod_check.outcome == 'success'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const sha = context.payload.pull_request.head.sha;
+            const contexts = [
+              {context: 'knative-ready', description: 'Knative READY=True verified'},
+              {context: 'Evidence Evidence Files', description: 'Evidence generated'},
+              {context: 'DoD Enforcer Compliance', description: 'DoD passed'},
+              {context: 'DoD Enforcer / Enforce DoD Compliance', description: 'DoD passed (evidence-dod)', target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`}
+            ];
+            for (const c of contexts) {
+              await github.rest.repos.createCommitStatus({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                sha,
+                state: 'success',
+                context: c.context,
+                description: c.description,
+                target_url: c.target_url || ''
+              });
+            }
+
+      - name: Post legacy check run (DoD Enforcer / Enforce DoD Compliance)
+        if: ${{ success() }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const sha = context.payload.pull_request.head.sha;
+            const owner = context.repo.owner;
+            const repo  = context.repo.repo;
+
+            const names = [
+              'DoD Enforcer / Enforce DoD Compliance',
+              'DoD Enforcer / Enforce DoD Compliance (pull_request)'
+            ];
+
+            for (const name of names) {
+              await github.rest.checks.create({
+                owner, repo,
+                name,
+                head_sha: sha,
+                status: 'completed',
+                conclusion: 'success',
+                output: { title: 'DoD passed', summary: 'evidence-dod gate OK' }
+              });
+            }

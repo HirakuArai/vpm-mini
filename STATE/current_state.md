@@ -1,3 +1,9 @@
+# VPM v0 DoD
+- Plan YAML → PR 自動生成（kai_apply.yml）
+- Knative READY=True 重検証（pr_validate.yml + kind）
+- Evidence自動生成 + DoD判定（scripts/gen_evidence_kservice_ready.sh, dod_enforcer.sh）
+- 全Green → Auto-merge可能
+
 # VPM-Mini Trial State
 
 active_repo: vpm-mini
