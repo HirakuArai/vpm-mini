@@ -1,82 +1,35 @@
 name: DoD Enforcer
 on:
   pull_request:
-    types: [opened, edited, synchronize, ready_for_review, reopened, labeled]
-  workflow_dispatch:
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
-  pull-requests: read
+  pull-requests: write
 
 jobs:
   enforce:
     name: Enforce DoD Compliance
     runs-on: ubuntu-latest
     steps:
-      # 1) ラベルをAPIで取得して分岐フラグを出力
-      - id: check_label
-        name: Check skip-dod label via API
-        uses: actions/github-script@v7
+      - uses: actions/checkout@v4
         with:
-          script: |
-            const {owner, repo, number} = {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              number: context.payload.pull_request.number
-            };
-            const { data: labels } = await github.rest.issues.listLabelsOnIssue({ owner, repo, issue_number: number });
-            const names = labels.map(l => l.name);
-            core.info('labels: ' + names.join(','));
-            const bypass = names.includes('skip-dod') ? 'true' : 'false';
-            core.setOutput('bypass', bypass);
-            if (bypass === 'true') {
-              core.notice('skip-dod present → bypass DoD');
-            }
+          fetch-depth: 0
 
-      # 2) bypass のときはここで成功終了（Required を満たす）
-      - name: Bypass DoD (success)
-        if: ${{ steps.check_label.outputs.bypass == 'true' }}
+      - name: Wait for Evidence commit from pr-validate
         run: |
-          echo "DoD bypassed by skip-dod label (temporary)."
-          exit 0
+          set -euo pipefail
+          BR="${{ github.event.pull_request.head.ref }}"
+          for i in {1..40}; do
+            if ls reports/p2_2_hello_ksvc_*.md >/dev/null 2>&1; then
+              echo "Evidence found"; break
+            fi
+            echo "Evidence not yet present; waiting 15s..."
+            sleep 15
+            git fetch origin "$BR"
+            git checkout -q FETCH_HEAD
+          done
+          ls reports/p2_2_hello_ksvc_*.md >/dev/null 2>&1 || { echo "Evidence timeout"; exit 1; }
 
-      # 3) 通常のDoDチェック（本文の完全一致判定）
-      - name: Check DoD compliance (safe mode)
-        if: ${{ steps.check_label.outputs.bypass != 'true' }}
-        uses: actions/github-script@v7
-        with:
-          script: |
-            try {
-              const body = (context.payload.pull_request?.body || "");
-              const required = [
-                "Auto-merge (squash) 有効化",
-                "CI 必須チェック Green（test-and-artifacts, healthcheck）",
-                "merged == true を API で確認",
-                "PR に最終コメント（✅ merged / commit hash / CI run URL / evidence）",
-                "必要な証跡（例: reports/*）を更新"
-              ];
-              const missing = required.filter(item => !body.includes(item));
-              if (missing.length) {
-                console.log("❌ DoD Compliance Check Failed");
-                console.log("================================");
-                console.log("Missing items:");
-                missing.forEach(item => console.log(`  - ${item}`));
-                console.log("\n📋 Copy and paste this complete DoD checklist to your PR body:");
-                console.log("```");
-                console.log("## DoD チェックリスト（編集不可・完全一致）");
-                console.log("- [x] Auto-merge (squash) 有効化");
-                console.log("- [x] CI 必須チェック Green（test-and-artifacts, healthcheck）");
-                console.log("- [x] merged == true を API で確認");
-                console.log("- [x] PR に最終コメント（✅ merged / commit hash / CI run URL / evidence）");
-                console.log("- [x] 必要な証跡（例: reports/*）を更新");
-                console.log("```");
-                console.log("================================");
-                core.setFailed(`DoD missing ${missing.length} items: ${missing.join(", ")}`);
-              } else {
-                console.log("✅ DoD Compliance Check Passed");
-                required.forEach(item => console.log(`  ✓ ${item}`));
-                core.notice("✅ DoD OK - All required items present");
-              }
-            } catch (e) {
-              core.setFailed("DoD script error: " + (e?.message || String(e)));
-            }
+      - name: Enforce DoD
+        run: bash scripts/dod_enforcer.sh
