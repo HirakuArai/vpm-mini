@@ -46,14 +46,14 @@ jobs:
 
           echo "Installing Knative Serving v1.18.0..."
           kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.18.0/serving-crds.yaml
-          kubectl wait --for=condition=Established --all crd --timeout=60s
+          kubectl wait --for=condition=Established --all crd --timeout=120s
 
           kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.18.0/serving-core.yaml
-          kubectl wait --for=condition=Available --all deployments -n knative-serving --timeout=180s
+          kubectl wait --for=condition=Available --all deployments -n knative-serving --timeout=360s
 
           echo "Installing Kourier networking..."
           kubectl apply -f https://github.com/knative/net-kourier/releases/download/knative-v1.18.0/kourier.yaml
-          kubectl wait --for=condition=Available --all deployments -n kourier-system --timeout=180s
+          kubectl wait --for=condition=Available --all deployments -n kourier-system --timeout=360s
 
           kubectl patch configmap/config-network \
             --namespace knative-serving \
