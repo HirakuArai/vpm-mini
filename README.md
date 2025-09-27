@@ -82,3 +82,6 @@ make trial-daily
 - KService / PR / Targets / Alerts を表示
 - `reports/daily_status_*.md` にEvidence保存
 
+---
+chore: trigger PR Validate (k8s-validate / knative-ready / evidence-dod) for ruleset calibration.
+
