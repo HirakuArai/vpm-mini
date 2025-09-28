@@ -1,29 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
-# 入力: KSVCの状態YAML (例: /tmp/ksvc_ready.yaml)
 KSVC_YAML="${1:-/tmp/ksvc_ready.yaml}"
 TS="$(date -u +%Y%m%d_%H%M%S)"
 OUT="reports/evidence_kservice_ready_${TS}.md"
 mkdir -p reports
 
-if [[ ! -f "$KSVC_YAML" ]]; then
-  echo "::warning::KSVC YAML not found: $KSVC_YAML (writing placeholder evidence)"
-  READY="Unknown"
-else
-  # "type: Ready" セクション直後の "status: True" を検出
-  if awk '
-    $0 ~ /type:[[:space:]]*Ready/ {flag=1; next}
-    flag==1 { if ($0 ~ /status:[[:space:]]*"?True"?/) {print "True"; exit}; flag=0 }
-  ' "$KSVC_YAML" | grep -q True; then
-    READY="True"
-  else
-    READY="False"
+READY="Unknown"
+if [[ -f "$KSVC_YAML" ]]; then
+  if command -v yq >/dev/null 2>&1; then
+    READY="$(yq -r '.status.conditions[] | select(.type=="Ready") | .status // "Unknown"' "$KSVC_YAML" 2>/dev/null | head -n1 || echo "Unknown")"
+  fi
+  if [[ "$READY" == "Unknown" ]]; then
+    # フォールバック：Ready セクション内の status を次の type ブロックまで探索
+    READY="$(awk '
+      BEGIN{ready="Unknown"; in=0}
+      /^[[:space:]]*- +type:[[:space:]]*Ready/ {in=1; next}
+      in==1 && /^[[:space:]]*- +type:/ {in=0}
+      in==1 && /status:[[:space:]]*"?True"?/ {ready="True"; in=0}
+      END{print ready}
+    ' "$KSVC_YAML" 2>/dev/null || echo "Unknown")"
   fi
 fi
 
-RESULT="FAIL"
-[[ "$READY" == "True" ]] && RESULT="PASS"
+RESULT="FAIL"; [[ "$READY" == "True" ]] && RESULT="PASS"
 
 cat > "$OUT" <<EOF
 # Knative Service READY Evidence

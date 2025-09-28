@@ -135,20 +135,28 @@ jobs:
           name: ksvc-state
           path: /tmp/
 
+      - name: Install yq (v4)
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+          yq --version
+
       - name: Detect KSVC YAML path
         id: detect_ksvc
         run: |
           set -euo pipefail
-          # 直パス優先
-          if [ -f /tmp/ksvc_ready.yaml ]; then
-            echo "p=/tmp/ksvc_ready.yaml" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          # v4 の既定レイアウト（サブフォルダ）
-          if [ -f /tmp/ksvc-state/ksvc_ready.yaml ]; then
-            echo "p=/tmp/ksvc-state/ksvc_ready.yaml" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+          CANDIDATES=(
+            "/tmp/ksvc_ready.yaml"
+            "/tmp/ksvc-state/ksvc_ready.yaml"
+            "/tmp/ksvc-state/ksvc_ready.yml"
+          )
+          for p in "${CANDIDATES[@]}"; do
+            if [ -f "$p" ]; then
+              echo "p=$p" >> "$GITHUB_OUTPUT"
+              echo "Found KSVC yaml at $p"
+              exit 0
+            fi
+          done
           echo "::error::ksvc_ready.yaml not found under /tmp"
           ls -R /tmp || true
           exit 1
