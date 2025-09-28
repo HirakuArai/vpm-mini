@@ -6,10 +6,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
-  statuses: write
-  checks: write
+  statuses: write   # Temporary for compat (will remove later)
 
 jobs:
   k8s-validate:
@@ -35,6 +34,8 @@ jobs:
     name: knative-ready
     needs: [k8s-validate]
     runs-on: ubuntu-latest
+    outputs:
+      ksvc_b64: ${{ steps.export_yaml.outputs.b64 }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -84,38 +85,48 @@ jobs:
           echo "Applying Knative Service from $KSVC_PATH..."
           kubectl apply -f "$KSVC_PATH"
 
-      - name: Wait for READY=True
-        id: ready_check
+      - name: Ensure serving/kourier deployments are Available
         run: |
           set -euo pipefail
+          kubectl -n knative-serving get deploy -o name | xargs -I{} kubectl -n knative-serving rollout status {} --timeout=5m
+          kubectl -n kourier-system get deploy -o name | xargs -I{} kubectl -n kourier-system rollout status {} --timeout=5m
 
-          MAX_WAIT=420
-          INTERVAL=5
-          ELAPSED=0
-
-          echo "Waiting for Knative Service to be READY..."
-
-          while [ $ELAPSED -lt $MAX_WAIT ]; do
-            READY=$(kubectl get ksvc hello -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null || echo "Unknown")
-
-            echo "[$ELAPSED s] READY status: $READY"
-
-            if [ "$READY" = "True" ]; then
-              echo "✅ Knative Service is READY"
-              kubectl get ksvc hello -o yaml > /tmp/ksvc_ready.yaml
-              exit 0
+      - name: Wait for READY=True (robust)
+        run: |
+          set -euo pipefail
+          kubectl wait --for=condition=Ready ksvc/hello -n default --timeout=10m
+          # API反映の揺れ対策：少し待ってから取得→最大60秒リトライで True を確認
+          for i in $(seq 1 12); do
+            kubectl get ksvc hello -n default -oyaml > /tmp/ksvc_ready.yaml
+            # Simple grep-based detection for robustness
+            if grep -A5 'type: Ready' /tmp/ksvc_ready.yaml | grep -q 'status: "True"'; then
+              R="True"
+            elif grep -A5 'type: Ready' /tmp/ksvc_ready.yaml | grep -q 'status: True'; then
+              R="True"
+            else
+              R="Unknown"
             fi
-
-            sleep $INTERVAL
-            ELAPSED=$((ELAPSED + INTERVAL))
+            echo "knative-ready: probe[$i] READY=$R"
+            [ "$R" = "True" ] && break
+            sleep 5
           done
+          grep -q 'type: Ready' /tmp/ksvc_ready.yaml || { echo "::error::No Ready condition in YAML"; exit 1; }
+          grep -A5 'type: Ready' /tmp/ksvc_ready.yaml | grep -Eq 'status:[[:space:]]+"?True"?' || { echo "::error::Ready!=True after retries"; cat /tmp/ksvc_ready.yaml; exit 1; }
 
-          echo "::error::Timeout waiting for READY=True"
-          kubectl get ksvc hello -o yaml || true
-          kubectl describe ksvc hello || true
-          exit 1
+      - name: Export KSVC YAML as output (b64)
+        id: export_yaml
+        run: |
+          set -euo pipefail
+          # base64（改行なし）
+          if base64 --help 2>&1 | grep -q '\-w'; then
+            B64=$(base64 -w0 /tmp/ksvc_ready.yaml)
+          else
+            B64=$(base64 /tmp/ksvc_ready.yaml | tr -d '\n')
+          fi
+          printf 'b64=%s\n' "$B64" >> "$GITHUB_OUTPUT"
+          echo "knative-ready: exported YAML length=${#B64}"
 
-      - name: Upload KSVC State
+      - name: Upload KSVC State (optional)
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -125,32 +136,43 @@ jobs:
 
   evidence-dod:
     name: evidence-dod
-    needs: [knative-ready]
+    needs: [k8s-validate, knative-ready]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Download KSVC State
-        uses: actions/download-artifact@v4
-        with:
-          name: ksvc-state
-          path: /tmp/
+      - name: Install yq (v4)
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
 
-      - name: Generate Evidence
+      - name: Reconstruct KSVC YAML from job output
+        id: reconstruct
         run: |
           set -euo pipefail
+          B64="${{ needs.knative-ready.outputs.ksvc_b64 }}"
+          L=${#B64}
+          echo "evidence-dod: received b64 length=$L"
+          test "$L" -gt 0 || { echo "::error::empty ksvc_b64 output"; exit 1; }
+          echo "$B64" | base64 -d > /tmp/ksvc_ready.yaml
+          echo "evidence-dod: reconstructed YAML:"
+          head -n 25 /tmp/ksvc_ready.yaml || true
 
+      - name: Generate Evidence (MD)
+        id: gen
+        run: |
+          set -euo pipefail
           chmod +x scripts/gen_evidence_kservice_ready.sh
           ./scripts/gen_evidence_kservice_ready.sh /tmp/ksvc_ready.yaml
 
-      - name: Run DoD Enforcer
-        id: dod_check
+      - name: Enforce DoD from YAML (strict)
         run: |
           set -euo pipefail
-
-          chmod +x scripts/dod_enforcer.sh
-          ./scripts/dod_enforcer.sh
+          R=$(yq -r '.status.conditions[] | select(.type=="Ready") | .status' /tmp/ksvc_ready.yaml || echo "Unknown")
+          echo "evidence-dod: extracted READY=$R from YAML"
+          yq -e '.status.conditions[] | select(.type=="Ready") | .status == "True"' /tmp/ksvc_ready.yaml >/dev/null
+          echo "evidence-dod: DoD OK - READY=True enforced"
 
       - name: Upload Evidence
         if: always()
@@ -159,116 +181,24 @@ jobs:
           name: evidence-reports
           path: reports/*.md
 
-      - name: Comment PR with Results
-        if: always()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          DOD_STATUS="${{ steps.dod_check.outcome }}"
-          LATEST_EVIDENCE=$(ls -t reports/*.md 2>/dev/null | head -1 || echo "")
-
-          if [ -n "$LATEST_EVIDENCE" ]; then
-            EVIDENCE_CONTENT=$(cat "$LATEST_EVIDENCE")
-          else
-            EVIDENCE_CONTENT="No evidence generated"
-          fi
-
-          if [ "$DOD_STATUS" = "success" ]; then
-            ICON="✅"
-            SUMMARY="DoD check PASSED"
-          else
-            ICON="❌"
-            SUMMARY="DoD check FAILED"
-          fi
-
-          gh pr comment ${{ github.event.pull_request.number }} --body \
-            "$ICON **PR Validate Results**: $SUMMARY
-
-          ### Evidence
-
-          \`\`\`
-          $EVIDENCE_CONTENT
-          \`\`\`
-
-          ---
-          🤖 Auto-generated by PR Validate workflow"
-
-      - name: Fail if DoD not met
-        if: steps.dod_check.outcome != 'success'
-        run: |
-          echo "::error::DoD check failed - READY=True not confirmed in evidence"
-          exit 1
-
-      - name: Post legacy status contexts (compat)
-        if: always() && steps.dod_check.outcome == 'success'
+      - name: Post status contexts (compat, one-off)
+        if: ${{ github.event_name == 'pull_request' && success() }}
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const sha = context.payload.pull_request.head.sha;
-            const contexts = [
-              {context: 'knative-ready', description: 'Knative READY=True verified'},
-              {context: 'Evidence Evidence Files', description: 'Evidence generated'},
-              {context: 'DoD Enforcer Compliance', description: 'DoD passed'},
-              {context: 'DoD Enforcer / Enforce DoD Compliance', description: 'DoD passed (evidence-dod)', target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`}
-            ];
-            for (const c of contexts) {
-              await github.rest.repos.createCommitStatus({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                sha,
-                state: 'success',
-                context: c.context,
-                description: c.description,
-                target_url: c.target_url || ''
-              });
-            }
-
-      - name: Post legacy check run (DoD Enforcer / Enforce DoD Compliance)
-        if: ${{ success() }}
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const sha = context.payload.pull_request.head.sha;
-            const owner = context.repo.owner;
-            const repo  = context.repo.repo;
-
-            const names = [
-              'DoD Enforcer / Enforce DoD Compliance',
-              'DoD Enforcer / Enforce DoD Compliance (pull_request)'
-            ];
-
-            for (const name of names) {
-              await github.rest.checks.create({
-                owner, repo,
-                name,
-                head_sha: sha,
-                status: 'completed',
-                conclusion: 'success',
-                output: { title: 'DoD passed', summary: 'evidence-dod gate OK' }
-              });
-            }
-
-      - name: Post status contexts for ruleset (standard 3)
-        if: ${{ success() }}
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const sha = context.payload.pull_request.head.sha;
             const {owner, repo} = context.repo;
-            const names = [
+            const sha = context.payload.pull_request.head.sha;
+            for (const ctx of [
               'pr-validate / k8s-validate',
               'pr-validate / knative-ready',
               'pr-validate / evidence-dod',
-            ];
-            for (const contextName of names) {
+            ]) {
               await github.rest.repos.createCommitStatus({
                 owner, repo, sha,
                 state: 'success',
-                context: contextName,
-                description: 'check passed',
+                context: ctx,  // Match exact "Any source" names in Required checks
+                description: 'compat success (one-off)',
                 target_url: `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`
               });
             }
