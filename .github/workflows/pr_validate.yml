@@ -135,12 +135,29 @@ jobs:
           name: ksvc-state
           path: /tmp/
 
+      - name: Detect KSVC YAML path
+        id: detect_ksvc
+        run: |
+          set -euo pipefail
+          # 直パス優先
+          if [ -f /tmp/ksvc_ready.yaml ]; then
+            echo "p=/tmp/ksvc_ready.yaml" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # v4 の既定レイアウト（サブフォルダ）
+          if [ -f /tmp/ksvc-state/ksvc_ready.yaml ]; then
+            echo "p=/tmp/ksvc-state/ksvc_ready.yaml" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "::error::ksvc_ready.yaml not found under /tmp"
+          ls -R /tmp || true
+          exit 1
+
       - name: Generate Evidence
         run: |
           set -euo pipefail
-
           chmod +x scripts/gen_evidence_kservice_ready.sh
-          ./scripts/gen_evidence_kservice_ready.sh /tmp/ksvc_ready.yaml
+          ./scripts/gen_evidence_kservice_ready.sh "${{ steps.detect_ksvc.outputs.p }}"
 
       - name: Run DoD Enforcer
         id: dod_check
