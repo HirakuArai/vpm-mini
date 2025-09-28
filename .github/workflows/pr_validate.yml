@@ -97,7 +97,7 @@ jobs:
           # API反映の揺れ対策：少し待ってから取得→最大60秒リトライで True を確認
           for i in $(seq 1 12); do
             kubectl get ksvc hello -n default -oyaml > /tmp/ksvc_ready.yaml
-            R=$(awk 'BEGIN{ready="Unknown"; in=0} /^[[:space:]]*- +type:[[:space:]]*Ready/ {in=1; next} in==1 && /^[[:space:]]*- +type:/ {in=0} in==1 && /status:[[:space:]]*"?True"?/ {ready="True"; in=0} END{print ready}' /tmp/ksvc_ready.yaml)
+            R=$(awk 'BEGIN{ready="Unknown"; in=0} /^[[:space:]]*- +type:[[:space:]]*Ready/{in=1; next} in==1 && /^[[:space:]]*- +type:/{in=0} in==1 && /status:[[:space:]]*"?True"?/{ready="True"; in=0} END{print ready}' /tmp/ksvc_ready.yaml)
             echo "knative-ready: probe[$i] READY=$R"
             [ "$R" = "True" ] && break
             sleep 5
