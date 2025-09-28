@@ -82,36 +82,19 @@ jobs:
           echo "Applying Knative Service from $KSVC_PATH..."
           kubectl apply -f "$KSVC_PATH"
 
-      - name: Wait for READY=True
-        id: ready_check
+      - name: Ensure serving/kourier deployments are Available
         run: |
           set -euo pipefail
+          kubectl -n knative-serving  rollout status deploy --all --timeout=5m
+          kubectl -n kourier-system   rollout status deploy --all --timeout=5m
 
-          MAX_WAIT=420
-          INTERVAL=5
-          ELAPSED=0
-
-          echo "Waiting for Knative Service to be READY..."
-
-          while [ $ELAPSED -lt $MAX_WAIT ]; do
-            READY=$(kubectl get ksvc hello -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null || echo "Unknown")
-
-            echo "[$ELAPSED s] READY status: $READY"
-
-            if [ "$READY" = "True" ]; then
-              echo "✅ Knative Service is READY"
-              kubectl get ksvc hello -o yaml > /tmp/ksvc_ready.yaml
-              exit 0
-            fi
-
-            sleep $INTERVAL
-            ELAPSED=$((ELAPSED + INTERVAL))
-          done
-
-          echo "::error::Timeout waiting for READY=True"
-          kubectl get ksvc hello -o yaml || true
-          kubectl describe ksvc hello || true
-          exit 1
+      - name: Wait for READY=True (robust)
+        run: |
+          set -euo pipefail
+          # Ready 条件を公式に待つ（最大10分）
+          kubectl wait --for=condition=Ready ksvc/hello -n default --timeout=10m
+          # 必ず最新の状態を保存（Evidence 用）
+          kubectl get ksvc hello -n default -oyaml > /tmp/ksvc_ready.yaml
 
       - name: Upload KSVC State
         if: always()
@@ -119,7 +102,7 @@ jobs:
         with:
           name: ksvc-state
           path: /tmp/ksvc_ready.yaml
-          if-no-files-found: ignore
+          if-no-files-found: error
 
   evidence-dod:
     name: evidence-dod
