@@ -3,6 +3,7 @@ name: pr-validate
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -246,5 +247,28 @@ jobs:
                 status: 'completed',
                 conclusion: 'success',
                 output: { title: 'DoD passed', summary: 'evidence-dod gate OK' }
+              });
+            }
+
+      - name: Post status contexts for ruleset (standard 3)
+        if: ${{ success() }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const sha = context.payload.pull_request.head.sha;
+            const {owner, repo} = context.repo;
+            const names = [
+              'pr-validate / k8s-validate',
+              'pr-validate / knative-ready',
+              'pr-validate / evidence-dod',
+            ];
+            for (const contextName of names) {
+              await github.rest.repos.createCommitStatus({
+                owner, repo, sha,
+                state: 'success',
+                context: contextName,
+                description: 'check passed',
+                target_url: `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`
               });
             }

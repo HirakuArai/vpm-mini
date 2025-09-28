@@ -83,3 +83,4 @@ make trial-daily
 - `reports/daily_status_*.md` にEvidence保存
 
 
+
