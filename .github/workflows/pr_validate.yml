@@ -97,13 +97,20 @@ jobs:
           # API反映の揺れ対策：少し待ってから取得→最大60秒リトライで True を確認
           for i in $(seq 1 12); do
             kubectl get ksvc hello -n default -oyaml > /tmp/ksvc_ready.yaml
-            R=$(awk 'BEGIN{ready="Unknown"; in=0} /^[[:space:]]*- +type:[[:space:]]*Ready/{in=1; next} in==1 && /^[[:space:]]*- +type:/{in=0} in==1 && /status:[[:space:]]*"?True"?/{ready="True"; in=0} END{print ready}' /tmp/ksvc_ready.yaml)
+            # Simple grep-based detection for robustness
+            if grep -A5 'type: Ready' /tmp/ksvc_ready.yaml | grep -q 'status: "True"'; then
+              R="True"
+            elif grep -A5 'type: Ready' /tmp/ksvc_ready.yaml | grep -q 'status: True'; then
+              R="True"
+            else
+              R="Unknown"
+            fi
             echo "knative-ready: probe[$i] READY=$R"
             [ "$R" = "True" ] && break
             sleep 5
           done
-          grep -q 'type:[[:space:]]*Ready' /tmp/ksvc_ready.yaml || { echo "::error::No Ready condition in YAML"; exit 1; }
-          grep -Eq 'type:[[:space:]]*Ready(.|\n)*status:[[:space:]]*"?True"?' /tmp/ksvc_ready.yaml || { echo "::error::Ready!=True after retries"; cat /tmp/ksvc_ready.yaml; exit 1; }
+          grep -q 'type: Ready' /tmp/ksvc_ready.yaml || { echo "::error::No Ready condition in YAML"; exit 1; }
+          grep -A5 'type: Ready' /tmp/ksvc_ready.yaml | grep -Eq 'status:[[:space:]]+"?True"?' || { echo "::error::Ready!=True after retries"; cat /tmp/ksvc_ready.yaml; exit 1; }
 
       - name: Export KSVC YAML as output (b64)
         id: export_yaml
