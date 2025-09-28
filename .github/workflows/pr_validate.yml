@@ -87,8 +87,8 @@ jobs:
       - name: Ensure serving/kourier deployments are Available
         run: |
           set -euo pipefail
-          kubectl -n knative-serving  rollout status deploy --all --timeout=5m
-          kubectl -n kourier-system   rollout status deploy --all --timeout=5m
+          kubectl -n knative-serving get deploy -o name | xargs -I{} kubectl -n knative-serving rollout status {} --timeout=5m
+          kubectl -n kourier-system get deploy -o name | xargs -I{} kubectl -n kourier-system rollout status {} --timeout=5m
 
       - name: Wait for READY=True (robust)
         run: |
