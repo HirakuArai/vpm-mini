@@ -1,3 +1,11 @@
+# ✅ P2-2 GREEN（Hello KService）
+
+- Checks（標準3本）: **pr-validate / k8s-validate・/ knative-ready・/ evidence-dod → All Green**
+- Evidence: `reports/evidence_kservice_ready_20250928_015512.md`
+- DoD: `kubectl get ksvc hello → READY=True` を満たした（VPM v0 初運転成功）
+- PR: #305
+- Snapタグ予定: `p2-2-green-20250928`
+
 # Check-in 2025-09-28
 - P2-2: Hello KService を本日検証（DoD: READY=True）
 
