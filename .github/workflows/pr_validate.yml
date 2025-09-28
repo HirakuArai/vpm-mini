@@ -6,10 +6,8 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
-  statuses: write
-  checks: write
 
 jobs:
   k8s-validate:
@@ -198,77 +196,3 @@ jobs:
         run: |
           echo "::error::DoD check failed - READY=True not confirmed in evidence"
           exit 1
-
-      - name: Post legacy status contexts (compat)
-        if: always() && steps.dod_check.outcome == 'success'
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const sha = context.payload.pull_request.head.sha;
-            const contexts = [
-              {context: 'knative-ready', description: 'Knative READY=True verified'},
-              {context: 'Evidence Evidence Files', description: 'Evidence generated'},
-              {context: 'DoD Enforcer Compliance', description: 'DoD passed'},
-              {context: 'DoD Enforcer / Enforce DoD Compliance', description: 'DoD passed (evidence-dod)', target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`}
-            ];
-            for (const c of contexts) {
-              await github.rest.repos.createCommitStatus({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                sha,
-                state: 'success',
-                context: c.context,
-                description: c.description,
-                target_url: c.target_url || ''
-              });
-            }
-
-      - name: Post legacy check run (DoD Enforcer / Enforce DoD Compliance)
-        if: ${{ success() }}
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const sha = context.payload.pull_request.head.sha;
-            const owner = context.repo.owner;
-            const repo  = context.repo.repo;
-
-            const names = [
-              'DoD Enforcer / Enforce DoD Compliance',
-              'DoD Enforcer / Enforce DoD Compliance (pull_request)'
-            ];
-
-            for (const name of names) {
-              await github.rest.checks.create({
-                owner, repo,
-                name,
-                head_sha: sha,
-                status: 'completed',
-                conclusion: 'success',
-                output: { title: 'DoD passed', summary: 'evidence-dod gate OK' }
-              });
-            }
-
-      - name: Post status contexts for ruleset (standard 3)
-        if: ${{ success() }}
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const sha = context.payload.pull_request.head.sha;
-            const {owner, repo} = context.repo;
-            const names = [
-              'pr-validate / k8s-validate',
-              'pr-validate / knative-ready',
-              'pr-validate / evidence-dod',
-            ];
-            for (const contextName of names) {
-              await github.rest.repos.createCommitStatus({
-                owner, repo, sha,
-                state: 'success',
-                context: contextName,
-                description: 'check passed',
-                target_url: `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`
-              });
-            }

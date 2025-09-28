@@ -1,23 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
+f=$(ls -1 reports/evidence_kservice_ready_*.md reports/p2_2_hello_ksvc_*.md 2>/dev/null | tail -n1 || true)
+[ -n "$f" ] || { echo "No evidence file found"; exit 1; }
 
-REPORTS_DIR="reports"
-LATEST_EVIDENCE=$(ls -t "$REPORTS_DIR"/evidence_kservice_ready_*.md 2>/dev/null | head -1 || echo "")
-
-if [ -z "$LATEST_EVIDENCE" ]; then
-  echo "::error::No evidence file found in $REPORTS_DIR"
-  exit 1
-fi
-
-echo "Checking DoD compliance in: $LATEST_EVIDENCE"
-
-if grep -qE 'Ready.*:.*["\s]?True["\s]?' "$LATEST_EVIDENCE"; then
-  echo "✅ DoD PASS: Ready=True found in evidence"
-  exit 0
+# 新旧どちらの表記にもマッチ
+if grep -Eq 'READY status extracted:[[:space:]]*"True"|Ready:[[:space:]]*True' "$f"; then
+  echo "DoD OK: $f"
 else
-  echo "❌ DoD FAIL: Ready=True NOT found in evidence"
-  echo ""
-  echo "Evidence content:"
-  cat "$LATEST_EVIDENCE"
-  exit 1
+  echo "DoD fail: READY not True in $f"; exit 1
 fi
