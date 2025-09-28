@@ -82,3 +82,4 @@ make trial-daily
 - KService / PR / Targets / Alerts を表示
 - `reports/daily_status_*.md` にEvidence保存
 
+
