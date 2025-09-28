@@ -1,3 +1,6 @@
+# Check-in 2025-09-28
+- P2-2: Hello KService を本日検証（DoD: READY=True）
+
 # VPM v0 DoD
 - Plan YAML → PR 自動生成（kai_apply.yml）
 - Knative READY=True 重検証（pr_validate.yml + kind）
