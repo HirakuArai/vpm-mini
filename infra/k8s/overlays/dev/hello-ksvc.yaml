@@ -1,20 +1,8 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
-metadata:
-  name: hello
-  namespace: default
+metadata: { name: hello, namespace: default }
 spec:
   template:
-    metadata:
-      annotations:
-        autoscaling.knative.dev/minScale: "0"
-        autoscaling.knative.dev/maxScale: "50"
-        autoscaling.knative.dev/target: "100"
-        # rollout-hash: "<to-be-filled-after-secrets>"
-        rollout-hash: "rev-1756670218"
     spec:
       containers:
         - image: gcr.io/knative-samples/helloworld-go
-          env:
-            - name: TARGET
-              value: "Knative"
