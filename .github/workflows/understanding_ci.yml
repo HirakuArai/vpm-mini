@@ -1,0 +1,43 @@
+name: understanding-ci
+on:
+  pull_request:
+    paths:
+      - 'STATE/**'
+      - 'reports/**'
+      - 'config/understanding.yaml'
+      - 'tools/uc_*.py'
+      - '.github/workflows/understanding_ci.yml'
+  schedule:
+    - cron: '21 3 * * *'
+
+jobs:
+  understanding-ci:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Extract understanding snapshot
+        run: python tools/uc_extract.py --config config/understanding.yaml
+
+      - name: Validate snapshot
+        run: python tools/uc_validate.py --json "reports/uc_*.json" --md "reports/uc_*.md"
+
+      - name: Upload snapshot artefacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: uc-snapshot
+          path: |
+            reports/uc_*.json
+            reports/uc_*.md
+          if-no-files-found: error
