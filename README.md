@@ -6,10 +6,9 @@
 
 **context_header:** repo=vpm-mini / branch=main / phase=Phase 2
 
-## Phase 6 (Current)
+## Phase 2
 
-- Phase 5 完了: `phase5-complete`（GitOps / Canary / Guard / Failover / 800 RPS）
-- Phase 6 目標: マルチクラスタのグローバル配信 + 30日連続 SLO 99.9%
+- Current: dev 監視ラインの整備と理解Diagの導入（Phase 2）
 - 運用ルール: 1PR=1ステップ=1スナップショット / Auto-merge / タグ
 
 ## Quickstart (10min Repro, Phase 1)
@@ -81,6 +80,4 @@ make trial-daily
 ```
 - KService / PR / Targets / Alerts を表示
 - `reports/daily_status_*.md` にEvidence保存
-
-
 

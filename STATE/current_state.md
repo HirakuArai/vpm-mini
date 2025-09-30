@@ -19,9 +19,10 @@
 
 active_repo: vpm-mini
 active_branch: main
-phase: Phase 5 (Scaling & Migration)
-context_header: repo=vpm-mini / branch=main / phase=Phase 5 Trial
-short_goal: Complete P5-5 Consumer Injection and advance to P5-6 Observability
+phase: Phase 2
+context_header: repo=vpm-mini / branch=main / phase=Phase 2 Trial
+short_goal: Complete P2-3 monitoring line validation and understanding diag integration
+phase_notes: Chaos Engineering focus — dev monitoring line & understanding diag
 
 ## Phase Progress
 - **P1** (Foundation): ✅ GREEN  
