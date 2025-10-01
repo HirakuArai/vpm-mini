@@ -2,6 +2,8 @@ name: CD Canary Pipeline
 
 on:
   push:
+    branches:
+      - main
     paths:
       - "infra/gitops/apps/hello/**"
       - "infra/gitops/apps/hello-v2/**"
@@ -22,6 +24,7 @@ env:
 
 jobs:
   canary:
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: self-hosted
     timeout-minutes: 60
     steps:
