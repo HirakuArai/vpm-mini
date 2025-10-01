@@ -2,6 +2,10 @@ name: CD Canary (Multi-Cluster)
 
 on:
   push:
+    branches:
+      - main
+    tags-ignore:
+      - '*'
     paths:
       - 'hello/**'
       - 'infra/k8s/**/hello-ksvc.yaml'
@@ -28,6 +32,7 @@ env:
 
 jobs:
   cd:
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
