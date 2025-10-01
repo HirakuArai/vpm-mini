@@ -21,7 +21,7 @@ active_repo: vpm-mini
 active_branch: main
 phase: Phase 2
 context_header: repo=vpm-mini / branch=main / phase=Phase 2 Trial
-short_goal: Complete P2-3 monitoring line validation and understanding diag integration
+short_goal: "P2-3 達成（dev監視構文OK＋Diag常設）"
 phase_notes: Chaos Engineering focus — dev monitoring line & understanding diag
 
 ## Phase Progress
@@ -63,3 +63,7 @@ phase_notes: Chaos Engineering focus — dev monitoring line & understanding dia
 - Evidence collection: Document consumption via pod exec
 
 Updated: 2025-09-16T20:23:15Z
+
+
+### Audit Links (P2-3)
+- Evidence: reports/evidence_p2-3_dev_monitoring_20251001T174411Z.md
