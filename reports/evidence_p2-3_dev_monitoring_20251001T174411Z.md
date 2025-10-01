@@ -4,7 +4,7 @@
 - Files:
   - infra/k8s/overlays/dev/monitoring/kustomization.yaml
   - infra/k8s/overlays/dev/monitoring/namespace.yaml
-- CI Run: _pending_ (update with `k8s-validate` success URL once available)
+- CI Run: Run: https://github.com/HirakuArai/vpm-mini/actions/runs/18170877978 (update with `k8s-validate` success URL once available)
 
 ## Notes
 - Namespace only; no service deployments included at this stage.
