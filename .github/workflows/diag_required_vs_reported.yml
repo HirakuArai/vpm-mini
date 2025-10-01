@@ -3,11 +3,6 @@ name: diag-required-vs-reported
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-  workflow_dispatch:
-    inputs:
-      pr_number:
-        description: "PR number to comment to (manual test)"
-        required: true
 
 permissions:
   contents: read
@@ -17,43 +12,27 @@ permissions:
 
 jobs:
   diag:
-    if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install deps (PyYAML only)
-        run: pip install --disable-pip-version-check --quiet pyyaml
-
-      - name: Resolve PR number
-        shell: bash
+      - name: Install deps (PyYAML)
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "PR_NUMBER=${{ github.event.inputs.pr_number }}" >> "$GITHUB_ENV"
-          else
-            echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> "$GITHUB_ENV"
-          fi
+          python -V
+          pip install --disable-pip-version-check --quiet pyyaml
 
-      - name: Resolve head sha
-        shell: bash
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            HEAD_SHA=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.inputs.pr_number }} --jq .head.sha)
-          else
-            HEAD_SHA="${{ github.event.pull_request.head.sha }}"
-          fi
-          echo "HEAD_SHA=$HEAD_SHA" >> "$GITHUB_ENV"
-
-      - name: Read required from config (robust YAML)
+      - name: Read required from config (PyYAML)
         id: req
-        shell: bash
         run: |
           python - <<'PY' > required.json
           import json, pathlib, yaml
@@ -61,14 +40,13 @@ jobs:
           lst = cfg.get("ruleset_required", []) or []
           req = sorted({str(x).strip() for x in lst if str(x).strip()})
           print(json.dumps(req, ensure_ascii=False))
-PY
+          PY
           echo "required=$(cat required.json)" >> "$GITHUB_OUTPUT"
 
       - name: Collect reported check-runs
         id: rep
-        shell: bash
         run: |
-          gh api repos/${{ github.repository }}/commits/$HEAD_SHA/check-runs \
+          gh api repos/${{ github.repository }}/commits/${HEAD_SHA}/check-runs \
             -H "Accept: application/vnd.github+json" --jq '.check_runs[].name' |
           jq -R -s 'split("\n")|map(select(length>0))|unique|sort' > reported.json
           echo "reported=$(cat reported.json)" >> "$GITHUB_OUTPUT"
@@ -76,29 +54,39 @@ PY
       - name: Build diff
         id: diff
         run: |
-          jq -n --argjson A '${{ steps.req.outputs.required }}' --argjson B '${{ steps.rep.outputs.reported }}' \
-            '{required:$A, reported:$B, missing: ($A - $B), extra: ($B - $A)}' > diff.json
+          python - <<'PY' > diff.json
+          import json
+          req = json.load(open('required.json'))
+          rep = json.load(open('reported.json'))
+          A, B = set(req), set(rep)
+          out = {
+            "required": sorted(A),
+            "reported": sorted(B),
+            "missing": sorted(A - B),
+            "extra":    sorted(B - A),
+          }
+          json.dump(out, open('diff.json', 'w'), ensure_ascii=False, indent=2)
+          PY
           cat diff.json
 
       - name: Upsert PR comment
         run: |
-          PR=$PR_NUMBER
           MARK="<!-- diag-required-vs-reported -->"
           REQ=$(jq -r '.required|join(", ")' diff.json)
           REP=$(jq -r '.reported|join(", ")' diff.json)
           MIS=$(jq -r '.missing|join(", ")' diff.json)
           EXT=$(jq -r '.extra|join(", ")' diff.json)
           BODY="$MARK
-### Diag: required vs reported
-**required**: $REQ
-**reported**: $REP
-**missing**: $MIS
-**extra**: $EXT
-"
-          CID=$(gh api repos/${{ github.repository }}/issues/$PR/comments \
+          ### Diag: required vs reported
+          **required**: $REQ
+          **reported**: $REP
+          **missing**: $MIS
+          **extra**: $EXT
+          "
+          CID=$(gh api repos/${{ github.repository }}/issues/${PR_NUMBER}/comments \
                 --jq '.[] | select(.body|contains("diag-required-vs-reported")) | .id' || true)
           if [ -n "$CID" ]; then
             gh api repos/${{ github.repository }}/issues/comments/$CID -X PATCH -f body="$BODY" >/dev/null
           else
-            gh api repos/${{ github.repository }}/issues/$PR/comments -f body="$BODY" >/dev/null
+            gh api repos/${{ github.repository }}/issues/${PR_NUMBER}/comments -f body="$BODY" >/dev/null
           fi
