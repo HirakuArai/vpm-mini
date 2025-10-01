@@ -1,9 +1,9 @@
 {
-  "updated_at": "2025-10-01T21:12:44.367447Z",
-  "total_runs": 5,
+  "updated_at": "2025-10-01T22:42:31.932193Z",
+  "total_runs": 6,
   "success_rate": 0.0,
-  "freeze_rate": 0.4,
-  "fail_rate": 0.6,
+  "freeze_rate": 0.333,
+  "fail_rate": 0.667,
   "p50_duration_sec": {
     "A": 0,
     "B": 0
@@ -13,10 +13,10 @@
     "B": 0
   },
   "last_run": {
-    "runId": "18175783058",
-    "runUrl": "https://github.com/HirakuArai/vpm-mini/actions/runs/18175783058",
-    "sha": "a2747c644b5d093425b268479d794b2e567f1d20",
-    "timestamp": "2025-10-01T21:12:44Z",
+    "runId": "18177718670",
+    "runUrl": "https://github.com/HirakuArai/vpm-mini/actions/runs/18177718670",
+    "sha": "eb4e396d3fc21c6ea3235248f7d9c326d40e483b",
+    "timestamp": "2025-10-01T22:42:31Z",
     "namespace": "hyper-swarm",
     "ksvc": "hello",
     "canary": 10,
