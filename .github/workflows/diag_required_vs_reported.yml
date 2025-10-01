@@ -56,11 +56,11 @@ jobs:
         shell: bash
         run: |
           python - <<'PY' > required.json
-import json, pathlib, yaml
-cfg = yaml.safe_load(pathlib.Path("config/understanding.yaml").read_text(encoding="utf-8")) or {}
-lst = cfg.get("ruleset_required", []) or []
-req = sorted({str(x).strip() for x in lst if str(x).strip()})
-print(json.dumps(req, ensure_ascii=False))
+          import json, pathlib, yaml
+          cfg = yaml.safe_load(pathlib.Path("config/understanding.yaml").read_text(encoding="utf-8")) or {}
+          lst = cfg.get("ruleset_required", []) or []
+          req = sorted({str(x).strip() for x in lst if str(x).strip()})
+          print(json.dumps(req, ensure_ascii=False))
 PY
           echo "required=$(cat required.json)" >> "$GITHUB_OUTPUT"
 
