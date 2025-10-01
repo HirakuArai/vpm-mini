@@ -9,3 +9,4 @@ resources:
   - synthesizer
   - archivist
   - hello-ai
+  - hello-ksvc.yaml
