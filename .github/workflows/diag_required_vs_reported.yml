@@ -46,10 +46,14 @@ jobs:
       - name: Collect reported check-runs
         id: rep
         run: |
-          gh api repos/${{ github.repository }}/commits/${HEAD_SHA}/check-runs \
-            -H "Accept: application/vnd.github+json" --jq '.check_runs[].name' |
-          jq -R -s 'split("\n")|map(select(length>0))|unique|sort' > reported.json
-          echo "reported=$(cat reported.json)" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          NAMES=$(gh api repos/${{ github.repository }}/commits/${HEAD_SHA}/check-runs \
+            -H "Accept: application/vnd.github+json" --jq '.check_runs[].name' || true)
+          printf "%s\n" "$NAMES" | jq -R -s 'split("\n")|map(select(length>0))|unique|sort' > reported.json
+          if [ ! -s reported.json ]; then
+            echo "[]" > reported.json
+          fi
+          echo "reported=$(jq -c '.' reported.json)" >> "$GITHUB_OUTPUT"
 
       - name: Build diff
         id: diff
