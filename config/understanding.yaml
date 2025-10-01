@@ -8,6 +8,6 @@ ruleset_required:
 - evidence-dod
 branch_required: []
 goals:
-  short: P2-4（hello を Knative Service へ移植／READY=True）
+  short: P2-5（Autoscale PoC：min=0 / max=30 の挙動を記録）
   mid: サービス移植 / Autoscale PoC
   long: 小規模Swarm安定 + KPI閾値達成

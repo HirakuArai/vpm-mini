@@ -21,7 +21,7 @@ active_repo: vpm-mini
 active_branch: main
 phase: Phase 2
 context_header: repo=vpm-mini / branch=main / phase=Phase 2 Trial
-short_goal: "P2-4 達成（hello を Knative Service へ移植／READY=True）"
+short_goal: "P2-5（Autoscale PoC：min=0 / max=30 の挙動を記録）"
 phase_notes: Chaos Engineering focus — dev monitoring line & understanding diag
 
 ## Phase Progress
@@ -67,3 +67,7 @@ Updated: 2025-09-16T20:23:15Z
 
 ### Audit Links (P2-3)
 - Evidence: reports/evidence_p2-3_dev_monitoring_20251001T174411Z.md
+
+
+### Audit Links (P2-4)
+- Evidence: reports/evidence_p2-4_hello_20251001T211112Z.md
