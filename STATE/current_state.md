@@ -21,7 +21,7 @@ active_repo: vpm-mini
 active_branch: main
 phase: Phase 2
 context_header: repo=vpm-mini / branch=main / phase=Phase 2 Trial
-short_goal: "P2-3 達成（dev監視構文OK＋Diag常設）"
+short_goal: "P2-4 達成（hello を Knative Service へ移植／READY=True）"
 phase_notes: Chaos Engineering focus — dev monitoring line & understanding diag
 
 ## Phase Progress

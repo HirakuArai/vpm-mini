@@ -1,13 +1,13 @@
 project_id: vpm-mini
-phase: "Phase 2"
+phase: Phase 2
 state_path: STATE/current_state.md
-evidence_glob: "reports/evidence_*.md"
+evidence_glob: reports/evidence_*.md
 ruleset_required:
-  - k8s-validate
-  - knative-ready
-  - evidence-dod
+- k8s-validate
+- knative-ready
+- evidence-dod
 branch_required: []
 goals:
-  short: "P2-3（監視ラインdev構文OK＋理解Diag導入）"
-  mid: "サービス移植 / Autoscale PoC"
-  long: "小規模Swarm安定 + KPI閾値達成"
+  short: P2-4（hello を Knative Service へ移植／READY=True）
+  mid: サービス移植 / Autoscale PoC
+  long: 小規模Swarm安定 + KPI閾値達成
