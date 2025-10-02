@@ -1,0 +1,36 @@
+name: understanding-card
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  card:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deps
+        run: pip install --quiet pyyaml
+      - name: Generate card
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          python tools/understanding_status.py --pr "${{ env.PR_NUMBER }}" --format md | tee card.md
+      - name: Upsert PR comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          MARK="<!-- understanding-status -->"
+          BODY=$(printf "%s\n\n%s" "$MARK" "$(cat card.md)")
+          CID=$(gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments --paginate \
+                --jq '.[] | select(.body|contains("understanding-status")) | .id' || true)
+          if [ -n "$CID" ]; then
+            gh api repos/${{ github.repository }}/issues/comments/$CID -X PATCH -f body="$BODY" >/dev/null
+          else
+            gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments -f body="$BODY" >/dev/null
+          fi
