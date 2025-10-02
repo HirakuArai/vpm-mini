@@ -21,7 +21,7 @@ active_repo: vpm-mini
 active_branch: main
 phase: Phase 2
 context_header: repo=vpm-mini / branch=main / phase=Phase 2 Trial
-\1"P2-6（監視ライン拡張：ServiceMonitor/PromRule 構文OK＋Evidence）"
+short_goal: "P2-6（監視ライン拡張：ServiceMonitor/PromRule 構文OK＋Evidence）"
 phase_notes: Chaos Engineering focus — dev monitoring line & understanding diag
 
 ## Phase Progress
