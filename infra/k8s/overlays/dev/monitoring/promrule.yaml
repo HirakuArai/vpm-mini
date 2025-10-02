@@ -1,0 +1,12 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: dummy-rule
+  namespace: monitoring-dev
+spec:
+  groups:
+    - name: dummy
+      rules:
+        - alert: DummyAlwaysFalse
+          expr: vector(0)
+          for: 1m
