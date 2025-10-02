@@ -8,6 +8,6 @@ ruleset_required:
 - evidence-dod
 branch_required: []
 goals:
-  short: （次ゴールを設定してください）
+  short: P2-6（監視ライン拡張：ServiceMonitor/PromRule 構文OK＋Evidence）
   mid: サービス移植 / Autoscale PoC
   long: 小規模Swarm安定 + KPI閾値達成
