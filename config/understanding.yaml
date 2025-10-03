@@ -8,6 +8,6 @@ ruleset_required:
 - evidence-dod
 branch_required: []
 goals:
-  short: P2-6（監視ライン拡張：ServiceMonitor/PromRule 構文OK＋Evidence）
+  short: P3-1（Guardrails lite：actionlint必須＋Diag warn-label）
   mid: サービス移植 / Autoscale PoC
   long: 小規模Swarm安定 + KPI閾値達成

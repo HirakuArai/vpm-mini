@@ -21,7 +21,7 @@ active_repo: vpm-mini
 active_branch: main
 phase: Phase 2
 context_header: repo=vpm-mini / branch=main / phase=Phase 2 Trial
-short_goal: "P2-6（監視ライン拡張：ServiceMonitor/PromRule 構文OK＋Evidence）"
+short_goal: "P3-1（Guardrails lite：actionlint必須＋Diag warn-label）"
 phase_notes: Chaos Engineering focus — dev monitoring line & understanding diag
 
 ## Phase Progress
@@ -75,3 +75,7 @@ Updated: 2025-09-16T20:23:15Z
 
 ### Audit Links (P2-5)
 - Evidence: (missing)
+
+
+### Audit Links (P2-6b)
+- Evidence: reports/evidence_p2-6b_monitoring_real_20251003T163437Z.md
