@@ -94,3 +94,18 @@ jobs:
           else
             gh api repos/${{ github.repository }}/issues/${PR_NUMBER}/comments -f body="$BODY" >/dev/null
           fi
+      - name: Label for diag missing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          COUNT=$(jq -r '.missing|length' diff.json 2>/dev/null || echo 0)
+          gh label create needs-sync --color FF8C00 --description "Diag required vs reported mismatch" >/dev/null 2>&1 || true
+          if [ "${COUNT}" -gt 0 ]; then
+            gh pr edit "${PR_NUMBER}" --add-label "needs-sync" >/dev/null 2>&1 || true
+          else
+            gh pr edit "${PR_NUMBER}" --remove-label "needs-sync" >/dev/null 2>&1 || true
+          fi
+

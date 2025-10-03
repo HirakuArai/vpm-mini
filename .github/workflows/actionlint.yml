@@ -1,0 +1,20 @@
+name: actionlint
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+permissions:
+  contents: read
+jobs:
+  actionlint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download actionlint
+        run: |
+          set -euo pipefail
+          curl -sS https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash -s -- -b .
+          ./actionlint --version
+      - name: Run actionlint
+        run: ./actionlint -color
