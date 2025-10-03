@@ -42,9 +42,7 @@ def latest_understanding_ci():
 def diag_missing(pr_number: int | None):
     if not pr_number:
         return []
-    js = gh_json(
-        ["gh", "issue", "comments", str(pr_number), "--limit", "50", "--json", "body"]
-    )
+    js = gh_json(["gh", "issue", "comments", str(pr_number), "--json", "body"])
     if not js:
         return []
     bodies = [x.get("body", "") for x in js if isinstance(x, dict)]
