@@ -108,4 +108,24 @@ jobs:
           else
             gh pr edit "${PR_NUMBER}" --remove-label "needs-sync" >/dev/null 2>&1 || true
           fi
-
+      - name: Label for goals mismatch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          GS=$(grep -m1 -E '^short_goal:' STATE/current_state.md | sed -e 's/short_goal:\s*//')
+          GU=$(python - <<'PP'
+import yaml
+print(yaml.safe_load(open("config/understanding.yaml"))['goals']['short'])
+PP
+)
+          cmp="equal"
+          [ "$GS" = "$GU" ] || cmp="diff"
+          gh label create needs-goal-sync --color D3A625 --description "Goals mismatch (STATE vs understanding)" >/dev/null 2>&1 || true
+          if [ "$cmp" = "diff" ]; then
+            gh pr edit "${PR_NUMBER}" --add-label "needs-goal-sync" >/dev/null 2>&1 || true
+          else
+            gh pr edit "${PR_NUMBER}" --remove-label "needs-goal-sync" >/dev/null 2>&1 || true
+          fi
