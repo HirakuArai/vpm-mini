@@ -3,4 +3,4 @@ Files:
 - monitoring/servicemonitor-hello.yaml
 - monitoring/promrule-hello.yaml
 Run URL:
-https://github.com/HirakuArai/vpm-mini/actions/runs/18228494358/job/51905796639
+https://github.com/HirakuArai/vpm-mini/actions/runs/18228559023/job/51906023605
