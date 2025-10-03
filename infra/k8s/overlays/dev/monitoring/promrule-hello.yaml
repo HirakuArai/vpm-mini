@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: hello-rules
+  namespace: monitoring-dev
+spec:
+  groups:
+    - name: hello
+      rules:
+        - alert: HelloTargetMissing
+          expr: absent(up{job="hello"}) == 1
+          for: 1m
+          labels: { severity: warning }
+          annotations:
+            summary: "hello target missing"
