@@ -4,5 +4,5 @@ Checks:
 - diag warn-label when missing>0
 Run URLs:
 - actionlint: 
-- PR example: 
+https://github.com/HirakuArai/vpm-mini/actions/runs/18229853068/job/51910300989
 Notes: non-blocking (warn only)
