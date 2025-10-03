@@ -12,6 +12,9 @@ jobs:
       contents: write
       pull-requests: write
       issues: write
+    concurrency:
+      group: understanding-guard-post-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
@@ -52,6 +55,7 @@ jobs:
         with:
           name: evidence-understanding-guard
           path: ${{ steps.evidence.outputs.path }}
+          retention-days: 7
 
       - name: Labels (warn-only)
         if: github.event_name == 'pull_request'
