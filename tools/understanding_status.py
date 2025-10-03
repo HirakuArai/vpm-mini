@@ -119,12 +119,41 @@ def as_markdown(status: dict):
     )
     missing = "0" if status["diag_missing"] == [] else ", ".join(status["diag_missing"])
     goals = "yes" if status["goals_equal"] else "no"
+    # Evidence を可能であれば GitHub の blob URL に変換
+    ev = status["evidence"]
+    ev_link = ev
+    if ev != "(none)":
+        try:
+            import subprocess
+
+            remote = subprocess.check_output(
+                ["git", "remote", "get-url", "origin"], text=True
+            ).strip()
+            match = re.search(r"github.com[:/](.*?)(?:\\.git)?$", remote)
+            if match:
+                repo = match.group(1)
+                branch = subprocess.check_output(
+                    [
+                        "gh",
+                        "repo",
+                        "view",
+                        "--json",
+                        "defaultBranchRef",
+                        "-q",
+                        ".defaultBranchRef.name",
+                    ],
+                    text=True,
+                ).strip()
+                ev_link = f"https://github.com/{repo}/blob/{branch}/{ev}"
+        except Exception:
+            pass
+
     lines = [
         header,
         f"- Snapshot: {status['snapshot']}",
         f"- Diag missing: {missing}",
         f"- Goals synced: {goals}",
-        f"- Evidence: {status['evidence']}",
+        f"- Evidence: {ev_link}",
     ]
     if status.get("understanding_ci_url"):
         lines.append(f"- understanding-ci: {status['understanding_ci_url']}")
