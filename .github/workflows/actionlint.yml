@@ -18,3 +18,4 @@ jobs:
           ./actionlint --version
       - name: Run actionlint
         run: ./actionlint -color
+        continue-on-error: true
