@@ -1,0 +1,89 @@
+name: understanding-guard (post)
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  workflow_dispatch:
+
+jobs:
+  post:
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    concurrency:
+      group: understanding-guard-post-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: pip install pyyaml >/dev/null
+
+      - name: Compute understanding status (always succeed)
+        id: status
+        run: |
+          OUT="$(python tools/understanding_status.py --format summary || true)"
+          echo "$OUT"
+          parse() { echo "$OUT" | sed -n "s/.*$1=\([^;]*\).*/\1/p"; }
+          echo "snapshot=$(parse snapshot)" >> $GITHUB_OUTPUT
+          echo "diag_missing=$(parse diag_missing)" >> $GITHUB_OUTPUT
+          echo "goals_equal=$(parse goals_equal)" >> $GITHUB_OUTPUT
+
+      - name: Write Evidence
+        id: evidence
+        run: |
+          SNAPSHOT="${{ steps.status.outputs.snapshot }}"
+          DIAG_MISSING="${{ steps.status.outputs.diag_missing }}"
+          GOALS_EQUAL="${{ steps.status.outputs.goals_equal }}"
+          NOW="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          EVIDENCE="reports/evidence_p3_3_understanding_guard_${{ github.run_id }}.md"
+          sed -e "s/{{SNAPSHOT}}/$SNAPSHOT/; s/{{DIAG_MISSING}}/$DIAG_MISSING/; s/{{GOALS_EQUAL}}/$GOALS_EQUAL/; s/{{NOW}}/$NOW/" \
+            reports/_understanding_evidence_tpl.md > "$EVIDENCE"
+          echo "path=$EVIDENCE" >> $GITHUB_OUTPUT
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-understanding-guard
+          path: ${{ steps.evidence.outputs.path }}
+          retention-days: 7
+
+      - name: Labels (warn-only)
+        if: github.event_name == 'pull_request'
+        run: |
+          PRNUM="${{ github.event.pull_request.number }}"
+          SNAPSHOT="${{ steps.status.outputs.snapshot }}"
+          DIAG_MISSING="${{ steps.status.outputs.diag_missing }}"
+          GOALS_EQUAL="${{ steps.status.outputs.goals_equal }}"
+          add(){ gh pr edit "$PRNUM" --add-label "$1" >/dev/null || true; }
+          rmv(){ gh pr edit "$PRNUM" --remove-label "$1" >/dev/null || true; }
+          for L in needs-goal-sync needs-snapshot needs-diagnostic; do rmv "$L"; done
+          if [ "$GOALS_EQUAL" != "yes" ]; then
+            add needs-goal-sync
+          fi
+          if [ -z "$SNAPSHOT" ] || [ "$SNAPSHOT" = "n/a" ]; then
+            add needs-snapshot
+          fi
+          if [ "$DIAG_MISSING" = "present" ]; then
+            add needs-diagnostic
+          fi
+
+      - name: Upsert PR Comment
+        if: github.event_name == 'pull_request'
+        env:
+          SNAPSHOT: ${{ steps.status.outputs.snapshot }}
+          DIAG_MISSING: ${{ steps.status.outputs.diag_missing }}
+          GOALS_EQUAL: ${{ steps.status.outputs.goals_equal }}
+          EVIDENCE_PATH: ${{ steps.evidence.outputs.path }}
+        run: tools/ci/upsert_understanding_comment.sh "${{ github.event.pull_request.number }}"
+
+      # 非ブロッキング：終了コード0で完了

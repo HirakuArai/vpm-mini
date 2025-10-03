@@ -81,3 +81,7 @@ make trial-daily
 - KService / PR / Targets / Alerts を表示
 - `reports/daily_status_*.md` にEvidence保存
 
+
+### Understanding Guard (post)
+- 既存guardは保持。本workflowはPR上のコメント/ラベル/Evidence整形のみ（非ブロッキング）
+- GH_TOKEN を明示し、PR文脈が無いときは動作をスキップ

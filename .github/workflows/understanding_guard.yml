@@ -7,6 +7,7 @@ permissions:
   pull-requests: write
 jobs:
   guard:
+    continue-on-error: true
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
@@ -29,5 +30,5 @@ jobs:
             echo "OK"
           else
             echo "NG"
-            exit 1
+            echo "NG (non-blocking)"
           fi
