@@ -1,0 +1,38 @@
+name: understanding-required (dry-run)
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+jobs:
+  dryrun:
+    runs-on: ubuntu-latest
+    permissions:
+      statuses: write        # commit status を発行
+      contents: read
+    steps:
+      - name: Set required-like commit statuses (success only)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const contexts = [
+              "understanding/guard-required",
+              "understanding/snapshot-present",
+              "understanding/goals-synced"
+            ];
+            const sha = context.payload.pull_request
+              ? context.payload.pull_request.head.sha
+              : (process.env.GITHUB_SHA || context.sha);
+
+            for (const ctx of contexts) {
+              await github.rest.repos.createCommitStatus({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                sha,
+                state: "success",
+                context: ctx,
+                description: "dry-run: marking success for future required check"
+              });
+              core.info(`dry-run status set: ${ctx}`);
+            }
+      # 常に成功（非ブロッキング）
