@@ -85,3 +85,8 @@ make trial-daily
 ### Understanding Guard (post)
 - 既存guardは保持。本workflowはPR上のコメント/ラベル/Evidence整形のみ（非ブロッキング）
 - GH_TOKEN を明示し、PR文脈が無いときは動作をスキップ
+
+### P3-3 Exit (non-blocking guard stabilized)
+- 🧭 一意コメント＋warnラベル＋Evidence生成（post）
+- legacy guard は continue-on-error で非ブロッキング運用
+- 詳細: reports/p3_3_exit_20251004T001113Z.md
