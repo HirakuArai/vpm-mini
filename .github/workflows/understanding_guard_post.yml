@@ -35,6 +35,21 @@ jobs:
           echo "diag_missing=$(parse diag_missing)" >> $GITHUB_OUTPUT
           echo "goals_equal=$(parse goals_equal)" >> $GITHUB_OUTPUT
 
+      - name: Collect dry-run statuses
+        id: dry
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          SHA="${{ github.event.pull_request.head.sha || github.sha }}"
+          JSON=$(gh api repos/{owner}/{repo}/commits/$SHA/status --jq '[.statuses[] | {context,state}]')
+          ok() { echo "$JSON" | jq -r "map(select(.context==\"$1\" and .state==\"success\"))|length"; }
+          DG=$(ok "understanding/guard-required")
+          DS=$(ok "understanding/snapshot-present")
+          DG2=$(ok "understanding/goals-synced")
+          echo "dry_guard=$DG" >> $GITHUB_OUTPUT
+          echo "dry_snap=$DS" >> $GITHUB_OUTPUT
+          echo "dry_goal=$DG2" >> $GITHUB_OUTPUT
+
       - name: Write Evidence
         id: evidence
         run: |
@@ -43,7 +58,10 @@ jobs:
           GOALS_EQUAL="${{ steps.status.outputs.goals_equal }}"
           NOW="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           EVIDENCE="reports/evidence_p3_3_understanding_guard_${{ github.run_id }}.md"
-          sed -e "s/{{SNAPSHOT}}/$SNAPSHOT/; s/{{DIAG_MISSING}}/$DIAG_MISSING/; s/{{GOALS_EQUAL}}/$GOALS_EQUAL/; s/{{NOW}}/$NOW/" \
+          DRY_GUARD="${{ steps.dry.outputs.dry_guard }}"
+          DRY_SNAP="${{ steps.dry.outputs.dry_snap }}"
+          DRY_GOAL="${{ steps.dry.outputs.dry_goal }}"
+          sed -e "s/{{SNAPSHOT}}/$SNAPSHOT/; s/{{DIAG_MISSING}}/$DIAG_MISSING/; s/{{GOALS_EQUAL}}/$GOALS_EQUAL/; s/{{NOW}}/$NOW/; s/{{DRY_GUARD}}/$DRY_GUARD/; s/{{DRY_SNAP}}/$DRY_SNAP/; s/{{DRY_GOAL}}/$DRY_GOAL/" \
             reports/_understanding_evidence_tpl.md > "$EVIDENCE"
           echo "path=$EVIDENCE" >> $GITHUB_OUTPUT
 
@@ -73,6 +91,19 @@ jobs:
             add needs-diagnostic
           fi
 
+      - name: Label: ready-for-required
+        if: github.event_name == 'pull_request'
+        run: |
+          PRNUM="${{ github.event.pull_request.number }}"
+          DG=${{ steps.dry.outputs.dry_guard }}
+          DS=${{ steps.dry.outputs.dry_snap }}
+          DG2=${{ steps.dry.outputs.dry_goal }}
+          if [ "$DG" = "1" ] && [ "$DS" = "1" ] && [ "$DG2" = "1" ]; then
+            gh pr edit "$PRNUM" --add-label ready-for-required >/dev/null || true
+          else
+            gh pr edit "$PRNUM" --remove-label ready-for-required >/dev/null || true
+          fi
+
       - name: Upsert PR Comment
         if: github.event_name == 'pull_request'
         env:
@@ -80,6 +111,9 @@ jobs:
           DIAG_MISSING: ${{ steps.status.outputs.diag_missing }}
           GOALS_EQUAL: ${{ steps.status.outputs.goals_equal }}
           EVIDENCE_PATH: ${{ steps.evidence.outputs.path }}
+          DRY_GUARD: ${{ steps.dry.outputs.dry_guard }}
+          DRY_SNAP: ${{ steps.dry.outputs.dry_snap }}
+          DRY_GOAL: ${{ steps.dry.outputs.dry_goal }}
         run: tools/ci/upsert_understanding_comment.sh "${{ github.event.pull_request.number }}"
 
       # 非ブロッキング：終了コード0で完了

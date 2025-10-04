@@ -13,12 +13,17 @@ cat > "$BODY_FILE" <<'MD'
 - Goals Equal: **{{GOALS_EQUAL}}**
 
 Evidence: {{EVIDENCE_PATH}}
+
+_Dry-Run:_ guard-required: **{{DRY_GUARD}}**, snapshot-present: **{{DRY_SNAP}}**, goals-synced: **{{DRY_GOAL}}**
 MD
 sed -i.bak \
   -e "s/{{SNAPSHOT}}/${SNAPSHOT:-n\/a}/" \
   -e "s/{{DIAG_MISSING}}/${DIAG_MISSING:-none}/" \
   -e "s/{{GOALS_EQUAL}}/${GOALS_EQUAL:-unknown}/" \
   -e "s|{{EVIDENCE_PATH}}|${EVIDENCE_PATH:-n/a}|" \
+  -e "s/{{DRY_GUARD}}/${DRY_GUARD:-0}/" \
+  -e "s/{{DRY_SNAP}}/${DRY_SNAP:-0}/" \
+  -e "s/{{DRY_GOAL}}/${DRY_GOAL:-0}/" \
   "$BODY_FILE"
 
 CID="$(gh issue comments "$PRNUM" --limit 100 --json id,body \
