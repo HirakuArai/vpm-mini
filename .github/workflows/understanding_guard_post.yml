@@ -35,6 +35,13 @@ jobs:
           echo "diag_missing=$(parse diag_missing)" >> $GITHUB_OUTPUT
           echo "goals_equal=$(parse goals_equal)" >> $GITHUB_OUTPUT
 
+      - name: Collect dry-run statuses (wait up to 180s)
+        id: dry
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          bash tools/ci/wait_dryrun.sh
+
       - name: Write Evidence
         id: evidence
         run: |
