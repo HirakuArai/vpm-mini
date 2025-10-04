@@ -64,18 +64,15 @@ phase_notes: Chaos Engineering focus — dev monitoring line & understanding dia
 
 Updated: 2025-09-16T20:23:15Z
 
-
 ### Audit Links (P2-3)
 - Evidence: reports/evidence_p2-3_dev_monitoring_20251001T174411Z.md
-
 
 ### Audit Links (P2-4)
 - Evidence: reports/evidence_p2-4_hello_20251001T211112Z.md
 
-
 ### Audit Links (P2-5)
 - Evidence: (missing)
 
-
 ### Audit Links (P2-6b)
 - Evidence: reports/evidence_p2-6b_monitoring_real_20251003T163437Z.md
+
