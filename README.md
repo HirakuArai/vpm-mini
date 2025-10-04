@@ -90,3 +90,8 @@ make trial-daily
 - 🧭 一意コメント＋warnラベル＋Evidence生成（post）
 - legacy guard は continue-on-error で非ブロッキング運用
 - 詳細: reports/p3_3_exit_20251004T001113Z.md
+
+### P3-4 Kickoff
+- Add dry-run workflow to emit success statuses for future required checks:
+  - understanding/guard-required, understanding/snapshot-present, understanding/goals-synced
+- No rule change yet; observe impact while keeping post workflow.
