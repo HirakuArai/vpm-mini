@@ -35,20 +35,12 @@ jobs:
           echo "diag_missing=$(parse diag_missing)" >> $GITHUB_OUTPUT
           echo "goals_equal=$(parse goals_equal)" >> $GITHUB_OUTPUT
 
-      - name: Collect dry-run statuses
+      - name: Collect dry-run statuses (wait up to 180s)
         id: dry
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          SHA="${{ github.event.pull_request.head.sha || github.sha }}"
-          JSON=$(gh api repos/{owner}/{repo}/commits/$SHA/status --jq '[.statuses[] | {context,state}]')
-          ok() { echo "$JSON" | jq -r "map(select(.context==\"$1\" and .state==\"success\"))|length"; }
-          DG=$(ok "understanding/guard-required")
-          DS=$(ok "understanding/snapshot-present")
-          DG2=$(ok "understanding/goals-synced")
-          echo "dry_guard=$DG" >> $GITHUB_OUTPUT
-          echo "dry_snap=$DS" >> $GITHUB_OUTPUT
-          echo "dry_goal=$DG2" >> $GITHUB_OUTPUT
+          bash tools/ci/wait_dryrun.sh
 
       - name: Write Evidence
         id: evidence
