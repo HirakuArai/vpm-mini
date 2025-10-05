@@ -90,7 +90,7 @@ jobs:
           DG=${{ steps.dry.outputs.dry_guard }}
           DS=${{ steps.dry.outputs.dry_snap }}
           DG2=${{ steps.dry.outputs.dry_goal }}
-          if [ "$DG" = "1" ] && [ "$DS" = "1" ] && [ "$DG2" = "1" ]; then
+          if [ "${DG:-0}" -ge 1 ] && [ "${DS:-0}" -ge 1 ] && [ "${DG2:-0}" -ge 1 ]; then
             gh pr edit "$PRNUM" --add-label ready-for-required >/dev/null || true
           else
             gh pr edit "$PRNUM" --remove-label ready-for-required >/dev/null || true
