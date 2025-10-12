@@ -8,5 +8,5 @@
 ## recommendation
 A を採用。Phase 2 で最小リスク・短時間で READY=True を証明する。
 - Evidence: .vpm/intent_input_20251013_065655.md, .vpm/intent_output_20251013_065655.md, STATE/current_state.md
-- Decision: <採用案を1行で>
-- Next actions: <担当/期限/DoD: READY=True + Evidence PR>
+- Decision: Adopt rougel-exporter (stateless HTTP) as the first Phase 2 migration target.
+- Next actions: ksvc/rougel-exporter READY=True with evidence (PR #360); owner: HirakuArai; DoD met.
