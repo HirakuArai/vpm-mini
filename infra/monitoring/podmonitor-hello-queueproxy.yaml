@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: knative-hello-queueproxy
+  namespace: default
+  labels:
+    # kube-prometheus-stack が拾えるように release を明示
+    release: vpm-mini-kube-prometheus-stack
+spec:
+  namespaceSelector:
+    matchNames: ["default"]
+  selector:
+    matchLabels:
+      serving.knative.dev/service: hello
+  podMetricsEndpoints:
+    - targetPort: 9090
+      path: /metrics
+      interval: 15s
