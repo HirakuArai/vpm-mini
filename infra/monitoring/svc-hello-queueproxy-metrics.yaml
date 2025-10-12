@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-queueproxy-metrics
+  namespace: default
+  labels:
+    app: hello-queueproxy-metrics
+spec:
+  selector:
+    serving.knative.dev/service: hello
+  ports:
+    - name: metrics
+      port: 9090
+      targetPort: metrics
+      protocol: TCP
