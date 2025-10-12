@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# 統一インターフェース：
+#   scripts/vpm --mode decide --in <input.md> --out <output.md>
+MODE=""; IN=""; OUT=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --mode) MODE="$2"; shift 2;;
+    --in)   IN="$2";   shift 2;;
+    --out)  OUT="$2";  shift 2;;
+    *) echo "unknown arg: $1" >&2; exit 2;;
+  esac
+done
+[ -n "${MODE:-}" ] && [ -n "${IN:-}" ] && [ -n "${OUT:-}" ] || { echo "usage: scripts/vpm --mode decide --in <in> --out <out>"; exit 2; }
+
+# 1) 既存エンジンがあれば優先して呼ぶ（軽い検出）
+if [ -f scripts/codex_shim.py ]; then
+  # 例: 既存のLLMシムに渡す（無ければフォールバック）
+  python3 scripts/codex_shim.py --mode "${MODE}" --in "${IN}" --out "${OUT}" 2>/dev/null && exit 0 || true
+fi
+if command -v python3 >/dev/null && [ -f scripts/vpm_engine.py ]; then
+  python3 scripts/vpm_engine.py --mode "${MODE}" --in "${IN}" --out "${OUT}" && exit 0 || true
+fi
+
+# 2) フォールバック（最小スタブ）：入力を読み、雛形の意思決定を吐く
+mkdir -p "$(dirname "${OUT}")"
+{
+  echo "# VPM Output (stub)"
+  echo "mode: ${MODE}"
+  echo
+  echo "## read-facts"
+  [ -f "${IN}" ] && sed -n '1,80p' "${IN}" || echo "(no input file)"
+  echo
+  echo "## options"
+  echo "- A) 最小リスク（stateless/HTTP）"
+  echo "- B) 中庸（軽い依存あり）"
+  echo "- C) 高リスク（stateful/依存重）"
+  echo
+  echo "## recommendation"
+  echo "A を推奨（Phase 2の速度と安全性の観点）"
+} > "${OUT}"

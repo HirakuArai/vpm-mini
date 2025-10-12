@@ -95,3 +95,10 @@ state-view:
 
 phase-guard:
 	PHASE_ALLOWED="Phase 2" $(PYTHON) scripts/phase_guard.py --project $(PROJECT)
+
+vpm-decide:
+	@TS=$$(date +%Y%m%d_%H%M%S); IN=.vpm/intent_input_$${TS}.md; OUT=.vpm/intent_output_$${TS}.md; \
+	mkdir -p .vpm; \
+	[ -f $$IN ] || echo "# VPM Intent Input" > $$IN; \
+	scripts/vpm --mode decide --in $$IN --out $$OUT; \
+	echo "Wrote $$OUT"
