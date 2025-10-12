@@ -22,3 +22,4 @@ reports/codex_run_*.log
 reports/*.png
 reports/mna_update_*.md
 reports/icr_history.csv
+.DS_Store
