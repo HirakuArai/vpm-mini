@@ -1,0 +1,23 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: ksvc-<SERVICE>-queue-proxy
+  namespace: monitoring
+  labels: { release: kps }
+spec:
+  namespaceSelector:
+    matchNames: ["<NAMESPACE>"]   # 例: default
+  selector:
+    matchLabels:
+      serving.knative.dev/service: "<SERVICE>"   # 例: hello
+  podMetricsEndpoints:
+  - port: http-autometric   # 9090
+    path: /metrics
+    interval: 15s
+    scrapeTimeout: 10s
+    enableHttp2: false
+  - port: http-usermetric   # 9091
+    path: /metrics
+    interval: 15s
+    scrapeTimeout: 10s
+    enableHttp2: false
