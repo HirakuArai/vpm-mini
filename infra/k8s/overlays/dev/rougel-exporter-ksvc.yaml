@@ -11,7 +11,9 @@ spec:
     spec:
       containers:
       - name: app
-        image: gcr.io/knative-samples/helloworld-go
+        image: ghcr.io/hirakuarai/rougel-exporter:latest
+        command: ["python"]
+        args: ["-m", "http.server", "8080"]
         env:
         - name: TARGET
           value: rougel-exporter
