@@ -10,21 +10,28 @@ spec:
         autoscaling.knative.dev/minScale: "1"
     spec:
       containers:
-      - name: app
-        image: ghcr.io/hirakuarai/rougel-exporter:latest
-        command: ["python"]
-        args: ["-m", "http.server", "8080"]
-        env:
-        - name: TARGET
-          value: rougel-exporter
-        ports:
-        - containerPort: 8080
-          protocol: TCP
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 8080
-          initialDelaySeconds: 2
-          periodSeconds: 5
+        - name: app
+          image: ghcr.io/hirakuarai/rougel-exporter:latest
+          command: ["python"]
+          args: ["-m", "http.server", "8080"]
+          env:
+            - name: TARGET
+              value: rougel-exporter
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
       enableServiceLinks: false
       timeoutSeconds: 300
