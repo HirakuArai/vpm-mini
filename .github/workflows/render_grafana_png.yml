@@ -1,0 +1,17 @@
+name: render-grafana-png
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Render panel (placeholder)
+        run: |
+          echo "This is a placeholder. Enable grafana.imageRenderer and set GRAFANA_URL/USER/PASSWORD secrets."
+          # Example:
+          # curl -u "$GRAFANA_USER:$GRAFANA_PASSWORD" \
+          #   "$GRAFANA_URL/render/d-solo/<dashboard-uid>?orgId=1&from=now-15m&to=now&panelId=<ID>&width=1200&height=600" \
+          #   -o reports/img/grafana_auto_${{ github.run_id }}.png
