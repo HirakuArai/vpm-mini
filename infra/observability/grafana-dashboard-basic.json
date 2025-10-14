@@ -206,8 +206,8 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "rate(kn_queueproxy_proxied_requests_total[1m])",
-          "legendFormat": "knative queue proxy",
+          "expr": "sum by (pod) (rate(revision_request_count{job=\"monitoring/ksvc-metrics-echo-queue-proxy-9091\"}[1m]))",
+          "legendFormat": "{{pod}}",
           "range": true,
           "refId": "A"
         }
