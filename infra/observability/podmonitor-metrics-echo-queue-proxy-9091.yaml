@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: ksvc-metrics-echo-queue-proxy-9091
+  namespace: monitoring
+  labels:
+    release: kps
+spec:
+  namespaceSelector:
+    matchNames: ["default"]
+  selector:
+    matchLabels:
+      serving.knative.dev/service: "metrics-echo"
+  podMetricsEndpoints:
+  - port: http-usermetric
+    path: /metrics
+    interval: 15s
+    scrapeTimeout: 10s
+    enableHttp2: false
