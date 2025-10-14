@@ -29,5 +29,4 @@ $ kubectl -n monitoring exec prometheus-kps-kube-prometheus-stack-prometheus-0 -
 
 ## Grafana RPS Panel (screenshot)
 ![rps](img/grafana_p3_1_metrics_echo_rps_20251015_034043.png)
-
-TODO: Capture Grafana panel screenshot and save to reports/img/grafana_p3_1_metrics_echo_rps_20251015_034043.png.
+Captured after driving steady load (120 curls / 60s) with PromQL `sum by (pod) (rate(revision_request_count{job="monitoring/ksvc-metrics-echo-queue-proxy-9091"}[1m]))`.
