@@ -1,0 +1,83 @@
+name: render-grafana-png
+on:
+  workflow_dispatch:
+    inputs:
+      from:
+        description: 'time range from'
+        default: 'now-30m'
+      to:
+        description: 'time range to'
+        default: 'now'
+permissions:
+  contents: write
+jobs:
+  render:
+    runs-on: [self-hosted, local-mac]
+    env:
+      LOCAL_URL: http://127.0.0.1:3000
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve dashboard UID & panel ID (RPS)
+        id: meta
+        run: |
+          set -euo pipefail
+          DASH='infra/observability/grafana-dashboard-basic.json'
+          if [ ! -f "$DASH" ]; then
+            echo "Dashboard JSON missing: $DASH" >&2
+            exit 1
+          fi
+          DASH_UID=$(jq -r '.dashboard.uid // .uid // empty' "$DASH")
+          if [ -z "$DASH_UID" ]; then
+            DASH_UID="vpm-basic-observability"
+          fi
+          PANEL_ID=$(jq -r '.dashboard.panels[]?, .panels[]? | select(.title | test("RPS"; "i")) | .id' "$DASH" | head -n1)
+          if [ -z "$PANEL_ID" ]; then
+            echo "RPS panel not found in dashboard JSON" >&2
+            exit 1
+          fi
+          {
+            echo "uid=$DASH_UID"
+            echo "panel=$PANEL_ID"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Health check
+        run: curl -fsS "$LOCAL_URL/api/health" >/dev/null
+
+      - name: Render PNG via /render
+        env:
+          GRAFANA_USER: ${{ secrets.GRAFANA_USER }}
+          GRAFANA_PASSWORD: ${{ secrets.GRAFANA_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GRAFANA_USER:-}" ] || [ -z "${GRAFANA_PASSWORD:-}" ]; then
+            echo "Grafana credentials secrets are required" >&2
+            exit 1
+          fi
+          TS=$(date +%Y%m%d_%H%M%S)
+          OUT="reports/img/grafana_p3_2_auto_${TS}.png"
+          mkdir -p reports/img
+          curl -fsS -u "${GRAFANA_USER}:${GRAFANA_PASSWORD}" \
+            "${LOCAL_URL}/render/d-solo/${{ steps.meta.outputs.uid }}?orgId=1&from=${{ github.event.inputs.from || 'now-30m' }}&to=${{ github.event.inputs.to || 'now' }}&panelId=${{ steps.meta.outputs.panel }}&width=1600&height=800" \
+            -o "$OUT"
+          echo "OUT=$OUT" >> "$GITHUB_ENV"
+
+      - name: Append Evidence MD
+        run: |
+          set -euo pipefail
+          TS=$(date +%Y%m%d_%H%M%S)
+          EV="reports/p3_2_grafana_auto_render_${TS}.md"
+          REL="${OUT#reports/}"
+          {
+            echo "# P3-2 Grafana auto render @ ${TS}"
+            echo "- dashboard uid: ${{ steps.meta.outputs.uid }}"
+            echo "- panel id: ${{ steps.meta.outputs.panel }}"
+            echo "- range: ${{ github.event.inputs.from || 'now-30m' }} → ${{ github.event.inputs.to || 'now' }}"
+            echo
+            echo "![render](${REL})"
+          } > "$EV"
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "feat(p3-2): add Grafana auto-render evidence (local :3000)"
+          file_pattern: "reports/p3_2_grafana_auto_render_*.md reports/img/grafana_p3_2_auto_*.png"
