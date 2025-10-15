@@ -77,7 +77,19 @@ jobs:
             echo "![render](${REL})"
           } > "$EV"
 
-      - uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Create PR with artifacts
+        uses: peter-evans/create-pull-request@v6
         with:
-          commit_message: "feat(p3-2): add Grafana auto-render evidence (local :3000)"
-          file_pattern: "reports/p3_2_grafana_auto_render_*.md reports/img/grafana_p3_2_auto_*.png"
+          commit-message: "feat(p3-2): add Grafana auto-render evidence (bot)"
+          title: "feat(p3-2): auto-render evidence (bot)"
+          body: |
+            Auto-generated evidence from workflow run ${{ github.run_id }}.
+            - Dashboard UID: ${{ steps.meta.outputs.uid }}
+            - Panel ID: ${{ steps.meta.outputs.panel }}
+            - Range: ${{ github.event.inputs.from || 'now-30m' }} → ${{ github.event.inputs.to || 'now' }}
+          branch: "bot/p3-2-render/${{ github.run_id }}"
+          add-paths: |
+            reports/p3_2_grafana_auto_render_*.md
+            reports/img/grafana_p3_2_auto_*.png
+          labels: p3-2,evidence,bot
+          delete-branch: true
