@@ -1,0 +1,8 @@
+name: selfhosted-smoketest
+on: workflow_dispatch
+jobs:
+  ping:
+    runs-on: [self-hosted, local-mac]
+    steps:
+      - run: uname -a
+      - run: which kubectl && kubectl get ns | wc -l || true
