@@ -1,11 +1,14 @@
-# repo=vpm-mini / branch=main / phase=Phase 2
+# repo=vpm-mini / branch=main / phase=Phase 4 Kickoff
 
-- **C（現在地）**: P2-2 GREEN（Hello KService READY=True）。観測テンプレ(main)追加済み。
-- **G（短期）**: Phase 2 Kickoff完 → ComposeサービスのKnative移植へ着手。
-- **δ（次の一手）**: 観測ラインは Issue「P2-Obs-hello-metrics」で lastErrorベースに一手ずつ推進（同じ試行はしない）。
+- **C（現在地）**: Phase 3 完了。Evidenceライン/自動マージ/掃除が安定稼働済み。
+- **G（短期）**: Phase 4 Kickoff – P4-1 Knative縦スライスと P4-2 外形監視の立ち上げ。
+- **δ（次の一手）**: P4-1 対象サービスを選定し縦スライス着手。Evidenceラインは Phase 4 向け枠を準備。
 
 ## Evidence
-- reports/p2_2_hello_ready_YYYYMMDD_HHMMSS.md
-- infra/observability/podmonitor-ksvc.yaml
-- docs/observability/ksvc_metrics.md
-- 観測: hello UP=1（job=monitoring/ksvc-hello-queue-proxy-9091）。Evidence: reports/p2_obs_hello_up_20251013_115925.md
+- STATE/update_20251017_043754_phase4_kickoff.md
+- reports/p3_2_grafana_auto_render_*.md
+- img/grafana_p3_2_auto_*.png
+
+## Current Phase
+- Phase 4 Kickoff 宣言
+- (ref: PR #400)
