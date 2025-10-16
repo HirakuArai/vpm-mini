@@ -1,0 +1,24 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: blackbox-exporter
+  namespace: monitoring
+  labels:
+    release: kps
+spec:
+  selector:
+    matchLabels:
+      app: blackbox-exporter
+  namespaceSelector:
+    matchNames:
+      - monitoring
+  endpoints:
+    - port: http
+      interval: 30s
+      path: /probe
+      scheme: http
+      params:
+        module:
+          - http_2xx_host
+        target:
+          - http://kourier-internal.kourier-system.svc.cluster.local/
