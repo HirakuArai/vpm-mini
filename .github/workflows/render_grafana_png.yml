@@ -81,6 +81,7 @@ jobs:
       - name: Create PR with artifacts
         uses: peter-evans/create-pull-request@v6
         with:
+          token: ${{ secrets.PR_BOT_TOKEN }}
           commit-message: "feat(p3-2): add Grafana auto-render evidence (bot)"
           title: "feat(p3-2): auto-render evidence (bot)"
           body: |
