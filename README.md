@@ -95,3 +95,11 @@ make trial-daily
 - Add dry-run workflow to emit success statuses for future required checks:
   - understanding/guard-required, understanding/snapshot-present, understanding/goals-synced
 - No rule change yet; observe impact while keeping post workflow.
+
+## Kourier Access (dev)
+
+```bash
+make -f Makefile.kourier curl-hello      # NodePort優先でHTTP 200確認
+make -f Makefile.kourier pf-kourier      # 8080:8080 port-forwardを起動（別ターミナルで curl-hello-pf）
+make -f Makefile.kourier curl-hello-pf   # 強制的にpf経由でHTTP 200確認
+```
