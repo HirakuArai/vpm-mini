@@ -7,10 +7,10 @@
   "panels": [
     {
       "type": "stat",
-      "title": "probe_success (http_2xx_host)",
+      "title": "probe_success (blackbox-exporter)",
       "datasource": {"type": "prometheus", "uid": "Prometheus"},
       "targets": [
-        {"expr": "avg(probe_success{module=\"http_2xx_host\"})"}
+        {"expr": "avg(probe_success{job=\"blackbox-exporter\"})"}
       ],
       "options": {"reduceOptions": {"calcs": ["lastNotNull"]}}
     },
@@ -19,7 +19,7 @@
       "title": "HTTP Status Code",
       "datasource": {"type": "prometheus", "uid": "Prometheus"},
       "targets": [
-        {"expr": "avg_over_time(probe_http_status_code{module=\"http_2xx_host\"}[5m])"}
+        {"expr": "avg_over_time(probe_http_status_code{job=\"blackbox-exporter\"}[5m])"}
       ]
     },
     {
@@ -27,7 +27,7 @@
       "title": "Probe Duration (s)",
       "datasource": {"type": "prometheus", "uid": "Prometheus"},
       "targets": [
-        {"expr": "probe_duration_seconds{module=\"http_2xx_host\"}"}
+        {"expr": "probe_duration_seconds{job=\"blackbox-exporter\"}"}
       ]
     }
   ]
