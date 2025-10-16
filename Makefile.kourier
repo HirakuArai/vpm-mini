@@ -1,0 +1,12 @@
+.PHONY: pf-kourier curl-hello curl-hello-pf
+
+pf-kourier:
+	@scripts/pf_kourier.sh
+
+# NodePort 優先で hello へ HTTP 確認（1 行だけ表示）
+curl-hello:
+	@scripts/test_hello.sh
+
+# 強制的に port-forward 経由でテスト
+curl-hello-pf:
+	@FORCE_PF=1 scripts/test_hello.sh
