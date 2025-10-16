@@ -1,0 +1,34 @@
+{
+  "title": "P4-2 Uptime (blackbox)",
+  "uid": "p4-uptime-blackbox",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "probe_success (http_2xx_host)",
+      "datasource": {"type": "prometheus", "uid": "Prometheus"},
+      "targets": [
+        {"expr": "avg(probe_success{module=\"http_2xx_host\"})"}
+      ],
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}}
+    },
+    {
+      "type": "timeseries",
+      "title": "HTTP Status Code",
+      "datasource": {"type": "prometheus", "uid": "Prometheus"},
+      "targets": [
+        {"expr": "avg_over_time(probe_http_status_code{module=\"http_2xx_host\"}[5m])"}
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Probe Duration (s)",
+      "datasource": {"type": "prometheus", "uid": "Prometheus"},
+      "targets": [
+        {"expr": "probe_duration_seconds{module=\"http_2xx_host\"}"}
+      ]
+    }
+  ]
+}
