@@ -1,0 +1,47 @@
+name: weekly-artifact-cleanup
+on:
+  schedule:
+    - cron: "0 1 * * 1"   # 毎週月曜 10:00 JST（UTC 01:00）
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Close stale artifact PRs and delete orphan bot branches
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "## Open artifact PRs (p3-2+evidence)"
+          open_json="$(gh pr list --state open --label p3-2 --label evidence --json number,createdAt,headRefName || echo '[]')"
+          echo "$open_json" | jq -r '.[] | "\(.number) \(.createdAt) \(.headRefName)"' || true
+
+          latest="$(echo "$open_json" | jq -r 'sort_by(.createdAt)|reverse|.[0].number // empty')"
+          if [[ -n "$latest" ]]; then
+            echo "Latest artifact PR: #$latest"
+          fi
+
+          for pr in $(echo "$open_json" | jq -r '.[].number'); do
+            if [[ -n "$latest" && "$pr" != "$latest" ]]; then
+              br=$(gh pr view "$pr" --json headRefName --jq .headRefName)
+              echo "Closing stale artifact PR #$pr (branch: $br)"
+              gh pr comment "$pr" -b "Closing as superseded by newer artifact PR #$latest."
+              gh pr close "$pr" --delete-branch || git push origin ":$br" || true
+            fi
+          done
+
+          echo "## Delete orphan bot branches"
+          open_heads="$(gh pr list --state open --json headRefName --jq '.[].headRefName' || true)"
+          while read -r ref; do
+            [[ -z "$ref" ]] && continue
+            if ! grep -qx "$ref" <<<"$open_heads"; then
+              echo "Deleting orphan branch: $ref"
+              git push origin ":$ref" || true
+            fi
+          done < <(git ls-remote --heads origin 'refs/heads/bot/p3-2-render/*' | awk '{print $2}' | sed 's#refs/heads/##')
