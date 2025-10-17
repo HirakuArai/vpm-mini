@@ -1,7 +1,7 @@
 name: render-grafana-png
 on:
   push:
-    branches: [ main ]
+    branches: [ main, chore/render-fire-20251018_071800 ]
     paths:
       - ".github/forced-runs/**"
   repository_dispatch:
