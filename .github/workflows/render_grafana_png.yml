@@ -1,6 +1,8 @@
 name: render-grafana-png
 on:
-  schedule:
+  
+  repository_dispatch:
+    types: [render_now]schedule:
     - cron: "0 0 * * *"  # 09:00 JST (UTC 00:00)
   workflow_dispatch:
     inputs:
