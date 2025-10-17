@@ -44,8 +44,8 @@ jobs:
       UID: ${{ matrix.uid }}
       PANEL_ID: ${{ matrix.panelId }}
       EVIDENCE_PREFIX: ${{ matrix.evidence_prefix }}
-      FROM: ${{ github.event.inputs.from || 'now-30m' }}
-      TO: ${{ github.event.inputs.to || 'now' }}
+      FROM: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.from || github.event_name == 'repository_dispatch' && github.event.client_payload.from || 'now-30m' }}
+      TO:   ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.to || github.event_name == 'repository_dispatch' && github.event.client_payload.to || 'now' }}
     steps:
       - name: Echo target context
         run: |
