@@ -1,5 +1,9 @@
 name: render-grafana-png
 on:
+  push:
+    branches: [ main ]
+    paths:
+      - ".github/forced-runs/**"
   repository_dispatch:
     types: [render_now]
   schedule:
