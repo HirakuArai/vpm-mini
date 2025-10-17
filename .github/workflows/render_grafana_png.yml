@@ -104,6 +104,7 @@ jobs:
 
       - name: Create PR with artifacts
         uses: peter-evans/create-pull-request@v6
+        id: create_pr
         with:
           token: ${{ secrets.PR_BOT_TOKEN }}
           commit-message: "feat(p3-2): add Grafana auto-render evidence (bot)"
@@ -119,6 +120,10 @@ jobs:
             reports/img/grafana_p3_2_auto_*.png
           labels: p3-2,evidence,bot
           delete-branch: true
+      - name: Echo Evidence PR URL (if created)
+        if: ${{ steps.create_pr.outputs.pull-request-url != '' }}
+        run: |
+          echo "Evidence PR: ${{ steps.create_pr.outputs.pull-request-url }}"
       - name: Cleanup port-forward
         if: always()
         run: |
@@ -128,4 +133,4 @@ jobs:
           fi
 
 # TODO: wire dashboard UID into this workflow
-# Suggested UID: "p4-uptime-blackbox"
+# Suggested UID: "p4-uptime-blackbox" (current workflow renders a single dashboard via infra/observability/grafana-dashboard-basic.json)
