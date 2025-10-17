@@ -24,7 +24,23 @@ jobs:
     timeout-minutes: 20
     env:
       LOCAL_URL: http://127.0.0.1:3000
+      GRAFANA_NS: monitoring
+      GRAFANA_SVC: kps-grafana
     steps:
+      - name: Start Grafana port-forward
+        run: |
+          set -euo pipefail
+          echo "Starting kubectl port-forward for ${GRAFANA_SVC} in ns=${GRAFANA_NS} → 127.0.0.1:3000"
+          kubectl -n "${GRAFANA_NS}" port-forward "svc/${GRAFANA_SVC}" 3000:80 >/dev/null 2>&1 &
+          echo $! > pf.pid
+          for i in $(seq 1 30); do
+            if curl -sfS "$LOCAL_URL/api/health" >/dev/null; then
+              echo "Grafana is reachable (attempt $i)"
+              break
+            fi
+            sleep 1
+          done
+          curl -sfS "$LOCAL_URL/api/health" >/dev/null || { echo "Grafana not reachable after waiting"; exit 1; }
       - uses: actions/checkout@v4
 
       - name: Resolve dashboard UID & panel ID (RPS)
@@ -103,6 +119,13 @@ jobs:
             reports/img/grafana_p3_2_auto_*.png
           labels: p3-2,evidence,bot
           delete-branch: true
+      - name: Cleanup port-forward
+        if: always()
+        run: |
+          if [ -f pf.pid ]; then
+            kill "$(cat pf.pid)" 2>/dev/null || true
+            rm -f pf.pid
+          fi
 
 # TODO: wire dashboard UID into this workflow
 # Suggested UID: "p4-uptime-blackbox"
