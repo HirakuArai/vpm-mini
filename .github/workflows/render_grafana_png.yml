@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   render:
-    runs-on: [self-hosted, local-mac]
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
       LOCAL_URL: http://127.0.0.1:3000
@@ -103,3 +103,6 @@ jobs:
             reports/img/grafana_p3_2_auto_*.png
           labels: p3-2,evidence,bot
           delete-branch: true
+
+# TODO: wire dashboard UID into this workflow
+# Suggested UID: "p4-uptime-blackbox"

@@ -1,0 +1,27 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: blackbox-rules
+  namespace: monitoring
+  labels:
+    release: kps
+spec:
+  groups:
+    - name: blackbox.rules
+      rules:
+        - alert: BlackboxProbeDown
+          expr: avg_over_time(probe_success{module="http_2xx_host"}[2m]) < 1
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: Blackbox probe failing (http_2xx_host)
+            description: probe_success < 1 for 2m
+        - alert: BlackboxSlow
+          expr: avg_over_time(probe_duration_seconds{module="http_2xx_host"}[5m]) > 1
+          for: 5m
+          labels:
+            severity: info
+          annotations:
+            summary: Blackbox probe slow
+            description: probe_duration_seconds avg(5m) > 1s
