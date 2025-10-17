@@ -25,10 +25,10 @@ jobs:
         include:
           - uid: vpm-basic-observability
             panelId: "2"
-            evidence_prefix: grafana_p3_2_auto
+            evidence_prefix: p3_2_auto
           - uid: p4-uptime-blackbox
             panelId: ""
-            evidence_prefix: grafana_p4-uptime-blackbox
+            evidence_prefix: p4_uptime
     runs-on: [self-hosted, local-mac]
     timeout-minutes: 20
     env:
@@ -41,6 +41,11 @@ jobs:
       FROM: ${{ github.event.inputs.from || 'now-30m' }}
       TO: ${{ github.event.inputs.to || 'now' }}
     steps:
+      - name: Echo target context
+        run: |
+          echo UID=${UID}
+          echo PANEL_ID=${PANEL_ID:-}
+          echo EVIDENCE_PREFIX=${EVIDENCE_PREFIX:-}
       - name: Start Grafana port-forward
         run: |
           set -euo pipefail
@@ -75,39 +80,47 @@ jobs:
             echo "Grafana credentials secrets are required" >&2
             exit 1
           fi
+
           TS="$(date +%Y%m%d_%H%M%S)"
-          PREFIX="${EVIDENCE_PREFIX:-${UID}}"
-          OUT="reports/img/${PREFIX}_${TS}.png"
-          mkdir -p reports/img
+          OUT_DIR="reports/img"
+          mkdir -p "$OUT_DIR"
+          OUT="${OUT_DIR}/grafana_${UID}_${TS}.png"
+
           AUTH=(-u "${GRAFANA_USER}:${GRAFANA_PASSWORD}")
           if [ -n "${PANEL_ID:-}" ]; then
-            curl -fsS "${AUTH[@]}" \
-              "${LOCAL_URL}/render/d-solo/${UID}?orgId=1&from=${FROM}&to=${TO}&panelId=${PANEL_ID}&width=1600&height=900" \
+            echo "Render mode: d-solo (panelId=${PANEL_ID})"
+            curl -fsS "${AUTH[@]}" -G "$LOCAL_URL/render/d-solo/${UID}" \
+              --data-urlencode "panelId=${PANEL_ID}" \
+              --data-urlencode "from=${FROM}" --data-urlencode "to=${TO}" \
+              --data-urlencode "width=1600" --data-urlencode "height=900" \
               -o "$OUT"
           else
-            curl -fsS "${AUTH[@]}" \
-              "${LOCAL_URL}/render/d/${UID}?orgId=1&from=${FROM}&to=${TO}&width=1600&height=900" \
+            echo "Render mode: dashboard (uid=${UID})"
+            curl -fsS "${AUTH[@]}" -G "$LOCAL_URL/render/d/${UID}" \
+              --data-urlencode "from=${FROM}" --data-urlencode "to=${TO}" \
+              --data-urlencode "width=1600" --data-urlencode "height=900" \
               -o "$OUT"
           fi
-          echo "OUT=$OUT" >> "$GITHUB_ENV"
+
+          test -s "$OUT" || { echo "Render failed: empty $OUT"; exit 1; }
 
       - name: Note evidence UID
         run: echo "EVIDENCE UID: ${UID} PANEL: ${PANEL_ID:-none}"
+
       - name: Append Evidence MD
         run: |
           set -euo pipefail
-          TS=$(date +%Y%m%d_%H%M%S)
-          PREFIX="${EVIDENCE_PREFIX:-${UID}}"
-          EV="reports/${PREFIX}_grafana_render_${TS}.md"
-          REL="${OUT#reports/}"
+          TS="$(date +%Y%m%d_%H%M%S)"
+          MD="reports/${UID}_grafana_render_${TS}.md"
+          mkdir -p reports
           {
-            echo "# Grafana render @ ${TS}"
-            echo "- dashboard uid: ${UID}"
-            echo "- panel id: ${PANEL_ID:-<none>}"
-            echo "- range: ${FROM} → ${TO}"
-            echo
-            echo "![render](${REL})"
-          } > "$EV"
+            echo "# Grafana Render Evidence (${UID})"
+            echo ""
+            echo "- Range: ${FROM} → ${TO}"
+            echo "- Panel: ${PANEL_ID:-none}"
+            echo "- Image: reports/img/grafana_${UID}_${TS}.png"
+          } > "$MD"
+          test -s "$MD"
 
       - name: Create PR with artifacts
         uses: peter-evans/create-pull-request@v6
@@ -123,14 +136,48 @@ jobs:
             - Range: ${FROM} → ${TO}
           branch: "bot/render/${{ github.run_id }}"
           add-paths: |
-            reports/*_grafana_render_*.md
-            reports/img/grafana_*.png
+            reports/${UID}_grafana_render_*.md
+            reports/img/grafana_${UID}_*.png
           labels: p3-2,evidence,bot
           delete-branch: true
+
       - name: Echo Evidence PR URL (if created)
         if: ${{ steps.create_pr.outputs.pull-request-url != '' }}
         run: |
           echo "Evidence PR: ${{ steps.create_pr.outputs.pull-request-url }}"
+
+      - name: Cleanup port-forward
+        if: always()
+        run: |
+          if [ -f pf.pid ]; then
+            kill "$(cat pf.pid)" 2>/dev/null || true
+            rm -f pf.pid
+          fi
+
+      - name: Create PR with artifacts
+        uses: peter-evans/create-pull-request@v6
+        id: create_pr
+        with:
+          token: ${{ secrets.PR_BOT_TOKEN }}
+          commit-message: "chore(render): add Grafana evidence (${UID})"
+          title: "chore(render): auto-render evidence (${UID})"
+          body: |
+            Auto-generated evidence from workflow run ${{ github.run_id }}.
+            - Dashboard UID: ${UID}
+            - Panel ID: ${PANEL_ID:-<none>}
+            - Range: ${FROM} → ${TO}
+          branch: "bot/render/${{ github.run_id }}"
+          add-paths: |
+            reports/${UID}_grafana_render_*.md
+            reports/img/grafana_${UID}_*.png
+          labels: p3-2,evidence,bot
+          delete-branch: true
+
+      - name: Echo Evidence PR URL (if created)
+        if: ${{ steps.create_pr.outputs.pull-request-url != '' }}
+        run: |
+          echo "Evidence PR: ${{ steps.create_pr.outputs.pull-request-url }}"
+
       - name: Cleanup port-forward
         if: always()
         run: |
