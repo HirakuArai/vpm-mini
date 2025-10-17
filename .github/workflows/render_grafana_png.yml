@@ -20,13 +20,32 @@ concurrency:
   cancel-in-progress: true
 jobs:
   render:
+    strategy:
+      matrix:
+        include:
+          - uid: vpm-basic-observability
+            panelId: "2"
+            evidence_prefix: p3_2_auto
+          - uid: p4-uptime-blackbox
+            panelId: ""
+            evidence_prefix: p4_uptime
     runs-on: [self-hosted, local-mac]
     timeout-minutes: 20
     env:
       LOCAL_URL: http://127.0.0.1:3000
       GRAFANA_NS: monitoring
       GRAFANA_SVC: kps-grafana
+      UID: ${{ matrix.uid }}
+      PANEL_ID: ${{ matrix.panelId }}
+      EVIDENCE_PREFIX: ${{ matrix.evidence_prefix }}
+      FROM: ${{ github.event.inputs.from || 'now-30m' }}
+      TO: ${{ github.event.inputs.to || 'now' }}
     steps:
+      - name: Echo target context
+        run: |
+          echo UID=${UID}
+          echo PANEL_ID=${PANEL_ID:-}
+          echo EVIDENCE_PREFIX=${EVIDENCE_PREFIX:-}
       - name: Start Grafana port-forward
         run: |
           set -euo pipefail
@@ -43,28 +62,10 @@ jobs:
           curl -sfS "$LOCAL_URL/api/health" >/dev/null || { echo "Grafana not reachable after waiting"; exit 1; }
       - uses: actions/checkout@v4
 
-      - name: Resolve dashboard UID & panel ID (RPS)
-        id: meta
+      - name: Resolve render target
         run: |
           set -euo pipefail
-          DASH='infra/observability/grafana-dashboard-basic.json'
-          if [ ! -f "$DASH" ]; then
-            echo "Dashboard JSON missing: $DASH" >&2
-            exit 1
-          fi
-          DASH_UID=$(jq -r '.dashboard.uid // .uid // empty' "$DASH")
-          if [ -z "$DASH_UID" ]; then
-            DASH_UID="vpm-basic-observability"
-          fi
-          PANEL_ID=$(jq -r '.dashboard.panels[]?, .panels[]? | select(.title | test("RPS"; "i")) | .id' "$DASH" | head -n1)
-          if [ -z "$PANEL_ID" ]; then
-            echo "RPS panel not found in dashboard JSON" >&2
-            exit 1
-          fi
-          {
-            echo "uid=$DASH_UID"
-            echo "panel=$PANEL_ID"
-          } >> "$GITHUB_OUTPUT"
+          echo "Rendering UID=${UID} PANEL_ID=${PANEL_ID:-<none>} range ${FROM} → ${TO}"
 
       - name: Health check
         run: curl -fsS "$LOCAL_URL/api/health" >/dev/null
@@ -79,51 +80,104 @@ jobs:
             echo "Grafana credentials secrets are required" >&2
             exit 1
           fi
-          TS=$(date +%Y%m%d_%H%M%S)
-          OUT="reports/img/grafana_p3_2_auto_${TS}.png"
-          mkdir -p reports/img
-          curl -fsS -u "${GRAFANA_USER}:${GRAFANA_PASSWORD}" \
-            "${LOCAL_URL}/render/d-solo/${{ steps.meta.outputs.uid }}?orgId=1&from=${{ github.event.inputs.from || 'now-30m' }}&to=${{ github.event.inputs.to || 'now' }}&panelId=${{ steps.meta.outputs.panel }}&width=1600&height=800" \
-            -o "$OUT"
-          echo "OUT=$OUT" >> "$GITHUB_ENV"
+
+          TS="$(date +%Y%m%d_%H%M%S)"
+          OUT_DIR="reports/img"
+          mkdir -p "$OUT_DIR"
+          OUT="${OUT_DIR}/grafana_${UID}_${TS}.png"
+
+          AUTH=(-u "${GRAFANA_USER}:${GRAFANA_PASSWORD}")
+          if [ -n "${PANEL_ID:-}" ]; then
+            echo "Render mode: d-solo (panelId=${PANEL_ID})"
+            curl -fsS "${AUTH[@]}" -G "$LOCAL_URL/render/d-solo/${UID}" \
+              --data-urlencode "panelId=${PANEL_ID}" \
+              --data-urlencode "from=${FROM}" --data-urlencode "to=${TO}" \
+              --data-urlencode "width=1600" --data-urlencode "height=900" \
+              -o "$OUT"
+          else
+            echo "Render mode: dashboard (uid=${UID})"
+            curl -fsS "${AUTH[@]}" -G "$LOCAL_URL/render/d/${UID}" \
+              --data-urlencode "from=${FROM}" --data-urlencode "to=${TO}" \
+              --data-urlencode "width=1600" --data-urlencode "height=900" \
+              -o "$OUT"
+          fi
+
+          test -s "$OUT" || { echo "Render failed: empty $OUT"; exit 1; }
+
+      - name: Note evidence UID
+        run: echo "EVIDENCE UID: ${UID} PANEL: ${PANEL_ID:-none}"
 
       - name: Append Evidence MD
         run: |
           set -euo pipefail
-          TS=$(date +%Y%m%d_%H%M%S)
-          EV="reports/p3_2_grafana_auto_render_${TS}.md"
-          REL="${OUT#reports/}"
+          TS="$(date +%Y%m%d_%H%M%S)"
+          MD="reports/${UID}_grafana_render_${TS}.md"
+          mkdir -p reports
           {
-            echo "# P3-2 Grafana auto render @ ${TS}"
-            echo "- dashboard uid: ${{ steps.meta.outputs.uid }}"
-            echo "- panel id: ${{ steps.meta.outputs.panel }}"
-            echo "- range: ${{ github.event.inputs.from || 'now-30m' }} → ${{ github.event.inputs.to || 'now' }}"
-            echo
-            echo "![render](${REL})"
-          } > "$EV"
+            echo "# Grafana Render Evidence (${UID})"
+            echo ""
+            echo "- Range: ${FROM} → ${TO}"
+            echo "- Panel: ${PANEL_ID:-none}"
+            echo "- Image: reports/img/grafana_${UID}_${TS}.png"
+          } > "$MD"
+          test -s "$MD"
 
       - name: Create PR with artifacts
         uses: peter-evans/create-pull-request@v6
         id: create_pr
         with:
           token: ${{ secrets.PR_BOT_TOKEN }}
-          commit-message: "feat(p3-2): add Grafana auto-render evidence (bot)"
-          title: "feat(p3-2): auto-render evidence (bot)"
+          commit-message: "chore(render): add Grafana evidence (${UID})"
+          title: "chore(render): auto-render evidence (${UID})"
           body: |
             Auto-generated evidence from workflow run ${{ github.run_id }}.
-            - Dashboard UID: ${{ steps.meta.outputs.uid }}
-            - Panel ID: ${{ steps.meta.outputs.panel }}
-            - Range: ${{ github.event.inputs.from || 'now-30m' }} → ${{ github.event.inputs.to || 'now' }}
-          branch: "bot/p3-2-render/${{ github.run_id }}"
+            - Dashboard UID: ${UID}
+            - Panel ID: ${PANEL_ID:-<none>}
+            - Range: ${FROM} → ${TO}
+          branch: "bot/render/${{ github.run_id }}"
           add-paths: |
-            reports/p3_2_grafana_auto_render_*.md
-            reports/img/grafana_p3_2_auto_*.png
+            reports/${UID}_grafana_render_*.md
+            reports/img/grafana_${UID}_*.png
           labels: p3-2,evidence,bot
           delete-branch: true
+
       - name: Echo Evidence PR URL (if created)
         if: ${{ steps.create_pr.outputs.pull-request-url != '' }}
         run: |
           echo "Evidence PR: ${{ steps.create_pr.outputs.pull-request-url }}"
+
+      - name: Cleanup port-forward
+        if: always()
+        run: |
+          if [ -f pf.pid ]; then
+            kill "$(cat pf.pid)" 2>/dev/null || true
+            rm -f pf.pid
+          fi
+
+      - name: Create PR with artifacts
+        uses: peter-evans/create-pull-request@v6
+        id: create_pr
+        with:
+          token: ${{ secrets.PR_BOT_TOKEN }}
+          commit-message: "chore(render): add Grafana evidence (${UID})"
+          title: "chore(render): auto-render evidence (${UID})"
+          body: |
+            Auto-generated evidence from workflow run ${{ github.run_id }}.
+            - Dashboard UID: ${UID}
+            - Panel ID: ${PANEL_ID:-<none>}
+            - Range: ${FROM} → ${TO}
+          branch: "bot/render/${{ github.run_id }}"
+          add-paths: |
+            reports/${UID}_grafana_render_*.md
+            reports/img/grafana_${UID}_*.png
+          labels: p3-2,evidence,bot
+          delete-branch: true
+
+      - name: Echo Evidence PR URL (if created)
+        if: ${{ steps.create_pr.outputs.pull-request-url != '' }}
+        run: |
+          echo "Evidence PR: ${{ steps.create_pr.outputs.pull-request-url }}"
+
       - name: Cleanup port-forward
         if: always()
         run: |
