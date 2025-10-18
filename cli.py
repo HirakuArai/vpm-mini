@@ -1,25 +1,78 @@
 #!/usr/bin/env python
 """
-使い方: python cli.py <objective_id> <メッセージ>
-例    : python cli.py demo "こんにちは"
+使い方:
+  python cli.py <objective_id> <メッセージ>
+  python cli.py answer "今のPhaseは？" [--ai] [--budget 2000] [--no-json]
 """
 
-import sys
+from __future__ import annotations
+
+import argparse
+import json
 import pathlib
+import sys
 
 # src/ を import パスへ追加
 sys.path.append(str(pathlib.Path(__file__).resolve().parent / "src"))
 from core import ask_openai
 
 
-def main():
-    if len(sys.argv) < 3:
-        print("Usage: python cli.py <objective_id> <message>")
+def main() -> None:
+    if len(sys.argv) >= 3 and sys.argv[1] != "answer":
+        # 互換維持: 従来の CLI は早期リターン
+        obj_id = sys.argv[1]
+        user_msg = " ".join(sys.argv[2:])
+        print(ask_openai(obj_id, user_msg))
+        return
+
+    parser = _build_parser()
+    if len(sys.argv) <= 1:
+        parser.print_help()
         sys.exit(1)
 
-    obj_id = sys.argv[1]
-    user_msg = " ".join(sys.argv[2:])
-    print(ask_openai(obj_id, user_msg))
+    args = parser.parse_args()
+    if args.command == "answer":
+        _handle_answer(args)
+    else:
+        parser.print_help()
+        sys.exit(1)
+
+
+def _build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(dest="command")
+    answer = subparsers.add_parser("answer", help="SSOTに基づく質問応答を実行")
+    answer.add_argument("question", help="質問文")
+    answer.add_argument("--ai", action="store_true", help="LLMモードを有効化")
+    answer.add_argument(
+        "--budget",
+        type=int,
+        default=2000,
+        help="SSOT抜粋の最大文字数（デフォルト: 2000）",
+    )
+    answer.add_argument(
+        "--no-json",
+        action="store_true",
+        help="JSONではなく短文サマリを出力",
+    )
+    return parser
+
+
+def _handle_answer(args: argparse.Namespace) -> None:
+    from core.grounded_answer import grounded_answer
+
+    result = grounded_answer(args.question, use_ai=args.ai, budget=args.budget)
+    if args.no_json:
+        print(result.get("answer", ""))
+        sources = result.get("sources", [])
+        if sources:
+            print("sources:", ", ".join(sources))
+        print(f"confidence: {result.get('confidence', 0.0)}")
+        unknown = result.get("unknown_fields", [])
+        if unknown:
+            print("unknown_fields:", ", ".join(unknown))
+    else:
+        print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":

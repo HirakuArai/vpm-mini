@@ -1,10 +1,15 @@
 import datetime
 import json
+import os
 import re
+import sys
 import textwrap
 from pathlib import Path
 
 import streamlit as st
+
+sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
+from core.grounded_answer import grounded_answer
 
 SSOT_STATE = Path("STATE/current_state.md")
 REPORTS_DIR = Path("reports")
@@ -72,25 +77,6 @@ def parse_state(md: str) -> dict:
     }
 
 
-def answer_question(question: str, facts: dict) -> str:
-    if "Phase" in question:
-        return f"現在は **{facts['phase']}**。短期ゴールは **{facts['short_goal']}** です。"
-    if "Exit Criteria" in question:
-        return "READY=True と HTTP 200 の疎通、そして reports/ に Evidence(MD/PNG) が揃えば達成です。"
-    if "次に着手" in question:
-        items = (
-            "\n".join(f"- {d}" for d in facts["delta"])
-            or "- STATEにδを記載してください"
-        )
-        return f"差分δの観点から、次は以下：\n{items}"
-    if "ロールバック" in question:
-        return "KService の前版へ `kubectl rollout undo ksvc/hello`、または manifest を前タグへ戻し PR で証跡化。"
-    if "Evidence" in question or "証跡" in question:
-        ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        return f"`reports/poc_vpm_demo_{ts}.md` に手順・結果・スクショパスを書き、PNG は `reports/img/` に保存。"
-    return "STATE/current_state.md を更新し、C/G/δを明確にしてください。"
-
-
 def next_actions(facts: dict) -> list[dict]:
     return [
         {
@@ -154,9 +140,16 @@ with st.sidebar:
     st.write("STATE:", SSOT_STATE if SSOT_STATE.exists() else demo_state_path)
     st.write("reports:", REPORTS_DIR if REPORTS_DIR.exists() else DEMO_DIR / "reports")
     use_real = st.checkbox("実リポのSSOTを使う（存在する場合）", value=True)
+    st.markdown("### AI モード")
+    ai_mode_requested = st.checkbox("AIモード (OPENAI_API_KEY 必須)", value=False)
+    free_question = st.text_input("自由質問", "")
+    if ai_mode_requested and not os.getenv("OPENAI_API_KEY"):
+        st.info("OPENAI_API_KEY が未設定のためルール回答で動作します。")
 
 state_text = load_text(SSOT_STATE if use_real else demo_state_path)
 facts = parse_state(state_text)
+has_openai_key = bool(os.getenv("OPENAI_API_KEY"))
+effective_ai = ai_mode_requested and has_openai_key
 
 col1, col2 = st.columns(2)
 with col1:
@@ -167,7 +160,21 @@ with col2:
     st.markdown("### 2) 理解 → 即答（5問）")
     for q in FIXED_QUESTIONS:
         with st.expander(q, expanded=False):
-            st.write(answer_question(q, facts))
+            try:
+                response = grounded_answer(q, use_ai=effective_ai, budget=2000)
+            except Exception as exc:  # pragma: no cover - UI path
+                st.warning(f"grounded_answer でエラーが発生しました: {exc}")
+            else:
+                st.json(response)
+
+if free_question.strip():
+    st.markdown("### 自由質問")
+    try:
+        free_response = grounded_answer(free_question, use_ai=effective_ai, budget=2000)
+    except Exception as exc:  # pragma: no cover - UI path
+        st.warning(f"自由質問の処理でエラーが発生しました: {exc}")
+    else:
+        st.json(free_response)
 
 st.divider()
 st.markdown("### 3) 診断 → 優先度（next_actions.json 生成）")
