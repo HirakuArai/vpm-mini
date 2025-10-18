@@ -27,6 +27,11 @@ load_dotenv(DOTENV_PATH, override=True)
 client = OpenAI()
 
 
+def get_openai_client() -> OpenAI:
+    """Return the shared OpenAI client instance."""
+    return client
+
+
 def ask_openai(obj_id: str, user_msg: str) -> str:
     """
     最小チャットラッパー
