@@ -1,0 +1,2 @@
+asset_id,kind,name,owner,criticality,status,due_date
+SAMPLE-001,BI,DWH日次ダッシュボード,**SAMPLE**,H,pending,2099-12-31
