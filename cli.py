@@ -3,11 +3,13 @@
 使い方:
   python cli.py <objective_id> <メッセージ>
   python cli.py answer "今のPhaseは？" [--ai] [--budget 2000] [--no-json]
+  python cli.py state-update [--ai] [--print] [--decisions-dir PATH]
 """
 
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
 import pathlib
 import sys
@@ -15,52 +17,61 @@ import sys
 # src/ を import パスへ追加
 sys.path.append(str(pathlib.Path(__file__).resolve().parent / "src"))
 from core import ask_openai
+from core.grounded_answer import grounded_answer
+from core.state_drafter import draft_state
 
 
-def main() -> None:
-    if len(sys.argv) >= 3 and sys.argv[1] != "answer":
-        # 互換維持: 従来の CLI は早期リターン
-        obj_id = sys.argv[1]
-        user_msg = " ".join(sys.argv[2:])
-        print(ask_openai(obj_id, user_msg))
-        return
+def _maybe_handle_subcommand() -> bool:
+    if len(sys.argv) < 2:
+        return False
 
-    parser = _build_parser()
-    if len(sys.argv) <= 1:
-        parser.print_help()
-        sys.exit(1)
+    parser = argparse.ArgumentParser(add_help=False)
+    subparsers = parser.add_subparsers(dest="subcmd")
 
-    args = parser.parse_args()
-    if args.command == "answer":
+    p_ans = subparsers.add_parser("answer", add_help=False)
+    p_ans.add_argument("question", nargs="+")
+    p_ans.add_argument("--ai", action="store_true")
+    p_ans.add_argument("--budget", type=int, default=2000)
+    p_ans.add_argument("--no-json", action="store_true")
+
+    p_state = subparsers.add_parser("state-update", add_help=False)
+    p_state.add_argument("--ai", action="store_true")
+    p_state.add_argument("--print", dest="prn", action="store_true")
+    p_state.add_argument("--decisions-dir", default="reports/decisions")
+    p_state.add_argument("--max-items", type=int, default=10)
+
+    try:
+        ns, _ = parser.parse_known_args()
+    except SystemExit:
+        return False
+
+    if ns.subcmd == "answer":
+        question_text = " ".join(getattr(ns, "question", []))
+        if not question_text:
+            return False
+        args = argparse.Namespace(
+            question=question_text,
+            ai=getattr(ns, "ai", False),
+            budget=getattr(ns, "budget", 2000),
+            no_json=getattr(ns, "no_json", False),
+        )
         _handle_answer(args)
-    else:
-        parser.print_help()
-        sys.exit(1)
+        return True
 
+    if ns.subcmd == "state-update":
+        args = argparse.Namespace(
+            ai=getattr(ns, "ai", False),
+            print_body=getattr(ns, "prn", False),
+            decisions_dir=getattr(ns, "decisions_dir", "reports/decisions"),
+            max_items=getattr(ns, "max_items", 10),
+        )
+        _handle_state_update(args)
+        return True
 
-def _build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(dest="command")
-    answer = subparsers.add_parser("answer", help="SSOTに基づく質問応答を実行")
-    answer.add_argument("question", help="質問文")
-    answer.add_argument("--ai", action="store_true", help="LLMモードを有効化")
-    answer.add_argument(
-        "--budget",
-        type=int,
-        default=2000,
-        help="SSOT抜粋の最大文字数（デフォルト: 2000）",
-    )
-    answer.add_argument(
-        "--no-json",
-        action="store_true",
-        help="JSONではなく短文サマリを出力",
-    )
-    return parser
+    return False
 
 
 def _handle_answer(args: argparse.Namespace) -> None:
-    from core.grounded_answer import grounded_answer
-
     result = grounded_answer(args.question, use_ai=args.ai, budget=args.budget)
     if args.no_json:
         print(result.get("answer", ""))
@@ -73,6 +84,54 @@ def _handle_answer(args: argparse.Namespace) -> None:
             print("unknown_fields:", ", ".join(unknown))
     else:
         print(json.dumps(result, ensure_ascii=False, indent=2))
+
+
+def _handle_state_update(args: argparse.Namespace) -> None:
+    repo_root = pathlib.Path(__file__).resolve().parent
+
+    result = draft_state(
+        decisions_dir=args.decisions_dir,
+        max_items=args.max_items,
+        use_ai=args.ai,
+    )
+    raw_path = result.get("path") or ""
+    target_path = pathlib.Path(raw_path)
+    if not target_path.is_absolute():
+        target_path = repo_root / target_path
+    if target_path.exists():
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        target_path = target_path.parent / f"update_{timestamp}.md"
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+    target_path.write_text(result["body"], encoding="utf-8")
+
+    meta = result.get("meta") or {}
+    if args.ai and not meta.get("ai_used", False):
+        print("AI draft unavailable or skipped; rule-based template used.")
+
+    print(f"Generated {target_path}")
+
+    if args.print_body:
+        print("---")
+        print(result["body"])
+
+    sources = result.get("sources", [])
+    if sources:
+        print("sources:", ", ".join(sources))
+
+    print(str(target_path))
+
+
+def main() -> None:
+    if _maybe_handle_subcommand():
+        return
+
+    if len(sys.argv) < 3:
+        print("Usage: python cli.py <objective_id> <message>")
+        sys.exit(1)
+
+    obj_id = sys.argv[1]
+    user_msg = " ".join(sys.argv[2:])
+    print(ask_openai(obj_id, user_msg))
 
 
 if __name__ == "__main__":
