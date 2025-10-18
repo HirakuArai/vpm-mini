@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
 import pathlib
 import sys
@@ -18,19 +19,6 @@ sys.path.append(str(pathlib.Path(__file__).resolve().parent / "src"))
 from core import ask_openai
 from core.grounded_answer import grounded_answer
 from core.state_drafter import draft_state
-
-
-def main() -> None:
-    if _maybe_handle_subcommand():
-        return
-
-    if len(sys.argv) < 3:
-        print("Usage: python cli.py <objective_id> <message>")
-        sys.exit(1)
-
-    obj_id = sys.argv[1]
-    user_msg = " ".join(sys.argv[2:])
-    print(ask_openai(obj_id, user_msg))
 
 
 def _maybe_handle_subcommand() -> bool:
@@ -110,6 +98,9 @@ def _handle_state_update(args: argparse.Namespace) -> None:
     target_path = pathlib.Path(raw_path)
     if not target_path.is_absolute():
         target_path = repo_root / target_path
+    if target_path.exists():
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        target_path = target_path.parent / f"update_{timestamp}.md"
     target_path.parent.mkdir(parents=True, exist_ok=True)
     target_path.write_text(result["body"], encoding="utf-8")
 
@@ -127,8 +118,20 @@ def _handle_state_update(args: argparse.Namespace) -> None:
     if sources:
         print("sources:", ", ".join(sources))
 
-    # 最後に生成ファイルの絶対パスを単独行で表示（スクリプトから取得しやすいように）
     print(str(target_path))
+
+
+def main() -> None:
+    if _maybe_handle_subcommand():
+        return
+
+    if len(sys.argv) < 3:
+        print("Usage: python cli.py <objective_id> <message>")
+        sys.exit(1)
+
+    obj_id = sys.argv[1]
+    user_msg = " ".join(sys.argv[2:])
+    print(ask_openai(obj_id, user_msg))
 
 
 if __name__ == "__main__":
