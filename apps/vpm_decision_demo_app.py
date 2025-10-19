@@ -10,6 +10,7 @@ import streamlit as st
 
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 from core.grounded_answer import grounded_answer
+from core.plan_suggester import suggest_plan
 
 SSOT_STATE = Path("STATE/current_state.md")
 REPORTS_DIR = Path("reports")
@@ -178,15 +179,22 @@ if free_question.strip():
 
 st.divider()
 st.markdown("### 3) 診断 → 優先度（next_actions.json 生成）")
-actions = next_actions(facts)
-out_payload = {
-    "short_goal": facts["short_goal"],
-    "next_actions": actions,
-}
-actions_json = json.dumps(out_payload, ensure_ascii=False, indent=2)
-st.code(actions_json, language="json")
-(OUT_DIR / "next_actions.json").write_text(actions_json, encoding="utf-8")
-st.success(f"Saved: {OUT_DIR / 'next_actions.json'}")
+try:
+    plan_payload = suggest_plan(use_ai=effective_ai, limit=5)
+except Exception as exc:  # pragma: no cover - defensive path
+    st.warning(f"plan_suggester でエラーが発生しました: {exc}")
+    plan_payload = {"next_actions": [], "short_goal": facts["short_goal"]}
+
+if not plan_payload.get("short_goal"):
+    plan_payload["short_goal"] = facts["short_goal"]
+
+actions = plan_payload.get("next_actions", [])
+plan_json = json.dumps(plan_payload, ensure_ascii=False, indent=2)
+st.code(plan_json, language="json")
+plan_path = OUT_DIR / "next_actions.json"
+plan_path.parent.mkdir(parents=True, exist_ok=True)
+plan_path.write_text(plan_json, encoding="utf-8")
+st.success(f"Saved: {plan_path}")
 
 st.divider()
 st.markdown("### 4) 提案 → アクション（PR草案生成）")

@@ -40,6 +40,11 @@ def _maybe_handle_subcommand() -> bool:
     p_state.add_argument("--decisions-dir", default="reports/decisions")
     p_state.add_argument("--max-items", type=int, default=10)
 
+    p_plan = subparsers.add_parser("plan", add_help=False)
+    p_plan.add_argument("--ai", action="store_true")
+    p_plan.add_argument("--limit", type=int, default=5)
+    p_plan.add_argument("--out", dest="out_path", default="out/next_actions.json")
+
     try:
         ns, _ = parser.parse_known_args()
     except SystemExit:
@@ -66,6 +71,15 @@ def _maybe_handle_subcommand() -> bool:
             max_items=getattr(ns, "max_items", 10),
         )
         _handle_state_update(args)
+        return True
+
+    if ns.subcmd == "plan":
+        args = argparse.Namespace(
+            ai=getattr(ns, "ai", False),
+            limit=max(1, int(getattr(ns, "limit", 5) or 5)),
+            out_path=getattr(ns, "out_path", "out/next_actions.json"),
+        )
+        _handle_plan(args)
         return True
 
     return False
@@ -119,6 +133,29 @@ def _handle_state_update(args: argparse.Namespace) -> None:
         print("sources:", ", ".join(sources))
 
     print(str(target_path))
+
+
+def _handle_plan(args: argparse.Namespace) -> None:
+    from core.plan_suggester import suggest_plan
+
+    out_path = pathlib.Path(args.out_path)
+    try:
+        plan = suggest_plan(use_ai=args.ai, limit=args.limit)
+    except Exception as exc:  # pragma: no cover - defensive path
+        print(f"Plan generation failed: {exc}")
+        return
+
+    actions = plan.get("next_actions") or []
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(
+        json.dumps(plan, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
+    if actions:
+        first_title = actions[0].get("title", "")
+        print(f"Saved {len(actions)} actions to {out_path} (top: {first_title})")
+    else:
+        print(f"Saved empty plan to {out_path}")
 
 
 def main() -> None:
