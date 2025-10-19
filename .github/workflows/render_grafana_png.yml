@@ -1,4 +1,5 @@
 name: render-grafana-png
+
 on:
   push:
     branches: [ main ]
@@ -7,7 +8,7 @@ on:
   repository_dispatch:
     types: [render_now]
   schedule:
-    - cron: "0 0 * * *"  # 09:00 JST (UTC 00:00)
+    - cron: "0 22 * * *"  # 07:00 JST
   workflow_dispatch:
     inputs:
       from:
@@ -16,14 +17,15 @@ on:
       to:
         description: 'time range to'
         default: 'now'
+
 permissions:
   contents: write
-  pull-requests: write
   actions: read
 
 concurrency:
   group: render-grafana-png-${{ github.ref }}
   cancel-in-progress: true
+
 jobs:
   render:
     strategy:
@@ -44,8 +46,8 @@ jobs:
       UID: ${{ matrix.uid }}
       PANEL_ID: ${{ matrix.panelId }}
       EVIDENCE_PREFIX: ${{ matrix.evidence_prefix }}
-      FROM: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.from || github.event_name == 'repository_dispatch' && github.event.client_payload.from || 'now-30m' }}
-      TO:   ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.to || github.event_name == 'repository_dispatch' && github.event.client_payload.to || 'now' }}
+      FROM: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.from || github.event_name == 'repository_dispatch' && github.event.client_payload.from || 'now-24h' }}
+      TO:   ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.to   || github.event_name == 'repository_dispatch' && github.event.client_payload.to   || 'now' }}
     steps:
       - name: Echo target context
         run: |
@@ -128,6 +130,54 @@ jobs:
           } > "$MD"
           test -s "$MD"
 
+      - name: Validate evidence outputs
+        run: |
+          python - <<'PY'
+import glob
+import os
+from pathlib import Path
+
+results_ok = []
+results_ng = []
+
+def latest(pattern: str):
+    files = glob.glob(pattern)
+    files.sort(key=os.path.getmtime, reverse=True)
+    return files
+
+p4 = latest("reports/img/grafana_p4-uptime-blackbox_*.png")
+if p4:
+    results_ok.append(f"P4 PNG: {os.path.basename(p4[0])}")
+else:
+    results_ng.append("P4 PNG not found")
+
+p3 = latest("reports/img/grafana_vpm-basic-observability_*.png")
+if p3:
+    results_ok.append(f"P3 PNG: {os.path.basename(p3[0])}")
+else:
+    results_ng.append("P3 PNG not found")
+
+md = latest("reports/*_grafana_render_*.md")
+if len(md) >= 2:
+    results_ok.append(f"MD count: {len(md)} (latest {os.path.basename(md[0])})")
+elif md:
+    results_ng.append("Only one evidence MD found (expect ≥2)")
+else:
+    results_ng.append("Evidence MD not found")
+
+footer_path = Path("evidence_footer.txt")
+with footer_path.open("w", encoding="utf-8") as fh:
+    fh.write("## Validate\n")
+    fh.write("- OK: " + ("; ".join(results_ok) if results_ok else "none") + "\n")
+    fh.write("- NG: " + ("; ".join(results_ng) if results_ng else "none") + "\n")
+
+status_path = Path("evidence_status.txt")
+status_path.write_text("NG" if results_ng else "OK", encoding="utf-8")
+
+print("== FOOTER ==")
+print(footer_path.read_text(encoding="utf-8"))
+PY
+
       - name: Create PR with artifacts
         uses: peter-evans/create-pull-request@v6
         id: create_pr
@@ -152,37 +202,42 @@ jobs:
         run: |
           echo "Evidence PR: ${{ steps.create_pr.outputs.pull-request-url }}"
 
-      - name: Cleanup port-forward
+      - name: Append validate footer
         if: always()
+        env:
+          GH_TOKEN: ${{ secrets.PR_BOT_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUM: ${{ steps.create_pr.outputs.pull-request-number }}
         run: |
-          if [ -f pf.pid ]; then
-            kill "$(cat pf.pid)" 2>/dev/null || true
-            rm -f pf.pid
+          set -euo pipefail
+          if [ ! -f evidence_footer.txt ]; then
+            echo "No evidence footer generated";
+            exit 0
           fi
-
-      - name: Create PR with artifacts
-        uses: peter-evans/create-pull-request@v6
-        id: create_pr
-        with:
-          token: ${{ secrets.PR_BOT_TOKEN }}
-          commit-message: "chore(render): add Grafana evidence (${UID})"
-          title: "chore(render): auto-render evidence (${UID})"
-          body: |
-            Auto-generated evidence from workflow run ${{ github.run_id }}.
-            - Dashboard UID: ${UID}
-            - Panel ID: ${PANEL_ID:-<none>}
-            - Range: ${FROM} → ${TO}
-          branch: "bot/render/${{ github.run_id }}"
-          add-paths: |
-            reports/${UID}_grafana_render_*.md
-            reports/img/grafana_${UID}_*.png
-          labels: p3-2,evidence,bot
-          delete-branch: true
-
-      - name: Echo Evidence PR URL (if created)
-        if: ${{ steps.create_pr.outputs.pull-request-url != '' }}
-        run: |
-          echo "Evidence PR: ${{ steps.create_pr.outputs.pull-request-url }}"
+          BODY=$(python - <<'PY'
+import json
+from pathlib import Path
+text = Path('evidence_footer.txt').read_text(encoding='utf-8')
+status_path = Path('evidence_status.txt')
+header = ''
+if status_path.exists() and status_path.read_text(encoding='utf-8').strip() != 'OK':
+    header = 'NG: validation detected missing evidence\n\n'
+print(json.dumps(header + text))
+PY
+)
+          if [ -z "${PR_NUM}" ]; then
+            echo "No PR number from create-pull-request; printing footer"
+            python - <<'PY'
+from pathlib import Path
+print(Path('evidence_footer.txt').read_text(encoding='utf-8'))
+PY
+            exit 0
+          fi
+          curl -s -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${REPO}/issues/${PR_NUM}/comments" \
+            -d "{\"body\":${BODY}}" >/dev/null
 
       - name: Cleanup port-forward
         if: always()
