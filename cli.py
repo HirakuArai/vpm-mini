@@ -18,7 +18,14 @@ import sys
 sys.path.append(str(pathlib.Path(__file__).resolve().parent / "src"))
 from core import ask_openai
 from core.grounded_answer import grounded_answer
+from core.plan_suggester import suggest_plan
 from core.state_drafter import draft_state
+from guard.validate_json import (
+    load_json,
+    validate_answer,
+    validate_plan,
+    validate_state_md,
+)
 
 
 def _maybe_handle_subcommand() -> bool:
@@ -39,6 +46,17 @@ def _maybe_handle_subcommand() -> bool:
     p_state.add_argument("--print", dest="prn", action="store_true")
     p_state.add_argument("--decisions-dir", default="reports/decisions")
     p_state.add_argument("--max-items", type=int, default=10)
+
+    p_plan = subparsers.add_parser("plan", add_help=False)
+    p_plan.add_argument("--ai", action="store_true")
+    p_plan.add_argument("--limit", type=int, default=5)
+    p_plan.add_argument("--out", dest="out_path", default="out/next_actions.json")
+
+    p_validate = subparsers.add_parser("validate", add_help=False)
+    p_validate.add_argument(
+        "--type", choices=["answer", "plan", "state"], required=True
+    )
+    p_validate.add_argument("--file", dest="file_path", required=True)
 
     try:
         ns, _ = parser.parse_known_args()
@@ -66,6 +84,20 @@ def _maybe_handle_subcommand() -> bool:
             max_items=getattr(ns, "max_items", 10),
         )
         _handle_state_update(args)
+        return True
+
+    if ns.subcmd == "plan":
+        args = argparse.Namespace(
+            ai=getattr(ns, "ai", False),
+            limit=max(1, int(getattr(ns, "limit", 5) or 5)),
+            out_path=getattr(ns, "out_path", "out/next_actions.json"),
+        )
+        _handle_plan(args)
+        return True
+
+    if ns.subcmd == "validate":
+        args = argparse.Namespace(kind=ns.type, file_path=ns.file_path)
+        _handle_validate(args)
         return True
 
     return False
@@ -119,6 +151,50 @@ def _handle_state_update(args: argparse.Namespace) -> None:
         print("sources:", ", ".join(sources))
 
     print(str(target_path))
+
+
+def _handle_plan(args: argparse.Namespace) -> None:
+    out_path = pathlib.Path(args.out_path)
+    try:
+        plan = suggest_plan(use_ai=args.ai, limit=args.limit)
+    except Exception as exc:  # pragma: no cover - defensive path
+        print(f"Plan generation failed: {exc}")
+        return
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    payload = json.dumps(plan, ensure_ascii=False, indent=2)
+    out_path.write_text(payload, encoding="utf-8")
+
+    actions = plan.get("next_actions") or []
+    summary = actions[0]["title"] if actions else "(empty)"
+    print(f"Saved {len(actions)} actions to {out_path} (top: {summary})")
+
+
+def _handle_validate(args: argparse.Namespace) -> None:
+    path = pathlib.Path(args.file_path)
+    if not path.exists():
+        print(f"NG: file not found: {path}")
+        sys.exit(1)
+
+    kind = args.kind
+    if kind == "answer":
+        data = load_json(path)
+        ok, errs = validate_answer(data)
+    elif kind == "plan":
+        data = load_json(path)
+        ok, errs = validate_plan(data)
+    else:
+        text = path.read_text(encoding="utf-8")
+        ok, errs = validate_state_md(text)
+
+    if ok:
+        print(f"OK: {kind} validation passed")
+        sys.exit(0)
+
+    print(f"NG: {kind} validation failed")
+    for err in errs:
+        print(f" - {err}")
+    sys.exit(1)
 
 
 def main() -> None:
