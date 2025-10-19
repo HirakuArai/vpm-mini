@@ -51,6 +51,7 @@ def _maybe_handle_subcommand() -> bool:
     p_plan.add_argument("--ai", action="store_true")
     p_plan.add_argument("--limit", type=int, default=5)
     p_plan.add_argument("--out", dest="out_path", default="out/next_actions.json")
+    p_plan.add_argument("--json-stdout", action="store_true")
 
     p_validate = subparsers.add_parser("validate", add_help=False)
     p_validate.add_argument(
@@ -91,6 +92,7 @@ def _maybe_handle_subcommand() -> bool:
             ai=getattr(ns, "ai", False),
             limit=max(1, int(getattr(ns, "limit", 5) or 5)),
             out_path=getattr(ns, "out_path", "out/next_actions.json"),
+            json_stdout=getattr(ns, "json_stdout", False),
         )
         _handle_plan(args)
         return True
@@ -162,8 +164,12 @@ def _handle_plan(args: argparse.Namespace) -> None:
         return
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    payload = json.dumps(plan, ensure_ascii=False, indent=2)
-    out_path.write_text(payload, encoding="utf-8")
+    plan_json = json.dumps(plan, ensure_ascii=False, indent=2)
+    out_path.write_text(plan_json, encoding="utf-8")
+
+    if getattr(args, "json_stdout", False):
+        print(plan_json)
+        return
 
     actions = plan.get("next_actions") or []
     summary = actions[0]["title"] if actions else "(empty)"
