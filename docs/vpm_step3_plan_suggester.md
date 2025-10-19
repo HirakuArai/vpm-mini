@@ -8,7 +8,10 @@
 ## 使い方
     python cli.py plan
     python cli.py plan --ai --limit 7
+    python cli.py plan --json-stdout --limit 3
     python cli.py plan --out tmp/next_actions.json
+
+- --json-stdout を指定すると stdout に JSON が出力されます（同時に --out 先にも保存されます）。
 
 ## ルールスコア
 - スコア = criticality + deadline + (4 - effort) + risk。

@@ -18,7 +18,14 @@ import sys
 sys.path.append(str(pathlib.Path(__file__).resolve().parent / "src"))
 from core import ask_openai
 from core.grounded_answer import grounded_answer
+from core.plan_suggester import suggest_plan
 from core.state_drafter import draft_state
+from guard.validate_json import (
+    load_json,
+    validate_answer,
+    validate_plan,
+    validate_state_md,
+)
 
 
 def _maybe_handle_subcommand() -> bool:
@@ -44,6 +51,13 @@ def _maybe_handle_subcommand() -> bool:
     p_plan.add_argument("--ai", action="store_true")
     p_plan.add_argument("--limit", type=int, default=5)
     p_plan.add_argument("--out", dest="out_path", default="out/next_actions.json")
+    p_plan.add_argument("--json-stdout", action="store_true")
+
+    p_validate = subparsers.add_parser("validate", add_help=False)
+    p_validate.add_argument(
+        "--type", choices=["answer", "plan", "state"], required=True
+    )
+    p_validate.add_argument("--file", dest="file_path", required=True)
 
     try:
         ns, _ = parser.parse_known_args()
@@ -78,8 +92,14 @@ def _maybe_handle_subcommand() -> bool:
             ai=getattr(ns, "ai", False),
             limit=max(1, int(getattr(ns, "limit", 5) or 5)),
             out_path=getattr(ns, "out_path", "out/next_actions.json"),
+            json_stdout=getattr(ns, "json_stdout", False),
         )
         _handle_plan(args)
+        return True
+
+    if ns.subcmd == "validate":
+        args = argparse.Namespace(kind=ns.type, file_path=ns.file_path)
+        _handle_validate(args)
         return True
 
     return False
@@ -136,8 +156,6 @@ def _handle_state_update(args: argparse.Namespace) -> None:
 
 
 def _handle_plan(args: argparse.Namespace) -> None:
-    from core.plan_suggester import suggest_plan
-
     out_path = pathlib.Path(args.out_path)
     try:
         plan = suggest_plan(use_ai=args.ai, limit=args.limit)
@@ -145,17 +163,44 @@ def _handle_plan(args: argparse.Namespace) -> None:
         print(f"Plan generation failed: {exc}")
         return
 
-    actions = plan.get("next_actions") or []
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(
-        json.dumps(plan, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    plan_json = json.dumps(plan, ensure_ascii=False, indent=2)
+    out_path.write_text(plan_json, encoding="utf-8")
 
-    if actions:
-        first_title = actions[0].get("title", "")
-        print(f"Saved {len(actions)} actions to {out_path} (top: {first_title})")
+    if getattr(args, "json_stdout", False):
+        print(plan_json)
+        return
+
+    actions = plan.get("next_actions") or []
+    summary = actions[0]["title"] if actions else "(empty)"
+    print(f"Saved {len(actions)} actions to {out_path} (top: {summary})")
+
+
+def _handle_validate(args: argparse.Namespace) -> None:
+    path = pathlib.Path(args.file_path)
+    if not path.exists():
+        print(f"NG: file not found: {path}")
+        sys.exit(1)
+
+    kind = args.kind
+    if kind == "answer":
+        data = load_json(path)
+        ok, errs = validate_answer(data)
+    elif kind == "plan":
+        data = load_json(path)
+        ok, errs = validate_plan(data)
     else:
-        print(f"Saved empty plan to {out_path}")
+        text = path.read_text(encoding="utf-8")
+        ok, errs = validate_state_md(text)
+
+    if ok:
+        print(f"OK: {kind} validation passed")
+        sys.exit(0)
+
+    print(f"NG: {kind} validation failed")
+    for err in errs:
+        print(f" - {err}")
+    sys.exit(1)
 
 
 def main() -> None:
