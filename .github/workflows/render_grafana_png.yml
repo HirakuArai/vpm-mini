@@ -65,7 +65,31 @@ jobs:
       - name: Open issue on failure
         env:
           GH_TOKEN: ${{ github.token }}
+          ISSUE_TITLE: Render Grafana PNG failed on ${{ github.ref_name }} (${{ github.run_id }})
+          ISSUE_BODY: |-
+            Auto-opened because /render job failed.
+
+            Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Commit: ${{ github.sha }}
         run: |
-          title="Render Grafana PNG failed on ${{ github.ref_name }} (${{ github.run_id }})"
-          body="Auto-opened because /render job failed.\n\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\nCommit: ${{ github.sha }}\n"
-          gh issue create --title "$title" --body "$body" --label evidence,monitoring,runner || true
+          ISSUE_JSON=$(python - <<'PY2'
+import json
+import os
+print(json.dumps({
+    "title": os.environ["ISSUE_TITLE"],
+    "body": os.environ["ISSUE_BODY"],
+    "labels": ["evidence", "monitoring", "runner"],
+}))
+PY2
+)
+          response=$(echo "$ISSUE_JSON" | curl -sS -X POST             -H "Authorization: Bearer $GH_TOKEN"             -H "Accept: application/vnd.github+json"             -d @-             "${{ github.api_url }}/repos/${{ github.repository }}/issues")
+          echo "$response" | python - <<'PY3'
+import json
+import sys
+resp=json.load(sys.stdin)
+url=resp.get('html_url')
+if not url:
+    print('Issue creation may have failed:', resp)
+else:
+    print('Issue created:', url)
+PY3
