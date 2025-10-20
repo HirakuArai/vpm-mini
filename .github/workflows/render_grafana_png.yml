@@ -17,8 +17,6 @@ on:
 jobs:
   render:
     runs-on: [self-hosted, k8s-runner]
-    container:
-      image: ghcr.io/actions/actions-runner:latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
