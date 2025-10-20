@@ -32,9 +32,9 @@ jobs:
       - name: Render dashboard (anonymous, in-cluster)
         run: |
           BASE="http://grafana.monitoring.svc.cluster.local"
-          UID="a128c0c0-c3f9-43e6-8476-dac42fe03110"
-          SLUG="evidence-smoke"
-          curl -sS -G "$BASE/render/d-solo/$UID/$SLUG" \
+          DASH_UID="a128c0c0-c3f9-43e6-8476-dac42fe03110"
+          DASH_SLUG="evidence-smoke"
+          curl -sS -G "$BASE/render/d-solo/$DASH_UID/$DASH_SLUG" \
             --data-urlencode "from=${{ steps.prep.outputs.from }}" \
             --data-urlencode "to=${{ steps.prep.outputs.to }}" \
             --data-urlencode "orgId=1" \
