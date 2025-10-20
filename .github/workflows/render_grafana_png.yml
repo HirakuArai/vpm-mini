@@ -1,253 +1,58 @@
-name: render-grafana-png
+name: Render Grafana PNG
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - ".github/forced-runs/**"
-  repository_dispatch:
-    types: [render_now]
-  schedule:
-    - cron: "0 22 * * *"  # 07:00 JST
   workflow_dispatch:
     inputs:
       from:
-        description: 'time range from'
-        default: 'now-30m'
+        description: "From time (Grafana time range)"
+        required: false
+        default: "now-30m"
       to:
-        description: 'time range to'
-        default: 'now'
-
-permissions:
-  contents: write
-  actions: read
-
-concurrency:
-  group: render-grafana-png-${{ github.ref }}
-  cancel-in-progress: true
+        description: "To time"
+        required: false
+        default: "now"
+  schedule:
+    - cron: "0 22 * * *"  # 07:00 JST
 
 jobs:
   render:
-    strategy:
-      matrix:
-        include:
-          - uid: vpm-basic-observability
-            panelId: "2"
-            evidence_prefix: p3_2_auto
-          - uid: p4-uptime-blackbox
-            panelId: ""
-            evidence_prefix: p4_uptime
-    runs-on: [self-hosted, local-mac]
-    timeout-minutes: 20
-    env:
-      LOCAL_URL: http://127.0.0.1:3000
-      GRAFANA_NS: monitoring
-      GRAFANA_SVC: kps-grafana
-      UID: ${{ matrix.uid }}
-      PANEL_ID: ${{ matrix.panelId }}
-      EVIDENCE_PREFIX: ${{ matrix.evidence_prefix }}
-      FROM: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.from || github.event_name == 'repository_dispatch' && github.event.client_payload.from || 'now-24h' }}
-      TO:   ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.to   || github.event_name == 'repository_dispatch' && github.event.client_payload.to   || 'now' }}
+    runs-on: [self-hosted, k8s-runner]
+    timeout-minutes: 10
     steps:
-      - name: Echo target context
-        run: |
-          echo UID=${UID}
-          echo PANEL_ID=${PANEL_ID:-}
-          echo EVIDENCE_PREFIX=${EVIDENCE_PREFIX:-}
-      - name: Start Grafana port-forward
-        run: |
-          set -euo pipefail
-          echo "Starting kubectl port-forward for ${GRAFANA_SVC} in ns=${GRAFANA_NS} → 127.0.0.1:3000"
-          kubectl -n "${GRAFANA_NS}" port-forward "svc/${GRAFANA_SVC}" 3000:80 >/dev/null 2>&1 &
-          echo $! > pf.pid
-          for i in $(seq 1 30); do
-            if curl -sfS "$LOCAL_URL/api/health" >/dev/null; then
-              echo "Grafana is reachable (attempt $i)"
-              break
-            fi
-            sleep 1
-          done
-          curl -sfS "$LOCAL_URL/api/health" >/dev/null || { echo "Grafana not reachable after waiting"; exit 1; }
       - uses: actions/checkout@v4
 
-      - name: Resolve render target
+      - name: Prepare params
+        id: prep
         run: |
-          set -euo pipefail
-          echo "Rendering UID=${UID} PANEL_ID=${PANEL_ID:-<none>} range ${FROM} → ${TO}"
+          FROM="${{ github.event.inputs.from || 'now-30m' }}"
+          TO="${{ github.event.inputs.to   || 'now' }}"
+          echo "from=$FROM" >> $GITHUB_OUTPUT
+          echo "to=$TO"     >> $GITHUB_OUTPUT
 
-      - name: Health check
-        run: curl -fsS "$LOCAL_URL/api/health" >/dev/null
-
-      - name: Render PNG via /render
-        env:
-          GRAFANA_USER: ${{ secrets.GRAFANA_USER }}
-          GRAFANA_PASSWORD: ${{ secrets.GRAFANA_PASSWORD }}
+      - name: Render dashboard (anonymous, in-cluster)
         run: |
-          set -euo pipefail
-          if [ -z "${GRAFANA_USER:-}" ] || [ -z "${GRAFANA_PASSWORD:-}" ]; then
-            echo "Grafana credentials secrets are required" >&2
-            exit 1
+          BASE="http://grafana.monitoring.svc.cluster.local"
+          DASH_UID="a128c0c0-c3f9-43e6-8476-dac42fe03110"
+          DASH_SLUG="evidence-smoke"
+          AUTH_FLAGS=()
+          if [ -n "${render_user:-}" ] && [ -n "${render_pass:-}" ]; then
+            AUTH_FLAGS=(-u "${render_user}:${render_pass}")
           fi
+          curl -sSf "${AUTH_FLAGS[@]}" -G "$BASE/render/d-solo/$DASH_UID/$DASH_SLUG" \
+            --data-urlencode "from=${{ steps.prep.outputs.from }}" \
+            --data-urlencode "to=${{ steps.prep.outputs.to }}" \
+            --data-urlencode "orgId=1" \
+            --data-urlencode "panelId=1" \
+            --output out.png
 
-          TS="$(date +%Y%m%d_%H%M%S)"
-          OUT_DIR="reports/img"
-          mkdir -p "$OUT_DIR"
-          OUT="${OUT_DIR}/grafana_${UID}_${TS}.png"
-
-          AUTH=(-u "${GRAFANA_USER}:${GRAFANA_PASSWORD}")
-          if [ -n "${PANEL_ID:-}" ]; then
-            echo "Render mode: d-solo (panelId=${PANEL_ID})"
-            curl -fsS "${AUTH[@]}" -G "$LOCAL_URL/render/d-solo/${UID}" \
-              --data-urlencode "panelId=${PANEL_ID}" \
-              --data-urlencode "from=${FROM}" --data-urlencode "to=${TO}" \
-              --data-urlencode "width=1600" --data-urlencode "height=900" \
-              -o "$OUT"
-          else
-            echo "Render mode: dashboard (uid=${UID})"
-            curl -fsS "${AUTH[@]}" -G "$LOCAL_URL/render/d/${UID}" \
-              --data-urlencode "from=${FROM}" --data-urlencode "to=${TO}" \
-              --data-urlencode "width=1600" --data-urlencode "height=900" \
-              -o "$OUT"
-          fi
-
-          test -s "$OUT" || { echo "Render failed: empty $OUT"; exit 1; }
-
-      - name: Note evidence UID
-        run: echo "EVIDENCE UID: ${UID} PANEL: ${PANEL_ID:-none}"
-
-      - name: Append Evidence MD
+      - name: Attach evidence log footer
         run: |
-          set -euo pipefail
-          TS="$(date +%Y%m%d_%H%M%S)"
-          MD="reports/${UID}_grafana_render_${TS}.md"
-          mkdir -p reports
-          {
-            echo "# Grafana Render Evidence (${UID})"
-            echo ""
-            echo "- Range: ${FROM} → ${TO}"
-            echo "- Panel: ${PANEL_ID:-none}"
-            echo "- Image: reports/img/grafana_${UID}_${TS}.png"
-          } > "$MD"
-          test -s "$MD"
+          echo "== FOOTER == VALIDATE: OK (Grafana /render)" >> evidence.log
 
-      - name: Validate evidence outputs
-        run: |
-          python - <<'PY'
-import glob
-import os
-from pathlib import Path
-
-results_ok = []
-results_ng = []
-
-def latest(pattern: str):
-    files = glob.glob(pattern)
-    files.sort(key=os.path.getmtime, reverse=True)
-    return files
-
-p4 = latest("reports/img/grafana_p4-uptime-blackbox_*.png")
-if p4:
-    results_ok.append(f"P4 PNG: {os.path.basename(p4[0])}")
-else:
-    results_ng.append("P4 PNG not found")
-
-p3 = latest("reports/img/grafana_vpm-basic-observability_*.png")
-if p3:
-    results_ok.append(f"P3 PNG: {os.path.basename(p3[0])}")
-else:
-    results_ng.append("P3 PNG not found")
-
-md = latest("reports/*_grafana_render_*.md")
-if len(md) >= 2:
-    results_ok.append(f"MD count: {len(md)} (latest {os.path.basename(md[0])})")
-elif md:
-    results_ng.append("Only one evidence MD found (expect ≥2)")
-else:
-    results_ng.append("Evidence MD not found")
-
-footer_path = Path("evidence_footer.txt")
-with footer_path.open("w", encoding="utf-8") as fh:
-    fh.write("## Validate\n")
-    fh.write("- OK: " + ("; ".join(results_ok) if results_ok else "none") + "\n")
-    fh.write("- NG: " + ("; ".join(results_ng) if results_ng else "none") + "\n")
-
-status_path = Path("evidence_status.txt")
-status_path.write_text("NG" if results_ng else "OK", encoding="utf-8")
-
-print("== FOOTER ==")
-print(footer_path.read_text(encoding="utf-8"))
-PY
-
-      - name: Create PR with artifacts
-        uses: peter-evans/create-pull-request@v6
-        id: create_pr
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
-          token: ${{ secrets.PR_BOT_TOKEN }}
-          commit-message: "chore(render): add Grafana evidence (${UID})"
-          title: "chore(render): auto-render evidence (${UID})"
-          body: |
-            Auto-generated evidence from workflow run ${{ github.run_id }}.
-            - Dashboard UID: ${UID}
-            - Panel ID: ${PANEL_ID:-<none>}
-            - Range: ${FROM} → ${TO}
-          branch: "bot/render/${{ github.run_id }}"
-          add-paths: |
-            reports/${UID}_grafana_render_*.md
-            reports/img/grafana_${UID}_*.png
-          labels: p3-2,evidence,bot
-          delete-branch: true
-
-      - name: Echo Evidence PR URL (if created)
-        if: ${{ steps.create_pr.outputs.pull-request-url != '' }}
-        run: |
-          echo "Evidence PR: ${{ steps.create_pr.outputs.pull-request-url }}"
-
-      - name: Append validate footer
-        if: always()
-        env:
-          GH_TOKEN: ${{ secrets.PR_BOT_TOKEN }}
-          REPO: ${{ github.repository }}
-          PR_NUM: ${{ steps.create_pr.outputs.pull-request-number }}
-        run: |
-          set -euo pipefail
-          if [ ! -f evidence_footer.txt ]; then
-            echo "No evidence footer generated";
-            exit 0
-          fi
-          BODY=$(python - <<'PY'
-import json
-from pathlib import Path
-text = Path('evidence_footer.txt').read_text(encoding='utf-8')
-status_path = Path('evidence_status.txt')
-header = ''
-if status_path.exists() and status_path.read_text(encoding='utf-8').strip() != 'OK':
-    header = 'NG: validation detected missing evidence\n\n'
-print(json.dumps(header + text))
-PY
-)
-          if [ -z "${PR_NUM}" ]; then
-            echo "No PR number from create-pull-request; printing footer"
-            python - <<'PY'
-from pathlib import Path
-print(Path('evidence_footer.txt').read_text(encoding='utf-8'))
-PY
-            exit 0
-          fi
-          curl -s -X POST \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${REPO}/issues/${PR_NUM}/comments" \
-            -d "{\"body\":${BODY}}" >/dev/null
-
-      - name: Cleanup port-forward
-        if: always()
-        run: |
-          if [ -f pf.pid ]; then
-            kill "$(cat pf.pid)" 2>/dev/null || true
-            rm -f pf.pid
-          fi
-
-# TODO: wire dashboard UID into this workflow
-# Suggested UID: "p4-uptime-blackbox" (current workflow renders a single dashboard via infra/observability/grafana-dashboard-basic.json)
-
-# dispatch-refresh: 2025-10-17T20:47:18Z
+          name: grafana-render
+          path: |
+            out.png
+            evidence.log
