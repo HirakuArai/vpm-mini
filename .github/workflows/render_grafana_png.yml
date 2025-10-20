@@ -56,3 +56,16 @@ jobs:
           path: |
             out.png
             evidence.log
+
+  notify-on-failure:
+    needs: render
+    if: ${{ failure() }}
+    runs-on: [self-hosted, k8s-runner]
+    steps:
+      - name: Open issue on failure
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Render Grafana PNG failed on ${{ github.ref_name }} (${{ github.run_id }})"
+          body="Auto-opened because /render job failed.\n\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\nCommit: ${{ github.sha }}\n"
+          gh issue create --title "$title" --body "$body" --label evidence,monitoring,runner || true
