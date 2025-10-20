@@ -11,6 +11,10 @@ on:
         description: "To time"
         required: false
         default: "now"
+      force_fail:
+        description: "Force workflow failure (testing)"
+        required: false
+        default: "false"
   schedule:
     - cron: "0 22 * * *"  # 07:00 JST
 
@@ -28,9 +32,15 @@ jobs:
           TO="${{ github.event.inputs.to   || 'now' }}"
           echo "from=$FROM" >> $GITHUB_OUTPUT
           echo "to=$TO"     >> $GITHUB_OUTPUT
+          FORCE_FAIL="${{ github.event.inputs.force_fail || 'false' }}"
+          echo "force_fail=$FORCE_FAIL" >> $GITHUB_OUTPUT
 
       - name: Render dashboard (anonymous, in-cluster)
         run: |
+          if [ "${{ steps.prep.outputs.force_fail }}" = "true" ]; then
+            echo "Force failure requested"
+            exit 1
+          fi
           BASE="http://grafana.monitoring.svc.cluster.local"
           DASH_UID="a128c0c0-c3f9-43e6-8476-dac42fe03110"
           DASH_SLUG="evidence-smoke"
@@ -56,3 +66,46 @@ jobs:
           path: |
             out.png
             evidence.log
+
+  notify-on-failure:
+    needs: render
+    if: ${{ failure() }}
+    runs-on: [self-hosted, k8s-runner]
+    steps:
+      - name: Open issue on failure
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Render Grafana PNG failed on ${{ github.ref_name }} (${{ github.run_id }})"
+          body=$(cat <<'EOF'
+Auto-opened because /render job failed.
+
+Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+Commit: ${{ github.sha }}
+EOF
+)
+          ISSUE_JSON=$(ISSUE_TITLE="$title" ISSUE_BODY="$body" python - <<'PY'
+import json
+import os
+print(json.dumps({
+    "title": os.environ["ISSUE_TITLE"],
+    "body": os.environ["ISSUE_BODY"],
+    "labels": ["evidence", "monitoring", "runner"],
+}))
+PY
+)
+          response=$(echo "$ISSUE_JSON" | curl -sS -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -d @- \
+            "${{ github.api_url }}/repos/${{ github.repository }}/issues")
+          echo "$response" | python - <<'PY'
+import json
+import sys
+resp=json.load(sys.stdin)
+url=resp.get("html_url")
+if url:
+    print("Issue created:", url)
+else:
+    print("Issue creation may have failed:", resp)
+PY
