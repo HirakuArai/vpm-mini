@@ -34,7 +34,11 @@ jobs:
           BASE="http://grafana.monitoring.svc.cluster.local"
           DASH_UID="a128c0c0-c3f9-43e6-8476-dac42fe03110"
           DASH_SLUG="evidence-smoke"
-          curl -sS -G "$BASE/render/d-solo/$DASH_UID/$DASH_SLUG" \
+          AUTH_FLAGS=()
+          if [ -n "${render_user:-}" ] && [ -n "${render_pass:-}" ]; then
+            AUTH_FLAGS=(-u "${render_user}:${render_pass}")
+          fi
+          curl -sSf "${AUTH_FLAGS[@]}" -G "$BASE/render/d-solo/$DASH_UID/$DASH_SLUG" \
             --data-urlencode "from=${{ steps.prep.outputs.from }}" \
             --data-urlencode "to=${{ steps.prep.outputs.to }}" \
             --data-urlencode "orgId=1" \
