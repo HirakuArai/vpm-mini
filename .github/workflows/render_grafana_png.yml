@@ -2,19 +2,6 @@ name: Render Grafana PNG
 
 on:
   workflow_dispatch:
-    inputs:
-      from:
-        description: "From time (Grafana time range)"
-        required: false
-        default: "now-30m"
-      to:
-        description: "To time"
-        required: false
-        default: "now"
-      force_fail:
-        description: "Force workflow failure (testing)"
-        required: false
-        default: "false"
   schedule:
     - cron: "0 22 * * *"  # 07:00 JST
   repository_dispatch:
