@@ -16,6 +16,9 @@ on:
         required: false
         default: "false"
   schedule:
+  repository_dispatch:
+    types:
+      - render_request
     - cron: "0 22 * * *"  # 07:00 JST
 
 jobs:
@@ -28,8 +31,8 @@ jobs:
       - name: Prepare params
         id: prep
         run: |
-          FROM="${{ github.event.inputs.from || 'now-30m' }}"
-          TO="${{ github.event.inputs.to   || 'now' }}"
+          FROM="${{ github.event.inputs.from || github.event.client_payload.from || 'now-30m' }}"
+          TO="${{ github.event.inputs.to   || github.event.client_payload.to   || 'now' }}"
           echo "from=$FROM" >> $GITHUB_OUTPUT
           echo "to=$TO"     >> $GITHUB_OUTPUT
           FORCE_FAIL="${{ github.event.inputs.force_fail || 'false' }}"
