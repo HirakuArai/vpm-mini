@@ -7,11 +7,7 @@ on:
 
 jobs:
   call-render:
-    name: Call render reusable
-    runs-on: ubuntu-latest
-    steps:
-      - name: Call reusable
-        uses: ./.github/workflows/render_reusable.yml
-        with:
-          from: ${{ github.event.inputs.from }}
-          to:   ${{ github.event.inputs.to }}
+    uses: ./.github/workflows/render_reusable.yml
+    with:
+      from: ${{ github.event.inputs.from }}
+      to:   ${{ github.event.inputs.to }}
