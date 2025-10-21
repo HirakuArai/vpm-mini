@@ -42,8 +42,8 @@ jobs:
             exit 1
           fi
           BASE="http://grafana.monitoring.svc.cluster.local"
-          DASH_UID="a128c0c0-c3f9-43e6-8476-dac42fe03110"
-          DASH_SLUG="evidence-smoke"
+          DASH_UID="evidence-prod"
+          DASH_SLUG="evidence-e28093-prod"
           AUTH_FLAGS=()
           if [ -n "${render_user:-}" ] && [ -n "${render_pass:-}" ]; then
             AUTH_FLAGS=(-u "${render_user}:${render_pass}")
