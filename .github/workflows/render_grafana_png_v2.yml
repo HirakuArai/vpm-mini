@@ -1,0 +1,67 @@
+name: Render Grafana PNG v2
+on:
+  workflow_dispatch:
+    inputs:
+      from: { required: false, default: "now-30m" }
+      to:   { required: false, default: "now" }
+  repository_dispatch:
+    types: [render_request]
+  schedule:
+    - cron: "0 22 * * *"  # 07:00 JST
+
+jobs:
+  render:
+    name: Render Grafana
+    runs-on: [self-hosted, k8s-runner]
+    steps:
+      - name: Prepare params
+        id: prep
+        run: |
+          FROM="${{ github.event.inputs.from || github.event.client_payload.from || 'now-30m' }}"
+          TO="${{ github.event.inputs.to   || github.event.client_payload.to   || 'now' }}"
+          echo "from=$FROM" >> $GITHUB_OUTPUT
+          echo "to=$TO"     >> $GITHUB_OUTPUT
+
+      - name: Grafana health
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" http://grafana.monitoring.svc.cluster.local/api/health)
+          echo "HEALTH=$code"; test "$code" = "200"
+
+      - name: Render dashboard
+        run: |
+          BASE="http://grafana.monitoring.svc.cluster.local"
+          UID="evidence-prod"
+          SLUG="evidence-e28093-prod"
+          curl -sS -G "$BASE/render/d-solo/$UID/$SLUG" \
+            --data-urlencode "from=${{ steps.prep.outputs.from }}" \
+            --data-urlencode "to=${{ steps.prep.outputs.to }}" \
+            --data-urlencode "orgId=1" \
+            --data-urlencode "panelId=1" \
+            --output out.png
+          file out.png && test -s out.png
+
+      - name: Footer
+        run: echo "== FOOTER == VALIDATE: OK" >> evidence.log
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: grafana-render
+          path: |
+            out.png
+            evidence.log
+
+  notify-on-failure:
+    name: Open triage issue on failure
+    needs: render
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post issue via REST
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          title="Render failed on ${{ github.ref_name }} (run ${{ github.run_id }})"
+          body="Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -fsS -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/issues \
+            -d "$(jq -nc --arg t "$title" --arg b "$body" '{title:$t, body:$b, labels:["evidence","monitoring","runner"]}')"
