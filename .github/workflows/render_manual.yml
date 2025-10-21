@@ -7,7 +7,8 @@ on:
 
 jobs:
   call-render:
-    uses: ./.github/workflows/render_reusable.yml
+    uses: HirakuArai/vpm-mini/.github/workflows/render_reusable.yml@main
+    secrets: inherit
     with:
       from: ${{ github.event.inputs.from }}
       to:   ${{ github.event.inputs.to }}
