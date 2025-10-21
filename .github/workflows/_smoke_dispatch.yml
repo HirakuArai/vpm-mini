@@ -1,0 +1,8 @@
+name: Smoke Dispatch (main)
+on:
+  workflow_dispatch: {}
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "RUN=$GITHUB_RUN_ID EVENT=$GITHUB_EVENT_NAME REF=$GITHUB_REF"
