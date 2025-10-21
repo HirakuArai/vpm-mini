@@ -16,10 +16,10 @@ on:
         required: false
         default: "false"
   schedule:
+    - cron: "0 22 * * *"  # 07:00 JST
   repository_dispatch:
     types:
       - render_request
-    - cron: "0 22 * * *"  # 07:00 JST
 
 jobs:
   render:
