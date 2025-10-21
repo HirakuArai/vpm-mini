@@ -111,3 +111,12 @@ else:
 PY
 
 # tick: 2025-10-21T14:32:22Z
+
+  debug_hello:
+    name: Debug Hello
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo RUN_ID=${{ github.run_id }}
+          echo EVENT=${{ github.event_name }}
+          echo REF=${{ github.ref }}
