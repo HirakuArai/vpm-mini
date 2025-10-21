@@ -1,0 +1,17 @@
+name: Render Manual (wrapper)
+on:
+  workflow_dispatch:
+    inputs:
+      from: { description: "From", required: false, default: "now-30m" }
+      to:   { description: "To",   required: false, default: "now" }
+
+jobs:
+  call-render:
+    name: Call render reusable
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call reusable
+        uses: ./.github/workflows/render_reusable.yml
+        with:
+          from: ${{ github.event.inputs.from }}
+          to:   ${{ github.event.inputs.to }}
