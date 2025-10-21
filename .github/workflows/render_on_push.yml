@@ -1,0 +1,46 @@
+name: Render via push (manual-render)
+on:
+  push:
+    branches: [ manual-render ]
+jobs:
+  render:
+    runs-on: [self-hosted, k8s-runner]
+    steps:
+      - name: Parse params from commit message
+        id: p
+        run: |
+          msg="${{ github.event.head_commit.message }}"
+          FROM=$(printf "%s" "$msg" | sed -n 's/.*from=\([^ ]*\).*/\1/p')
+          TO=$(printf "%s" "$msg" | sed -n 's/.*to=\([^ ]*\).*/\1/p')
+          [ -z "$FROM" ] && FROM="now-30m"
+          [ -z "$TO" ] && TO="now"
+          echo "from=$FROM" >> "$GITHUB_OUTPUT"
+          echo "to=$TO"     >> "$GITHUB_OUTPUT"
+
+      - name: Grafana health
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" http://grafana.monitoring.svc.cluster.local/api/health)
+          echo "HEALTH=$code"; test "$code" = "200"
+
+      - name: Render PNG
+        run: |
+          BASE="http://grafana.monitoring.svc.cluster.local"
+          UID="evidence-prod"
+          SLUG="evidence-e28093-prod"
+          curl -sS -G "$BASE/render/d-solo/$UID/$SLUG" \
+            --data-urlencode "from=${{ steps.p.outputs.from }}" \
+            --data-urlencode "to=${{ steps.p.outputs.to }}" \
+            --data-urlencode "orgId=1" \
+            --data-urlencode "panelId=1" \
+            --output out.png
+          file out.png && test -s out.png
+
+      - name: Footer
+        run: echo "== FOOTER == PUSH ENTRY OK" >> evidence.log
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: grafana-render
+          path: |
+            out.png
+            evidence.log
