@@ -25,9 +25,9 @@ jobs:
       - name: Render PNG
         run: |
           BASE="http://grafana.monitoring.svc.cluster.local"
-          UID="evidence-prod"
-          SLUG="evidence-e28093-prod"
-          curl -sS -G "$BASE/render/d-solo/$UID/$SLUG" \
+          DASH_UID="evidence-prod"
+          DASH_SLUG="evidence-e28093-prod"
+          curl -sS -G "$BASE/render/d-solo/$DASH_UID/$DASH_SLUG" \
             --data-urlencode "from=${{ steps.p.outputs.from }}" \
             --data-urlencode "to=${{ steps.p.outputs.to }}" \
             --data-urlencode "orgId=1" \
