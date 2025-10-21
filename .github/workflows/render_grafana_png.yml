@@ -1,8 +1,6 @@
 name: Render Grafana PNG
 
 on:
-  push:
-    branches: [feat/render-prod-dashboard]
   workflow_dispatch:
     inputs:
       from:
