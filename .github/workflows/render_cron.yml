@@ -1,0 +1,35 @@
+name: Render Daily (07:00 JST)
+on:
+  schedule:
+    - cron: "0 22 * * *"
+  workflow_dispatch:
+    inputs:
+      from:
+        required: false
+        default: "now-30m"
+      to:
+        required: false
+        default: "now"
+jobs:
+  call:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call reusable
+        uses: ./.github/workflows/render_reusable.yml
+        with:
+          from: ${{ github.event.inputs.from || 'now-30m' }}
+          to:   ${{ github.event.inputs.to || 'now' }}
+  notify-on-failure:
+    needs: call
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post triage issue
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          title="Render Daily failed on ${{ github.ref_name }} (run ${{ github.run_id }})"
+          body="Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -fsS -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/issues \
+            -d "$(jq -nc --arg t \"$title\" --arg b \"$body\" '{title:$t, body:$b, labels:["evidence","monitoring","runner"]}')"
