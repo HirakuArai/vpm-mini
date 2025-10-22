@@ -1,4 +1,4 @@
-name: Smoke Dispatch (main)
+name: Smoke Dispatch
 on:
   workflow_dispatch: {}
 jobs:
