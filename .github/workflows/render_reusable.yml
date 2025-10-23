@@ -17,7 +17,9 @@ jobs:
           code=$(curl -s -o /dev/null -w "%{http_code}" http://grafana.monitoring.svc.cluster.local/api/health)
           echo "HEALTH=$code"; test "$code" = "200"
 
-      - name: Render PNG
+      - name: Render PNG (collect only)
+        id: render
+        shell: bash
         env:
           INPUT_FROM: ${{ inputs.from }}
           INPUT_TO: ${{ inputs.to }}
@@ -25,41 +27,54 @@ jobs:
           set -euo pipefail
 
           meta=$(cat infra/observability/dashboard_target.json)
-          ORG=$(jq -r '.grafana.org' <<<"$meta")
-          UID=$(jq -r '.grafana.uid' <<<"$meta")
-          SLUG=$(jq -r '.grafana.slug' <<<"$meta")
-          PANEL=$(jq -r '.grafana.panelId' <<<"$meta")
+          ORG=$(jq -r '.grafana.org'      <<<"$meta")
+          UID=$(jq -r '.grafana.uid'      <<<"$meta")
+          SLUG_RAW=$(jq -r '.grafana.slug'<<<"$meta")
+          PANEL=$(jq -r '.grafana.panelId'<<<"$meta")
+
+          BASE="${GRAFANA_BASE_URL:-http://grafana.monitoring.svc.cluster.local}"
+          BASE="${BASE%/}"
+
+          SLUG=$(python3 - <<'PY'
+import urllib.parse, sys
+print(urllib.parse.quote(sys.argv[1], safe=''))
+PY
+"$SLUG_RAW")
 
           FROM="${FROM:-${INPUT_FROM:-now-30m}}"
           TO="${TO:-${INPUT_TO:-now}}"
-          BASE="${GRAFANA_BASE_URL:-http://grafana.monitoring.svc.cluster.local}"
-          URL="${BASE}/render/d-solo/${UID}/${SLUG}?panelId=${PANEL}&orgId=${ORG}&from=${FROM}&to=${TO}"
 
           mkdir -p artifacts
 
-          AUTH=()
-          if [ -n "${GRAFANA_API_TOKEN:-}" ]; then
-            AUTH+=(-H "Authorization: Bearer ${GRAFANA_API_TOKEN}")
-          fi
+          URL="${BASE}/render/d-solo/${UID}/${SLUG}?panelId=${PANEL}&from=${FROM}&to=${TO}&orgId=${ORG}"
+          echo "URL=${URL}" | tee -a artifacts/evidence.log
 
-          HTTP=$(curl -sS -w "%{http_code}" -o out.png "${AUTH[@]}" "$URL" || true)
-          SIZE=$( (stat -f%z out.png 2>/dev/null || stat -c%s out.png 2>/dev/null) || echo 0)
+          HTTP=$(curl -sS -w "%{http_code}" \
+            -H "Authorization: Bearer ${GRAFANA_API_TOKEN:-}" \
+            -H "X-Org-Id: ${ORG}" \
+            -o artifacts/out.png "$URL" || true)
 
-          echo "HTTP=${HTTP} UID=${UID} panelId=${PANEL} from=${FROM} to=${TO} size=${SIZE}" >> artifacts/evidence.log
+          SIZE=$( (stat -f%z artifacts/out.png 2>/dev/null || stat -c%s artifacts/out.png 2>/dev/null) || echo 0)
+
+          echo "HTTP=${HTTP} UID=${UID} panelId=${PANEL} from=${FROM} to=${TO} size=${SIZE}" | tee -a artifacts/evidence.log
 
           if [ "${HTTP}" = "200" ] && [ "${SIZE:-0}" -gt 0 ]; then
             echo "== FOOTER == OK" | tee -a artifacts/evidence.log
+            echo "result=ok" >> "$GITHUB_OUTPUT"
           else
             echo "== FOOTER == NG" | tee -a artifacts/evidence.log
-            exit 1
+            echo "result=ng" >> "$GITHUB_OUTPUT"
           fi
 
-          file out.png
-          test -s out.png
-
-      - uses: actions/upload-artifact@v4
+      - name: Upload artifacts (always)
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: grafana-render
-          path: |
-            out.png
-            artifacts/evidence.log
+          name: render-evidence
+          path: artifacts/
+
+      - name: Fail if NG
+        if: steps.render.outputs.result == 'ng'
+        run: |
+          echo "::error::Render guard tripped (HTTP/size). See artifacts/evidence.log"
+          exit 1
