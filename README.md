@@ -110,3 +110,8 @@ make -f Makefile.kourier curl-hello-pf   # 強制的にpf経由でHTTP 200確認
 pip install -r requirements-demo.txt
 streamlit run apps/vpm_decision_demo_app.py
 ```
+
+## Evidence Render
+- Manual: push to `manual-render` (set `from`/`to` in commit message)
+- Daily: 07:00 JST via `render_cron.yml`
+- Runbook: ops/runbook.md (updated 2025-10-22T20:51:43Z)
