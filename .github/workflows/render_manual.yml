@@ -8,32 +8,7 @@ on:
 jobs:
   call-render:
     name: Render Grafana manual
-    runs-on: [self-hosted, k8s-runner]
-    steps:
-      - name: Grafana health
-        run: |
-          code=$(curl -s -o /dev/null -w "%{http_code}" http://grafana.monitoring.svc.cluster.local/api/health)
-          echo "HEALTH=$code"; test "$code" = "200"
-
-      - name: Render PNG
-        run: |
-          BASE="http://grafana.monitoring.svc.cluster.local"
-          UID="evidence-prod"
-          SLUG="evidence-e28093-prod"
-          curl -sS -G "$BASE/render/d-solo/$UID/$SLUG" \
-            --data-urlencode "from=${{ github.event.inputs.from }}" \
-            --data-urlencode "to=${{ github.event.inputs.to }}" \
-            --data-urlencode "orgId=1" \
-            --data-urlencode "panelId=1" \
-            --output out.png
-          file out.png && test -s out.png
-
-      - name: Footer
-        run: echo "== FOOTER == VALIDATE: OK" >> evidence.log
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: grafana-render
-          path: |
-            out.png
-            evidence.log
+    uses: ./.github/workflows/render_reusable.yml
+    with:
+      from: ${{ github.event.inputs.from || 'now-30m' }}
+      to:   ${{ github.event.inputs.to   || 'now' }}

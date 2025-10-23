@@ -10,30 +10,56 @@ jobs:
     name: Render Grafana
     runs-on: [self-hosted, k8s-runner]
     steps:
+      - uses: actions/checkout@v4
+
       - name: Grafana health
         run: |
           code=$(curl -s -o /dev/null -w "%{http_code}" http://grafana.monitoring.svc.cluster.local/api/health)
           echo "HEALTH=$code"; test "$code" = "200"
 
       - name: Render PNG
+        env:
+          INPUT_FROM: ${{ inputs.from }}
+          INPUT_TO: ${{ inputs.to }}
         run: |
-          BASE="http://grafana.monitoring.svc.cluster.local"
-          UID="evidence-prod"
-          SLUG="evidence-e28093-prod"
-          curl -sS -G "$BASE/render/d-solo/$UID/$SLUG" \
-            --data-urlencode "from=${{ inputs.from }}" \
-            --data-urlencode "to=${{ inputs.to }}" \
-            --data-urlencode "orgId=1" \
-            --data-urlencode "panelId=1" \
-            --output out.png
-          file out.png && test -s out.png
+          set -euo pipefail
 
-      - name: Footer
-        run: echo "== FOOTER == VALIDATE: OK" >> evidence.log
+          meta=$(cat infra/observability/dashboard_target.json)
+          ORG=$(jq -r '.grafana.org' <<<"$meta")
+          UID=$(jq -r '.grafana.uid' <<<"$meta")
+          SLUG=$(jq -r '.grafana.slug' <<<"$meta")
+          PANEL=$(jq -r '.grafana.panelId' <<<"$meta")
+
+          FROM="${FROM:-${INPUT_FROM:-now-30m}}"
+          TO="${TO:-${INPUT_TO:-now}}"
+          BASE="${GRAFANA_BASE_URL:-http://grafana.monitoring.svc.cluster.local}"
+          URL="${BASE}/render/d-solo/${UID}/${SLUG}?panelId=${PANEL}&orgId=${ORG}&from=${FROM}&to=${TO}"
+
+          mkdir -p artifacts
+
+          AUTH=()
+          if [ -n "${GRAFANA_API_TOKEN:-}" ]; then
+            AUTH+=(-H "Authorization: Bearer ${GRAFANA_API_TOKEN}")
+          fi
+
+          HTTP=$(curl -sS -w "%{http_code}" -o out.png "${AUTH[@]}" "$URL" || true)
+          SIZE=$( (stat -f%z out.png 2>/dev/null || stat -c%s out.png 2>/dev/null) || echo 0)
+
+          echo "HTTP=${HTTP} UID=${UID} panelId=${PANEL} from=${FROM} to=${TO} size=${SIZE}" >> artifacts/evidence.log
+
+          if [ "${HTTP}" = "200" ] && [ "${SIZE:-0}" -gt 0 ]; then
+            echo "== FOOTER == OK" | tee -a artifacts/evidence.log
+          else
+            echo "== FOOTER == NG" | tee -a artifacts/evidence.log
+            exit 1
+          fi
+
+          file out.png
+          test -s out.png
 
       - uses: actions/upload-artifact@v4
         with:
           name: grafana-render
           path: |
             out.png
-            evidence.log
+            artifacts/evidence.log
