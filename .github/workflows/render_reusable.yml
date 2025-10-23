@@ -35,11 +35,7 @@ jobs:
           BASE="${GRAFANA_BASE_URL:-http://grafana.monitoring.svc.cluster.local}"
           BASE="${BASE%/}"
 
-          SLUG=$(python3 - <<'PY'
-import urllib.parse, sys
-print(urllib.parse.quote(sys.argv[1], safe=''))
-PY
-"$SLUG_RAW")
+          SLUG=$(jq -rn --arg slug "$SLUG_RAW" '$slug|@uri')
 
           FROM="${FROM:-${INPUT_FROM:-now-30m}}"
           TO="${TO:-${INPUT_TO:-now}}"
