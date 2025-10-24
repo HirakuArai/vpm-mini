@@ -13,7 +13,7 @@ git commit -m "from=now-30m to=now"
 git push
 ```
 
-Artifacts: `out.png` and `artifacts/evidence.log`. The evidence file appends `HTTP=<code> UID=<uid> panelId=<id> from=<from> to=<to> size=<bytes>` followed by the footer `== FOOTER == OK` on success or `== FOOTER == NG` on failure.
+Artifacts: `artifacts/out.png`, `artifacts/evidence.log`, `artifacts/headers.txt`, and `artifacts/png_head.hex`. Evidence lines now include `HTTP`, `CT`, `UID`, `panelId`, `from`, `to`, `size`, and `HEADHEX` (first 16 bytes as hex). Success requires `== FOOTER == OK` on the last line.
 
 ## Daily 07:00 JST
 
@@ -32,7 +32,19 @@ Both manual (`manual-render` push) and daily jobs load these values through the 
 
 ## Failure triage
 
-Check the final line in `artifacts/evidence.log` (`HTTP / UID / panelId / from / to / size`) to confirm status before escalating.
+Render success criteria (all must hold):
+- `HTTP=200`
+- `CT=image/png`
+- `HEADHEX` starts with `89 50 4e 47` (PNG signature)
+- `size` ≥ `MIN_PNG_BYTES` (default 512B, overridable via env)
+- Footer `== FOOTER == OK`
+
+On failure, inspect:
+- `artifacts/evidence.log` — confirm HTTP/CT/size/signature
+- `artifacts/headers.txt` — raw HTTP headers from Grafana
+- `artifacts/png_head.hex` — first 16 bytes of the PNG payload
+
+If `HTTP=302` or `CT=text/html` the Grafana token/org is invalid; diagnose via the `Grafana Diagnostics` workflow (checks `/api/health` with/without token).
 
 ## Token guard
 
