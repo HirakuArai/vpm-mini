@@ -42,8 +42,9 @@ jobs:
 
           : > evidence.log
 
-          URL="${BASE}/render/d-solo/${DASH_UID}/${DASH_SLUG}?panelId=${PANEL_ID}&from=${FROM}&to=${TO}&orgId=${ORG}"
+          URL="${BASE}/render/d-solo/${DASH_UID}/${DASH_SLUG}"
           echo "URL=${URL}" | tee -a evidence.log
+          echo "PARAMS panelId=${PANEL_ID} from=${FROM} to=${TO} orgId=${ORG}" | tee -a evidence.log
 
           AUTH=()
           if [ -n "${GRAFANA_API_TOKEN:-}" ]; then
@@ -52,8 +53,12 @@ jobs:
 
           HTTP=$(curl -sS -w "%{http_code}" \
             "${AUTH[@]}" \
-            -H "X-Org-Id: ${ORG}" \
-            -o out.png "$URL" || true)
+            -G "$URL" \
+            --data-urlencode "panelId=${PANEL_ID}" \
+            --data-urlencode "from=${FROM}" \
+            --data-urlencode "to=${TO}" \
+            --data-urlencode "orgId=${ORG}" \
+            -o out.png || true)
 
           SIZE=$( (stat -f%z out.png 2>/dev/null || stat -c%s out.png 2>/dev/null) || echo 0)
 
