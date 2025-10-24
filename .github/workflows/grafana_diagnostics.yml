@@ -1,0 +1,57 @@
+name: Grafana Diagnostics
+on:
+  workflow_dispatch: {}
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y jq
+
+      - name: Load SSOT
+        id: ssot
+        run: |
+          meta=$(cat infra/observability/dashboard_target.json)
+          echo "org=$(jq -r '.grafana.org' <<<"$meta")" >> "$GITHUB_OUTPUT"
+          echo "uid=$(jq -r '.grafana.uid' <<<"$meta")" >> "$GITHUB_OUTPUT"
+          echo "slug=$(jq -r '.grafana.slug' <<<"$meta")" >> "$GITHUB_OUTPUT"
+          echo "panel=$(jq -r '.grafana.panelId' <<<"$meta")" >> "$GITHUB_OUTPUT"
+
+      - name: Echo config
+        env:
+          ORG: ${{ steps.ssot.outputs.org }}
+          UID: ${{ steps.ssot.outputs.uid }}
+          SLUG: ${{ steps.ssot.outputs.slug }}
+          PANEL: ${{ steps.ssot.outputs.panel }}
+          BASE: ${{ vars.GRAFANA_BASE_URL || 'http://grafana.monitoring.svc.cluster.local' }}
+        run: |
+          echo "BASE=$BASE"
+          echo "ORG=$ORG UID=$UID SLUG=$SLUG PANEL=$PANEL"
+          echo "RENDER_URL=${BASE%/}/render/d-solo/$UID/$SLUG?panelId=$PANEL&from=now-30m&to=now&orgId=$ORG"
+
+      - name: API health check (no token)
+        env:
+          BASE: ${{ vars.GRAFANA_BASE_URL || 'http://grafana.monitoring.svc.cluster.local' }}
+        run: |
+          set -x
+          curl -fsS -o /dev/null -w "no-token:/api/health HTTP=%{http_code}\n" "$BASE/api/health" || true
+
+      - name: API health check (with token if present)
+        env:
+          BASE: ${{ vars.GRAFANA_BASE_URL || 'http://grafana.monitoring.svc.cluster.local' }}
+          ORG: ${{ vars.GRAFANA_ORG_ID || '1' }}
+          TOKEN: ${{ secrets.GRAFANA_API_TOKEN }}
+        run: |
+          set -x
+          if [ -n "${TOKEN:-}" ]; then
+            curl -fsS -o /dev/null -w "with-token:/api/health HTTP=%{http_code}\n" \
+              -H "Authorization: Bearer $TOKEN" \
+              -H "X-Org-Id: $ORG" \
+              "$BASE/api/health" || true
+          else
+            echo "GRAFANA_API_TOKEN not set (skipping with-token health)"
+          fi
