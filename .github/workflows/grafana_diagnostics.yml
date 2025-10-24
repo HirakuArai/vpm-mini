@@ -3,7 +3,11 @@ on:
   workflow_dispatch: {}
 jobs:
   diag:
-    runs-on: ubuntu-latest
+    env:
+      GRAFANA_BASE_URL: ${{ vars.GRAFANA_BASE_URL || 'http://grafana.monitoring.svc.cluster.local' }}
+      GRAFANA_API_TOKEN: ${{ secrets.GRAFANA_API_TOKEN }}
+      GRAFANA_ORG_ID: ${{ vars.GRAFANA_ORG_ID || '1' }}
+    runs-on: [self-hosted, k8s-runner]
     steps:
       - uses: actions/checkout@v4
 
@@ -27,7 +31,7 @@ jobs:
           UID: ${{ steps.ssot.outputs.uid }}
           SLUG: ${{ steps.ssot.outputs.slug }}
           PANEL: ${{ steps.ssot.outputs.panel }}
-          BASE: ${{ vars.GRAFANA_BASE_URL || 'http://grafana.monitoring.svc.cluster.local' }}
+          BASE: ${{ env.GRAFANA_BASE_URL }}
         run: |
           echo "BASE=$BASE"
           echo "ORG=$ORG UID=$UID SLUG=$SLUG PANEL=$PANEL"
@@ -35,16 +39,16 @@ jobs:
 
       - name: API health check (no token)
         env:
-          BASE: ${{ vars.GRAFANA_BASE_URL || 'http://grafana.monitoring.svc.cluster.local' }}
+          BASE: ${{ env.GRAFANA_BASE_URL }}
         run: |
           set -x
           curl -fsS -o /dev/null -w "no-token:/api/health HTTP=%{http_code}\n" "$BASE/api/health" || true
 
       - name: API health check (with token if present)
         env:
-          BASE: ${{ vars.GRAFANA_BASE_URL || 'http://grafana.monitoring.svc.cluster.local' }}
-          ORG: ${{ vars.GRAFANA_ORG_ID || '1' }}
-          TOKEN: ${{ secrets.GRAFANA_API_TOKEN }}
+          BASE: ${{ env.GRAFANA_BASE_URL }}
+          ORG: ${{ env.GRAFANA_ORG_ID }}
+          TOKEN: ${{ env.GRAFANA_API_TOKEN }}
         run: |
           set -x
           if [ -n "${TOKEN:-}" ]; then
