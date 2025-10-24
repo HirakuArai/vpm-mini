@@ -1,0 +1,30 @@
+name: Render Uptime Report (07:05 JST)
+on:
+  schedule: [ { cron: "5 22 * * *" } ]  # 07:05 JST
+  workflow_dispatch: {}
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y jq fd-find
+          sudo ln -sf $(command -v fdfind) /usr/local/bin/fd || true
+      - name: GH auth
+        env: { GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} }
+        run: gh auth status
+      - name: Generate 7-day uptime report
+        env: { GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} }
+        run: bash scripts/render_uptime_report.sh
+      - name: Commit report
+        run: |
+          OUT=$(ls -t reports/render_daily_uptime_*.md | head -n1)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$OUT"
+          git commit -m "reports: $(basename "$OUT")"
+      - name: Push
+        uses: ad-m/github-push-action@v0.8.0
+        with: { github_token: ${{ secrets.GITHUB_TOKEN }}, branch: main }
