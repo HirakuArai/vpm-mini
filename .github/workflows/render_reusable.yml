@@ -28,23 +28,26 @@ jobs:
 
           meta=$(cat infra/observability/dashboard_target.json)
           ORG=$(jq -r '.grafana.org'      <<<"$meta")
-          DASH_UID=$(jq -r '.grafana.uid' <<<"$meta")
+          UID=$(jq -r '.grafana.uid'      <<<"$meta")
           SLUG_RAW=$(jq -r '.grafana.slug'<<<"$meta")
-          PANEL_ID=$(jq -r '.grafana.panelId'<<<"$meta")
+          PANEL=$(jq -r '.grafana.panelId'<<<"$meta")
 
           BASE="${GRAFANA_BASE_URL:-http://grafana.monitoring.svc.cluster.local}"
           BASE="${BASE%/}"
 
-          DASH_SLUG=$(jq -rn --arg slug "$SLUG_RAW" '$slug|@uri')
+          SLUG=$(jq -rn --arg slug "$SLUG_RAW" '$slug|@uri')
 
           FROM="${FROM:-${INPUT_FROM:-now-30m}}"
           TO="${TO:-${INPUT_TO:-now}}"
+          MIN_PNG_BYTES="${MIN_PNG_BYTES:-512}"
 
-          : > evidence.log
+          mkdir -p artifacts
+          : > artifacts/evidence.log
+          : > artifacts/headers.txt
 
-          URL="${BASE}/render/d-solo/${DASH_UID}/${DASH_SLUG}"
-          echo "URL=${URL}" | tee -a evidence.log
-          echo "PARAMS panelId=${PANEL_ID} from=${FROM} to=${TO} orgId=${ORG}" | tee -a evidence.log
+          URL="${BASE}/render/d-solo/${UID}/${SLUG}"
+          echo "URL=${URL}" | tee -a artifacts/evidence.log
+          echo "PARAMS panelId=${PANEL} from=${FROM} to=${TO} orgId=${ORG}" | tee -a artifacts/evidence.log
 
           AUTH=()
           if [ -n "${GRAFANA_API_TOKEN:-}" ]; then
@@ -53,22 +56,29 @@ jobs:
 
           HTTP=$(curl -sS -w "%{http_code}" \
             "${AUTH[@]}" \
+            -H "X-Org-Id: ${ORG}" \
             -G "$URL" \
-            --data-urlencode "panelId=${PANEL_ID}" \
+            --data-urlencode "panelId=${PANEL}" \
             --data-urlencode "from=${FROM}" \
             --data-urlencode "to=${TO}" \
             --data-urlencode "orgId=${ORG}" \
-            -o out.png || true)
+            -D artifacts/headers.txt \
+            -o artifacts/out.png || true)
 
-          SIZE=$( (stat -f%z out.png 2>/dev/null || stat -c%s out.png 2>/dev/null) || echo 0)
+          CT=$(grep -i '^content-type:' artifacts/headers.txt | tr -d '\r' | awk '{print tolower($2)}')
+          SIZE=$( (stat -f%z artifacts/out.png 2>/dev/null || stat -c%s artifacts/out.png 2>/dev/null) || echo 0)
+          head -c 16 artifacts/out.png | od -An -tx1 | tr -s ' ' > artifacts/png_head.hex
 
-          echo "HTTP=${HTTP} UID=${DASH_UID} panelId=${PANEL_ID} from=${FROM} to=${TO} size=${SIZE}" | tee -a evidence.log
+          echo "HTTP=${HTTP} CT=${CT:-n/a} UID=${UID} panelId=${PANEL} from=${FROM} to=${TO} size=${SIZE}" | tee -a artifacts/evidence.log
+          echo "HEADHEX=$(cat artifacts/png_head.hex)" | tee -a artifacts/evidence.log
 
-          if [ "${HTTP}" = "200" ] && [ "${SIZE:-0}" -gt 0 ]; then
-            echo "== FOOTER == OK" | tee -a evidence.log
+          PNG_SIG_OK=$(head -c 8 artifacts/out.png | xxd -p | awk '{print tolower($0)}' | grep -q '^89504e47' && echo ok || echo ng)
+
+          if [ "${HTTP}" = "200" ] && echo "${CT}" | grep -q 'image/png' && [ "${PNG_SIG_OK}" = "ok" ] && [ "${SIZE:-0}" -ge "${MIN_PNG_BYTES}" ]; then
+            echo "== FOOTER == OK" | tee -a artifacts/evidence.log
             echo "result=ok" >> "$GITHUB_OUTPUT"
           else
-            echo "== FOOTER == NG" | tee -a evidence.log
+            echo "== FOOTER == NG" | tee -a artifacts/evidence.log
             echo "result=ng" >> "$GITHUB_OUTPUT"
           fi
 
@@ -78,11 +88,13 @@ jobs:
         with:
           name: grafana-render
           path: |
-            out.png
-            evidence.log
+            artifacts/out.png
+            artifacts/evidence.log
+            artifacts/headers.txt
+            artifacts/png_head.hex
 
       - name: Fail if NG
         if: steps.render.outputs.result == 'ng'
         run: |
-          echo "::error::Render guard tripped (HTTP/size). See evidence.log"
+          echo "::error::Render guard tripped (HTTP/size/type). See artifacts/evidence.log"
           exit 1
