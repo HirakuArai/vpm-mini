@@ -28,37 +28,42 @@ jobs:
 
           meta=$(cat infra/observability/dashboard_target.json)
           ORG=$(jq -r '.grafana.org'      <<<"$meta")
-          UID=$(jq -r '.grafana.uid'      <<<"$meta")
+          DASH_UID=$(jq -r '.grafana.uid' <<<"$meta")
           SLUG_RAW=$(jq -r '.grafana.slug'<<<"$meta")
-          PANEL=$(jq -r '.grafana.panelId'<<<"$meta")
+          PANEL_ID=$(jq -r '.grafana.panelId'<<<"$meta")
 
           BASE="${GRAFANA_BASE_URL:-http://grafana.monitoring.svc.cluster.local}"
           BASE="${BASE%/}"
 
-          SLUG=$(jq -rn --arg slug "$SLUG_RAW" '$slug|@uri')
+          DASH_SLUG=$(jq -rn --arg slug "$SLUG_RAW" '$slug|@uri')
 
           FROM="${FROM:-${INPUT_FROM:-now-30m}}"
           TO="${TO:-${INPUT_TO:-now}}"
 
-          mkdir -p artifacts
+          : > evidence.log
 
-          URL="${BASE}/render/d-solo/${UID}/${SLUG}?panelId=${PANEL}&from=${FROM}&to=${TO}&orgId=${ORG}"
-          echo "URL=${URL}" | tee -a artifacts/evidence.log
+          URL="${BASE}/render/d-solo/${DASH_UID}/${DASH_SLUG}?panelId=${PANEL_ID}&from=${FROM}&to=${TO}&orgId=${ORG}"
+          echo "URL=${URL}" | tee -a evidence.log
+
+          AUTH=()
+          if [ -n "${GRAFANA_API_TOKEN:-}" ]; then
+            AUTH+=(-H "Authorization: Bearer ${GRAFANA_API_TOKEN}")
+          fi
 
           HTTP=$(curl -sS -w "%{http_code}" \
-            -H "Authorization: Bearer ${GRAFANA_API_TOKEN:-}" \
+            "${AUTH[@]}" \
             -H "X-Org-Id: ${ORG}" \
-            -o artifacts/out.png "$URL" || true)
+            -o out.png "$URL" || true)
 
-          SIZE=$( (stat -f%z artifacts/out.png 2>/dev/null || stat -c%s artifacts/out.png 2>/dev/null) || echo 0)
+          SIZE=$( (stat -f%z out.png 2>/dev/null || stat -c%s out.png 2>/dev/null) || echo 0)
 
-          echo "HTTP=${HTTP} UID=${UID} panelId=${PANEL} from=${FROM} to=${TO} size=${SIZE}" | tee -a artifacts/evidence.log
+          echo "HTTP=${HTTP} UID=${DASH_UID} panelId=${PANEL_ID} from=${FROM} to=${TO} size=${SIZE}" | tee -a evidence.log
 
           if [ "${HTTP}" = "200" ] && [ "${SIZE:-0}" -gt 0 ]; then
-            echo "== FOOTER == OK" | tee -a artifacts/evidence.log
+            echo "== FOOTER == OK" | tee -a evidence.log
             echo "result=ok" >> "$GITHUB_OUTPUT"
           else
-            echo "== FOOTER == NG" | tee -a artifacts/evidence.log
+            echo "== FOOTER == NG" | tee -a evidence.log
             echo "result=ng" >> "$GITHUB_OUTPUT"
           fi
 
@@ -66,11 +71,13 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: render-evidence
-          path: artifacts/
+          name: grafana-render
+          path: |
+            out.png
+            evidence.log
 
       - name: Fail if NG
         if: steps.render.outputs.result == 'ng'
         run: |
-          echo "::error::Render guard tripped (HTTP/size). See artifacts/evidence.log"
+          echo "::error::Render guard tripped (HTTP/size). See evidence.log"
           exit 1
