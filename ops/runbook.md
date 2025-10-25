@@ -1,9 +1,9 @@
 # Runbook — Evidence Render
 
-## Manual trigger (only path)
-**Manual entry is `manual-render` branch push; workflow_dispatch remains disabled.**
+## Manual trigger (push or dispatch)
+**Manual entry supports both `manual-render` branch push and Actions → “Render Entrypoint” workflow_dispatch.**
 
-Push an empty commit to branch `manual-render`; set optional `from`/`to` in the commit message.
+Push an empty commit to branch `manual-render`; set optional `from`/`to` in the commit message (these propagate to the reusable workflow). Alternatively, open the “Render Entrypoint” workflow in GitHub Actions, choose “Run workflow”, and supply optional `from`/`to`.
 
 ```bash
 git switch manual-render || git checkout -b manual-render origin/manual-render
