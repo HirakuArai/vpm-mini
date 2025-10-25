@@ -14,6 +14,14 @@ jobs:
     name: Render Grafana
     runs-on: [self-hosted, k8s-runner]
     steps:
+      - name: Debug env wiring (safe)
+        if: always()
+        shell: bash
+        run: |
+          echo "DBG_BASE=${GRAFANA_BASE_URL:-<empty>}"
+          echo "DBG_ORG=${GRAFANA_ORG_ID:-<empty>}"
+          if [ -z "${GRAFANA_API_TOKEN:-}" ]; then echo "DBG_TOKEN=ABSENT"; else echo "DBG_TOKEN=PRESENT"; fi
+
       - uses: actions/checkout@v4
 
       - name: Grafana health

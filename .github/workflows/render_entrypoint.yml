@@ -10,7 +10,7 @@ on:
 
 jobs:
   bridge:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, k8s-runner]
     env:
       GRAFANA_BASE_URL: ${{ vars.GRAFANA_BASE_URL || 'http://grafana.monitoring.svc.cluster.local' }}
       GRAFANA_API_TOKEN: ${{ secrets.GRAFANA_API_TOKEN }}
@@ -28,6 +28,7 @@ jobs:
   reuse:
     needs: bridge
     uses: ./.github/workflows/render_reusable.yml
+    secrets: inherit  # pragma: allowlist secret
     with:
       from: ${{ needs.bridge.outputs.FROM }}
       to:   ${{ needs.bridge.outputs.TO }}
