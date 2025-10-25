@@ -1,14 +1,33 @@
-name: Render Entrypoint (manual)
+name: Render Entrypoint
+
 on:
+  push:
+    branches: [ manual-render ]
   workflow_dispatch:
     inputs:
-      from: { required: false, default: "now-30m" }
-      to:   { required: false, default: "now" }
-  schedule:
-    - cron: "0 22 * * *"   # 07:00 JST（不要なら後で外せます）
+      from: { description: "from", required: false, default: "now-30m" }
+      to:   { description: "to",   required: false, default: "now" }
+
 jobs:
-  render:
+  bridge:
+    runs-on: ubuntu-latest
+    env:
+      GRAFANA_BASE_URL: ${{ vars.GRAFANA_BASE_URL || 'http://grafana.monitoring.svc.cluster.local' }}
+      GRAFANA_API_TOKEN: ${{ secrets.GRAFANA_API_TOKEN }}
+      GRAFANA_ORG_ID: ${{ vars.GRAFANA_ORG_ID || '1' }}
+    outputs:
+      FROM: ${{ steps.set.outputs.FROM }}
+      TO:   ${{ steps.set.outputs.TO }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: set
+        run: |
+          echo "FROM=${{ github.event.inputs.from || 'now-30m' }}" >> "$GITHUB_OUTPUT"
+          echo "TO=${{ github.event.inputs.to   || 'now'     }}" >> "$GITHUB_OUTPUT"
+
+  reuse:
+    needs: bridge
     uses: ./.github/workflows/render_reusable.yml
     with:
-      from: ${{ github.event.inputs.from || 'now-30m' }}
-      to:   ${{ github.event.inputs.to   || 'now' }}
+      from: ${{ needs.bridge.outputs.FROM }}
+      to:   ${{ needs.bridge.outputs.TO }}
