@@ -27,21 +27,33 @@ jobs:
       - name: Load dashboard metadata
         shell: bash
         run: |
-          meta=$(cat infra/observability/dashboard_target.json)
-          ORG=$(jq -r '.grafana.org' <<<"$meta")
-          UID=$(jq -r '.grafana.uid' <<<"$meta")
-          SLUG=$(jq -r '.grafana.slug'<<<"$meta")
-          PANEL=$(jq -r '.grafana.panelId'<<<"$meta")
-          {
-            echo "DASH_ORG=$ORG"
-            echo "DASH_UID=$UID"
-            echo "DASH_SLUG=$SLUG"
-            echo "DASH_PANEL=$PANEL"
-          } >> "$GITHUB_ENV"
-          echo "SSOT_ORG=$ORG" | tee -a artifacts/evidence.log
-          echo "SSOT_UID=$UID" | tee -a artifacts/evidence.log
-          echo "SSOT_SLUG=$SLUG" | tee -a artifacts/evidence.log
-          echo "SSOT_PANEL=$PANEL" | tee -a artifacts/evidence.log
+          set -euo pipefail
+          FILE="infra/observability/dashboard_target.json"
+          if [ ! -f "$FILE" ]; then
+            echo "::error file=$FILE::dashboard_target.json not found"; exit 1
+          fi
+          python3 - <<'PY2'
+import json, os, sys
+try:
+    with open('infra/observability/dashboard_target.json', 'r', encoding='utf-8') as fh:
+        data = json.load(fh)
+except Exception as exc:
+    print(f"::error ::Failed to load dashboard_target.json: {exc}", flush=True)
+    sys.exit(1)
+grafana = data.get('grafana', {}) if isinstance(data, dict) else {}
+missing = [key for key in ['org', 'uid', 'slug', 'panelId'] if not grafana.get(key)]
+if missing:
+    print('::error ::Missing fields in dashboard_target.json: ' + ','.join(missing), flush=True)
+    sys.exit(1)
+org = str(grafana['org'])
+uid = str(grafana['uid'])
+slug = str(grafana['slug'])
+panel = str(grafana['panelId'])
+with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as env:
+    env.write(f"DASH_ORG={org}\nDASH_UID={uid}\nDASH_SLUG={slug}\nDASH_PANEL={panel}\n")
+with open('artifacts/evidence.log', 'a', encoding='utf-8') as ev:
+    ev.write(f"SSOT_ORG={org}\nSSOT_UID={uid}\nSSOT_SLUG={slug}\nSSOT_PANEL={panel}\n")
+PY2
 
       - name: Debug env wiring (deep, safe)
         if: always()
