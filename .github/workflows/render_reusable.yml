@@ -28,14 +28,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          FILE="infra/observability/dashboard_target.json"
+          FILE="$GITHUB_WORKSPACE/infra/observability/dashboard_target.json"
           if [ ! -f "$FILE" ]; then
             echo "::error file=$FILE::dashboard_target.json not found"; exit 1
           fi
           python3 - <<'PY2'
 import json, os, sys
+file_path = os.path.join(os.environ.get('GITHUB_WORKSPACE', ''), 'infra/observability/dashboard_target.json')
 try:
-    with open('infra/observability/dashboard_target.json', 'r', encoding='utf-8') as fh:
+    with open(file_path, 'r', encoding='utf-8') as fh:
         data = json.load(fh)
 except Exception as exc:
     print(f"::error ::Failed to load dashboard_target.json: {exc}", flush=True)
@@ -50,9 +51,10 @@ uid = str(grafana['uid'])
 slug = str(grafana['slug'])
 panel = str(grafana['panelId'])
 with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as env:
+    env.write(f"ORG={org}\nUID={uid}\nSLUG={slug}\nPANEL={panel}\n")
     env.write(f"DASH_ORG={org}\nDASH_UID={uid}\nDASH_SLUG={slug}\nDASH_PANEL={panel}\n")
 with open('artifacts/evidence.log', 'a', encoding='utf-8') as ev:
-    ev.write(f"SSOT_ORG={org}\nSSOT_UID={uid}\nSSOT_SLUG={slug}\nSSOT_PANEL={panel}\n")
+    ev.write(f"SSOT_UID={uid}\nSSOT_SLUG={slug}\nSSOT_PANEL={panel}\n")
 PY2
 
       - name: Debug env wiring (deep, safe)
