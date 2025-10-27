@@ -1,0 +1,17 @@
+name: Render Manual Min
+on:
+  workflow_dispatch:
+    inputs:
+      from: { description: "from", required: false, default: "now-30m" }
+      to:   { description: "to",   required: false, default: "now" }
+jobs:
+  render:
+    runs-on: [self-hosted, k8s-runner]
+    permissions: { contents: write }
+    steps:
+      - uses: actions/checkout@v4
+      - name: Smoke write
+        run: |
+          echo ok > out.png && test -s out.png
+          mkdir -p reports
+          printf "# Smoke OK %s\n" "$(date -u)" > reports/daily.md
