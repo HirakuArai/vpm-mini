@@ -1,3 +1,4 @@
+# touch: refresh dispatch recognition
 name: Render Grafana PNG
 
 on:
