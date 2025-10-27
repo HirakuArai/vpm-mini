@@ -35,8 +35,145 @@ jobs:
 
   reuse:
     needs: bridge
-    uses: ./.github/workflows/render_reusable.yml
-    secrets: inherit  # pragma: allowlist secret
-    with:
-      from: ${{ needs.bridge.outputs.FROM }}
-      to:   ${{ needs.bridge.outputs.TO }}
+    runs-on: [self-hosted, k8s-runner]
+    env:
+      GRAFANA_BASE_URL: ${{ vars.GRAFANA_BASE_URL || 'http://grafana.monitoring.svc.cluster.local' }}
+      GRAFANA_API_TOKEN: ${{ secrets.GRAFANA_API_TOKEN }}
+      GRAFANA_ORG_ID:   ${{ vars.GRAFANA_ORG_ID || '1' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Init evidence log
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          : > artifacts/evidence.log
+          : > artifacts/headers.txt
+
+      - name: Load dashboard metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILE="$GITHUB_WORKSPACE/infra/observability/dashboard_target.json"
+          if [ ! -f "$FILE" ]; then
+            echo "::error file=$FILE::dashboard_target.json not found"; exit 1
+          fi
+          python3 - <<'PY2'
+import json, os, sys
+file_path = os.path.join(os.environ.get('GITHUB_WORKSPACE', ''), 'infra/observability/dashboard_target.json')
+try:
+    with open(file_path, 'r', encoding='utf-8') as fh:
+        data = json.load(fh)
+except Exception as exc:
+    print(f"::error ::Failed to load dashboard_target.json: {exc}", flush=True)
+    sys.exit(1)
+grafana = data.get('grafana', {}) if isinstance(data, dict) else {}
+missing = [key for key in ['org', 'uid', 'slug', 'panelId'] if not grafana.get(key)]
+if missing:
+    print('::error ::Missing fields in dashboard_target.json: ' + ','.join(missing), flush=True)
+    sys.exit(1)
+org = str(grafana['org'])
+uid = str(grafana['uid'])
+slug = str(grafana['slug'])
+panel = str(grafana['panelId'])
+with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env:
+    env.write(f"ORG={org}\nUID={uid}\nSLUG={slug}\nPANEL={panel}\n")
+    env.write(f"DASH_ORG={org}\nDASH_UID={uid}\nDASH_SLUG={slug}\nDASH_PANEL={panel}\n")
+with open("artifacts/evidence.log", "a", encoding="utf-8") as ev:
+    ev.write(f"SSOT_UID={uid}\nSSOT_SLUG={slug}\nSSOT_PANEL={panel}\n")
+PY2
+
+      - name: Debug env wiring (deep, safe)
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "DBG_BASE=${GRAFANA_BASE_URL:-<empty>}" | tee -a artifacts/evidence.log
+          echo "DBG_ORG=${GRAFANA_ORG_ID:-<empty>}" | tee -a artifacts/evidence.log
+          if [ -n "${GRAFANA_API_TOKEN:-}" ]; then
+            echo "DBG_TOKEN=PRESENT" | tee -a artifacts/evidence.log
+            len=$(printf '%s' "${GRAFANA_API_TOKEN}" | wc -c | tr -d '[:space:]')
+            echo "DBG_TOKEN_LEN=${len}" | tee -a artifacts/evidence.log
+          else
+            echo "DBG_TOKEN=ABSENT" | tee -a artifacts/evidence.log
+            echo "DBG_TOKEN_LEN=0" | tee -a artifacts/evidence.log
+          fi
+          echo "DBG_DASH_UID=${DASH_UID:-<unset>}" | tee -a artifacts/evidence.log
+          echo "DBG_DASH_SLUG=${DASH_SLUG:-<unset>}" | tee -a artifacts/evidence.log
+          echo "DBG_DASH_PANEL=${DASH_PANEL:-<unset>}" | tee -a artifacts/evidence.log
+          echo "DBG_URL_PREVIEW=${GRAFANA_BASE_URL%/}/render/d-solo/${DASH_UID:-<uid>}/${DASH_SLUG:-<slug>}?panelId=${DASH_PANEL:-<panel>}" | tee -a artifacts/evidence.log
+
+      - name: Preflight /api/health
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="${GRAFANA_BASE_URL%/}"
+          ORG="${GRAFANA_ORG_ID}"
+          PRE_HEALTH_HTTP=$(curl -sS \
+            -D artifacts/pre_health.headers.txt \
+            -w "%{http_code}" \
+            -H "Authorization: Bearer ${GRAFANA_API_TOKEN:-}" \
+            -H "X-Org-Id: ${ORG}" \
+            -o /dev/null "${BASE}/api/health" || true)
+          echo "CTRL_HEALTH_HTTP=${PRE_HEALTH_HTTP}" | tee -a artifacts/evidence.log
+
+      - name: Preflight /render (headers only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="${GRAFANA_BASE_URL%/}"
+          ORG="${GRAFANA_ORG_ID}"
+          FROM="${{ needs.bridge.outputs.FROM }}"
+          TO="${{ needs.bridge.outputs.TO }}"
+          URL="${BASE}/render/d-solo/${DASH_UID}/${DASH_SLUG}?panelId=${DASH_PANEL}&from=${FROM}&to=${TO}&orgId=${ORG}"
+          PRE_RENDER_HTTP=$(curl -sS \
+            -D artifacts/pre_render.headers.txt \
+            -w "%{http_code}" \
+            -H "Authorization: Bearer ${GRAFANA_API_TOKEN:-}" \
+            -H "X-Org-Id: ${ORG}" \
+            -o /dev/null "$URL" || true)
+          echo "CTRL_RENDER_HTTP=${PRE_RENDER_HTTP}" | tee -a artifacts/evidence.log
+
+      - name: Render PNG (collect only)
+        id: render
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="${GRAFANA_BASE_URL%/}"
+          ORG="${GRAFANA_ORG_ID}"
+          FROM="${{ needs.bridge.outputs.FROM }}"
+          TO="${{ needs.bridge.outputs.TO }}"
+          URL="${BASE}/render/d-solo/${DASH_UID}/${DASH_SLUG}?panelId=${DASH_PANEL}&from=${FROM}&to=${TO}&orgId=${ORG}"
+          echo "URL=${URL}" | tee -a artifacts/evidence.log
+          HTTP=$(curl -sS \
+            -D artifacts/headers.txt \
+            -w "%{http_code}" \
+            -H "Authorization: Bearer ${GRAFANA_API_TOKEN:-}" \
+            -H "X-Org-Id: ${ORG}" \
+            -o artifacts/out.png "$URL" || true)
+          CT=$(grep -i '^content-type:' artifacts/headers.txt | tr -d '\\r' | awk '{print tolower($2)}')
+          SIZE=$( (stat -f%z artifacts/out.png 2>/dev/null || stat -c%s artifacts/out.png 2>/dev/null) || echo 0)
+          head -c 16 artifacts/out.png | od -An -tx1 | tr -s ' ' > artifacts/png_head.hex || true
+          HEADHEX=$(cat artifacts/png_head.hex || true)
+          echo "HTTP=${HTTP} CT=${CT:-n/a} UID=${DASH_UID} panelId=${DASH_PANEL} from=${FROM} to=${TO} size=${SIZE}" | tee -a artifacts/evidence.log
+          echo "HEADHEX=${HEADHEX}" | tee -a artifacts/evidence.log
+          if [ "${HTTP}" = "200" ] && echo "${CT}" | grep -q 'image/png' && echo "$HEADHEX" | grep -qi '^ *89 50 4e 47' && [ "${SIZE:-0}" -ge 512 ]; then
+            echo "== FOOTER == OK" | tee -a artifacts/evidence.log
+            echo "result=ok" >> $GITHUB_OUTPUT
+          else
+            echo "== FOOTER == NG" | tee -a artifacts/evidence.log
+            echo "result=ng" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload artifacts (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: grafana-render
+          path: artifacts/
+
+      - name: Fail if NG
+        if: steps.render.outputs.result == 'ng'
+        run: |
+          echo "::error::Render guard failed. See artifacts/evidence.log"
+          exit 1
