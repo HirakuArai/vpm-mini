@@ -1,0 +1,16 @@
+name: _debug_smoke
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Proof
+        run: |
+          echo "smoke-ok $(date -u +%FT%TZ)" | tee smoke-proof.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: smoke-artifact
+          path: smoke-proof.txt
