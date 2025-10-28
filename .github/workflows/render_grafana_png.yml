@@ -86,6 +86,7 @@ jobs:
           echo "verify=$(wc -c < out.png)" >> "$GITHUB_OUTPUT"
 
       - name: Open PR with evidence
+        id: cpr
         uses: peter-evans/create-pull-request@v6
         with:
           commit-message: "evidence: ${{ steps.stamp.outputs.date }} run ${{ github.run_id }}"
@@ -97,8 +98,18 @@ jobs:
             RANGE:  ${{ steps.prep.outputs.from }}-${{ steps.prep.outputs.to }}
             VERIFY: size=${{ steps.stamp.outputs.verify }}
           branch: "bot/evidence/${{ github.run_id }}"
+          branch-suffix: timestamp
+          delete-branch: true
           base: "main"
           labels: "evidence,bot"
+
+      - name: Enable auto-merge (squash) for evidence PR
+        if: always() && steps.cpr.outputs.pull-request-number
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+          merge-method: squash
 
   notify-on-failure:
     needs: render
