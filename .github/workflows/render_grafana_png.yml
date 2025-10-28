@@ -73,40 +73,21 @@ jobs:
     if: ${{ failure() }}
     runs-on: [self-hosted, k8s-runner]
     steps:
-      - name: Open issue on failure
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          title="Render Grafana PNG failed on ${{ github.ref_name }} (${{ github.run_id }})"
-          body=$(cat <<'EOF'
-Auto-opened because /render job failed.
-
-Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-Commit: ${{ github.sha }}
-EOF
-)
-          ISSUE_JSON=$(ISSUE_TITLE="$title" ISSUE_BODY="$body" python - <<'PY'
-import json
-import os
-print(json.dumps({
-    "title": os.environ["ISSUE_TITLE"],
-    "body": os.environ["ISSUE_BODY"],
-    "labels": ["evidence", "monitoring", "runner"],
-}))
-PY
-)
-          response=$(echo "$ISSUE_JSON" | curl -sS -X POST \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            -d @- \
-            "${{ github.api_url }}/repos/${{ github.repository }}/issues")
-          echo "$response" | python - <<'PY'
-import json
-import sys
-resp=json.load(sys.stdin)
-url=resp.get("html_url")
-if url:
-    print("Issue created:", url)
-else:
-    print("Issue creation may have failed:", resp)
-PY
+      - uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const title = `Render Grafana PNG failed on ${{context.ref}} (${{context.runId}})`;
+            const body = [
+              'Auto-opened because /render job failed.',
+              '',
+              `Run: ${{context.serverUrl}}/${{context.repo.owner}}/${{context.repo.repo}}/actions/runs/${{context.runId}}`,
+              `Commit: ${{context.sha}}`
+            ].join('\n');
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: ['evidence','monitoring','runner'],
+            });
