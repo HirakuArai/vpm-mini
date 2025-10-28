@@ -22,6 +22,8 @@ on:
 jobs:
   render:
     runs-on: [self-hosted, k8s-runner]
+    permissions:
+      contents: write
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -55,6 +57,7 @@ jobs:
             --data-urlencode "orgId=1" \
             --data-urlencode "panelId=1" \
             --output out.png
+          test -s out.png  # fail if empty
 
       - name: Attach evidence log footer
         run: |
@@ -67,6 +70,24 @@ jobs:
           path: |
             out.png
             evidence.log
+
+      - name: Stamp daily.md and commit
+        run: |
+          mkdir -p reports
+          size=$(wc -c < out.png)
+          {
+            echo "# Evidence $(date +%F)"
+            echo
+            echo "FOOTER: RUN=${GITHUB_RUN_ID} RANGE=${{ steps.prep.outputs.from }}-${{ steps.prep.outputs.to }} VERIFY=size=${size}"
+          } > reports/daily.md
+          git config user.name "evidence-bot"
+          git config user.email "bot@example.local"
+          git add reports/daily.md
+          if git commit -m "evidence: $(date -u +%F) run ${GITHUB_RUN_ID}"; then
+            git push
+          else
+            echo "No changes to commit"
+          fi
 
   notify-on-failure:
     needs: render
