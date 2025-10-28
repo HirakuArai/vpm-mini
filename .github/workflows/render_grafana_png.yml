@@ -17,7 +17,7 @@ on:
         required: false
         default: "false"
   schedule:
-    - cron: "*/5 * * * *"  # TEMP: every 5min
+    - cron: "0 22 * * *"  # 07:00 JST
 
 jobs:
   render:
