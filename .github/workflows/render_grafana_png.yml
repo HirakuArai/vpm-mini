@@ -45,12 +45,16 @@ jobs:
 
       - name: Prepare params
         id: prep
+        env:
+          INPUT_FROM: ${{ inputs.from || github.event.inputs.from || 'now-30m' }}
+          INPUT_TO: ${{ inputs.to || github.event.inputs.to || 'now' }}
+          INPUT_FORCE_FAIL: ${{ inputs.force_fail || github.event.inputs.force_fail || 'false' }}
         run: |
-          FROM="${{ inputs.from }}"
-          TO="${{ inputs.to }}"
+          FROM="${INPUT_FROM}"
+          TO="${INPUT_TO}"
           echo "from=$FROM" >> $GITHUB_OUTPUT
           echo "to=$TO"     >> $GITHUB_OUTPUT
-          FORCE_FAIL="${{ inputs.force_fail }}"
+          FORCE_FAIL="${INPUT_FORCE_FAIL}"
           echo "force_fail=$FORCE_FAIL" >> $GITHUB_OUTPUT
 
       - name: Render dashboard (anonymous, in-cluster)
