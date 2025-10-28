@@ -45,12 +45,16 @@ jobs:
 
       - name: Prepare params
         id: prep
+        env:
+          INPUT_FROM: ${{ inputs.from || github.event.inputs.from || 'now-30m' }}
+          INPUT_TO: ${{ inputs.to || github.event.inputs.to || 'now' }}
+          INPUT_FORCE_FAIL: ${{ inputs.force_fail || github.event.inputs.force_fail || 'false' }}
         run: |
-          FROM="${{ inputs.from }}"
-          TO="${{ inputs.to }}"
+          FROM="${INPUT_FROM}"
+          TO="${INPUT_TO}"
           echo "from=$FROM" >> $GITHUB_OUTPUT
           echo "to=$TO"     >> $GITHUB_OUTPUT
-          FORCE_FAIL="${{ inputs.force_fail }}"
+          FORCE_FAIL="${INPUT_FORCE_FAIL}"
           echo "force_fail=$FORCE_FAIL" >> $GITHUB_OUTPUT
 
       - name: Render dashboard (anonymous, in-cluster)
@@ -122,7 +126,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OWNER: ${{ github.repository_owner }}
-          REPO: ${{ github.event.repository.name }}
+          REPO_FULL: ${{ github.repository }}
           PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
         run: |
           python - <<'PY2'
@@ -133,7 +137,8 @@ import urllib.request
 
 token = os.environ['GH_TOKEN']
 owner = os.environ['OWNER']
-repo = os.environ['REPO']
+repo_full = os.environ['REPO_FULL']
+repo = repo_full.split('/', 1)[1] if '/' in repo_full else repo_full
 number = int(os.environ['PR_NUMBER'])
 
 url = 'https://api.github.com/graphql'
@@ -148,7 +153,7 @@ def graphql(query, variables):
     with urllib.request.urlopen(req) as resp:
         body = json.load(resp)
     if 'errors' in body:
-        raise SystemExit(f"GitHub GraphQL error: {body['errors']}")
+        raise SystemExit(f\"GitHub GraphQL error: {body['errors']}\")
     return body['data']
 
 data = graphql(
@@ -160,7 +165,7 @@ graphql(
     'mutation($pr:ID!, $method:PullRequestMergeMethod!){ enablePullRequestAutoMerge(input:{pullRequestId:$pr, mergeMethod:$method}) { clientMutationId } }',
     {'pr': pr_id, 'method': 'SQUASH'},
 )
-print(f"Queued auto-merge for PR #{number}")
+print(f\"Queued auto-merge for PR #{number}\")
 PY2
 
   notify-on-failure:
