@@ -77,12 +77,13 @@ jobs:
         with:
           github-token: ${{ github.token }}
           script: |
-            const title = `Render Grafana PNG failed on ${{context.ref}} (${{context.runId}})`;
+            const runId = context.runId;
+            const title = `Render Grafana PNG failed on ${context.ref} (${runId})`;
             const body = [
               'Auto-opened because /render job failed.',
               '',
-              `Run: ${{context.serverUrl}}/${{context.repo.owner}}/${{context.repo.repo}}/actions/runs/${{context.runId}}`,
-              `Commit: ${{context.sha}}`
+              `Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId}`,
+              `Commit: ${context.sha}`
             ].join('\n');
             await github.rest.issues.create({
               owner: context.repo.owner,
