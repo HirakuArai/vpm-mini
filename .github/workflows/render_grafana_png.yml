@@ -2,6 +2,20 @@
 name: Render Grafana PNG
 
 on:
+  workflow_call:
+    inputs:
+      from:
+        required: false
+        type: string
+        default: "now-30m"
+      to:
+        required: false
+        type: string
+        default: "now"
+      force_fail:
+        required: false
+        type: string
+        default: "false"
   workflow_dispatch:
     inputs:
       from:
