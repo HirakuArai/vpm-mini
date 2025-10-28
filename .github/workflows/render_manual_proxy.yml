@@ -1,0 +1,14 @@
+name: Render Manual Proxy
+on:
+  workflow_dispatch:
+    inputs:
+      from: { description: "from", required: false, default: "now-30m" }
+      to:   { description: "to",   required: false, default: "now" }
+      force_fail: { description: "force", required: false, default: "false" }
+jobs:
+  proxy:
+    uses: ./.github/workflows/render_grafana_png.yml
+    with:
+      from: ${{ github.event.inputs.from }}
+      to: ${{ github.event.inputs.to }}
+      force_fail: ${{ github.event.inputs.force_fail }}
