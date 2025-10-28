@@ -105,11 +105,49 @@ jobs:
 
       - name: Enable auto-merge (squash) for evidence PR
         if: always() && steps.cpr.outputs.pull-request-number
-        uses: peter-evans/enable-pull-request-automerge@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
-          merge-method: squash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
+        run: |
+          python - <<'PY2'
+import json
+import os
+import sys
+import urllib.request
+
+token = os.environ['GH_TOKEN']
+owner = os.environ['OWNER']
+repo = os.environ['REPO']
+number = int(os.environ['PR_NUMBER'])
+
+url = 'https://api.github.com/graphql'
+headers = {
+    'Authorization': f'bearer {token}',
+    'Content-Type': 'application/json',
+}
+
+def graphql(query, variables):
+    payload = json.dumps({'query': query, 'variables': variables}).encode()
+    req = urllib.request.Request(url, data=payload, headers=headers)
+    with urllib.request.urlopen(req) as resp:
+        body = json.load(resp)
+    if 'errors' in body:
+        raise SystemExit(f"GitHub GraphQL error: {body['errors']}")
+    return body['data']
+
+data = graphql(
+    'query ($owner:String!, $name:String!, $number:Int!){ repository(owner:$owner, name:$name) { pullRequest(number:$number) { id } } }',
+    {'owner': owner, 'name': repo, 'number': number},
+)
+pr_id = data['repository']['pullRequest']['id']
+graphql(
+    'mutation($pr:ID!, $method:PullRequestMergeMethod!){ enablePullRequestAutoMerge(input:{pullRequestId:$pr, mergeMethod:$method}) { clientMutationId } }',
+    {'pr': pr_id, 'method': 'SQUASH'},
+)
+print(f"Queued auto-merge for PR #{number}")
+PY2
 
   notify-on-failure:
     needs: render
