@@ -1,4 +1,7 @@
 name: Render Manual Proxy
+permissions:
+  contents: write
+  pull-requests: write
 on:
   workflow_dispatch:
     inputs:
@@ -12,3 +15,4 @@ jobs:
       from: ${{ github.event.inputs.from }}
       to: ${{ github.event.inputs.to }}
       force_fail: ${{ github.event.inputs.force_fail }}
+    secrets: inherit  # pragma: allowlist secret
