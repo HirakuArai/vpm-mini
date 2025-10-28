@@ -24,6 +24,7 @@ jobs:
     runs-on: [self-hosted, k8s-runner]
     permissions:
       contents: write
+      pull-requests: write
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -71,23 +72,33 @@ jobs:
             out.png
             evidence.log
 
-      - name: Stamp daily.md and commit
+      - name: Stamp daily.md (prepare PR)
+        id: stamp
         run: |
+          DATE=$(date -u +%F)
           mkdir -p reports
-          size=$(wc -c < out.png)
           {
-            echo "# Evidence $(date +%F)"
+            echo "# Evidence $DATE"
             echo
-            echo "FOOTER: RUN=${GITHUB_RUN_ID} RANGE=${{ steps.prep.outputs.from }}-${{ steps.prep.outputs.to }} VERIFY=size=${size}"
+            echo "FOOTER: RUN=${GITHUB_RUN_ID} RANGE=${{ steps.prep.outputs.from }}-${{ steps.prep.outputs.to }} VERIFY=size=$(wc -c < out.png)"
           } > reports/daily.md
-          git config user.name "evidence-bot"
-          git config user.email "bot@example.local"
-          git add reports/daily.md
-          if git commit -m "evidence: $(date -u +%F) run ${GITHUB_RUN_ID}"; then
-            git push
-          else
-            echo "No changes to commit"
-          fi
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+          echo "verify=$(wc -c < out.png)" >> "$GITHUB_OUTPUT"
+
+      - name: Open PR with evidence
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "evidence: ${{ steps.stamp.outputs.date }} run ${{ github.run_id }}"
+          title: "evidence: ${{ steps.stamp.outputs.date }} run ${{ github.run_id }}"
+          body: |
+            Auto-generated daily evidence.
+
+            FOOTER: RUN=${{ github.run_id }}
+            RANGE:  ${{ steps.prep.outputs.from }}-${{ steps.prep.outputs.to }}
+            VERIFY: size=${{ steps.stamp.outputs.verify }}
+          branch: "bot/evidence/${{ github.run_id }}"
+          base: "main"
+          labels: "evidence,bot"
 
   notify-on-failure:
     needs: render
