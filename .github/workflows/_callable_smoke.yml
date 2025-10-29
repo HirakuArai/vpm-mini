@@ -1,0 +1,17 @@
+name: _callable_smoke
+on:
+  workflow_call:
+    inputs:
+      msg:
+        required: false
+        type: string
+        default: "hello-from-call"
+jobs:
+  echo:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "${{ inputs.msg }}" | tee smoke.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: smoke
+          path: smoke.txt

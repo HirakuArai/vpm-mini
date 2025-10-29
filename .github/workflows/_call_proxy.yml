@@ -1,0 +1,10 @@
+name: _call_proxy
+on:
+  workflow_dispatch:
+jobs:
+  proxy:
+    uses: ./.github/workflows/_callable_smoke.yml
+    with:
+      msg: "proxy→call ok"
+    permissions: inherit
+    secrets: inherit  # pragma: allowlist secret
