@@ -15,4 +15,5 @@ jobs:
       from: ${{ github.event.inputs.from }}
       to: ${{ github.event.inputs.to }}
       force_fail: ${{ github.event.inputs.force_fail }}
+    permissions: inherit
     secrets: inherit  # pragma: allowlist secret
