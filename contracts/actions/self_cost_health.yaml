@@ -1,4 +1,8 @@
-if: "external_ip_zero == false || unused_pds_zero == false || runtime_minutes:red"
+---
+if: >
+  external_ip_zero == false ||
+  unused_pds_zero == false ||
+  runtime_minutes:red
 then:
   - title: "Self-Cost 健全性逸脱（IP/PD/Runtime）"
     owner: "@ops-lead"
