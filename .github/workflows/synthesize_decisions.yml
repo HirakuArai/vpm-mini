@@ -1,0 +1,44 @@
+name: synthesize_decisions
+on:
+  schedule: [{ cron: "5 22 * * *" }]  # JST 07:05
+  workflow_dispatch: {}
+jobs:
+  decide:
+    runs-on: [self-hosted, k8s-runner]
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute metadata
+        id: now
+        run: |
+          echo "date=$(date +%F)" >> "$GITHUB_OUTPUT"
+          echo "run_id=${GITHUB_RUN_ID}" >> "$GITHUB_OUTPUT"
+
+      - name: Generate decision card (stub)
+        run: |
+          mkdir -p reports
+          D="${{ steps.now.outputs.date }}"
+          {
+            echo "# Daily Decision — ${D}"
+            echo
+            echo "Status: GREEN（bootstrap）"
+            echo
+            echo "**Today (max 3)**"
+            echo "- なし"
+            echo
+            echo "Evidence: <TBD>"
+            echo "FOOTER: RUN=${{ steps.now.outputs.run_id }} VERIFY=stub"
+          } > "reports/decision_${D}.md"
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: "chore/decision-${{ steps.now.outputs.date }}-${{ steps.now.outputs.run_id }}"
+          title: "decision: ${{ steps.now.outputs.date }}"
+          body: "bootstrap decision card (stub). No binaries; PR-based flow."
+          commit-message: "decision: ${{ steps.now.outputs.date }}"
+          add-paths: |
+            reports/decision_*.md
