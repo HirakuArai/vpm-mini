@@ -9,10 +9,11 @@ jobs:
   call-render:
     name: Render Grafana manual
     permissions:
+      actions: read
       contents: read
     uses: HirakuArai/vpm-mini/.github/workflows/render_reusable.yml@main
     # pass repo secrets to the called workflow
-    secrets: "inherit"  # pragma: allowlist secret
+    secrets: inherit  # pragma: allowlist secret
     with:
       from: ${{ github.event.inputs.from || 'now-30m' }}
       to:   ${{ github.event.inputs.to   || 'now' }}
