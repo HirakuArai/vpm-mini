@@ -41,6 +41,12 @@ jobs:
       pull-requests: write
     timeout-minutes: 10
     steps:
+      - name: Guard: enforce runner labels
+        if: ${{ !contains(runner.labels, 'self-hosted') || !contains(runner.labels, 'k8s-runner') }}
+        run: |
+          echo "This workflow must run on [self-hosted, k8s-runner]."
+          echo "Current labels: ${{ toJson(runner.labels) }}"
+          exit 1
       - uses: actions/checkout@v4
 
       - name: Prepare params
