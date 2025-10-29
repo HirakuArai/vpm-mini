@@ -1,0 +1,14 @@
+name: test-and-artifacts
+on:
+  pull_request:
+    types: [opened, synchronize, labeled, reopened]
+jobs:
+  ok:
+    if: contains(github.event.pull_request.labels.*.name, 'evidence')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: verify daily.md footprint
+        run: |
+          test -f reports/daily.md
+          awk '/^FOOTER:/{print; exit}' reports/daily.md || true
