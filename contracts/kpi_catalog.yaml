@@ -1,0 +1,9 @@
+kpis:
+  - id: self_cost_health
+    title: Self Health / Cost
+    owner: "@ops-lead"
+    render: "md"
+  - id: change_pr_flow
+    title: Change / PR Flow
+    owner: "@dev-lead"
+    render: "md"

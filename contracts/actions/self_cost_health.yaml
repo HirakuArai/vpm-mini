@@ -1,0 +1,6 @@
+if: "external_ip_zero == false || unused_pds_zero == false || runtime_minutes:red"
+then:
+  - title: "Self-Cost 健全性逸脱（IP/PD/Runtime）"
+    owner: "@ops-lead"
+    due: "EOD"
+    success: "外部IP=0・未使用PD=0・実行≤10分の証跡をEvidenceに添付"
