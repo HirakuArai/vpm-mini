@@ -122,7 +122,7 @@ jobs:
           labels: "evidence,bot"
 
       - name: Enable auto-merge (squash) for evidence PR
-        if: always() && steps.cpr.outputs.pull-request-number
+        if: always() && steps.cpr.outputs.pull-request-number || github.event_name == 'workflow_call'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OWNER: ${{ github.repository_owner }}
