@@ -120,6 +120,8 @@ jobs:
           delete-branch: true
           base: "main"
           labels: "evidence,bot"
+          add-paths: |
+            reports/daily.md
 
       - name: Enable auto-merge (squash) for evidence PR
         env:
