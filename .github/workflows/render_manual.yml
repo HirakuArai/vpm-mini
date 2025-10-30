@@ -67,14 +67,15 @@ jobs:
           ORG_ID: ${{ vars.GRAFANA_ORG_ID || '1' }}
         run: |
           set -euo pipefail
-          UID="evidence-prod"; SLUG="evidence-e28093-prod"; PANEL=1
+          TEST_UID="evidence-prod"; TEST_SLUG="evidence-e28093-prod"; TEST_PANEL=1
           H=(-H "X-Org-Id: ${ORG_ID}")
           if [ -n "${GRAFANA_API_TOKEN:-}" ]; then H+=(-H "Authorization: Bearer ${GRAFANA_API_TOKEN}"); fi
-          URL="http://grafana.monitoring.svc.cluster.local/render/d-solo/${UID}/${SLUG}"
+          URL="http://grafana.monitoring.svc.cluster.local/render/d-solo/${TEST_UID}/${TEST_SLUG}"
           echo "URL=$URL"
           curl -sS -I -G "${H[@]}" "$URL" \
-            --data-urlencode panelId=$PANEL --data-urlencode from=now-30m --data-urlencode to=now || true
-
+            --data-urlencode panelId=${TEST_PANEL} \
+            --data-urlencode from=now-30m \
+            --data-urlencode to=now || true
   call-render-inline:
     runs-on: [self-hosted, k8s-runner]
     steps:
