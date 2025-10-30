@@ -1,11 +1,12 @@
+---
 id: self_cost_health
 compute:
   kpis:
     external_ip_zero: "addresses == 0"
-    unused_pds_zero:  "unused_pds == 0"
-    runtime_minutes:  "runtime_minutes"
+    unused_pds_zero: "unused_pds == 0"
+    runtime_minutes: "runtime_minutes"
 thresholds:
   external_ip_zero: {green: "== true", red: "== false"}
-  unused_pds_zero:  {green: "== true", red: "== false"}
-  runtime_minutes:  {green: "<= 10", yellow: "<= 15", red: "> 15"}
+  unused_pds_zero: {green: "== true", red: "== false"}
+  runtime_minutes: {green: "<= 10", yellow: "<= 15", red: "> 15"}
 schedule: "5 7 * * *"
