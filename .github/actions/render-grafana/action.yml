@@ -84,7 +84,7 @@ runs:
             -D artifacts/headers.txt -o artifacts/out.png || true)
           CT=$(grep -i '^content-type:' artifacts/headers.txt | awk '{print tolower($2)}' | tr -d '\r')
           SIZE=$(stat -c%s artifacts/out.png 2>/dev/null || stat -f%z artifacts/out.png 2>/dev/null || echo 0)
-          SIG=$(head -c 8 artifacts/out.png | xxd -p | awk '{print tolower($0)}')
+          SIG=$(od -An -tx1 -N8 artifacts/out.png | tr -d '[:space:]' | tr 'A-Z' 'a-z')
           echo "TRY=$i HTTP=${HTTP} CT=${CT:-n/a} SIZE=${SIZE} SIG=${SIG}" | tee -a artifacts/evidence.log
           if [ "$HTTP" = "200" ] && echo "$CT" | grep -q 'image/png' && [ "$SIZE" -ge 512 ] && echo "$SIG" | grep -q '^89504e47'; then
             break
