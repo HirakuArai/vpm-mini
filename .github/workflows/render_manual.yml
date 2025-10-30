@@ -12,7 +12,7 @@ permissions:
 jobs:
   call-render:
     name: Render Grafana manual
-    uses: HirakuArai/vpm-mini/.github/workflows/render_reusable.yml@main
+    uses: ./.github/workflows/render_reusable.yml
     # pass repo secrets to the called workflow
     secrets: inherit  # pragma: allowlist secret
     with:
