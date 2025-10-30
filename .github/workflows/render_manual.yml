@@ -12,6 +12,7 @@ permissions:
 jobs:
   call-render:
     name: Render Grafana manual
+    if: ${{ false }}
     uses: ./.github/workflows/render_reusable.yml
     with:
       from: ${{ github.event.inputs.from || 'now-30m' }}
