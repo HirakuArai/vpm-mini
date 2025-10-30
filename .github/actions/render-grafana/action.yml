@@ -63,24 +63,24 @@ runs:
       run: |
         set -euo pipefail
         BASE="${GRAFANA_BASE_URL%/}"
-        UID="${DASH_UID}"; SLUG="${DASH_SLUG}"; PANEL="${DASH_PANEL}"
+        RENDER_UID="${DASH_UID}"; RENDER_SLUG="${DASH_SLUG}"; RENDER_PANEL="${DASH_PANEL}"
         FROM="${INPUT_FROM}"; TO="${INPUT_TO}"
         ORG="${DASH_ORG}"
-        URL="${BASE}/render/d-solo/${UID}/${SLUG}"
-        echo "BASE=$BASE UID=$UID SLUG=$SLUG PANEL=$PANEL ORG=$ORG FROM=$FROM TO=$TO" | tee -a artifacts/evidence.log
+        URL="${BASE}/render/d-solo/${RENDER_UID}/${RENDER_SLUG}"
+        echo "BASE=$BASE UID=$RENDER_UID SLUG=$RENDER_SLUG PANEL=$RENDER_PANEL ORG=$ORG FROM=$FROM TO=$TO" | tee -a artifacts/evidence.log
 
         AUTH=()
         [ -n "${GRAFANA_API_TOKEN:-}" ] && AUTH+=(-H "Authorization: Bearer ${GRAFANA_API_TOKEN}")
 
         CODE=$(curl -sS -m 20 -w "%{http_code}" -I -G "${AUTH[@]}" -H "X-Org-Id: ${ORG}" \
-          "$URL" --data-urlencode panelId="${PANEL}" --data-urlencode from="${FROM}" --data-urlencode to="${TO}" -o /dev/null || true)
+          "$URL" --data-urlencode panelId="${RENDER_PANEL}" --data-urlencode from="${FROM}" --data-urlencode to="${TO}" -o /dev/null || true)
         echo "PRE_HTTP=${CODE}" | tee -a artifacts/evidence.log
 
         HTTP=""; CT=""; SIZE=0; SIG=""
         for i in 1 2 3; do
           HTTP=$(curl -sS -m 60 --retry 2 --retry-delay 2 --retry-all-errors \
             -w "%{http_code}" -G "${AUTH[@]}" -H "X-Org-Id: ${ORG}" \
-            "$URL" --data-urlencode panelId="${PANEL}" --data-urlencode from="${FROM}" --data-urlencode to="${TO}" \
+            "$URL" --data-urlencode panelId="${RENDER_PANEL}" --data-urlencode from="${FROM}" --data-urlencode to="${TO}" \
             -D artifacts/headers.txt -o artifacts/out.png || true)
           CT=$(grep -i '^content-type:' artifacts/headers.txt | awk '{print tolower($2)}' | tr -d '\r')
           SIZE=$(stat -c%s artifacts/out.png 2>/dev/null || stat -f%z artifacts/out.png 2>/dev/null || echo 0)
