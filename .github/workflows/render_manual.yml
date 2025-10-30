@@ -13,8 +13,6 @@ jobs:
   call-render:
     name: Render Grafana manual
     uses: ./.github/workflows/render_reusable.yml
-    # pass repo secrets to the called workflow
-    secrets: inherit  # pragma: allowlist secret
     with:
       from: ${{ github.event.inputs.from || 'now-30m' }}
       to:   ${{ github.event.inputs.to   || 'now' }}
