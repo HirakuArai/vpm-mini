@@ -1,5 +1,6 @@
 name: Render Reusable (self-hosted)
 permissions:
+  actions: read
   contents: read
 on:
   workflow_call:
