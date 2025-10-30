@@ -78,7 +78,7 @@ runs:
 
         HTTP=""; CT=""; SIZE=0; SIG=""
         for i in 1 2 3; do
-          HTTP=$(curl -sS -m 60 --retry 2 --retry-delay 2 --retry-all-errors \
+          HTTP=$(curl -sS -m 60 --retry 2 --retry-delay 2 \
             -w "%{http_code}" -G "${AUTH[@]}" -H "X-Org-Id: ${ORG}" \
             "$URL" --data-urlencode panelId="${RENDER_PANEL}" --data-urlencode from="${FROM}" --data-urlencode to="${TO}" \
             -D artifacts/headers.txt -o artifacts/out.png || true)
