@@ -31,6 +31,7 @@ jobs:
   call-render-inline:
     runs-on: [self-hosted, k8s-runner]
     steps:
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/render-grafana
         with:
           from: ${{ github.event.inputs.from || 'now-30m' }}
