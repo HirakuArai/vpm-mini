@@ -1,24 +1,29 @@
 name: Render Manual (wrapper)
+
 on:
   workflow_dispatch:
     inputs:
-      from: { description: "From", required: false, default: "now-30m" }
-      to:   { description: "To",   required: false, default: "now" }
+      from:
+        description: "From"
+        required: false
+        default: "now-30m"
+      to:
+        description: "To"
+        required: false
+        default: "now"
 
 permissions:
   actions: read
   contents: read
 
-jobs:
-  call-render:
-    name: Render Grafana manual
-    if: ${{ false }}
-    uses: ./.github/workflows/render_reusable.yml
-    with:
-      from: ${{ github.event.inputs.from || 'now-30m' }}
-      to:   ${{ github.event.inputs.to   || 'now' }}
+concurrency:
+  group: render-manual
+  cancel-in-progress: false
 
-  plan-smoke:
+jobs:
+  smoke:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "planner OK"
+      - name: Planner OK
+        run: |
+          echo "planner OK: ${GITHUB_RUN_ID}"
