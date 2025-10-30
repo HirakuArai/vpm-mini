@@ -16,3 +16,8 @@ jobs:
     with:
       from: ${{ github.event.inputs.from || 'now-30m' }}
       to:   ${{ github.event.inputs.to   || 'now' }}
+
+  plan-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "planner OK"
