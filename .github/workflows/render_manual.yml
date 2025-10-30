@@ -28,6 +28,53 @@ jobs:
         run: |
           echo "planner OK: ${GITHUB_RUN_ID}"
 
+  call-render-diag:
+    runs-on: [self-hosted, k8s-runner]
+    env:
+      GRAFANA_BASE_URL: ${{ vars.GRAFANA_BASE_URL || 'http://grafana.monitoring.svc.cluster.local' }}
+      GRAFANA_API_TOKEN: ${{ secrets.GRAFANA_API_TOKEN }}
+      GRAFANA_ORG_ID: ${{ vars.GRAFANA_ORG_ID || '1' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Show env + DNS
+        shell: bash
+        run: |
+          echo "BASE=${GRAFANA_BASE_URL:-<unset>}"
+          echo "ORG=${GRAFANA_ORG_ID:-<unset>}"
+          if [ -n "${GRAFANA_API_TOKEN:-}" ]; then echo "TOKEN=PRESENT"; else echo "TOKEN=ABSENT"; fi
+          echo "---- resolv.conf ----"; cat /etc/resolv.conf || true
+          echo "---- nslookup ----";  (command -v nslookup >/dev/null && nslookup grafana.monitoring.svc.cluster.local) || true
+          echo "---- getent hosts ----"; getent hosts grafana.monitoring.svc.cluster.local || true
+      - name: Health check (no auth)
+        shell: bash
+        run: |
+          set -x
+          curl -v -m 10 -sS -o /dev/null -w "HTTP=%{http_code}\n" \
+            "http://grafana.monitoring.svc.cluster.local/api/health" || true
+      - name: Health check (with org + token if present)
+        shell: bash
+        env:
+          ORG_ID: ${{ vars.GRAFANA_ORG_ID || '1' }}
+        run: |
+          set -x
+          H=(-H "X-Org-Id: ${ORG_ID}")
+          if [ -n "${GRAFANA_API_TOKEN:-}" ]; then H+=(-H "Authorization: Bearer ${GRAFANA_API_TOKEN}"); fi
+          curl -v -m 15 -sS -o /dev/null -w "HTTP=%{http_code}\n" \
+            "${H[@]}" "http://grafana.monitoring.svc.cluster.local/api/health" || true
+      - name: Dump headers for render URL (no download)
+        shell: bash
+        env:
+          ORG_ID: ${{ vars.GRAFANA_ORG_ID || '1' }}
+        run: |
+          set -euo pipefail
+          UID="evidence-prod"; SLUG="evidence-e28093-prod"; PANEL=1
+          H=(-H "X-Org-Id: ${ORG_ID}")
+          if [ -n "${GRAFANA_API_TOKEN:-}" ]; then H+=(-H "Authorization: Bearer ${GRAFANA_API_TOKEN}"); fi
+          URL="http://grafana.monitoring.svc.cluster.local/render/d-solo/${UID}/${SLUG}"
+          echo "URL=$URL"
+          curl -sS -I -G "${H[@]}" "$URL" \
+            --data-urlencode panelId=$PANEL --data-urlencode from=now-30m --data-urlencode to=now || true
+
   call-render-inline:
     runs-on: [self-hosted, k8s-runner]
     steps:
