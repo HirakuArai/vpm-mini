@@ -43,11 +43,10 @@ runs:
       env:
         INPUT_FROM: ${{ inputs.from }}
         INPUT_TO: ${{ inputs.to }}
-        GRAFANA_BASE_URL: ${{ vars.GRAFANA_BASE_URL || 'http://grafana.monitoring.svc.cluster.local' }}
-        GRAFANA_API_TOKEN: ${{ secrets.GRAFANA_API_TOKEN }}
       run: |
         set -euo pipefail
-        BASE="${GRAFANA_BASE_URL%/}"
+        BASE="${GRAFANA_BASE_URL:-http://grafana.monitoring.svc.cluster.local}"
+        BASE="${BASE%/}"
         URL="${BASE}/render/d-solo/${DASH_UID}/${DASH_SLUG}"
         FROM="${INPUT_FROM}"; TO="${INPUT_TO}"
         AUTH=()
