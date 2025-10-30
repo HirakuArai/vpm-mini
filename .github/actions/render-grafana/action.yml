@@ -33,11 +33,26 @@ runs:
         if missing:
             print(f"::error ::Missing fields: {','.join(missing)}", flush=True)
             sys.exit(1)
+        org = str(grafana['org'])
+        uid = str(grafana['uid'])
+        slug = str(grafana['slug'])
+        panel = str(grafana['panelId'])
         with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as env:
-            env.write(f"DASH_ORG={grafana['org']}\\nDASH_UID={grafana['uid']}\\nDASH_SLUG={grafana['slug']}\\nDASH_PANEL={grafana['panelId']}\\n")
+            env.write(f"DASH_ORG={org}\\n")
+            env.write(f"DASH_UID={uid}\\n")
+            env.write(f"DASH_SLUG={slug}\\n")
+            env.write(f"DASH_PANEL={panel}\\n")
         with open('artifacts/evidence.log', 'a', encoding='utf-8') as ev:
-            ev.write(f"SSOT_UID={grafana['uid']}\\nSSOT_SLUG={grafana['slug']}\\nSSOT_PANEL={grafana['panelId']}\\n")
+            ev.write(f"DASH_ORG={org}\\nDASH_UID={uid}\\nDASH_SLUG={slug}\\nDASH_PANEL={panel}\\n")
         PY
+    - name: Show resolved DASH_*
+      shell: bash
+      run: |
+        set -euo pipefail
+        echo "DASH_ORG=${DASH_ORG:-<unset>}"
+        echo "DASH_UID=${DASH_UID:-<unset>}"
+        echo "DASH_SLUG=${DASH_SLUG:-<unset>}"
+        echo "DASH_PANEL=${DASH_PANEL:-<unset>}"
     - name: Render PNG
       shell: bash
       env:
