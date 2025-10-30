@@ -27,3 +27,11 @@ jobs:
       - name: Planner OK
         run: |
           echo "planner OK: ${GITHUB_RUN_ID}"
+
+  call-render-inline:
+    runs-on: [self-hosted, k8s-runner]
+    steps:
+      - uses: ./.github/actions/render-grafana
+        with:
+          from: ${{ github.event.inputs.from || 'now-30m' }}
+          to:   ${{ github.event.inputs.to   || 'now' }}
