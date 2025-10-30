@@ -38,12 +38,12 @@ runs:
         slug = str(grafana['slug'])
         panel = str(grafana['panelId'])
         with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as env:
-            env.write(f"DASH_ORG={org}\\n")
-            env.write(f"DASH_UID={uid}\\n")
-            env.write(f"DASH_SLUG={slug}\\n")
-            env.write(f"DASH_PANEL={panel}\\n")
+            env.write(f"DASH_ORG={org}\n")
+            env.write(f"DASH_UID={uid}\n")
+            env.write(f"DASH_SLUG={slug}\n")
+            env.write(f"DASH_PANEL={panel}\n")
         with open('artifacts/evidence.log', 'a', encoding='utf-8') as ev:
-            ev.write(f"DASH_ORG={org}\\nDASH_UID={uid}\\nDASH_SLUG={slug}\\nDASH_PANEL={panel}\\n")
+            ev.write(f"DASH_ORG={org}\nDASH_UID={uid}\nDASH_SLUG={slug}\nDASH_PANEL={panel}\n")
         PY
     - name: Show resolved DASH_*
       shell: bash
