@@ -1,0 +1,31 @@
+---
+id: redshift-migration-2026
+type: PT2
+ws: WS4
+phase: PH3
+goal: >
+  TeradataからAmazon Redshiftへの移行を2026-03-31までに完了し、切替直後のSLO
+  （主要BIのp50<3s、日次ETL完了<=06:00 JST）を満たす
+dod:
+  - >
+    全主要スキーマのDDL互換・差分表記
+    （docs/projects/redshift-migration-2026/ddl_diff.md）
+  - >
+    主要ETLの移行（Glue/Spark/SQL）とリトライ/監視
+  - >
+    BI主要ダッシュボードの再接続・応答p50<3s
+  - >
+    移行リハ2回：T-30/T-7、最終切替計画とロールバック手順
+deadline: "2026-03-31T23:59:59+09:00"
+owners: ["@hiraku"]
+stakeholders: ["@data-lead", "@infra-lead", "@bi-pm"]
+slo:
+  runbook_freshness_days_max: 3
+  evidence_card_time: "07:05 JST"
+  cost_minutes_max: 10
+risk_register: "reports/projects/redshift-migration-2026/risks.md"
+state_refs:
+  - "STATE/current_state.md"
+evidence_refs:
+  - "reports/projects/redshift-migration-2026/decisions/"
+  - "reports/projects/redshift-migration-2026/status/"

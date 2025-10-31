@@ -1,0 +1,103 @@
+name: VPM Control Room
+on:
+  issue_comment:
+    types: [created]
+permissions:
+  issues: write
+  contents: read
+jobs:
+  reply:
+    if: github.event.issue.title == 'Control Room'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reply via github-script
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = (context.payload.comment.body || '').trim();
+            const m = body.match(/^\/(status|next|ask)\s*(?:(\S+)|)\s*(?:"([^"]+)"|)?/i);
+            const kind = m ? m[1].toLowerCase() : 'help';
+            const target = (m && (m[2]||'').trim()) || 'hello-ksvc';
+            const free = (m && (m[3]||'').trim()) || '';
+
+            async function read(path) {
+              try {
+                const { data } = await github.repos.getContent({
+                  owner: context.repo.owner, repo: context.repo.repo, path
+                });
+                return data;
+              } catch(e) { return null; }
+            }
+
+            const contractPath = `contracts/projects/${target}.yaml`;
+            const contract = await read(contractPath);
+
+            let latestReport = null;
+            try {
+              const { data: tree } = await github.repos.getContent({
+                owner: context.repo.owner, repo: context.repo.repo,
+                path: `reports/projects/${target}/status`
+              });
+              if (Array.isArray(tree) && tree.length) {
+                tree.sort((a,b)=> b.name.localeCompare(a.name));
+                latestReport = tree[0].path;
+              }
+            } catch(e) {}
+
+            function reply(body) {
+              return github.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body
+              });
+            }
+
+            if (kind === 'status') {
+              const status = latestReport ? 'OK(候補あり)' : 'UNKNOWN';
+              const msg = [
+                'VPM Status',
+                '```',
+                `status: ${status}`,
+                `checked_at: ${new Date().toISOString()}`,
+                `contract: ${contractPath} ${contract?'(found)':'(missing)'}`,
+                `evidence: ${latestReport ? latestReport : '(none)'}`,
+                'refs: STATE/current_state.md, contracts/**, reports/**',
+                '```'
+              ].join('\n');
+              await reply(msg);
+              return;
+            }
+
+            if (kind === 'next') {
+              const items = [];
+              items.push(`- [1] self-cost wiring を追加（Owner:@hiraku / Due: 明朝09:00 JST / Success: cardにruntime_minutes≤10を表示）`);
+              items.push(`- [2] validate_contracts.yml を paths:["contracts/**"] に限定（CIノイズ除去）`);
+              items.push(latestReport
+                ? `- [3] Evidence連勝化（07:05までに日次statusを自動生成）  根拠:${latestReport}`
+                : `- [3] 初回Evidence作成（reports/projects/${target}/status/<date>.md）`);
+              const msg = [
+                `VPM Next for ${target}`,
+                '```',
+                ...items,
+                'refs: STATE/current_state.md, contracts/**, reports/**',
+                '```'
+              ].join('\n');
+              await reply(msg);
+              return;
+            }
+
+            if (kind === 'ask') {
+              const msg = [
+                `VPM Ask (echo)`,
+                '```',
+                `question: "${free || '(no text)'}"`,
+                `hint: 提案は /next ${target} を参照。詳細な設計は docs/projects/${target}/ 以下に蓄積。`,
+                'refs: STATE/current_state.md, contracts/**, reports/**',
+                '```'
+              ].join('\n');
+              await reply(msg);
+              return;
+            }
+
+            await reply('VPM Help\n```\n/ status <project>\n/ next <project>\n/ ask "free text"\n例: /status redshift-migration-2026\n```');

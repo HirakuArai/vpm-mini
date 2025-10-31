@@ -1,5 +1,11 @@
 name: validate_contracts
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - "contracts/**"
+  pull_request:
+    paths:
+      - "contracts/**"
 jobs:
   validate:
     runs-on: ubuntu-latest
