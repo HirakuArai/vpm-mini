@@ -66,8 +66,8 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        ./kubectl -n monitoring scale deploy/grafana --replicas=1
-        ./kubectl -n monitoring rollout status deploy/grafana --timeout=120s
+        ./kubectl --namespace monitoring scale deployment/grafana --replicas=1
+        ./kubectl --namespace monitoring rollout status deployment/grafana --timeout=120s
     - name: Render PNG
       shell: bash
       env:
@@ -124,4 +124,4 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        ./kubectl -n monitoring scale deploy/grafana --replicas=0
+        ./kubectl --namespace monitoring scale deployment/grafana --replicas=0
