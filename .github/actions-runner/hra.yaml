@@ -1,0 +1,16 @@
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: HorizontalRunnerAutoscaler
+metadata:
+  name: vpm-mini-rd-hra
+  namespace: actions
+spec:
+  scaleTargetRef:
+    name: vpm-mini-rd
+  minReplicas: 0
+  maxReplicas: 1
+  metrics:
+    - type: TotalNumberOfQueuedAndInProgressWorkflowRuns
+      repositoryNames:
+        - HirakuArai/vpm-mini
+      scaleUpThreshold: "1"
+      scaleDownThreshold: "0"
