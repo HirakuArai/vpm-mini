@@ -53,12 +53,21 @@ runs:
         echo "DASH_UID=${DASH_UID:-<unset>}"
         echo "DASH_SLUG=${DASH_SLUG:-<unset>}"
         echo "DASH_PANEL=${DASH_PANEL:-<unset>}"
+    - name: Install kubectl
+      shell: bash
+      run: |
+        set -euo pipefail
+        OS=linux ARCH=amd64
+        KVER=$(curl -sS https://storage.googleapis.com/kubernetes-release/release/stable.txt)
+        curl -sSLo kubectl https://storage.googleapis.com/kubernetes-release/release/${KVER}/bin/${OS}/${ARCH}/kubectl
+        chmod +x kubectl
+        ./kubectl version --client
     - name: Scale Grafana up
       shell: bash
       run: |
         set -euo pipefail
-        kubectl -n monitoring scale deploy/grafana --replicas=1
-        kubectl -n monitoring rollout status deploy/grafana --timeout=120s
+        ./kubectl -n monitoring scale deploy/grafana --replicas=1
+        ./kubectl -n monitoring rollout status deploy/grafana --timeout=120s
     - name: Render PNG
       shell: bash
       env:
@@ -115,4 +124,4 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        kubectl -n monitoring scale deploy/grafana --replicas=0
+        ./kubectl -n monitoring scale deploy/grafana --replicas=0
