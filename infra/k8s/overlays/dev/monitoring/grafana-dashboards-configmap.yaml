@@ -50,27 +50,25 @@ data:
       ],
       "templating": { "list": [] }
     }
----
-# Grafana が自動で dashboards/ を読むように、既存 Deployment へ volume をマウント（既存と併用想定）
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: grafana
-  namespace: monitoring
-spec:
-  template:
-    spec:
-      volumes:
-      - name: dashboards
-        configMap:
-          name: grafana-dashboards
-      containers:
-      - name: grafana
-        volumeMounts:
-        - name: dashboards
-          mountPath: /var/lib/grafana/dashboards
-        env:
-        - name: GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH
-          value: /var/lib/grafana/dashboards/vpm-mini-dev-overview.json
-        - name: GF_DASHBOARDS_ENABLE
-          value: "true"
+  evidence-prod.json: |
+    {
+      "uid": "evidence-prod",
+      "title": "Evidence \\u2013 Prod",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "5m",
+      "timezone": "browser",
+      "panels": [
+        {
+          "id": 1,
+          "type": "text",
+          "title": "Daily Evidence Placeholder",
+          "gridPos": { "x": 0, "y": 0, "w": 24, "h": 9 },
+          "options": {
+            "mode": "markdown",
+            "content": "# Evidence\\nPlaceholder panel rendered for tests."
+          }
+        }
+      ],
+      "templating": { "list": [] }
+    }

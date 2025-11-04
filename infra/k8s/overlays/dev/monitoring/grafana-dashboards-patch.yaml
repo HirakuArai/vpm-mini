@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      volumes:
+      - name: dashboards
+        configMap:
+          name: grafana-dashboards
+      containers:
+      - name: grafana
+        volumeMounts:
+        - name: dashboards
+          mountPath: /var/lib/grafana/dashboards
+        env:
+        - name: GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH
+          value: /var/lib/grafana/dashboards/vpm-mini-dev-overview.json
+        - name: GF_DASHBOARDS_ENABLE
+          value: "true"

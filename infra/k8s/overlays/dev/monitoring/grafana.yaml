@@ -19,12 +19,19 @@ kind: Deployment
 metadata:
   name: grafana
   namespace: monitoring
+  labels:
+    app: grafana
+    app.kubernetes.io/instance: grafana
+    app.kubernetes.io/name: grafana
 spec:
   replicas: 1
   selector: { matchLabels: { app: grafana } }
   template:
     metadata:
-      labels: { app: grafana }
+      labels:
+        app: grafana
+        app.kubernetes.io/instance: grafana
+        app.kubernetes.io/name: grafana
     spec:
       containers:
       - name: grafana
@@ -53,5 +60,5 @@ spec:
   selector: { app: grafana }
   ports:
   - name: http
-    port: 3000
+    port: 80
     targetPort: 3000
