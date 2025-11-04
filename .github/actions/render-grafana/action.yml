@@ -67,7 +67,7 @@ runs:
       run: |
         set -euo pipefail
         ./kubectl --namespace monitoring patch deployment grafana --type merge -p '{"spec":{"replicas":1}}'
-        ./kubectl --namespace monitoring rollout status deployment/grafana --timeout=120s
+        ./kubectl --namespace monitoring rollout status deployment/grafana --timeout=300s
     - name: Render PNG
       shell: bash
       env:
