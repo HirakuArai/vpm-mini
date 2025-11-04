@@ -10,6 +10,9 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
 
       - name: Compute metadata
         id: now
@@ -17,21 +20,75 @@ jobs:
           echo "date=$(date +%F)" >> "$GITHUB_OUTPUT"
           echo "run_id=${GITHUB_RUN_ID}" >> "$GITHUB_OUTPUT"
 
-      - name: Generate decision card (stub)
+      - name: Collect self-cost KPIs
+        id: self_cost
         run: |
-          mkdir -p reports
-          D="${{ steps.now.outputs.date }}"
+          python3 scripts/collect_and_compute.py > self_cost.json
+          cat self_cost.json
           {
-            echo "# Daily Decision — ${D}"
-            echo
-            echo "Status: GREEN（bootstrap）"
-            echo
-            echo "**Today (max 3)**"
-            echo "- なし"
-            echo
-            echo "Evidence: <TBD>"
-            echo "FOOTER: RUN=${{ steps.now.outputs.run_id }} VERIFY=stub"
-          } > "reports/decision_${D}.md"
+            echo "json<<EOF"
+            cat self_cost.json
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Generate decision card
+        run: |
+          python3 - <<'PY'
+import json
+import os
+from pathlib import Path
+
+date = os.environ["DATE"]
+run_id = os.environ["RUN_ID"]
+data = {}
+try:
+    with open("self_cost.json", "r", encoding="utf-8") as fh:
+        data = json.load(fh)
+except FileNotFoundError:
+    data = {}
+
+def fmt_flag(key: str) -> str:
+    value = data.get(key, -1)
+    if value in (0, 1):
+        return str(value)
+    return "unknown"
+
+runtime = data.get("runtime_minutes", -1)
+runtime_str = str(runtime if isinstance(runtime, int) and runtime >= 0 else "unknown")
+
+lines = [
+    f"# Daily Decision — {date}",
+    "",
+    "Status: GREEN（bootstrap）",
+    "",
+    "**Today (max 3)**",
+    "- なし",
+    "",
+    "**Self-Cost**",
+    f"- external_ip_zero: {fmt_flag('external_ip_zero')}",
+    f"- unused_pds_zero: {fmt_flag('unused_pds_zero')}",
+    f"- runtime_minutes: {runtime_str}",
+    "",
+    "Evidence: <TBD>",
+    f"FOOTER: RUN={run_id} VERIFY=self-cost-stub",
+]
+
+remediation = []
+if data.get("external_ip_zero", 1) == 0:
+    remediation.append("- [ ] Release unused external IPs")
+if data.get("unused_pds_zero", 1) == 0:
+    remediation.append("- [ ] Delete unused PDs")
+if remediation:
+    idx = lines.index("Evidence: <TBD>")
+    lines[idx:idx] = ["", "**Remediation**", *remediation, ""]
+
+path = Path(f"reports/decision_{date}.md")
+path.parent.mkdir(parents=True, exist_ok=True)
+path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+PY
+        env:
+          DATE: ${{ steps.now.outputs.date }}
+          RUN_ID: ${{ steps.now.outputs.run_id }}
 
       - name: Create PR
         uses: peter-evans/create-pull-request@v6
