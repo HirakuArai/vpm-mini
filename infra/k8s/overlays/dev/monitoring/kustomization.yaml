@@ -11,3 +11,4 @@ resources:
   - servicemonitor.yaml
 patchesStrategicMerge:
   - grafana-dashboards-patch.yaml
+  - patch-grafana-fixes.yaml
