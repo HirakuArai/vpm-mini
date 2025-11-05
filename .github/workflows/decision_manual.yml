@@ -9,6 +9,8 @@ permissions:
 
 jobs:
   trigger:
-    permissions: inherit
+    permissions:
+      contents: write
+      pull-requests: write
     uses: ./.github/workflows/synthesize_decisions.yml
     secrets: inherit  # pragma: allowlist secret
