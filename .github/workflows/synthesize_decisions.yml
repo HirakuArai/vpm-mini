@@ -1,6 +1,5 @@
 name: synthesize_decisions
 on:
-  schedule: [{ cron: "5 22 * * *" }]  # JST 07:05
   workflow_dispatch: {}
   workflow_call: {}
 jobs:
@@ -11,6 +10,7 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
@@ -21,82 +21,62 @@ jobs:
           echo "date=$(date +%F)" >> "$GITHUB_OUTPUT"
           echo "run_id=${GITHUB_RUN_ID}" >> "$GITHUB_OUTPUT"
 
-      - name: Collect self-cost KPIs
-        id: self_cost
+      - name: Collect Self-Cost
         run: |
-          python3 scripts/collect_and_compute.py > self_cost.json
+          if ! python3 scripts/collect_and_compute.py > self_cost.json; then
+            echo '{}' > self_cost.json
+          fi
           cat self_cost.json
-          {
-            echo "json<<EOF"
-            cat self_cost.json
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
 
       - name: Generate decision card
         run: |
           python3 - <<'PY'
-import json
-import os
-from pathlib import Path
+          import json
+          import os
+          from pathlib import Path
 
-date = os.environ["DATE"]
-run_id = os.environ["RUN_ID"]
-data = {}
-try:
-    with open("self_cost.json", "r", encoding="utf-8") as fh:
-        data = json.load(fh)
-except FileNotFoundError:
-    data = {}
+          data = {}
+          try:
+              with open("self_cost.json", "r", encoding="utf-8") as fh:
+                  data = json.load(fh)
+          except (FileNotFoundError, json.JSONDecodeError):
+              data = {}
 
-def fmt_flag(key: str) -> str:
-    value = data.get(key, -1)
-    if value in (0, 1):
-        return str(value)
-    return "unknown"
+          def fmt(value):
+              if isinstance(value, bool):
+                  return "1" if value else "0"
+              if value in (None, ""):
+                  return "unknown"
+              return str(value)
 
-runtime = data.get("runtime_minutes", -1)
-runtime_str = str(runtime if isinstance(runtime, int) and runtime >= 0 else "unknown")
+          date = os.environ["DATE"]
+          run_id = os.environ["RUN_ID"]
 
-lines = [
-    f"# Daily Decision — {date}",
-    "",
-    "Status: GREEN（bootstrap）",
-    "",
-    "**Today (max 3)**",
-    "- なし",
-    "",
-    "**Self-Cost**",
-    f"- external_ip_zero: {fmt_flag('external_ip_zero')}",
-    f"- unused_pds_zero: {fmt_flag('unused_pds_zero')}",
-    f"- runtime_minutes: {runtime_str}",
-    "",
-    "Evidence: <TBD>",
-    f"FOOTER: RUN={run_id} VERIFY=self-cost-stub",
-]
+          lines = [
+              f"# Daily Decision — {date}",
+              "",
+              "**Self-Cost**",
+              f"- external_ip_zero: {fmt(data.get('external_ip_zero'))}",
+              f"- unused_pds_zero: {fmt(data.get('unused_pds_zero'))}",
+              f"- runtime_minutes: {fmt(data.get('runtime_minutes'))}",
+              "",
+              f"FOOTER: RUN={run_id} VERIFY=pending",
+          ]
 
-remediation = []
-if data.get("external_ip_zero", 1) == 0:
-    remediation.append("- [ ] Release unused external IPs")
-if data.get("unused_pds_zero", 1) == 0:
-    remediation.append("- [ ] Delete unused PDs")
-if remediation:
-    idx = lines.index("Evidence: <TBD>")
-    lines[idx:idx] = ["", "**Remediation**", *remediation, ""]
-
-path = Path(f"reports/decision_{date}.md")
-path.parent.mkdir(parents=True, exist_ok=True)
-path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-PY
+          path = Path(f"reports/decision_{date}.md")
+          path.parent.mkdir(parents=True, exist_ok=True)
+          path.write_text("\\n".join(lines) + "\\n", encoding="utf-8")
+          PY
         env:
           DATE: ${{ steps.now.outputs.date }}
           RUN_ID: ${{ steps.now.outputs.run_id }}
 
-      - name: Create PR
+      - name: Open PR
         uses: peter-evans/create-pull-request@v6
         with:
           branch: "chore/decision-${{ steps.now.outputs.date }}-${{ steps.now.outputs.run_id }}"
           title: "decision: ${{ steps.now.outputs.date }}"
-          body: "bootstrap decision card (stub). No binaries; PR-based flow."
+          body: "Automated decision card incl. Self-Cost"
           commit-message: "decision: ${{ steps.now.outputs.date }}"
           add-paths: |
             reports/decision_*.md
