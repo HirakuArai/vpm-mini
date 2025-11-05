@@ -22,6 +22,12 @@ from urllib.request import Request, urlopen
 
 
 REPO = os.environ.get("SELF_COST_REPO", "HirakuArai/vpm-mini")
+PROJECT_ID = (
+    os.environ.get("GCP_PROJECT_ID")
+    or os.environ.get("GOOGLE_CLOUD_PROJECT")
+    or os.environ.get("GCLOUD_PROJECT")
+    or ""
+)
 WORKFLOW_FILE = "render_manual.yml"
 
 
@@ -45,7 +51,10 @@ def run_command(args: list[str]) -> Optional[str]:
 
 
 def count_lines(args: list[str]) -> Optional[int]:
-    output = run_command(args)
+    command = list(args)
+    if PROJECT_ID:
+        command += ["--project", PROJECT_ID]
+    output = run_command(command)
     if output is None:
         return None
     lines = [line for line in output.splitlines() if line.strip()]
