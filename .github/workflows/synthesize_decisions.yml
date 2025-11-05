@@ -45,6 +45,8 @@ jobs:
           def fmt(value):
               if isinstance(value, bool):
                   return "1" if value else "0"
+              if isinstance(value, (int, float)) and value < 0:
+                  return "unknown"
               if value in (None, ""):
                   return "unknown"
               return str(value)
@@ -65,7 +67,7 @@ jobs:
 
           path = Path(f"reports/decision_{date}.md")
           path.parent.mkdir(parents=True, exist_ok=True)
-          path.write_text("\\n".join(lines) + "\\n", encoding="utf-8")
+          path.write_text("\n".join(lines) + "\n", encoding="utf-8")
           PY
         env:
           DATE: ${{ steps.now.outputs.date }}
