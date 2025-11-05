@@ -2,6 +2,7 @@ name: synthesize_decisions
 on:
   schedule: [{ cron: "5 22 * * *" }]  # JST 07:05
   workflow_dispatch: {}
+  workflow_call: {}
 jobs:
   decide:
     runs-on: [self-hosted, k8s-runner]
