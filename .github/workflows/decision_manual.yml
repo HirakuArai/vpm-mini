@@ -3,6 +3,12 @@ name: Decision Manual
 on:
   workflow_dispatch: {}
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   trigger:
+    permissions: inherit
     uses: ./.github/workflows/synthesize_decisions.yml
+    secrets: inherit  # pragma: allowlist secret
