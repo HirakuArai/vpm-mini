@@ -1,82 +1,119 @@
 name: synthesize_decisions
-true:
+concurrency:
+  group: decision-cards
+  cancel-in-progress: true
+on:
   workflow_dispatch: {}
   workflow_call: {}
 jobs:
   decide:
-    runs-on:
-    - self-hosted
-    - k8s-runner
+    runs-on: [self-hosted, k8s-runner]
     permissions:
       contents: write
       pull-requests: write
       id-token: write
     steps:
-    - uses: actions/checkout@v4
-    - name: Auth to Google Cloud (WIF)
-      uses: google-github-actions/auth@v2
-      with:
-        workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
-        service_account: ${{ secrets.GCP_SA_EMAIL }}
-    - name: Setup gcloud
-      uses: google-github-actions/setup-gcloud@v2
-      with:
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
-    - name: Deps (jq/python3)
-      run: sudo apt-get update && sudo apt-get install -y jq python3 || true
-    - uses: actions/setup-python@v5
-      with:
-        python-version: 3.x
-    - name: Compute metadata
-      id: now
-      run: 'echo "date=$(date +%F)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
 
-        echo "run_id=${GITHUB_RUN_ID}" >> "$GITHUB_OUTPUT"
+      - name: Auth to Google Cloud (WIF)
+        if: ${{ secrets.GCP_WIF_PROVIDER != '' }}
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
 
-        '
-    - name: Collect Self-Cost
-      run: "if ! python3 scripts/collect_and_compute.py > self_cost.json; then\n \
-        \ echo '{}' > self_cost.json\nfi\ncat self_cost.json\n"
-    - name: Generate decision card
-      run: "python3 - <<'PY'\nimport json\nimport os\nfrom pathlib import Path\n\n\
-        data = {}\ntry:\n    with open(\"self_cost.json\", \"r\", encoding=\"utf-8\"\
-        ) as fh:\n        data = json.load(fh)\nexcept (FileNotFoundError, json.JSONDecodeError):\n\
-        \    data = {}\n\ndef fmt(value):\n    if isinstance(value, bool):\n     \
-        \   return \"1\" if value else \"0\"\n    if isinstance(value, (int, float))\
-        \ and value < 0:\n        return \"unknown\"\n    if value in (None, \"\"\
-        ):\n        return \"unknown\"\n    return str(value)\n\ndate = os.environ[\"\
-        DATE\"]\nrun_id = os.environ[\"RUN_ID\"]\n\nlines = [\n    f\"# Daily Decision\
-        \ \u2014 {date}\",\n    \"\",\n    \"**Self-Cost**\",\n    f\"- external_ip_zero:\
-        \ {fmt(data.get('external_ip_zero'))}\",\n    f\"- unused_pds_zero: {fmt(data.get('unused_pds_zero'))}\"\
-        ,\n    f\"- runtime_minutes: {fmt(data.get('runtime_minutes'))}\",\n    \"\
-        \",\n    f\"FOOTER: RUN={run_id} VERIFY=pending\",\n]\n\npath = Path(f\"reports/decision_{date}.md\"\
-        )\npath.parent.mkdir(parents=True, exist_ok=True)\npath.write_text(\"\\n\"\
-        .join(lines) + \"\\n\", encoding=\"utf-8\")\nPY\n"
-      env:
-        DATE: ${{ steps.now.outputs.date }}
-        RUN_ID: ${{ steps.now.outputs.run_id }}
-    - name: Open PR
-      uses: peter-evans/create-pull-request@v6
-      with:
-        branch: chore/decision-${{ steps.now.outputs.date }}-${{ steps.now.outputs.run_id
-          }}
-        title: 'decision: ${{ steps.now.outputs.date }}'
-        body: Automated decision card incl. Self-Cost
-        commit-message: 'decision: ${{ steps.now.outputs.date }}'
-        add-paths: 'reports/decision_*.md
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-          '
-    - name: Close older decision PRs
-      if: ${{ success() }}
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: "set -euo pipefail\nREPO=\"${{ github.repository }}\"\nNEW=$(gh pr list\
-        \ -R \"$REPO\" --state open --search \"decision:\" -L 1 --json number -q '.[0].number'\
-        \ || true)\n[ -z \"$NEW\" ] && exit 0\nfor N in $(gh pr list -R \"$REPO\"\
-        \ --state open --search \"decision:\" -L 10 --json number -q '.[].number');\
-        \ do\n  if [ \"$N\" != \"$NEW\" ]; then\n    echo \"Closing older PR #$N (new=$NEW)\"\
-        \n    gh pr close -R \"$REPO\" \"$N\" -c \"Superseded by #$NEW (new daily\
-        \ decision card).\"\n  fi\n done"
-concurrency:
-  group: decision-cards
-  cancel-in-progress: true
+      - name: Deps (jq/python3)
+        run: sudo apt-get update && sudo apt-get install -y jq python3 || true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Compute metadata
+        id: now
+        run: |
+          echo "date=$(date +%F)" >> "$GITHUB_OUTPUT"
+          echo "run_id=${GITHUB_RUN_ID}" >> "$GITHUB_OUTPUT"
+
+      - name: Collect Self-Cost
+        run: |
+          if ! python3 scripts/collect_and_compute.py > self_cost.json; then
+            echo '{}' > self_cost.json
+          fi
+          cat self_cost.json
+
+      - name: Generate decision card
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          data = {}
+          try:
+              with open("self_cost.json", "r", encoding="utf-8") as fh:
+                  data = json.load(fh)
+          except (FileNotFoundError, json.JSONDecodeError):
+              data = {}
+
+          def fmt(value):
+              if isinstance(value, bool):
+                  return "1" if value else "0"
+              if isinstance(value, (int, float)) and value < 0:
+                  return "unknown"
+              if value in (None, ""):
+                  return "unknown"
+              return str(value)
+
+          date = os.environ["DATE"]
+          run_id = os.environ["RUN_ID"]
+
+          lines = [
+              f"# Daily Decision — {date}",
+              "",
+              "**Self-Cost**",
+              f"- external_ip_zero: {fmt(data.get('external_ip_zero'))}",
+              f"- unused_pds_zero: {fmt(data.get('unused_pds_zero'))}",
+              f"- runtime_minutes: {fmt(data.get('runtime_minutes'))}",
+              "",
+              f"FOOTER: RUN={run_id} VERIFY=pending",
+          ]
+
+          path = Path(f"reports/decision_{date}.md")
+          path.parent.mkdir(parents=True, exist_ok=True)
+          path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+          PY
+        env:
+          DATE: ${{ steps.now.outputs.date }}
+          RUN_ID: ${{ steps.now.outputs.run_id }}
+
+      - name: Open PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: "chore/decision-${{ steps.now.outputs.date }}-${{ steps.now.outputs.run_id }}"
+          title: "decision: ${{ steps.now.outputs.date }}"
+          body: "Automated decision card incl. Self-Cost"
+          commit-message: "decision: ${{ steps.now.outputs.date }}"
+          add-paths: |
+            reports/decision_*.md
+
+      - name: Close older decision PRs
+        if: ${{ success() }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          REPO="${{ github.repository }}"
+          NEW=$(gh pr list -R "$REPO" --state open --search "decision:" -L 1 --json number -q '.[0].number' || true)
+          [ -z "$NEW" ] && exit 0
+          for N in $(gh pr list -R "$REPO" --state open --search "decision:" -L 20 --json number -q '.[].number'); do
+            if [ "$N" != "$NEW" ]; then
+              echo "Closing older PR #$N (new=$NEW)"
+              gh pr close -R "$REPO" "$N" -c "Superseded by #$NEW (new daily decision card)."
+            fi
+          done
