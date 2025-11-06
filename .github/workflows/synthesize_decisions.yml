@@ -1,4 +1,7 @@
 name: synthesize_decisions
+concurrency:
+  group: decision-cards
+  cancel-in-progress: true
 on:
   workflow_dispatch: {}
   workflow_call: {}
@@ -11,32 +14,39 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
+
       - name: Auth to Google Cloud (WIF)
         if: ${{ secrets.GCP_WIF_PROVIDER != '' }}
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
           service_account: ${{ secrets.GCP_SA_EMAIL }}
+
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
+
       - name: Deps (jq/python3)
         run: sudo apt-get update && sudo apt-get install -y jq python3 || true
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+
       - name: Compute metadata
         id: now
         run: |
           echo "date=$(date +%F)" >> "$GITHUB_OUTPUT"
           echo "run_id=${GITHUB_RUN_ID}" >> "$GITHUB_OUTPUT"
+
       - name: Collect Self-Cost
         run: |
           if ! python3 scripts/collect_and_compute.py > self_cost.json; then
             echo '{}' > self_cost.json
           fi
           cat self_cost.json
+
       - name: Generate decision card
         run: |
           python3 - <<'PY'
@@ -81,6 +91,7 @@ jobs:
         env:
           DATE: ${{ steps.now.outputs.date }}
           RUN_ID: ${{ steps.now.outputs.run_id }}
+
       - name: Open PR
         uses: peter-evans/create-pull-request@v6
         with:
@@ -90,3 +101,19 @@ jobs:
           commit-message: "decision: ${{ steps.now.outputs.date }}"
           add-paths: |
             reports/decision_*.md
+
+      - name: Close older decision PRs
+        if: ${{ success() }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          REPO="${{ github.repository }}"
+          NEW=$(gh pr list -R "$REPO" --state open --search "decision:" -L 1 --json number -q '.[0].number' || true)
+          [ -z "$NEW" ] && exit 0
+          for N in $(gh pr list -R "$REPO" --state open --search "decision:" -L 20 --json number -q '.[].number'); do
+            if [ "$N" != "$NEW" ]; then
+              echo "Closing older PR #$N (new=$NEW)"
+              gh pr close -R "$REPO" "$N" -c "Superseded by #$NEW (new daily decision card)."
+            fi
+          done
