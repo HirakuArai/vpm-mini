@@ -11,6 +11,11 @@
 - Current: dev 監視ラインの整備と理解Diagの導入（Phase 2）
 - 運用ルール: 1PR=1ステップ=1スナップショット / Auto-merge / タグ
 
+## Execution Model
+- **唯一の実行器**: devbox Codex（常駐ワーカー）
+- **Atlas**: OpenAIエージェントブラウザ。Cloud Shell や GitHub UI の操作補助のみ（実行はしない）
+- **Run-Contract(JSON)**: すべての実行は JSON 契約で記述し、`reports/` に証跡を集約
+
 ## Quickstart (10min Repro, Phase 1)
 ```bash
 git clone https://github.com/HirakuArai/vpm-mini.git

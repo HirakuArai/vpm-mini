@@ -1,0 +1,11 @@
+[Unit]
+Description=Codex Worker (poll GitHub issues and run contracts)
+
+[Service]
+# ~/.codex_env に REPO と GH_TOKEN を定義
+EnvironmentFile=%h/.codex_env
+ExecStart=/usr/bin/python3 /home/%u/vpm-mini/tools/codex_worker/poller.py
+Restart=always
+
+[Install]
+WantedBy=default.target
