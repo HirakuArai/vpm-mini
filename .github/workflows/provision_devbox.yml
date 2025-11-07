@@ -1,0 +1,40 @@
+name: provision_devbox
+on:
+  workflow_dispatch:
+    inputs:
+      project_id: { description: "GCP project", default: "vpm-mini-prod", required: true }
+      zone:       { description: "GCE zone",    default: "asia-northeast1-b", required: true }
+      name:       { description: "VM name",     default: "devbox-codex", required: true }
+jobs:
+  apply:
+    permissions: { id-token: write, contents: read }
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Auth to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account:           ${{ secrets.GCP_SA_EMAIL }}
+      - name: Install gcloud
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Create VM if not exists
+        shell: bash
+        run: |
+          set -eux
+          gcloud config set project "${{ github.event.inputs.project_id }}"
+          Z="${{ github.event.inputs.zone }}"
+          NAME="${{ github.event.inputs.name }}"
+          if gcloud compute instances describe "$NAME" --zone "$Z" >/dev/null 2>&1; then
+            echo "VM $NAME already exists in $Z. Skipping."
+          else
+            gcloud compute instances create "$NAME" \
+              --zone="$Z" \
+              --machine-type=e2-small \
+              --image-family=debian-12 --image-project=debian-cloud \
+              --scopes=https://www.googleapis.com/auth/cloud-platform \
+              --labels=role=devbox-codex,env=prod \
+              --tags=devbox
+          fi
+      - name: Show VM
+        run: gcloud compute instances list --filter="name=${{ github.event.inputs.name }}" --format="table(name,zone,status,networkInterfaces[0].networkIP)"
