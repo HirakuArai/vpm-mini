@@ -16,6 +16,11 @@
 - **Atlas**: OpenAIエージェントブラウザ。Cloud Shell や GitHub UI の操作補助のみ（実行はしない）
 - **Run-Contract(JSON)**: すべての実行は JSON 契約で記述し、`reports/` に証跡を集約
 
+## Provision devbox VM
+- Trigger `.github/workflows/provision_devbox.yml` manually (uses GCP WIF + `GCP_WIF_PROVIDER` / `GCP_SA_EMAIL` secrets)
+- Defaults: project `vpm-mini-prod`, zone `asia-northeast1-b`, VM name `devbox-codex`
+- Post-create steps (SSH, bootstrap, PAT, worker verify) are captured in `docs/ops/devbox_vm.md`
+
 ## Quickstart (10min Repro, Phase 1)
 ```bash
 git clone https://github.com/HirakuArai/vpm-mini.git
