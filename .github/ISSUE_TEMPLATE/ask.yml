@@ -1,0 +1,11 @@
+name: Ask (LLM relay)
+description: Ask VPM LLM relay to restate C/G/δ and propose a plan (JSON only)
+labels: [ask]
+body:
+  - type: textarea
+    id: q
+    attributes:
+      label: Question / intent
+      description: 前提・範囲・制約など
+      placeholder: |
+        P2-1→P2-2をGREENにする最短プランを。DoD: READY=True & 冪等。

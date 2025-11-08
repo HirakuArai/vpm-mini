@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type":"object",
+  "required":["context_header","understanding","plan","acceptance","citations","typing","confidence"],
+  "properties":{
+    "context_header":{"type":"string"},
+    "understanding":{"type":"object","required":["C","G","delta","assumptions","unknowns"],
+      "properties":{"C":{"type":"string"},"G":{"type":"string"},"delta":{"type":"string"},
+        "assumptions":{"type":"array","items":{"type":"string"}},
+        "unknowns":{"type":"array","items":{"type":"string"}}}},
+    "plan":{"type":"array","items":{"type":"object","required":["id","desc"],
+      "properties":{"id":{"type":"string"},"desc":{"type":"string"},
+        "commands":{"type":"array","items":{"type":"string"}},
+        "evidence":{"type":"array","items":{"type":"string"}},
+        "risks":{"type":"array","items":{"type":"string"}}}}},
+    "acceptance":{"type":"array","items":{"type":"string"}},
+    "citations":{"type":"array","items":{"type":"object","required":["path"],
+      "properties":{"path":{"type":"string"},"lines":{"type":"string"}}}},
+    "typing":{"type":"string"},
+    "confidence":{"type":"number","minimum":0,"maximum":1}
+  }
+}
