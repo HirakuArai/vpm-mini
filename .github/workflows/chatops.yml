@@ -1,11 +1,21 @@
 name: chatops-ask
 on:
+  workflow_dispatch:
+  issue_comment: { types: [created] }
+  issues:        { types: [opened] }
+permissions:
+  contents: write
+  issues: write
+jobs:
+  ask:
+on:
   issue_comment: { types: [created] }
   issues:        { types: [opened] }
 permissions: { contents: write, issues: write }
-jobs:
   ask:
     if: >
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/ask')) ||
+      (github.event_name == 'issues' && contains(join(github.event.issue.labels.*.name, ',\), 'ask'))
       (github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '/ask')) ||
       (github.event_name == 'issues' && contains(join(github.event.issue.labels.*.name, ','), 'ask'))
     runs-on: ubuntu-latest
@@ -47,5 +57,5 @@ jobs:
           git config user.email "bot@users.noreply.github.com"
           git config user.name  "github-actions[bot]"
           git add reports/ask/*.json
-          git commit -m "ask: store u_contract ($ts)" || true
+  ask:
           git push
