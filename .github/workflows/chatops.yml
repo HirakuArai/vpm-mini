@@ -8,7 +8,7 @@ permissions:
   issues: write
 jobs:
   ask:
-    # コメントは contains('/ask') に緩和、Issueは ask ラベルで発火
+    # コメントは contains('/ask')、Issueは ask ラベルで発火
     if: >
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/ask')) ||
       (github.event_name == 'issues' && contains(join(github.event.issue.labels.*.name, ','), 'ask'))
@@ -24,10 +24,11 @@ jobs:
           printf 'context_header: repo=vpm-mini / branch=main / phase=Phase 2\n' > out/ctx.txt
           printf 'QUESTION\n%s\n' "$(echo "$ISSUE_BODY")" >> out/ctx.txt
 
-      - name: Call OpenAI (gpt-5, JSON only)
+      - name: Call OpenAI (gpt-5, JSON only; save raw & strip fences)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
+          set -e
           jq -n --arg sys "$(cat out/sys.txt)" --arg usr "$(cat out/ctx.txt)" '{
             model:"gpt-5",
             response_format:{type:"json_object"},
@@ -37,7 +38,19 @@ jobs:
           curl -sS https://api.openai.com/v1/chat/completions \
             -H "Authorization: Bearer ${OPENAI_API_KEY}" \
             -H "Content-Type: application/json" \
-            -d @out/req.json | jq -r '.choices[0].message.content' > out/u_contract.json
+            -d @out/req.json | tee out/raw.json >/dev/null
+          if jq -e '.error' out/raw.json >/dev/null; then
+            echo '--- OpenAI error ---'
+            jq -r '.error.message' out/raw.json
+            exit 1
+          fi
+          jq -r '.choices[0].message.content // empty' out/raw.json > out/u_contract.txt
+          if [ ! -s out/u_contract.txt ]; then
+            echo 'No content in OpenAI response'; jq . out/raw.json; exit 1
+          fi
+          # 先頭/末尾のコードフェンスを除去
+          awk 'NR==1{sub(/^```(json)?[[:space:]]*/,"")} {print} END{if(last ~ /```[[:space:]]*$/){} } {last=$0}' out/u_contract.txt \
+            | sed -E 's/[[:space:]]*```$//' > out/u_contract.json
 
       - name: Validate JSON (must be object)
         run: jq -e 'type=="object"' out/u_contract.json
