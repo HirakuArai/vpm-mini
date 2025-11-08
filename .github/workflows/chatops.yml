@@ -44,7 +44,7 @@ jobs:
 
       - name: Schema Guard
         run: |
-          pipx install jsonschema >/dev/null
+          python3 -m pip install --user jsonschema >/dev/null
           python3 tools/guard/validate_u_contract.py out/u_contract.json contracts/u_contract.schema.json
 
       - name: Comment back JSON
