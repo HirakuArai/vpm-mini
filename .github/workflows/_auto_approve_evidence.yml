@@ -1,0 +1,16 @@
+name: _auto_approve_evidence
+on:
+  pull_request_target:
+    types: [opened, synchronize, labeled]
+permissions:
+  pull-requests: write
+  contents: read
+jobs:
+  approve:
+    if: contains(join(github.event.pull_request.labels.*.name), 'evidence')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: peter-evans/approve-pull-request@v5
+        with:
+          pull-request-number: ${{ github.event.pull_request.number }}
+          approval-message: "Auto-approve evidence PR"
