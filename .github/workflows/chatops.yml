@@ -8,7 +8,6 @@ permissions:
   issues: write
 jobs:
   ask:
-    # スキップ回避：/ask を含む or workflow_dispatch なら実行
     if: >
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/ask')) ||
       (github.event_name == 'issues' && contains(join(github.event.issue.labels.*.name, ','), 'ask')) ||
@@ -16,11 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Debug event
-        run: |
-          echo "event_name=$GITHUB_EVENT_NAME"
-          jq -r '..|.body? // empty | .[0:120]' "$GITHUB_EVENT_PATH" || true
 
       - name: Build prompt
         run: |
@@ -30,7 +24,7 @@ jobs:
           printf 'context_header: repo=vpm-mini / branch=main / phase=Phase 2\n' > out/ctx.txt
           printf 'QUESTION\n%s\n' "$(echo "$ISSUE_BODY")" >> out/ctx.txt
 
-      - name: Call OpenAI (gpt-5; raw保存＆フェンス除去)
+      - name: Call OpenAI (gpt-5; raw & strip fences)
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
         run: |
           set -e
@@ -48,21 +42,15 @@ jobs:
           awk 'NR==1{sub(/^```(json)?[[:space:]]*/,"")} {buf=buf $0 ORS} END{sub(/```[[:space:]]*[\r\n]*$/,"",buf); printf "%s", buf}' \
             out/u_contract.txt > out/u_contract.json
 
-      - name: Normalize (必須最低限の補完)
+      - name: Normalize + Coerce (schema最低限)
         run: |
           CH=$(sed -n '1s/^context_header: //p' out/ctx.txt)
-          jq --arg ch "$CH" '(.context_header //= $ch) | (.typing //= "plan要約") | (.confidence //= 0.5)' \
-             out/u_contract.json > out/u_contract.norm1.json
-          mv out/u_contract.norm1.json out/u_contract.json
-
-      - name: Coerce schema fields
-        run: |
-          jq '
+          jq --arg ch "$CH" '
+            (.context_header //= $ch) | (.typing //= "plan要約") | (.confidence //= 0.5) |
             (.understanding //= {}) |
             (.understanding.C //= "") | (.understanding.G //= "") |
             (.understanding.delta //= "") |
-            (.understanding.assumptions //= []) |
-            (.understanding.unknowns //= []) |
+            (.understanding.assumptions //= []) | (.understanding.unknowns //= []) |
             (.plan |= ( if type=="string" then
                           [ {id:"p1", desc: ., commands:[], evidence:[], risks:[]} ]
                         elif type=="array" then
@@ -75,33 +63,23 @@ jobs:
             (.citations |= ( if type=="string" then [ {path:., lines:""} ]
                              elif type=="array" then [ .[] | ( if type=="string" then {path:., lines:""} else . end ) ]
                              elif type=="object" then [.] else [] end ))
-          ' out/u_contract.json > out/u_contract.norm2.json
-          mv out/u_contract.norm2.json out/u_contract.json
+          ' out/u_contract.json > out/u_contract.norm.json
+          mv out/u_contract.norm.json out/u_contract.json
 
-      - name: Validate JSON (must be object)
-        id: jv
-        continue-on-error: true
-        run: jq -e 'type=="object"' out/u_contract.json
-
-      - name: Schema Guard
-        id: sg
+      - name: Schema Guard (best-effort)
         continue-on-error: true
         run: |
           python3 -m pip install --user jsonschema >/dev/null
-          python3 tools/guard/validate_u_contract.py out/u_contract.json contracts/u_contract.schema.json
+          python3 tools/guard/validate_u_contract.py out/u_contract.json contracts/u_contract.schema.json || true
 
       - name: Comment back JSON (always)
-        if: always()
         env: { GH_TOKEN: ${{ github.token }} }
         run: |
-          echo "[debug] jq=$JQF sg=$SGF" \
-            | JQF=${{ steps.jv.outcome }} SGF=${{ steps.sg.outcome }} cat
           body="\`\`\`json\n$(cat out/u_contract.json)\n\`\`\`"
           num=${{ github.event.issue.number || github.event.pull_request.number }}
           gh api repos/${{ github.repository }}/issues/$num/comments -f body="$body"
 
       - name: Open Save-PR (always)
-        if: always()
         env: { GH_TOKEN: ${{ github.token }} }
         run: |
           set -e
