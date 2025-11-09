@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 CLUSTER="${CLUSTER:-vpm-mini}"
-KIND_NODE_IMAGE="${KIND_NODE_IMAGE:-kindest/node:v1.29.2}"
+KIND_NODE_IMAGE="kindest/node:v1.31.2"
 KN_VERSION="${KN_VERSION:-knative-v1.18.0}"
 KOURIER_VERSION="${KOURIER_VERSION:-knative-v1.18.0}"
 DOMAIN="${DOMAIN:-127.0.0.1.nip.io}"
