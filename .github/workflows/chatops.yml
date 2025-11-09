@@ -12,13 +12,15 @@ permissions:
 jobs:
   ask:
     if: >
+      (github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '/ask')) ||
+      (github.event_name == 'issues' && contains(toJson(github.event.issue.labels), '"name":"ask"')) ||
+      (github.event_name == 'workflow_dispatch')
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/ask')) ||
       (github.event_name == 'issues' && contains(join(github.event.issue.labels.*.name, ','), 'ask')) ||
       (github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Build prompt
         run: |
           mkdir -p out reports/ask
