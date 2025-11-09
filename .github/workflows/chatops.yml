@@ -62,19 +62,37 @@ jobs:
       - name: Coerce required fields (schema-ready)
         run: |
           jq '
+            # understanding の穴埋め
             (.understanding //= {}) |
             (.understanding.C //= "") |
             (.understanding.G //= "") |
             (.understanding.delta //= "") |
             (.understanding.assumptions //= []) |
             (.understanding.unknowns //= []) |
-            (.plan //= []) |
-            (if (.plan|length)==0 then .plan=[{"id":"p1","desc":"auto-filled from /ask","commands":[],"evidence":[],"risks":[]}] else . end) |
-            (.acceptance //= []) |
-            (.citations //= [])
+
+            # plan: 文字列→オブジェクト配列、配列内の文字列もオブジェクト化
+            (.plan |= (
+              if type=="string" then
+                [ {id:"p1", desc: ., commands:[], evidence:[], risks:[]} ]
+              elif type=="array" then
+                [ range(0; length) as $i | .[$i]
+                  | ( if type=="string"
+                      then {id:("p"+(($i+1)|tostring)), desc:., commands:[], evidence:[], risks:[]}
+                      elif type=="object" then . else . end ) ]
+              else [] end
+            )) |
+
+            # acceptance: 文字列→配列
+            (.acceptance |= ( if type=="string" then [.] elif type=="array" then . else [] end )) |
+
+            # citations: 文字列 or 文字列配列 → {path,lines}
+            (.citations |= (
+              if type=="string" then [ {path:., lines:""} ]
+              elif type=="array" then [ .[] | ( if type=="string" then {path:., lines:""} else . end ) ]
+              elif type=="object" then [.] else [] end
+            ))
           ' out/u_contract.json > out/u_contract.norm2.json
           mv out/u_contract.norm2.json out/u_contract.json
-
       - name: Validate JSON (must be object)
         run: jq -e 'type=="object"' out/u_contract.json
 
