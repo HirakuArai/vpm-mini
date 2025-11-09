@@ -1,0 +1,10 @@
+{
+  "generated_at": "2025-11-09T19:44:02.102114Z",
+  "source_ask": "reports/ask/ask_2025-11-09T1900.json",
+  "issue": "571",
+  "dry_run": true,
+  "understanding": "received '/ask'",
+  "plan": {
+    "commands": []
+  }
+}
