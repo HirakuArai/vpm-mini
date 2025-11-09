@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["ready", "notes"],
+  "properties": {
+    "ready": { "type": "boolean" },
+    "notes": { "type": "string" },
+    "related_pr": { "type": ["integer","null"] },
+    "source_ask": { "type": ["string","null"] }
+  }
+}
