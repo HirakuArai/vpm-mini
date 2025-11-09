@@ -1,0 +1,17 @@
+name: _probe_issue_comment
+on:
+  issue_comment:
+    types: [created, edited]
+permissions:
+  contents: read
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: dump payload
+        run: |
+          echo "event=$GITHUB_EVENT_NAME"
+          echo "actor=$GITHUB_ACTOR"
+          echo "repo=$GITHUB_REPOSITORY"
+          echo "--- payload ---"
+          cat "$GITHUB_EVENT_PATH"
