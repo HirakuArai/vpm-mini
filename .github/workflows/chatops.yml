@@ -29,7 +29,6 @@ jobs:
           jq -n --arg sys "$(cat out/sys.txt)" --arg usr "$(cat out/ctx.txt)" '{
             model:"gpt-5",
             response_format:{type:"json_object"},
-            temperature:0.2,
             messages:[{role:"system",content:$sys},{role:"user",content:$usr}]
           }' > out/req.json
           curl -sS https://api.openai.com/v1/chat/completions \
