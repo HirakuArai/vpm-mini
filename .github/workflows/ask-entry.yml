@@ -1,5 +1,6 @@
 name: ask-entry
 on:
+  repository_dispatch:
   workflow_dispatch:
   issue_comment:
     types: [created]
@@ -16,11 +17,14 @@ jobs:
     if: >
       (github.event_name == 'issue_comment') ||
       (github.event_name == 'issues' && contains(toJson(github.event.issue.labels), '"name":"ask"')) ||
+      (github.event_name == 'workflow_dispatch') ||
+      (github.event_name == 'repository_dispatch')
+      (github.event_name == 'issue_comment') ||
+      (github.event_name == 'issues' && contains(toJson(github.event.issue.labels), '"name":"ask"')) ||
       (github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Build prompt
         run: |
           mkdir -p out reports/ask
