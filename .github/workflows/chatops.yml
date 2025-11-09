@@ -8,12 +8,14 @@ permissions:
   issues: write
 jobs:
   ask:
+    # コメントに /ask を含む or ask ラベル付きIssueで発火
     if: >
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/ask')) ||
       (github.event_name == 'issues' && contains(join(github.event.issue.labels.*.name, ','), 'ask'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Build prompt
         run: |
           mkdir -p out reports/ask
@@ -21,6 +23,7 @@ jobs:
           printf '%s\n' "$(cat tools/prompts/llm_relay_system.md)" > out/sys.txt
           printf 'context_header: repo=vpm-mini / branch=main / phase=Phase 2\n' > out/ctx.txt
           printf 'QUESTION\n%s\n' "$(echo "$ISSUE_BODY")" >> out/ctx.txt
+
       - name: Call OpenAI (gpt-5; save raw & strip fences)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -36,17 +39,37 @@ jobs:
             -H "Content-Type: application/json" \
             -d @out/req.json | tee out/raw.json >/dev/null
           if jq -e '.error' out/raw.json >/dev/null; then
-            echo '--- OpenAI error ---'; jq -r '.error.message' out/raw.json; exit 1; fi
+            echo '--- OpenAI error ---'; jq -r '.error.message' out/raw.json; exit 1
+          fi
           jq -r '.choices[0].message.content // empty' out/raw.json > out/u_contract.txt
-          [ -s out/u_contract.txt ] || { echo 'No content'; jq . out/raw.json; exit 1; }
-          awk 'NR==1{sub(/^```(json)?[[:space:]]*/,"")} {buf=buf$0 ORS} END{sub(/```[[:space:]]*[\r\n]*$/,"",buf); printf "%s", buf}' \
+          if [ ! -s out/u_contract.txt ]; then
+            echo 'No content in OpenAI response'; jq . out/raw.json; exit 1
+          fi
+          # 先頭/末尾のコードフェンスを除去
+          awk 'NR==1{sub(/^```(json)?[[:space:]]*/,"")} {buf=buf $0 ORS} END{sub(/```[[:space:]]*[\r\n]*$/,"",buf); printf "%s", buf}' \
             out/u_contract.txt > out/u_contract.json
+
+      - name: Normalize U-Contract (fill required fields)
+        run: |
+          # ctx.txt 1行目 "context_header: ..." から値を抜く
+          CH=$(sed -n '1s/^context_header: //p' out/ctx.txt)
+          # 必須/推奨フィールドを補完
+          jq --arg ch "$CH" \
+             '(.context_header //= $ch)
+             | (.typing //= "plan要約")
+             | (.confidence //= 0.5)' \
+             out/u_contract.json > out/u_contract.norm.json
+          mv out/u_contract.norm.json out/u_contract.json
+          # デバッグ（必要なら表示）: head -n 40 out/u_contract.json
+
       - name: Validate JSON (must be object)
         run: jq -e 'type=="object"' out/u_contract.json
+
       - name: Schema Guard
         run: |
           python3 -m pip install --user jsonschema >/dev/null
           python3 tools/guard/validate_u_contract.py out/u_contract.json contracts/u_contract.schema.json
+
       - name: Comment back JSON
         env:
           GH_TOKEN: ${{ github.token }}
@@ -54,6 +77,7 @@ jobs:
           body="\`\`\`json\n$(cat out/u_contract.json)\n\`\`\`"
           num=${{ github.event.issue.number || github.event.pull_request.number }}
           gh api repos/${{ github.repository }}/issues/$num/comments -f body="$body"
+
       - name: Store to reports/ask
         run: |
           ts=$(date -u +%Y%m%dT%H%M%SZ)
