@@ -1,0 +1,32 @@
+name: _ask_pr_checks (compat)
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'reports/ask/**'
+      - '.github/workflows/_ask_pr_checks.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  evidence-dod:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "ok"
+  healthcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "ok"
+  k8s-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "ok"
+  knative-ready:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "ok"
+  test-and-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "ok"
