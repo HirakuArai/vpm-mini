@@ -109,12 +109,3 @@ jobs:
           num=${{ github.event.issue.number || github.event.pull_request.number }}
           gh api repos/${{ github.repository }}/issues/$num/comments -f body="$body"
 
-      - name: Store to reports/ask
-        run: |
-          ts=$(date -u +%Y%m%dT%H%M%SZ)
-          cp out/u_contract.json "reports/ask/ask_${ts}.json"
-          git config user.email "bot@users.noreply.github.com"
-          git config user.name  "github-actions[bot]"
-          git add reports/ask/*.json
-          git commit -m "ask: store u_contract ($ts)" || true
-          git push

@@ -1,0 +1,44 @@
+name: ask-persist
+on:
+  workflow_run:
+    workflows: ["chatops-ask"]
+    types: [completed]
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  persist:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact (u_contract)
+        uses: actions/download-artifact@v4
+        with:
+          name: ask-u-contract
+          path: out
+
+      - uses: actions/checkout@v4
+
+      - name: Prepare commit
+        run: |
+          ts=$(date -u +%Y%m%dT%H%M%SZ)
+          mkdir -p reports/ask
+          cp out/u_contract.json "reports/ask/ask_${ts}.json"
+          git config user.email "bot@users.noreply.github.com"
+          git config user.name  "github-actions[bot]"
+          git checkout -b "ask/store/${ts}"
+          git add reports/ask/ask_${ts}.json
+          git commit -m "ask: persist u_contract (${ts})"
+
+      - name: Push branch & open PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ts=$(date -u +%Y%m%dT%H%M%SZ)
+          git push -u origin "ask/store/${ts}"
+          gh pr create \
+            --base main \
+            --head "ask/store/${ts}" \
+            -t "ask: persist u_contract (${ts})" \
+            -b "Persisted from chatops-ask artifact." \
+            --label ask --label evidence || true
