@@ -8,10 +8,10 @@ permissions:
   issues: write
 jobs:
   ask:
-    # コメントに /ask を含む or ask ラベル付きIssueで発火
     if: >
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/ask')) ||
-      (github.event_name == 'issues' && contains(join(github.event.issue.labels.*.name, ','), 'ask'))
+      (github.event_name == 'issues' && contains(join(github.event.issue.labels.*.name, ','), 'ask')) ||
+      (github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -49,18 +49,31 @@ jobs:
           awk 'NR==1{sub(/^```(json)?[[:space:]]*/,"")} {buf=buf $0 ORS} END{sub(/```[[:space:]]*[\r\n]*$/,"",buf); printf "%s", buf}' \
             out/u_contract.txt > out/u_contract.json
 
-      - name: Normalize U-Contract (fill required fields)
+      - name: Normalize U-Contract (fill easy fields)
         run: |
-          # ctx.txt 1行目 "context_header: ..." から値を抜く
           CH=$(sed -n '1s/^context_header: //p' out/ctx.txt)
-          # 必須/推奨フィールドを補完
           jq --arg ch "$CH" \
              '(.context_header //= $ch)
-             | (.typing //= "plan要約")
-             | (.confidence //= 0.5)' \
-             out/u_contract.json > out/u_contract.norm.json
-          mv out/u_contract.norm.json out/u_contract.json
-          # デバッグ（必要なら表示）: head -n 40 out/u_contract.json
+              | (.typing //= "plan要約")
+              | (.confidence //= 0.5)' \
+             out/u_contract.json > out/u_contract.norm1.json
+          mv out/u_contract.norm1.json out/u_contract.json
+
+      - name: Coerce required fields (schema-ready)
+        run: |
+          jq '
+            (.understanding //= {}) |
+            (.understanding.C //= "") |
+            (.understanding.G //= "") |
+            (.understanding.delta //= "") |
+            (.understanding.assumptions //= []) |
+            (.understanding.unknowns //= []) |
+            (.plan //= []) |
+            (if (.plan|length)==0 then .plan=[{"id":"p1","desc":"auto-filled from /ask","commands":[],"evidence":[],"risks":[]}] else . end) |
+            (.acceptance //= []) |
+            (.citations //= [])
+          ' out/u_contract.json > out/u_contract.norm2.json
+          mv out/u_contract.norm2.json out/u_contract.json
 
       - name: Validate JSON (must be object)
         run: jq -e 'type=="object"' out/u_contract.json
