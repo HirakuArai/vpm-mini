@@ -1,0 +1,10 @@
+name: _probe_dispatch
+on:
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - run: echo "ok"
