@@ -45,7 +45,7 @@ def main():
     ap = argparse.ArgumentParser(description="Minimal Thinker: read U-Contract, draft a PR, write reports/think/*")
     ap.add_argument("--issue", type=str, default=None, help="target issue number (optional)")
     ap.add_argument("--dry-run", action="store_true", default=True, help="draft PR only; do not execute commands")
-ap.add_argument("--execute", action="store_true", default=False, help="execute plan.commands via safe executor")
+    ap.add_argument("--execute", action="store_true", default=False, help="execute plan.commands via safe executor")
     ap.add_argument("--once", action="store_true", default=True, help="run once and exit")
     args = ap.parse_args()
 
