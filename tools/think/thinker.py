@@ -107,7 +107,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--issue", help="numeric issue id to prefer from reports/ask")
     ap.add_argument("--dry-run", action="store_true", help="do not execute external commands")
-    ap.add_argument("--execute", action="is_true", default=False)
+    ap.add_argument("--execute", action="store_true", default=False)
     args = ap.parse_args()
 
     # discover ask JSON
