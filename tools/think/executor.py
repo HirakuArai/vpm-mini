@@ -2,10 +2,11 @@
 # Safe executor for Thinker: allow-listed kubectl/curl/echo only.
 import argparse, shlex, subprocess, sys, time, os
 
+
 def allow_kubectl(argv):
     """
-    flags(-n/--namespace 等)とその値を飛ばして最初のサブコマンドを拾う。
-    読み取り系(get/describe)は常にOK。apply/waitは後で本番化。
+    flags(-n/--namespace など)とその値(-n ns / --namespace=ns 等)を飛ばして
+    最初のサブコマンドを拾う。
     """
     i = 1
     needs_val = {
@@ -14,14 +15,20 @@ def allow_kubectl(argv):
     }
     while i < len(argv):
         a = argv[i]
-        if not a.startswith("-"):
+        if not a.startswith('-'):
             sub = a
             return sub in {"get","describe","apply","wait"}
-        if a in needs_val and i + 1 < len(argv):
+        # --namespace=ns のような '=' 付きは1トークンで消費
+        if '=' in a:
+            i += 1
+            continue
+        # 値が別トークンのフラグは2トークン消費
+        if a in needs_val and i+1 < len(argv):
             i += 2
             continue
         i += 1
     return False
+
 
 def run_one(cmd, log, dry):
     parts = shlex.split(cmd) if isinstance(cmd, str) else list(cmd)
