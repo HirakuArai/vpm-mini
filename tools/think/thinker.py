@@ -4,6 +4,24 @@ from datetime import datetime
 import shlex
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+def exec_plan(commands, dry_run, ts, pr_number):
+    if not commands:
+        return
+    log_path = os.path.join(THINK_DIR, f"exec_{ts}.log")
+    cmd = (
+        f"python3 tools/think/executor.py --log {shlex.quote(log_path)} "
+        + ("--dry-run " if dry_run else "")
+        + " --commands " + " ".join(shlex.quote(c) for c in commands)
+    )
+    sh(cmd)
+    # 実行ログをコミットして PR にコメント
+    sh(f"git add {os.path.relpath(log_path, ROOT)}")
+    sh(f"git commit -m \"think: exec log {ts}\"")
+    sh("git push")
+    pr_num = pr_number.lstrip('#')
+    sh(f"gh pr comment {pr_num} --body \"Exec log: `{os.path.relpath(log_path, ROOT)}`\"")
+
 ASK_DIR = os.path.join(ROOT, "reports", "ask")
 THINK_DIR = os.path.join(ROOT, "reports", "think")
 
@@ -123,7 +141,10 @@ def main():
         }, f, indent=2, ensure_ascii=False)
 
     # evalはPRに含めず、mainへの後続PRでまとめて入れる運用でもOK
-    print("[thinker] outputs:")
+        if args.execute:
+        exec_plan(commands, args.dry_run, ts, pr_number)
+
+print("[thinker] outputs:")
     print(" -", os.path.relpath(plan_md, ROOT))
     print(" -", os.path.relpath(think_json, ROOT))
     print(" -", os.path.relpath(eval_json, ROOT))
