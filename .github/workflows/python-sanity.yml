@@ -1,0 +1,23 @@
+name: python-sanity
+on:
+  pull_request:
+    paths:
+      - '**/*.py'
+jobs:
+  py-compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: Syntax check
+        run: |
+          set -e
+          python - <<'PY'
+          import sys, subprocess, pathlib
+          files=[str(p) for p in pathlib.Path('.').rglob('*.py')]
+          if not files: sys.exit(0)
+          for f in files:
+              print('checking', f)
+              subprocess.check_call([sys.executable, '-m', 'py_compile', f])
+          PY
