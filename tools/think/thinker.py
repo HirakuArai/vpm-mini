@@ -165,16 +165,20 @@ def main():
     shline(f"git add {shlex.quote(str(think_json.relative_to(ROOT)))}", check=False)  # do not fail if ignored
     shline(f'git commit -m "think: plan {ts} (draft via thinker)"', check=True)
     shline("git push -u origin HEAD", check=True)
-    pr_number = run(
-        ["gh","pr","create","-t",f"think: plan {ts}",
-         "--draft","--body-file",str(body_md),
-         "--json","number","--jq",".number"],
-        capture=True).strip()
-    if not pr_number:
-        # fallback to parse URL
-        url = run(["gh","pr","create","-t",f"think: plan {ts}",
-                   "--draft","--body-file",str(body_md)], capture=True).strip()
-        pr_number = url.rsplit("/",1)[-1].lstrip("#")
+    url = run([
+        "gh","pr","create",
+        "-t", f"think: plan {ts}",
+        "--draft",
+        "--body-file", str(body_md),
+        "-H", branch,
+        "-B", "main"
+    ], capture=True).strip()
+pr_number = (url.rsplit("/", 1)[-1].lstrip("#") if url else "")
+if not pr_number:
+    # 最後の手段: ヘッドブランチからPR番号を引く
+    pr_number = run([
+        "gh","pr","list","--head", branch,"--json","number","-q",".[0].number"
+    ], capture=True,).strip()
 
     # optional execution
     if args.execute:
