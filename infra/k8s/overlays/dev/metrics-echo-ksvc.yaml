@@ -7,5 +7,5 @@ spec:
   template:
     spec:
       containers:
-      - image: ghcr.io/HirakuArai/metrics-echo:dev
+      - image: ghcr.io/hirakuarai/metrics-echo:dev
         env: [{ name: TARGET, value: "vpm-mini" }]
