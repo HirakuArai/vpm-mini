@@ -1,194 +1,121 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Minimal, indent-safe Thinker:
-- reads latest reports/ask/ask_*.json (or by --issue)
-- writes reports/think/plan_<ts>.md and think_<ts>.json
-- creates a feature branch and a draft PR with --body-file (no shell interpolation)
-- optional --execute: run allow-listed commands, write reports/think/exec_<ts>.log,
-  commit the log and comment the PR with its path
-- never commits ask JSON; uses spaces only (no tabs)
-"""
-
 from __future__ import annotations
-import argparse
-import json, os, sys, glob, subprocess, shlex, textwrap
-from datetime import datetime
+import argparse, json, os, sys, glob, subprocess, shlex, re
+from datetime import datetime, timezone
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]  # repo root
-ASK_DIR = ROOT / "reports" / "admin"  # fallback if moved
-FALLBACK_ASK = ROOT / "reports" / "ask"
+ROOT = Path(__file__).resolve().parents[2]
+ASK_DIRS = [ROOT / "reports" / "ask", ROOT / "reports" / "admin" / "ask"]
 THINK_DIR = ROOT / "reports" / "think"
 
-def run(cmd: list[str], check=True, capture=False, cwd: Path|None=None) -> str|int:
-    """Run a command; return stdout text if capture=True, else return returncode."""
-    if not isinstance(cmd, (list, tuple)):
-        raise TypeError("run() expects list/tuple")
-    proc = subprocess.run(cmd, cwd=str(cwd) if cwd else None,
-                          text=True, capture_output=capture)
-    if check and proc.returncode != 0:
-        sys.stderr.write(proc.stderr or "")
-        raise SystemExit(proc.returncode)
-    return proc.stdout if capture else proc.returncode
+def run(args, check=True, capture=False):
+    p = subprocess.run(args, text=True, capture_output=capture)
+    if check and p.returncode != 0:
+        sys.stderr.write(p.stderr or "")
+        raise SystemExit(p.returncode)
+    return p.stdout if capture else p.returncode
 
-def shline(line: str, check=True, capture=False, cwd: Path|None=None) -> str|int:
-    return run(shlex.split(line), check=check, capture=capture, cwd=cwd)
-
-def latest_ask_path(issue: str|None) -> Path:
-    roots = [ROOT / "reports" / "ask"]
-    if ASK_DIR.exists():
-        roots.insert(0, ASK_DIR)
-    candidates: list[Path] = []
-    for r in roots:
-        candidates += sorted(r.glob("ask_*.json"))
-    if not candidates:
-        sys.exit("no reports/ask/ask_*.json found")
+def latest_ask(issue: str|None) -> Path:
+    cand = []
+    for d in ASK_DIRS:
+        if d.exists(): cand += sorted(d.glob("ask_*.json"))
+    if not cand: sys.exit("no reports/ask/ask_*.json found")
     if issue:
-        # prefer one whose JSON .meta.issue == issue
-        for p in reversed(candidates):
+        for p in reversed(cand):
             try:
-                obj = json.loads(p.read_text(encoding="utf-8"))
-                if str(obj.get("meta", {}).get("issue")) == str(issue):
+                if str(json.loads(p.read_text()).get("meta",{}).get("issue")) == str(issue):
                     return p
-            except Exception:
-                pass
-    return candidates[-1]
+            except Exception: pass
+    return cand[-1]
 
-def allowlist_ok(argv: list[str]) -> bool:
-    if not argv:
-        return False
+def allow_ok(argv: list[str]) -> bool:
+    if not argv: return False
     cmd = argv[0]
     if cmd == "kubectl":
-        # allow only very safe subcommands
-        return any(argv[1:2] and argv[1] in {"get","describe","apply","wait"})  # minimal
-    if cmd == "curl":
-        return True
-    if cmd in {"echo"}:
-        return True
+        return any(x in argv[1:2] for x in ("get","describe","apply","wait"))
+    if cmd in ("curl","echo"): return True
     return False
 
-def exec_plan(commands: list[list[str]], dry_run: bool, pr_number: str, ts: str) -> Path:
+def exec_plan(cmds: list[list[str]], dry: bool, prnum: str, ts: str) -> Path:
     THINK_DIR.mkdir(parents=True, exist_ok=True)
-    log_path = THINK_DIR / f"exec_{ts}.log"
-    with log_path.open("w", encoding="utf-8") as fw:
-        for c in commands:
-            if not isinstance(c, (list, tuple)):
-                # also accept a single string and split it
-                if isinstance(c, str):
-                    c = shlex.split(c)
-                else:
-                    continue
+    log = THINK_DIR / f"exec_{ts}.log"
+    with log.open("w", encoding="utf-8") as fw:
+        for c in cmds:
+            if isinstance(c,str): c = shlex.split(c)
             line = " ".join(shlex.quote(x) for x in c)
             fw.write(f"$ {line}\n")
-            if not allowlist_ok(list(c)):
-                fw.write(f"  [skip] not in allowlist\n\n")
-                continue
-            if dry_run:
-                fw.write("  [dry-run]\n\n")
-                continue
-            proc = subprocess.run(c, text=True, capture_output=True)
-            if proc.stdout:
-                fw.write(proc.stdout)
-            if proc.stderr:
-                fw.write(proc.stderr)
-            fw.write("\n")
-    # commit the log & comment on PR
-    shline(f"git add {shlex.quote(str(log_path.relative_to(ROOT)))}")
-    shline(f'git commit -m "think: exec log {ts}"', check=True)
-    shline("git push", check=True)
-    # comment with PR number; gh prints nothing on success
-    shline(f"gh pr comment {pr_number} --body "
-           f"{shlex.quote('Exec log: ' + str(log_path.relative_path_to(ROOT) if hasattr(log_path,'relative_path_to') else str(log_path.relative_to(ROOT))))}",
-           check=False)
-    return log_path
+            if not allow_ok(c):
+                fw.write("  [skip] not in allowlist\n\n"); continue
+            if dry:
+                fw.write("  [dry-run]\n\n"); continue
+            p = subprocess.run(c, text=True, capture_output=True)
+            fw.write((p.stdout or "") + (p.stderr or "") + "\n")
+    run(["git","add", str(log.relative_to(ROOT))], check=False)
+    run(["git","commit","-m",f"think: exec log {ts}"], check=False)
+    run(["git","push"], check=False)
+    run(["gh","pr","comment", prnum, "--body", f"Exec log: `{log.relative_to(ROOT)}`"], check=False)
+    return log
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--issue", help="numeric issue id to prefer from reports/ask")
-    ap.add_argument("--dry-run", action="store_true", help="do not execute external commands")
-    ap.add_argument("--execute", action="store_true", default=False)
+    ap.add_argument("--issue")
+    ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--execute", action="store_true")
     args = ap.parse_args()
 
-    # discover ask JSON
-    ask_path = latest_ask_path(args.issue)
-    obj = json.loads(ask_path.read_json()) if hasattr(Path, "read_json") else json.loads(ask_path.read_text())
-    understanding = str(obj.get("understanding", "") or "")
-    plan = obj.get("plan") or {}
-    raw_cmds = plan.get("commands") or []
-    # normalize commands to list[list[str]]
-    norm_cmds: list[list[str]] = []
-    for x in raw_cmds:
-        if isinstance(x, str):
-            norm_cmds.append(shlex.split(x))
-        elif isinstance(x, (list, tuple)):
-            norm_cmds.append([str(y) for y in x])
-    ts = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+    ask = latest_ask(args.issue)
+    obj = json.loads(ask.read_text())
+    understanding = str(obj.get("understanding","") or "")
+    raw = (obj.get("plan") or {}).get("commands") or []
+    cmds = [shlex.split(x) if isinstance(x,str) else [str(y) for y in x] for x in raw]
 
+    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
     THINK_DIR.mkdir(parents=True, exist_ok=True)
     plan_md = THINK_DIR / f"plan_{ts}.md"
     think_json = THINK_DIR / f"think_{ts}.json"
     body_md = THINK_DIR / f"body_{ts}.md"
 
-    # write artefacts
     plan_md.write_text(
-        f"# metrics-echo plan {ts}\n\n"
-        f"source_ask: `{ask_path.relative_to(ROOT)}`\n\n"
-        f"## understanding\n{understanding}\n\n"
-        f"## plan.commands\n" +
-        "".join(f"- `{ ' '.join(shlex.quote(t) for t in cmd)}`\n" for cmd in norm_cmds),
+        f"# plan {ts}\n\nsource_ask: `{ask.relative_to(ROOT)}`\n\n## understanding\n{understanding}\n\n## plan.commands\n" +
+        "".join(f"- `{' '.join(shlex.quote(t) for t in c)}`\n" for c in cmds),
         encoding="utf-8"
     )
     think_json.write_text(json.dumps({
-        "generated_at": datetime.utcnow().isoformat() + "Z",
-        "source_ask": str(ask_path.relative_to(ROOT)),
-        "issue": args.issue,
-        "dry_run": bool(args.dry_run),
-        "plan": {"commands": [" ".join(c) for c in norm_cmds]},
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "source_ask": str(ask.relative_to(ROOT)),
+        "issue": args.issue, "dry_run": bool(args.dry_run),
+        "plan": {"commands": [" ".join(c) for c in cmds]},
         "understanding": understanding
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     body_md.write_text(
         "Draft plan generated by Thinker.\n\n"
-        f"- source_ask: `{ask_path.relative_to(ROOT)}`\n"
-        f"- dry_run: {args.dry_run}\n",
-        encoding="utf-8"
+        f"- source_ask: `{ask.relative_to(ROOT)}`\n"
+        f"- dry_run: {args.dry_run}\n", encoding="utf-8"
     )
 
-    # git/PR
-    shline("git fetch origin --quiet", check=False)
-    shline("git switch -q main", check=False)
-    shline("git pull --ff-only --quiet", check=False)
-    branch = f"think/plan-{ts}"
-    shline(f"git switch -c {branch}", check=True)
-    # never commit ask JSON
-    shline(f"git add {shlex.quote(str(plan_md.relative_to(ROOT)))}")
-    shline(f"git add {shlex.quote(str(think_json.relative_to(ROOT)))}", check=False)  # do not fail if ignored
-    shline(f'git commit -m "think: plan {ts} (draft via thinker)"', check=True)
-    shline("git push -u origin HEAD", check=True)
-    url = run([
-        "gh","pr","create",
-        "-t", f"think: plan {ts}",
-        "--draft",
-        "--body-file", str(body_md),
-        "-H", branch,
-        "-B", "main"
-    ], capture=True).strip()
-pr_number = (out.rsplit("/", 1)[-1].lstrip("#") if out else "")
-if not pr_number:
-    # 最後の手段: ヘッドブランチからPR番号を引く
-    pr_number = run([
-        "gh","pr","list","--head", branch,"--json","number","-q",".[0].number"
-    ], capture=True,).strip()
+    run(["git","fetch","origin","--quiet"], check=False)
+    run(["git","switch","-q","main"], check=False); run(["git","pull","--ff-only","--quiet"], check=False)
+    br = f"think/plan-{ts}"
+    run(["git","switch","-c", br])
+    run(["git","add", str(plan_md.relative_to(ROOT))])
+    run(["git","commit","-m",f"think: plan {ts} (draft via thinker)"])
+    run(["git","push","-u","origin","HEAD"])
 
-    # optional execution
-    if args.execute:
-        exec_plan(norm_cmds, args.dry_run, pr_number, ts)
+    # gh pr create（JSONなし互換）→URLから番号を抜く→取れなければ --head で照会
+    out = run(["gh","pr","create",
+               "-t", f"think: plan {ts}",
+               "-d", "--body-file", str(body_md),
+               "-H", br, "-B", "main"], capture=True, check=False)
+    prnum = ""
+    if isinstance(out,str):
+        m = re.search(r"/pull/(\\d+)", out);  prnum = m.group(1) if m else ""
+    if not prnum:
+        prnum = run(["gh","pr","list","--head", br, "--json","number","-q",".[0].number"],
+                    capture=True, check=False).strip()
+    if not prnum: sys.exit("[thinker] failed to obtain PR number")
+
+    if args.execute and cmds:
+        exec_plan(cmds, args.dry_run, prnum, ts)
 
 if __name__ == "__main__":
-    try:
-        main()
-    except SystemExit as e:
-        raise
-    except Exception as e:
-        sys.stderr.write(f"[thinker] error: {e}\n")
-        sys.exit(1)
+    sys.exit(main() or 0)
