@@ -99,7 +99,7 @@ def main():
     # 3) ブランチ作成→コミット→Push→ドラフトPR
     sh("git fetch origin --quiet")
     sh(f"git switch -c {branch}")
-    sh(f"git add {os.path.relpath(plan_md, ROOT)} {os.path.relpath(think_json, ROOT)}")
+    sh(f'git add {os.path.relpath(plan_md, ROOT)}')
     sh(f'git commit -m "think: plan {ts} (draft via thinker)"')
     sh("git push -u origin HEAD")
 
