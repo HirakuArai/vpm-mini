@@ -173,7 +173,7 @@ def main():
         "-H", branch,
         "-B", "main"
     ], capture=True).strip()
-pr_number = (url.rsplit("/", 1)[-1].lstrip("#") if url else "")
+pr_number = (out.rsplit("/", 1)[-1].lstrip("#") if out else "")
 if not pr_number:
     # 最後の手段: ヘッドブランチからPR番号を引く
     pr_number = run([
