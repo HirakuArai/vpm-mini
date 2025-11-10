@@ -1,0 +1,1 @@
+metrics-echo ok ts=1762739675 target=vpm-mini
