@@ -1,154 +1,190 @@
 #!/usr/bin/env python3
-import argparse, base64, glob, json, os, subprocess, sys, time
+# -*- coding: utf-8 -*-
+"""
+Minimal, indent-safe Thinker:
+- reads latest reports/ask/ask_*.json (or by --issue)
+- writes reports/think/plan_<ts>.md and think_<ts>.json
+- creates a feature branch and a draft PR with --body-file (no shell interpolation)
+- optional --execute: run allow-listed commands, write reports/think/exec_<ts>.log,
+  commit the log and comment the PR with its path
+- never commits ask JSON; uses spaces only (no tabs)
+"""
+
+from __future__ import annotations
+import argparse
+import json, os, sys, glob, subprocess, shlex, textwrap
 from datetime import datetime
-import shlex
+from pathlib import Path
 
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+ROOT = Path(__file__).resolve().parents[2]  # repo root
+ASK_DIR = ROOT / "reports" / "admin"  # fallback if moved
+FALLBACK_ASK = ROOT / "reports" / "ask"
+THINK_DIR = ROOT / "reports" / "think"
 
-def exec_plan(commands, dry_run, ts, pr_number):
-    if not commands:
-        return
-    log_path = os.path.join(THINK_DIR, f"exec_{ts}.log")
-    cmd = (
-        f"python3 tools/think/executor.py --log {shlex.quote(log_path)} "
-        + ("--dry-run " if dry_run else "")
-        + " --commands " + " ".join(shlex.quote(c) for c in commands)
-    )
-    sh(cmd)
-    # 実行ログをコミットして PR にコメント
-    sh(f"git add {os.path.relpath(log_path, ROOT)}")
-    sh(f"git commit -m \"think: exec log {ts}\"")
-    sh("git push")
-    pr_num = pr_number.lstrip('#')
-    sh(f"gh pr comment {pr_num} --body \"Exec log: `{os.path.relpath(log_path, ROOT)}`\"")
+def run(cmd: list[str], check=True, capture=False, cwd: Path|None=None) -> str|int:
+    """Run a command; return stdout text if capture=True, else return returncode."""
+    if not isinstance(cmd, (list, tuple)):
+        raise TypeError("run() expects list/tuple")
+    proc = subprocess.run(cmd, cwd=str(cwd) if cwd else None,
+                          text=True, capture_output=capture)
+    if check and proc.returncode != 0:
+        sys.stderr.write(proc.stderr or "")
+        raise SystemExit(proc.returncode)
+    return proc.stdout if capture else proc.returncode
 
-ASK_DIR = os.path.join(ROOT, "reports", "ask")
-THINK_DIR = os.path.join(ROOT, "reports", "think")
+def shline(line: str, check=True, capture=False, cwd: Path|None=None) -> str|int:
+    return run(shlex.split(line), check=check, capture=capture, cwd=cwd)
 
-def sh(cmd, check=True, capture=False):
-    print("+", cmd)
-    if capture:
-        return subprocess.check_output(cmd, shell=True, text=True)
-    else:
-        r = subprocess.run(cmd, shell=True)
-        if check and r.returncode != 0:
-            raise SystemExit(r.returncode)
-        return r
+def latest_ask_path(issue: str|None) -> Path:
+    roots = [ROOT / "reports" / "ask"]
+    if ASK_DIR.exists():
+        roots.insert(0, ASK_DIR)
+    candidates: list[Path] = []
+    for r in roots:
+        candidates += sorted(r.glob("ask_*.json"))
+    if not candidates:
+        sys.exit("no reports/ask/ask_*.json found")
+    if issue:
+        # prefer one whose JSON .meta.issue == issue
+        for p in reversed(candidates):
+            try:
+                obj = json.loads(p.read_text(encoding="utf-8"))
+                if str(obj.get("meta", {}).get("issue")) == str(issue):
+                    return p
+            except Exception:
+                pass
+    return candidates[-1]
 
-def find_latest_ask(issue=None):
-    files = sorted(glob.glob(os.path.join(ASK_DIR, "ask_*.json")))
-    if not files: return None
-    if issue is None:
-        return files[-1]
-    # issue番号を含むものを優先（ない場合は最新）
-    for path in reversed(files):
-        try:
-            with open(path, "r") as f:
-                j = json.load(f)
-            meta = j.get("meta", {})
-            if str(meta.get("issue")) == str(issue):
-                return path
-        except Exception:
-            pass
-    return files[-1]
+def allowlist_ok(argv: list[str]) -> bool:
+    if not argv:
+        return False
+    cmd = argv[0]
+    if cmd == "kubectl":
+        # allow only very safe subcommands
+        return any(argv[1:2] and argv[1] in {"get","describe","apply","wait"})  # minimal
+    if cmd == "curl":
+        return True
+    if cmd in {"echo"}:
+        return True
+    return False
 
-def load_json(path):
-    with open(path, "r") as f:
-        return json.load(f)
-
-def timestamp():
-    return datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+def exec_plan(commands: list[list[str]], dry_run: bool, pr_number: str, ts: str) -> Path:
+    THINK_DIR.mkdir(parents=True, exist_ok=True)
+    log_path = THINK_DIR / f"exec_{ts}.log"
+    with log_path.open("w", encoding="utf-8") as fw:
+        for c in commands:
+            if not isinstance(c, (list, tuple)):
+                # also accept a single string and split it
+                if isinstance(c, str):
+                    c = shlex.split(c)
+                else:
+                    continue
+            line = " ".join(shlex.quote(x) for x in c)
+            fw.write(f"$ {line}\n")
+            if not allowlist_ok(list(c)):
+                fw.write(f"  [skip] not in allowlist\n\n")
+                continue
+            if dry_run:
+                fw.write("  [dry-run]\n\n")
+                continue
+            proc = subprocess.run(c, text=True, capture_output=True)
+            if proc.stdout:
+                fw.write(proc.stdout)
+            if proc.stderr:
+                fw.write(proc.stderr)
+            fw.write("\n")
+    # commit the log & comment on PR
+    shline(f"git add {shlex.quote(str(log_path.relative_to(ROOT)))}")
+    shline(f'git commit -m "think: exec log {ts}"', check=True)
+    shline("git push", check=True)
+    # comment with PR number; gh prints nothing on success
+    shline(f"gh pr comment {pr_number} --body "
+           f"{shlex.quote('Exec log: ' + str(log_path.relative_path_to(ROOT) if hasattr(log_path,'relative_path_to') else str(log_path.relative_to(ROOT))))}",
+           check=False)
+    return log_path
 
 def main():
-    ap = argparse.ArgumentParser(description="Minimal Thinker: read U-Contract, draft a PR, write reports/think/*")
-    ap.add_argument("--issue", type=str, default=None, help="target issue number (optional)")
-    ap.add_argument("--dry-run", action="store_true", default=True, help="draft PR only; do not execute commands")
-    ap.add_argument("--execute", action="store_true", default=False, help="execute plan.commands via safe executor")
-    ap.add_argument("--once", action="store_true", default=True, help="run once and exit")
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--issue", help="numeric issue id to prefer from reports/ask")
+    ap.add_argument("--dry-run", action="store_true", help="do not execute external commands")
+    ap.add_argument("--execute", action="is_true", default=False)
     args = ap.parse_args()
 
-    os.makedirs(THINK_DIR, exist_ok=True)
+    # discover ask JSON
+    ask_path = latest_ask_path(args.issue)
+    obj = json.loads(ask_path.read_json()) if hasattr(Path, "read_json") else json.loads(ask_path.read_text())
+    understanding = str(obj.get("understanding", "") or "")
+    plan = obj.get("plan") or {}
+    raw_cmds = plan.get("commands") or []
+    # normalize commands to list[list[str]]
+    norm_cmds: list[list[str]] = []
+    for x in raw_cmds:
+        if isinstance(x, str):
+            norm_cmds.append(shlex.split(x))
+        elif isinstance(x, (list, tuple)):
+            norm_cmds.append([str(y) for y in x])
+    ts = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
 
-    # 0) 最新の /ask を取得（ローカル最新化）
-    sh("git fetch origin --quiet")
-    sh("git switch -q main && git pull --ff-only --quiet || true")
+    THINK_DIR.mkdir(parents=True, exist_ok=True)
+    plan_md = THINK_DIR / f"plan_{ts}.md"
+    think_json = THINK_DIR / f"think_{ts}.json"
+    body_md = THINK_DIR / f"body_{ts}.md"
 
-    ask_path = find_latest_ask(args.issue)
-    if not ask_path:
-        print("[thinker] no reports/ask/ask_*.json found; abort", file=sys.stderr)
-        return 1
+    # write artefacts
+    plan_md.write_text(
+        f"# metrics-echo plan {ts}\n\n"
+        f"source_ask: `{ask_path.relative_to(ROOT)}`\n\n"
+        f"## understanding\n{understanding}\n\n"
+        f"## plan.commands\n" +
+        "".join(f"- `{ ' '.join(shlex.quote(t) for t in cmd)}`\n" for cmd in norm_cmds),
+        encoding="utf-8"
+    )
+    think_json.write_text(json.dumps({
+        "generated_at": datetime.utcnow().isoformat() + "Z",
+        "source_ask": str(ask_path.relative_to(ROOT)),
+        "issue": args.issue,
+        "dry_run": bool(args.dry_run),
+        "plan": {"commands": [" ".join(c) for c in norm_cmds]},
+        "understanding": understanding
+    }, ensure_ascii=False, indent=2), encoding="utf-8")
+    body_md.write_text(
+        "Draft plan generated by Thinker.\n\n"
+        f"- source_ask: `{ask_path.relative_to(ROOT)}`\n"
+        f"- dry_run: {args.dry_run}\n",
+        encoding="utf-8"
+    )
 
-    ask = load_json(ask_path)
-    understanding = ask.get("understanding", "")
-    commands = (ask.get("plan", {}) or {}).get("commands", []) or []
-
-    ts = timestamp()
+    # git/PR
+    shline("git fetch origin --quiet", check=False)
+    shline("git switch -q main", check=False)
+    shline("git pull --ff-only --quiet", check=False)
     branch = f"think/plan-{ts}"
-    plan_md = os.path.join(THINK_DIR, f"plan_{ts}.md")
-    think_json = os.path.join(THINK_DIR, f"think_{ts}.json")
-    eval_json = os.path.join(THINK_DIR, f"eval_{ts}.json")
+    shline(f"git switch -c {branch}", check=True)
+    # never commit ask JSON
+    shline(f"git add {shlex.quote(str(plan_md.relative_to(ROOT)))}")
+    shline(f"git add {shlex.quote(str(think_json.relative_to(ROOT)))}", check=False)  # do not fail if ignored
+    shline(f'git commit -m "think: plan {ts} (draft via thinker)"', check=True)
+    shline("git push -u origin HEAD", check=True)
+    pr_number = run(
+        ["gh","pr","create","-t",f"think: plan {ts}",
+         "--draft","--body-file",str(body_md),
+         "--json","number","--jq",".number"],
+        capture=True).strip()
+    if not pr_number:
+        # fallback to parse URL
+        url = run(["gh","pr","create","-t",f"think: plan {ts}",
+                   "--draft","--body-file",str(body_md)], capture=True).strip()
+        pr_number = url.rsplit("/",1)[-1].lstrip("#")
 
-    # 1) 企画（plan）を Markdown に整形
-    with open(plan_md, "w") as f:
-        f.write("# Think Plan\n\n")
-        f.write(f"- source_ask: `{os.path.relpath(ask_path, ROOT)}`\n")
-        if args.issue: f.write(f"- issue: #{args.issue}\n")
-        f.write(f"- dry_run: {bool(args.dry_run)}\n")
-        f.write("\n## understanding\n")
-        f.write(understanding.strip() + "\n\n")
-        f.write("## plan.commands\n")
-        if commands:
-            for c in commands:
-                f.write(f"- `{c}`\n")
-        else:
-            f.write("- (no commands)\n")
-
-    # 2) thinkerレポート(JSON)
-    with open(think_json, "w") as f:
-        json.dump({
-            "generated_at": datetime.utcnow().isoformat() + "Z",
-            "source_ask": os.path.relpath(ask_path, ROOT),
-            "issue": args.issue,
-            "dry_run": bool(args.dry_run),
-            "understanding": understanding,
-            "plan": { "commands": commands }
-        }, f, indent=2, ensure_ascii=False)
-
-    # 3) ブランチ作成→コミット→Push→ドラフトPR
-    sh("git fetch origin --quiet")
-    sh(f"git switch -c {branch}")
-    sh(f'git add {os.path.relpath(plan_md, ROOT)}')
-    sh(f'git commit -m "think: plan {ts} (draft via thinker)"')
-    sh("git push -u origin HEAD")
-
-    title = f"think: plan {ts}"
-    body_path = os.path.join(THINK_DIR, f"body_{ts}.md")
-    with open(body_path, "w") as bf:
-        bf.write("Draft plan generated by Thinker.\n\n")
-        bf.write(f"- source_ask: `{os.path.relpath(ask_path, ROOT)}`\n")
-        bf.write(f"- dry_run: {bool(args.dry_run)}\n")
-
-    pr_number = sh(f'gh pr create -t "{title}" --body-file "{body_path}" --draft', capture=True).strip()
-    print("[thinker] draft PR created:", pr_number)
-
-    # 4) 評価（最小）→ eval JSON 出力
-    with open(eval_json, "w") as f:
-        json.dump({
-            "ready": True,              # 最小では常に ready（Dry-run）
-            "notes": "draft PR created",
-            "related_pr": int(pr_number.replace("#","")) if pr_number.startswith("#") else None,
-            "source_ask": os.path.relpath(ask_path, ROOT)
-        }, f, indent=2, ensure_ascii=False)
-
-    # evalはPRに含めず、mainへの後続PRでまとめて入れる運用でもOK
-        if args.execute:
-        exec_plan(commands, args.dry_run, ts, pr_number)
-
-print("[thinker] outputs:")
-    print(" -", os.path.relpath(plan_md, ROOT))
-    print(" -", os.path.relpath(think_json, ROOT))
-    print(" -", os.path.relpath(eval_json, ROOT))
-    return 0
+    # optional execution
+    if args.execute:
+        exec_plan(norm_cmds, args.dry_run, pr_number, ts)
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        main()
+    except SystemExit as e:
+        raise
+    except Exception as e:
+        sys.stderr.write(f"[thinker] error: {e}\n")
+        sys.exit(1)
