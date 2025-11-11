@@ -1,4 +1,4 @@
-# STATE — Phase 2 Kickoff 完了
-- P2-1 GREEN: kind + Knative v1.18 足場構築（control-plane READY）
-- P2-2 GREEN: hello KService READY=True（curl 証跡あり）
-Evidence: reports/p2_boot_*.md, reports/hello_ksvc_test.txt
+## Phase 2-2: Hello KService READY=True
+- Evidence: reports/phase2/hello_ready.md（apply → wait → get, READY=True）
+- Notes: /ask 経路と保存PRライン安定、executor dry-run 緑
+- Next: Autoscale PoC → 既存サービスのKnative移植 → 監視ラインのK8s側移設
