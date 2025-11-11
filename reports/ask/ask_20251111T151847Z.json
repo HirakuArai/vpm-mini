@@ -1,0 +1,13 @@
+{
+  "understanding": "repo=vpm-mini、branch=main、phase=Phase 2 のコンテキストは受け取りましたが、具体的な質問文が含まれていません（\"QUESTION\" のみ）。回答には質問内容が必要です。",
+  "plan": {
+    "commands": [
+      "ユーザーに具体的な質問内容（目的・期待する出力・関連ファイルやエラーなど）を確認する",
+      "質問が届いたら、リポジトリ vpm-mini の main ブランチで Phase 2 に関係するドキュメントやコード（例: README.md、docs/phase-2*.md、CONTRIBUTING、設計資料）を確認する",
+      "必要に応じてリポジトリ内を『Phase 2』『vpm-mini』に関連するキーワードで検索し、該当箇所を特定する",
+      "収集したコンテキストに基づいて、質問に対する簡潔で実行可能な回答を作成する",
+      "追加情報が必要な場合は最小限の追質問を行う"
+    ]
+  },
+  "acceptance": "needs_question"
+}
