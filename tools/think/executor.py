@@ -1,33 +1,37 @@
 #!/usr/bin/env python3
 # Safe executor for Thinker: allow-listed kubectl/curl/echo only.
-import argparse, shlex, subprocess, sys, time, os
+import argparse
+import os
+import shlex
+import subprocess
+import sys
+import time
 
 
-def allow_kubectl(argv):
+ALLOWED = {"get", "describe", "wait"}
+
+
+def kubectl_subcommand(argv):
     """
-    flags(-n/--namespace など)とその値(-n ns / --namespace=ns 等)を飛ばして
-    最初のサブコマンドを拾う。
+    左から走査して最初に現れた許可サブコマンドを返す。
     """
-    i = 1
-    needs_val = {
-        "-n","--namespace","-f","--filename","-o","--output",
-        "-l","--selector","--context","--kubeconfig"
-    }
-    while i < len(argv):
-        a = argv[i]
-        if not a.startswith('-'):
-            sub = a
-            return sub in {"get","describe","apply","wait"}
-        # --namespace=ns のような '=' 付きは1トークンで消費
-        if '=' in a:
-            i += 1
-            continue
-        # 値が別トークンのフラグは2トークン消費
-        if a in needs_val and i+1 < len(argv):
-            i += 2
-            continue
-        i += 1
-    return False
+    for token in argv[1:]:
+        if token in ALLOWED:
+            return token
+    return None
+
+
+def ensure_wait_timeout(argv):
+    """
+    kubectl wait に --request-timeout を強制的に付与する。
+    """
+    for token in argv[1:]:
+        if token.startswith("--request-timeout"):
+            return False
+        if token == "--request-timeout":
+            return False
+    argv.append("--request-timeout=30s")
+    return True
 
 
 def run_one(cmd, log, dry):
@@ -36,14 +40,19 @@ def run_one(cmd, log, dry):
         log.write("[deny] empty command\n")
         return 0
     prog = parts[0]
-    line = " ".join(shlex.quote(x) for x in parts)
-    log.write(f"$ {line}\n")
-
-    ok = False
+    subcmd = None
     if prog == "kubectl":
-        ok = allow_kubectl(parts)
+        subcmd = kubectl_subcommand(parts)
+        if subcmd == "wait":
+            ensure_wait_timeout(parts)
+        ok = subcmd is not None
     elif prog in {"curl", "echo"}:
         ok = True
+    else:
+        ok = False
+
+    line = " ".join(shlex.quote(x) for x in parts)
+    log.write(f"$ {line}\n")
 
     if not ok:
         log.write("  [skip] not in allowlist\n\n")
@@ -52,13 +61,19 @@ def run_one(cmd, log, dry):
         log.write("  [dry-run]\n\n")
         return 0
 
-    p = subprocess.run(parts, text=True, capture_output=True)
+    try:
+        p = subprocess.run(parts, text=True, capture_output=True, timeout=40)
+    except subprocess.TimeoutExpired as exc:
+        log.write(f"  [timeout] command exceeded 40s: {exc}\n\n")
+        return 1
+
     if p.stdout:
         log.write(p.stdout)
     if p.stderr:
         log.write(p.stderr)
     log.write("\n")
     return p.returncode
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -74,6 +89,7 @@ def main():
             rc |= run_one(c, lw, args.dry_run)
     print(args.log)
     sys.exit(rc)
+
 
 if __name__ == "__main__":
     main()

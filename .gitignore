@@ -23,4 +23,5 @@ reports/*.png
 reports/mna_update_*.md
 reports/icr_history.csv
 .DS_Store
-reports/think/*.json
+reports/think/*
+!reports/think/.gitkeep
