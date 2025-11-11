@@ -99,14 +99,14 @@ jobs:
                                     elif type=="object" then . else . end ) ]
                           else [] end ))
             | (.acceptance |= ( if type=="string" then [.] elif type=="array" then . else [] end ))
-            | (.citations |= ( if type=="string" then [ {path:., lines:\"\"} ]
-                               elif type=="array" then [ .[] | ( if type=="string" then {path:., lines:\"\"} else . end ) ]
+            | (.citations |= ( if type=="string" then [ {path:., lines:""} ]
+                               elif type=="array" then [ .[] | ( if type=="string" then {path:., lines:""} else . end ) ]
                                elif type=="object" then [.] else [] end ))
           ' out/u_contract.json > out/u_contract.norm.json
           mv out/u_contract.norm.json out/u_contract.json
 
-      - name: Comment back JSON (always)
-        if: always()
+      - name: Comment back JSON (issue/pr only)
+        if: ${{ github.event_name == 'issue_comment' || github.event_name == 'issues' || github.event_name == 'pull_request' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
