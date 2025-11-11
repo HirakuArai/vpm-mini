@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "コンテキスト（repo=vpm-mini / branch=main / phase=Phase 2）のみが提示され、具体的な質問（QUESTION）の内容が未指定です。Phase 2 で求める作業（例: 実装、レビュー、テスト、設計提案、バグ調査など）や期待するアウトカムを明示してください。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "受領しました。具体的な質問内容の提示をお願いします。準備でき次第、即時対応します。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
