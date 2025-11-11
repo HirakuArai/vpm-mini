@@ -84,12 +84,17 @@ jobs:
             (.context_header //= $ch)
             | (.typing //= "plan要約")
             | (.confidence //= 0.5)
-            | (.understanding //= {})
-            | (.understanding.C //= "")
-            | (.understanding.G //= "")
-            | (.understanding.delta //= "")
-            | (.understanding.assumptions //= [])
-            | (.understanding.unknowns //= [])
+            | (.understanding |=
+                ( if type=="string" then
+                    {C:., G:"", delta:"", assumptions:[], unknowns:[]}
+                  elif type=="null" then
+                    {C:"", G:"", delta:"", assumptions:[], unknowns:[]}
+                  elif type=="object" then
+                    (.C //= "") | (.G //= "") | (.delta //= "")
+                    | (.assumptions //= []) | (.unknowns //= [])
+                  else
+                    {C:"", G:"", delta:"", assumptions:[], unknowns:[]}
+                  end ))
             | (.plan |= ( if type=="string" then
                             [ {id:"p1", desc:., commands:[], evidence:[], risks:[]} ]
                           elif type=="array" then
