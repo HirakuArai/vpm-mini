@@ -1,17 +1,1 @@
-{
-  "understanding": {
-    "C": "You re-triggered the v2.2 guard on branch main for Phase 2. If the change set qualifies as evidence-only, the guard should pass and we can auto-approve the associated PR.",
-    "G": "",
-    "delta": "",
-    "assumptions": [],
-    "unknowns": []
-  },
-  "plan": [],
-  "acceptance": [
-    "Acknowledged. Run the script above to monitor the v2.2 guard on main and auto-approve the linked PR if it succeeds."
-  ],
-  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
-  "typing": "plan要約",
-  "confidence": 0.5,
-  "citations": []
-}
+nudge v2.3b run for PR664
