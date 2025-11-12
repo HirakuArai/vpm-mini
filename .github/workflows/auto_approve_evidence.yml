@@ -1,0 +1,41 @@
+name: Auto-approve Evidence PRs
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+    paths:
+      - 'reports/ask/**'
+      - 'codex/inbox/**'
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  guard-and-approve:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          filters: |
+            evidence:
+              - 'reports/ask/**'
+              - 'codex/inbox/**'
+            code:
+              - '**'
+              - '!reports/ask/**'
+              - '!codex/inbox/**'
+
+      - name: Approve evidence-only PR
+        if: >
+          startsWith(github.head_ref, 'ask/store/')
+          && contains(toJson(github.event.pull_request.labels), 'evidence')
+          && steps.filter.outputs.evidence == 'true'
+          && steps.filter.outputs.code == 'false'
+        uses: peter-evans/approve-pull-request@v5
+        with:
+          pull-request-number: ${{ github.event.pull_request.number }}
+          review-message: "Auto-approving evidence-only PR."
