@@ -5,6 +5,11 @@ on:
     paths:
       - 'reports/ask/**'
       - 'codex/inbox/**'
+  pull_request_target:
+    types: [opened, synchronize, reopened, labeled]
+    paths:
+      - 'reports/ask/**'
+      - 'codex/inbox/**'
 permissions:
   pull-requests: write
   contents: read
@@ -29,10 +34,15 @@ jobs:
               - '!reports/ask/**'
               - '!codex/inbox/**'
 
+      - name: Compute head ref
+        id: vars
+        shell: bash
+        run: echo "head_ref=${{ github.head_ref || github.event.pull_request.head.ref || '' }}" >> $GITHUB_OUTPUT
+
       - name: Approve evidence-only PR
         if: >
-          startsWith(github.head_ref, 'ask/store/')
-          && contains(toJson(github.event.pull_request.labels), 'evidence')
+          startsWith(steps.vars.outputs.head_ref, 'ask/store/')
+          && contains(toJson(github.event.pull_request.labels), '"name":"evidence"')
           && steps.filter.outputs.evidence == 'true'
           && steps.filter.outputs.code == 'false'
         uses: peter-evans/approve-pull-request@v5
