@@ -1,17 +1,1 @@
-{
-  "understanding": {
-    "C": "Nudge the pipeline by making a harmless update to the evidence file so Guard re-runs. Under v2 conditions it should now auto-approve.",
-    "G": "",
-    "delta": "",
-    "assumptions": [],
-    "unknowns": []
-  },
-  "plan": [],
-  "acceptance": [
-    "Ready to proceed. This will re-run Guard by nudging the evidence file; expect auto-approval under v2."
-  ],
-  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
-  "typing": "plan要約",
-  "confidence": 0.5,
-  "citations": []
-}
+nudge for auto-approve v2.2 on PR 662
