@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "approver bot と compose checks を有効化後に nudge 済み。対象の ask PR が自動承認され、ask_pr_checks が green になっているかを確認し、必要ならチェックを再実行する。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "上記手順で確認・必要時の再実行を行います。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
