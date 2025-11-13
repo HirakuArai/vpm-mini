@@ -1,0 +1,45 @@
+name: Produce Codex inbox for /ask evidence PRs
+on:
+  pull_request_target:
+    types: [opened, synchronize, labeled]
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  produce:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide evidence-only via API
+        id: decide
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            const headRef = (pr && pr.head && pr.head.ref) || '';
+            const labels = (pr && pr.labels ? pr.labels.map(l=>l.name) : []);
+            const files = await github.paginate(github.pulls.listFiles, { owner: context.repo.owner, repo: context.repo.repo, pull_number: pr.number, per_page: 100 });
+            const paths = files.map(f=>f.filename);
+            const onlyEvidence = paths.length > 0 && paths.every(p => p.startsWith('reports/ask/') || p.startsWith('codex/inbox/'));
+            const ok = headRef.startsWith('ask/store/') || labels.includes('evidence') || onlyEvidence;
+            core.info(`producer decide: ok=${ok} headRef=${headRef} labels=${labels} paths=${paths.length}`);
+            core.setOutput('ok', ok ? 'true' : 'false');
+            core.setOutput('head', headRef);
+      - name: Produce inbox (commit JSON to PR branch)
+        if: steps.decide.outputs.ok == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const headRef = '${{ steps.decide.outputs.head }}';
+            const ts = new Date().toISOString().replace(/[:.-]/g,'').slice(0,15)+'Z';
+            const id = `ask_${ts}`;
+            const path = `codex/inbox/${id}.json`;
+            const body = { id, task: 'noop', repo: `${owner}/${repo}`, branch_base: 'main', actions: [], evidence_out: `reports/ask/exec_${ts}.md` };
+            const content = Buffer.from(JSON.stringify(body, null, 2),'utf8').toString('base64');
+            await github.repos.createOrUpdateFileContents({ owner, repo, path, message: `producer: add ${path}`, content, branch: headRef });
+            core.info(`committed ${path} to ${headRef}`);
