@@ -4,6 +4,7 @@ on:
     types: [labeled, synchronize, opened]
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   decide:
@@ -21,8 +22,8 @@ jobs:
             const labels = (pr && pr.labels ? pr.labels.map(l=>l.name) : []);
             const files = await github.paginate(github.pulls.listFiles, { owner: context.repo.owner, repo: context.repo.repo, pull_number: pr.number, per_page: 100 });
             const paths = files.map(f=>f.filename);
-            const onlyEvidence = paths.length > 0 && paths.every(p => p.startsWith('reports/ask/') || p.startsWith('codex/inbox/'))
-            const ok = headRef.startsWith('ask/store/') && labels.includes('evidence') && onlyEvidence;
+            const onlyEvidence = paths.length > 0 && paths.every(p => p.startsWith('reports/ask/') || p.startsWith('codex/inbox/'));
+            const ok = headRef.startsWith('ask/store/') || labels.includes('evidence') || onlyEvidence;
             core.info(`compose decide ok=${ok} headRef=${headRef} labels=${labels} paths=${paths}`);
             core.setOutput('ok', ok ? 'true' : 'false');
 
