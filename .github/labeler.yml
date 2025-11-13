@@ -1,0 +1,4 @@
+evidence:
+  - all-globs-to-all-files:
+      - 'reports/ask/**'
+      - 'codex/inbox/**'
