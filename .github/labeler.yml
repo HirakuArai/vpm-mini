@@ -1,3 +1,4 @@
 evidence:
-  - changed-files:
-      - any-glob-to-any-file: ['reports/ask/**', 'codex/inbox/**']
+  - all-globs-to-all-files:
+      - 'reports/ask/**'
+      - 'codex/inbox/**'
