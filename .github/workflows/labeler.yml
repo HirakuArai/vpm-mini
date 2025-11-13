@@ -1,0 +1,3 @@
+evidence:
+  - changed-files:
+      - any-glob-to-any-file: ['reports/ask/**', 'codex/inbox/**']
