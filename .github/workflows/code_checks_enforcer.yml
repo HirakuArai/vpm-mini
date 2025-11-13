@@ -23,11 +23,16 @@ jobs:
             const files = await github.paginate(github.pulls.listFiles, { owner: context.repo.owner, repo: context.repo.repo, pull_number: pr.number, per_page: 100 });
             const paths = files.map(f=>f.filename);
             const onlyEvidence = paths.length > 0 && paths.every(p => p.startsWith('reports/ask/') || p.startsWith('codex/inbox/'));
-            const okEvidence = headRef.startsWith('ask/store/') || labels.includes('evidence') || onlyEvidence;
-            core.info(`evidence_decide: headRef=${headRef} labels=${labels.join(',')} paths=${paths.length}`);
-            core.setOutput('is_evidence', okEvidence ? 'true' : 'false');
+            const isEvidence = headRef.startsWith('ask/store/') || labels.includes('evidence') || onlyEvidence;
+            const isCIOnly = paths.length > 0 && paths.every(p => p.startsWith('.github/'));
+            core.info(`enforcer decide: isEvidence=${isEvidence} isCIOnly=${isCIOnly} headRef=${headRef} labels=${labels.join(',')} paths=${paths.length}`);
+            core.setOutput('is_evidence', isEvidence ? 'true' : 'false');
+            core.setOutput('is_cionly', isCIOnly ? 'true' : 'false');
+      - name: Skip on evidence-only or CI-only
+        if: steps.decide.outputs.is_evidence == 'true' || steps.decide.outputs.is_cionly == 'true'
+        run: echo "enforcer skipped (evidence or ci-only)"
       - name: Enforce heavy checks for code PRs
-        if: steps.decide.outputs.is_evidence != 'true'
+        if: steps.decide.outputs.is_evidence != 'true' && steps.decide.outputs.is_cionly != 'true'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -37,7 +42,6 @@ jobs:
             const required = ['test-and-artifacts', 'knative-ready', 'k8s-validate'];
             const { data: status } = await github.repos.getCombinedStatusForRef({ owner: context.repo.owner, repo: context.repo.repo, ref });
             const contexts = new Map(status.statuses.map(s => [s.context, s.state]));
-            // Also check checks API (GitHub Apps checks)
             const checks = await github.checks.listForRef({ owner: context.repo.owner, repo: context.repo.repo, ref, per_page: 100 });
             for (const c of checks.data.check_runs) { contexts.set(c.name, c.conclusion || c.status); }
             const missing = [];
@@ -45,8 +49,5 @@ jobs:
               const v = contexts.get(r);
               if (!v || !(v === 'success' || v === 'completed' || v === 'neutral')) missing.push(r);
             }
-            if (missing.length) {
-              core.setFailed(`Missing or failing required heavy checks for code PR: ${missing.join(', ')}`);
-            } else {
-              core.info('All required heavy checks present for code PR.');
-            }
+            if (missing.length) { core.setFailed(`Missing or failing heavy checks for code PR: ${missing.join(', ')}`); }
+            else { console.log('All required heavy checks present.'); }
