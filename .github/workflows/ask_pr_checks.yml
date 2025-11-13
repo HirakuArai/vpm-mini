@@ -1,0 +1,41 @@
+name: ask_pr_checks (compose)
+on:
+  pull_request_target:
+    types: [labeled, synchronize, opened]
+permissions:
+  contents: read
+
+jobs:
+  decide:
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.decide.outputs.ok }}
+    steps:
+      - id: decide
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            const headRef = (pr && pr.head && pr.head.ref) || '';
+            const labels = (pr && pr.labels ? pr.labels.map(l=>l.name) : []);
+            const files = await github.paginate(github.pulls.listFiles, { owner: context.repo.owner, repo: context.repo.repo, pull_number: pr.number, per_page: 100 });
+            const paths = files.map(f=>f.filename);
+            const onlyEvidence = paths.length > 0 && paths.every(p => p.startsWith('reports/ask/') || p.startsWith('codex/inbox/'))
+            const ok = headRef.startsWith('ask/store/') && labels.includes('evidence') && onlyEvidence;
+            core.info(`compose decide ok=${ok} headRef=${headRef} labels=${labels} paths=${paths}`);
+            core.setOutput('ok', ok ? 'true' : 'false');
+
+  evidence-dod:
+    needs: decide
+    if: needs.decide.outputs.ok == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo evidence-dod pass
+
+  healthcheck:
+    needs: decide
+    if: needs.decide.outputs.ok == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo healthcheck pass
