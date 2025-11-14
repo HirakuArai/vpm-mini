@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: hello
   namespace: default
+  annotations:
+    vpm-mini/s5-smoke: "2025-11-14"
 spec:
   template:
     spec:
