@@ -1,0 +1,45 @@
+{
+  "project": "vpm-mini",
+  "phase": "2",
+  "goal_m2": {
+    "id": "Goal-M2",
+    "title": "S5 apply + hello-ksvc 一巡",
+    "dev_env": {
+      "cluster_name": "vpm-mini-kind",
+      "kube_context": "kind-vpm-mini-kind",
+      "kind": true,
+      "knative_serving": true,
+      "kourier": true
+    },
+    "services": {
+      "hello": {
+        "type": "knative-service",
+        "namespace": "default",
+        "url": "http://hello.default.127.0.0.1.nip.io",
+        "ready": true,
+        "source_manifest": "infra/k8s/overlays/dev/hello-ksvc.yaml"
+      },
+      "metrics-echo": {
+        "type": "knative-service",
+        "namespace": "default",
+        "url": "http://metrics-echo.default.127.0.0.1.nip.io",
+        "ready": true
+      }
+    },
+    "runner_pipe": {
+      "t2_dry": "done",
+      "t3_exec_canary": "done",
+      "s5_apply": {
+        "producer": "partial",
+        "runner": "implemented",
+        "evidence_loop": "incomplete"
+      }
+    },
+    "open_issues": [
+      "S5 apply JSON を main の codex/inbox に自動で載せる経路設計",
+      "hello-ksvc manifest と実クラスタ spec の差分確認と整理",
+      "S5 apply 一巡の Evidence（reports/codex_runs/** と PR）の確定"
+    ],
+    "last_updated": "2025-11-14T21:52:25Z"
+  }
+}
