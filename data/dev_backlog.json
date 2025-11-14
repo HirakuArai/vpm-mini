@@ -31,5 +31,19 @@
       "T2/T3/S5 の Evidence（PR #660, #694, #696, #702 等）を 1枚のレポートにまとめる。",
       "STATE/current_state.md と reports/phase2/** を揃える。"
     ]
+  },
+  {
+    "id": "P2-1-kind-knative-hello",
+    "status": "todo",
+    "summary": "kind+Knative 上で hello-ksvc READY=True を確認し、S5 apply の一巡を完成させる",
+    "phase": "2",
+    "category": "infra+runner",
+    "priority": "high",
+    "notes": [
+      "devbox-codex 上に kind クラスタ vpm-mini-kind を作成",
+      "Knative Serving v1.18 + kourier を導入",
+      "infra/k8s/overlays/dev/hello-ksvc.yaml を apply → READY=True を Evidence 付きで確認",
+      "/ask → S5 apply → Runner(exec) → Evidence の一巡を hello-ksvc で完成させる"
+    ]
   }
 ]
