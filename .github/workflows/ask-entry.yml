@@ -187,21 +187,40 @@ jobs:
         run: |
           set -euo pipefail
           TS=$(date -u +%Y%m%dT%H%M%SZ)
-          if printf '%s' "$COMMENT_BODY" | grep -q 'S5 apply: dev hello-ksvc'; then
+          DEFAULT_MANIFEST="infra/k8s/overlays/dev/hello-ksvc.yaml"
+          HAS_S5_MARKER=0
+          MANIFEST=""
+          if printf '%s' "$COMMENT_BODY" | grep -iq 'S5 apply: dev'; then
+            HAS_S5_MARKER=1
+            S5_LINE=$(printf '%s\n' "$COMMENT_BODY" | grep -i 'S5 apply: dev' | head -n1 || true)
+            if [ -n "${S5_LINE:-}" ]; then
+              MANIFEST=$(printf '%s\n' "$S5_LINE" | awk '{print $4}')
+            fi
+          fi
+          if [ -z "$MANIFEST" ] || [ "$MANIFEST" = "hello-ksvc" ]; then
+            MANIFEST="$DEFAULT_MANIFEST"
+          fi
+
+          IS_DEV_MANIFEST=0
+          if printf '%s' "$MANIFEST" | grep -q '^infra/k8s/overlays/dev/'; then
+            IS_DEV_MANIFEST=1
+          fi
+
+          if [ "$HAS_S5_MARKER" -eq 1 ] && [ "$IS_DEV_MANIFEST" -eq 1 ]; then
             ID="apply_hello_dev_${TS}.json"
             FILE="codex/inbox/${ID}"
-            jq -n --arg pr "$PR_NUMBER" '{
+            jq -n --arg pr "$PR_NUMBER" --arg manifest "$MANIFEST" '{
               kind: "apply",
               source: "pr-direct-s5",
               approved: true,
               approver: "HirakuArai",
-              scope: "infra/k8s/overlays/dev/hello-ksvc.yaml",
+              scope: $manifest,
               pr_number: ($pr|tonumber),
-              note: "S5 dev apply: infra/k8s/overlays/dev/hello-ksvc.yaml",
+              note: ("S5 dev apply: " + $manifest),
               actions: [
                 {
                   type: "k8s-apply",
-                  path: "infra/k8s/overlays/dev/hello-ksvc.yaml",
+                  path: $manifest,
                   resource: {
                     kind: "Service",
                     name: "hello",
