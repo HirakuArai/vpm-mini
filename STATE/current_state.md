@@ -8,3 +8,15 @@
 - **T3:** `RUN_MODE=exec` で非破壊な `kubectl get ...` Canary を実行し、`reports/codex_runs/**` に `[EXEC] kubectl ...` が残ることを確認（PR #694）。
 - **S5:** `/ask` コメントに `S5 apply: dev hello-ksvc` がある場合、Producer が apply JSON を生成し、Runner(exec) が `infra/k8s/overlays/dev/**` に対して `kubectl diff/apply/get` を実行して `apply.log` / `after.yaml` / `run.log` を残すパスまで通った（PR #696, #702）。
 - **現状の制約:** Runner の起動は Codex (VM) からの手動 `RUN_MODE=dry/exec` に限定。実クラスタでは Knative CRD と hello リソースが未整備のため、`hello-ksvc` の apply はエラーになる（CRD 整備 or 対象リソースの見直しが必要）。
+
+### Phase 2 / Goal-M2: S5 apply + hello-ksvc 一巡
+
+- dev hello-ksvc 環境:
+  - devbox-codex 上の kind クラスタ `vpm-mini-kind`
+  - このクラスタ上に Knative Serving v1.18 + kourier を導入し、
+    `infra/k8s/overlays/dev/hello-ksvc.yaml` を apply して READY=True を確認する。
+- この環境を、Runner + /ask / S5 apply の「標準的な dev 実行先」として扱う。
+- 後続タスク:
+  - `infra/kind-dev/kind-cluster.yaml` の定義
+  - `scripts/p2_bootstrap_kind_knative.sh` による kind+Knative 足場構築
+  - S5 apply 経由で hello-ksvc を更新 → READY=True を Evidence 付きで確認
