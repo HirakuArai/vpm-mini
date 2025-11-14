@@ -1,0 +1,8 @@
+{
+  "kind": "ask",
+  "source": "manual-t3",
+  "note": "T3 hello KService exec canary",
+  "actions": [
+    {"cmd": "kubectl -n default get ksvc hello"}
+  ]
+}

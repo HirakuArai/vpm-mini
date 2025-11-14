@@ -1,0 +1,12 @@
+[INFO] Processing codex/inbox/t3_hello_canary_20251114T020621Z.json (mode=exec)
+[json] {
+[json]   "kind": "ask",
+[json]   "source": "manual-t3",
+[json]   "note": "T3 hello KService exec canary",
+[json]   "actions": [
+[json]     {
+[json]       "cmd": "kubectl -n default get ksvc hello"
+[json]     }
+[json]   ]
+[json] }
+[SKIP] not in allowlist: kubectl -n default get ksvc hello
