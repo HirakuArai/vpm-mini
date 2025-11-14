@@ -1,0 +1,35 @@
+[
+  {
+    "id": "S5-generalize-dev-overlay",
+    "title": "S5 apply を dev overlay 全体で使えるようにする",
+    "kind": "infra",
+    "status": "todo",
+    "phase": "P2",
+    "notes": [
+      "現在は hello-ksvc 固定。scope/path を infra/k8s/overlays/dev/** に一般化する。",
+      "安全のため、許可する path はホワイトリスト管理も検討する。"
+    ]
+  },
+  {
+    "id": "runner-auto-dry-cron",
+    "title": "Runner(DRY) の定期実行（Cron 相当）設計",
+    "kind": "ops",
+    "status": "todo",
+    "phase": "P2→P3",
+    "notes": [
+      "VM Codex から 1日1回程度 DRY で inbox を掃く運用を仕組み化する。",
+      "最初は手動運用ルールのみ、その後 GitHub Actions や VM 上の cron も検討する。"
+    ]
+  },
+  {
+    "id": "understanding-guard-phase2-summary",
+    "title": "Phase 2 Runner ラインの Understanding/Evidence サマリ作成",
+    "kind": "docs",
+    "status": "todo",
+    "phase": "P2",
+    "notes": [
+      "T2/T3/S5 の Evidence（PR #660, #694, #696, #702 等）を 1枚のレポートにまとめる。",
+      "STATE/current_state.md と reports/phase2/** を揃える。"
+    ]
+  }
+]
