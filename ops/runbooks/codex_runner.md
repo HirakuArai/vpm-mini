@@ -63,14 +63,16 @@ exit 0
 # - `RUN_MODE=exec` + kind≠apply  
 #   - **S3 Canary** 相当。許可リスト（`kubectl get/describe/wait`）のみ実行し、Evidence を `run.log` に追記。
 # - `RUN_MODE=exec` + `kind=apply` + `approved=true` + `scope` が `infra/k8s/overlays/dev/**`  
-#   - **S5 apply** 専用。`kubectl diff -f <manifest>` → `kubectl apply -f <manifest>` → `kubectl get ... -o yaml` を順番に実行し、`apply.log` と `after.yaml` に記録。
+#   - **S5 apply** 専用。`kubectl diff -f <manifest>` → `kubectl apply -f <manifest>` → `kubectl get ... -o yaml` を順番に実行し、`apply.log` と `after.yaml` に記録。  
+#   - `/ask` コメント例: `S5 apply: dev infra/k8s/overlays/dev/<manifest>.yaml`（任意の dev overlay manifest）。  
+#     - `S5 apply: dev hello-ksvc` は `infra/k8s/overlays/dev/hello-ksvc.yaml` を指すショートカット。
 #
 # ### 誰がいつ回すか（Phase 2 暫定運用）
 # - **DRY**  
 #   - Runner inbox に新しい /ask JSON が溜まったら、VM Codex が 1 日 1 回程度 or 作業のまとまりで `RUN_MODE=dry bash scripts/codex_inbox_runner.sh` を実行。  
 #   - /ask コメントの結果を `_done/` へ送ることで Evidence パイプが閉じる。
 # - **EXEC (Canary/S5)**  
-#   - `RUN_MODE=exec` は「PR / /ask に EXEC して良い明示の GO サイン（例: `T3 Canary`, `S5 apply: dev hello-ksvc`）」があるときだけ。  
+#   - `RUN_MODE=exec` は「PR / /ask に EXEC して良い明示の GO サイン（例: `T3 Canary`, `S5 apply: dev ...`)」があるときだけ。  
 #   - 実行者は Codex (VM) で、対象 PR のレビュー/承認状況を確認したうえで走らせる。
 #
 # ### ログ／Evidence の見方
