@@ -1,0 +1,14 @@
+[INFO] Processing codex/inbox/t3_hello_canary_20251114T020741Z.json (mode=exec)
+[json] {
+[json]   "kind": "ask",
+[json]   "source": "manual-t3",
+[json]   "note": "T3 hello KService exec canary",
+[json]   "actions": [
+[json]     {
+[json]       "cmd": "kubectl get ksvc hello -n default"
+[json]     }
+[json]   ]
+[json] }
+[EXEC] kubectl get ksvc hello -n default
+error: the server doesn't have a resource type "ksvc"
+[WARN] command returned non-zero
