@@ -1,0 +1,14 @@
+[APPLY] manifest=infra/k8s/overlays/dev/hello-ksvc.yaml
+[APPLY] kubectl diff -f infra/k8s/overlays/dev/hello-ksvc.yaml
+error: resource mapping not found for name: "hello" namespace: "default" from "infra/k8s/overlays/dev/hello-ksvc.yaml": no matches for kind "Service" in version "serving.knative.dev/v1"
+ensure CRDs are installed first
+[WARN] diff returned non-zero
+[APPLY] kubectl apply -f infra/k8s/overlays/dev/hello-ksvc.yaml
+error: resource mapping not found for name: "hello" namespace: "default" from "infra/k8s/overlays/dev/hello-ksvc.yaml": no matches for kind "Service" in version "serving.knative.dev/v1"
+ensure CRDs are installed first
+[ERROR] apply returned non-zero
+[APPLY] kubectl get ksvc hello -n default -o yaml
+error: the server doesn't have a resource type "ksvc"
+[WARN] kubectl get ksvc failed; falling back to service
+Error from server (NotFound): services "hello" not found
+[ERROR] failed to capture resource via fallback kind
