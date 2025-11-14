@@ -1,0 +1,7 @@
+[INFO] Processing codex/inbox/ask_20251114T010230Z.json (mode=dry)
+[json] {
+[json]   "kind": "ask",
+[json]   "source": "pr-direct",
+[json]   "note": "T2 E2E smoke from PR comment #660"
+[json] }
+[INFO] no actions; DRY record only
