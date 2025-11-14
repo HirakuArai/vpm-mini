@@ -144,3 +144,68 @@ jobs:
             -t "ask: persist u_contract (${ts})" \
             -b "Persisted from ask-entry." \
             --label ask --label evidence || true
+
+  ask_pr_direct:
+    name: Ask PR-direct (commit codex/inbox/ask_<ts>.json)
+    if: >
+      github.event.issue.pull_request != null &&
+      startsWith(github.event.comment.body, '/ask')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Fetch PR head ref
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = context.payload.issue.number;
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+            core.setOutput('head_ref', pr.head.ref);
+
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.head_ref }}
+
+      - name: Ensure codex/inbox directory
+        run: |
+          set -euo pipefail
+          mkdir -p codex/inbox
+
+      - name: Generate ask inbox JSON
+        id: gen
+        run: |
+          set -euo pipefail
+          TS=$(date -u +%Y%m%dT%H%M%SZ)
+          ID="ask_${TS}.json"
+          FILE="codex/inbox/${ID}"
+
+          cat > "${FILE}" <<EOF
+          {"kind":"ask","source":"pr-direct","note":"T2 E2E smoke from PR comment #${{ github.event.issue.number }}"}
+          EOF
+
+          echo "ASK_FILE=${FILE}" >> "$GITHUB_ENV"
+
+      - name: Commit inbox JSON into PR branch
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git status --short
+          git add "${ASK_FILE}"
+
+          git diff --cached --quiet && {
+            echo "No changes to commit; exiting."
+            exit 0
+          }
+
+          git commit -m "ask: add codex inbox payload (${ASK_FILE})"
+          git push
