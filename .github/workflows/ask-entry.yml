@@ -179,6 +179,11 @@ jobs:
           set -euo pipefail
           mkdir -p codex/inbox
 
+      - name: Initialize S5 env defaults
+        run: |
+          set -euo pipefail
+          echo "S5_ACTIVE=0" >> "$GITHUB_ENV"
+
       - name: Generate ask/apply inbox JSON
         id: gen
         env:
@@ -207,7 +212,7 @@ jobs:
           fi
 
           if [ "$HAS_S5_MARKER" -eq 1 ] && [ "$IS_DEV_MANIFEST" -eq 1 ]; then
-            ID="apply_hello_dev_${TS}.json"
+            ID="s5_apply_${TS}.json"
             FILE="codex/inbox/${ID}"
             jq -n --arg pr "$PR_NUMBER" --arg manifest "$MANIFEST" '{
               kind: "apply",
@@ -229,6 +234,11 @@ jobs:
                 }
               ]
             }' > "${FILE}"
+            echo "S5_ACTIVE=1" >> "$GITHUB_ENV"
+            echo "S5_JSON_PATH=${FILE}" >> "$GITHUB_ENV"
+            echo "S5_MANIFEST=${MANIFEST}" >> "$GITHUB_ENV"
+            echo "S5_PR=${PR_NUMBER}" >> "$GITHUB_ENV"
+            echo "S5_EVIDENCE_BRANCH=ask/store/s5-apply-${PR_NUMBER}-${GITHUB_RUN_ID}" >> "$GITHUB_ENV"
           else
             ID="ask_${TS}.json"
             FILE="codex/inbox/${ID}"
@@ -236,6 +246,41 @@ jobs:
           fi
 
           echo "ASK_FILE=${FILE}" >> "$GITHUB_ENV"
+
+      - name: Checkout base for S5 evidence PR
+        if: env.S5_ACTIVE == '1'
+        uses: actions/checkout@v4
+        with:
+          path: s5-evidence
+          ref: main
+
+      - name: Stage S5 JSON for evidence PR
+        if: env.S5_ACTIVE == '1'
+        run: |
+          set -euo pipefail
+          mkdir -p "s5-evidence/$(dirname "$S5_JSON_PATH")"
+          cp "$S5_JSON_PATH" "s5-evidence/$S5_JSON_PATH"
+        env:
+          S5_JSON_PATH: ${{ env.S5_JSON_PATH }}
+
+      - name: Create S5 apply evidence PR
+        if: env.S5_ACTIVE == '1'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: s5-evidence
+          branch: ${{ env.S5_EVIDENCE_BRANCH }}
+          base: main
+          title: "Evidence: S5 apply inbox for #${{ env.S5_PR }}"
+          body: |
+            S5 apply inbox JSON for /ask on #${{ env.S5_PR }}.
+
+            - scope: ${{ env.S5_MANIFEST }}
+            - path: `${{ env.S5_JSON_PATH }}`
+          commit-message: "chore(ask): add S5 apply inbox for #${{ env.S5_PR }}"
+          labels: |
+            evidence
+            kind:s5-apply
 
       - name: Commit inbox JSON into PR branch
         run: |
