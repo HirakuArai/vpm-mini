@@ -12,11 +12,14 @@
 ### Phase 2 / Goal-M2: S5 apply + hello-ksvc 一巡
 
 - dev hello-ksvc 環境:
-  - devbox-codex 上の kind クラスタ `vpm-mini-kind`
+  - devbox-codex 上の kind クラスタ `vpm-mini`（kube-context: `kind-vpm-mini`）
   - このクラスタ上に Knative Serving v1.18 + kourier を導入し、
     `infra/k8s/overlays/dev/hello-ksvc.yaml` を apply して READY=True を確認する。
+  - hello / metrics-echo の両 KService が READY=True で応答し、S5 apply の標準ターゲットとして扱える状態。
 - この環境を、Runner + /ask / S5 apply の「標準的な dev 実行先」として扱う。
 - 後続タスク:
   - `infra/kind-dev/kind-cluster.yaml` の定義
   - `scripts/p2_bootstrap_kind_knative.sh` による kind+Knative 足場構築
   - S5 apply 経由で hello-ksvc を更新 → READY=True を Evidence 付きで確認
+
+Note: STATE に環境の最新状況を十分反映できていなかったため、危うく dev クラスタ削除判断に傾きかけたことを忘れずにおく。
