@@ -179,17 +179,42 @@ jobs:
           set -euo pipefail
           mkdir -p codex/inbox
 
-      - name: Generate ask inbox JSON
+      - name: Generate ask/apply inbox JSON
         id: gen
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          PR_NUMBER: ${{ github.event.issue.number }}
         run: |
           set -euo pipefail
           TS=$(date -u +%Y%m%dT%H%M%SZ)
-          ID="ask_${TS}.json"
-          FILE="codex/inbox/${ID}"
-
-          cat > "${FILE}" <<EOF
-          {"kind":"ask","source":"pr-direct","note":"T2 E2E smoke from PR comment #${{ github.event.issue.number }}"}
-          EOF
+          if printf '%s' "$COMMENT_BODY" | grep -q 'S5 apply: dev hello-ksvc'; then
+            ID="apply_hello_dev_${TS}.json"
+            FILE="codex/inbox/${ID}"
+            jq -n --arg pr "$PR_NUMBER" '{
+              kind: "apply",
+              source: "pr-direct-s5",
+              approved: true,
+              approver: "HirakuArai",
+              scope: "infra/k8s/overlays/dev/hello-ksvc.yaml",
+              pr_number: ($pr|tonumber),
+              note: "S5 dev apply: infra/k8s/overlays/dev/hello-ksvc.yaml",
+              actions: [
+                {
+                  type: "k8s-apply",
+                  path: "infra/k8s/overlays/dev/hello-ksvc.yaml",
+                  resource: {
+                    kind: "Service",
+                    name: "hello",
+                    namespace: "default"
+                  }
+                }
+              ]
+            }' > "${FILE}"
+          else
+            ID="ask_${TS}.json"
+            FILE="codex/inbox/${ID}"
+            printf '{"kind":"ask","source":"pr-direct","note":"T2 E2E smoke from PR comment #%s"}\n' "$PR_NUMBER" > "${FILE}"
+          fi
 
           echo "ASK_FILE=${FILE}" >> "$GITHUB_ENV"
 
