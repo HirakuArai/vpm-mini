@@ -1,0 +1,23 @@
+[INFO] Processing codex/inbox/apply_hello_dev_20251114T035707Z.json (mode=exec)
+[json] {
+[json]   "kind": "apply",
+[json]   "source": "pr-direct-s5",
+[json]   "approved": true,
+[json]   "approver": "HirakuArai",
+[json]   "scope": "infra/k8s/overlays/dev/hello-ksvc.yaml",
+[json]   "pr_number": 697,
+[json]   "note": "S5 dev apply: infra/k8s/overlays/dev/hello-ksvc.yaml",
+[json]   "actions": [
+[json]     {
+[json]       "type": "k8s-apply",
+[json]       "path": "infra/k8s/overlays/dev/hello-ksvc.yaml",
+[json]       "resource": {
+[json]         "kind": "Service",
+[json]         "name": "hello",
+[json]         "namespace": "default"
+[json]       }
+[json]     }
+[json]   ]
+[json] }
+[INFO] Triggering S5 apply manifest=infra/k8s/overlays/dev/hello-ksvc.yaml
+[INFO] S5 apply artifacts: reports/codex_runs/apply_hello_dev_20251114T035707Z/apply.log, reports/codex_runs/apply_hello_dev_20251114T035707Z/after.yaml
