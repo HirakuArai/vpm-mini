@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "次の開発タスクを正しく選定するには、リポジトリ内の data/dev_backlog.json と STATE/current_state.md を読み、status==\"todo\" の中からスコープが小さいものを判断する必要があります。現状、そのファイル内容にアクセスできないため、内容を共有いただくまでは具体的なタスク選定とCodex Briefの提示ができません。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "data/dev_backlog.json と STATE/current_state.md の全文をご提示いただければ、次タスクを即選定し、所定フォーマット（タスク要約＋フェンス付きCodex Brief）で返答します。ファイルが大きい場合は該当するタスク群と現状セクションのみでも構いません。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
