@@ -1,52 +1,71 @@
 #!/usr/bin/env bash
 set -euo pipefail
-CLUSTER="${CLUSTER:-vpm-mini}"
-KIND_NODE_IMAGE="kindest/node:v1.31.2"
-KN_VERSION="${KN_VERSION:-knative-v1.18.0}"
-KOURIER_VERSION="${KOURIER_VERSION:-knative-v1.18.0}"
-DOMAIN="${DOMAIN:-127.0.0.1.nip.io}"
-REPORT_DIR="${REPORT_DIR:-reports}"
-mkdir -p "${REPORT_DIR}"
-ts(){ date +"%Y-%m-%dT%H%M%S%z"; }
-log(){ echo "[$(ts)] $*"; }
 
-log "== kind cluster =="
-if ! kind get clusters | grep -qx "${CLUSTER}"; then
-  log "creating kind cluster ${CLUSTER}"
-  kind create cluster --name "${CLUSTER}" --image "${KIND_NODE_IMAGE}"
-else
-  log "kind cluster ${CLUSTER} already exists"
-fi
+CLUSTER_NAME="vpm-mini-kind"
+KIND_CONFIG="infra/kind-dev/kind-cluster.yaml"
+HELLO_MANIFEST="infra/k8s/overlays/dev/hello-ksvc.yaml"
+HELLO_NS="default"
 
-export KUBECONFIG="${HOME}/.kube/config"
+log(){
+  printf '[%s] %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*"
+}
 
-log "== Knative Serving ${KN_VERSION} =="
-if ! kubectl get ns knative-serving >/dev/null 2>&1; then
-  kubectl apply -f "https://github.com/knative/serving/releases/download/${KN_VERSION}/serving-crds.yaml"
-  kubectl apply -f "https://github.com/knative/serving/releases/download/${KN_VERSION}/serving-core.yaml"
-fi
+require_binary(){
+  if ! command -v "$1" >/dev/null 2>&1; then
+    log "ERROR: required command '$1' not found. Install it first." >&2
+    exit 1
+  fi
+}
 
-log "== Kourier ${KOURIER_VERSION} =="
-kubectl apply -f "https://github.com/knative/net-kourier/releases/download/${KOURIER_VERSION}/kourier.yaml"
+cluster_exists(){
+  kind get clusters 2>/dev/null | grep -qx "$CLUSTER_NAME"
+}
 
-log "== Configure ingress-class/domain =="
-kubectl patch configmap/config-network -n knative-serving --type merge -p '{"data":{"ingress.class":"kourier.ingress.networking.knative.dev"}}'
-kubectl apply -n knative-serving -f - <<EOF
-apiVersion: v1
-kind: ConfigMap
-metadata: {name: config-domain, namespace: knative-serving}
-data: {${DOMAIN}: ""}
-EOF
+create_cluster(){
+  log "Creating kind cluster '$CLUSTER_NAME' via $KIND_CONFIG"
+  kind create cluster --name "$CLUSTER_NAME" --config "$KIND_CONFIG"
+}
 
-log "== Wait for control-plane =="
-kubectl wait --for=condition=Available deploy --all -n knative-serving --timeout=300s
-kubectl wait --for=condition=Available deploy --all -n kourier-system  --timeout=300s
+ensure_cluster(){
+  if cluster_exists; then
+    log "Reusing existing kind cluster '$CLUSTER_NAME'"
+  else
+    create_cluster
+  fi
+  kubectl config use-context "kind-$CLUSTER_NAME"
+}
 
-OUT="${REPORT_DIR}/p2_boot_$(date +%Y%m%dT%H%M%S).md"
-{
-  echo "# P2-1 bootstrap ($(ts))"
-  echo "## knative-serving";  kubectl get pods -n knative-serving -o wide
-  echo; echo "## kourier-system"; kubectl get pods -n kourier-system -o wide
-  echo; echo "## services";       kubectl get svc  -n kourier-system -o wide
-} | tee "${OUT}"
-log "done. report=${OUT}"
+deploy_knative(){
+  log "TODO: install Knative Serving v1.18 (CRDs + core)"
+  # TODO: Knative CRD インストール
+  # Example placeholder:
+  # kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.18.0/serving-crds.yaml
+  log "TODO: install Knative core"
+  # TODO: Knative core インストール
+  log "TODO: install kourier as ingress"
+  # TODO: kourier インストール
+}
+
+apply_hello(){
+  if [ ! -f "$HELLO_MANIFEST" ]; then
+    log "ERROR: manifest $HELLO_MANIFEST not found" >&2
+    exit 1
+  fi
+  log "Applying hello-ksvc manifest"
+  kubectl apply -f "$HELLO_MANIFEST"
+  log "Waiting for ksvc/hello Ready"
+  kubectl -n "$HELLO_NS" wait ksvc hello --for=condition=Ready --timeout=300s
+  log "Dumping ksvc hello summary"
+  kubectl -n "$HELLO_NS" get ksvc hello -oyaml | sed -n '1,80p'
+}
+
+main(){
+  require_binary kind
+  require_binary kubectl
+  ensure_cluster
+  deploy_knative
+  apply_hello
+  log "Bootstrap complete"
+}
+
+main "$@"
