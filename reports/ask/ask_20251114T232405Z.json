@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "dev の KService(hello-ksvc) に追加した annotation が S5 の apply 経路で反映されるかを、一巡(適用→Ready確認→実体の注釈確認)で検証したい。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "上記のコマンドで dev 環境へ適用し、hello-ksvc と最新Revisionの annotations を確認します。実行して問題なければ進めてください。必要があれば namespace や CLI 名称の差異を指示ください。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
