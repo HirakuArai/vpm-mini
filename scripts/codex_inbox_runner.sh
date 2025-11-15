@@ -149,14 +149,18 @@ for jf in "$INBOX_DIR"/*.json; do
     done <<< "$ACTIONS"
   fi
 
-  # move to _done and push evidence
-  git mv -f "$jf" "$DONE_DIR/" || true
-  git add -A
-  git commit -m "runner(${RUN_MODE}): mark $jf processed; add evidence $outdir" || true
-  git push || true
+  # move to _done and push evidence (dry-only)
+  if [ "$RUN_MODE" = "exec" ]; then
+    mv -f "$jf" "$DONE_DIR/" || true
+  else
+    git mv -f "$jf" "$DONE_DIR/" || true
+    git add -A
+    git commit -m "runner(${RUN_MODE}): mark $jf processed; add evidence $outdir" || true
+    git push || true
+  fi
 
   # optional PR per run (best-effort)
-  if command -v gh >/dev/null 2>&1; then
+  if [ "$RUN_MODE" != "exec" ] && command -v gh >/dev/null 2>&1; then
     branch="runner/${RUN_MODE}-$id"
     git checkout -b "$branch" || git checkout "$branch"
     git add -A
@@ -167,5 +171,9 @@ for jf in "$INBOX_DIR"/*.json; do
     git reset --hard origin/main || true
   fi
 done
+
+if [ "$RUN_MODE" = "exec" ]; then
+  echo "[WARN] RUN_MODE=exec: main への自動 push は無効化中です。今回の evidence はローカル (reports/codex_runs/**) のみに保存されました。"
+fi
 
 exit 0
