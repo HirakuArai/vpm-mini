@@ -1,0 +1,20 @@
+{
+  "kind": "apply",
+  "source": "pr-direct-s5",
+  "approved": true,
+  "approver": "HirakuArai",
+  "scope": "infra/k8s/overlays/dev/hello-ksvc.yaml",
+  "pr_number": 716,
+  "note": "S5 dev apply: infra/k8s/overlays/dev/hello-ksvc.yaml (hello smoke 1)",
+  "actions": [
+    {
+      "type": "k8s-apply",
+      "path": "infra/k8s/overlays/dev/hello-ksvc.yaml",
+      "resource": {
+        "kind": "Service",
+        "name": "hello",
+        "namespace": "default"
+      }
+    }
+  ]
+}
