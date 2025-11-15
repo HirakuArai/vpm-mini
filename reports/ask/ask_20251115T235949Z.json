@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "SSOTサンプルは #723（ask-entry; understanding.C と context_header を含む）を u_contract の代表として採用。#731 は chatops-min 由来の極小サンプルのため keep_recent とし、より良い chatops-min サンプル出現時（M-2 後半〜M-3）に入れ替え再検討する。対象リポジトリは vpm-mini、ブランチは main、フェーズは Phase 2。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "方針を承認。main（Phase 2）で #723 を u_contract の SSOT サンプルとして確定し、#731 は keep_recent として保留・再検討を手配します。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
