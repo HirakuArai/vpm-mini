@@ -32,8 +32,15 @@
       "s5_apply": {
         "producer": "partial",
         "runner": "implemented",
-        "evidence_loop": "incomplete"
+        "evidence_loop": "done"
       }
+    },
+    "last_successful_s5_apply": {
+      "id": "hello_s5_apply_success_20251115",
+      "manifest": "infra/k8s/overlays/dev/hello-ksvc.yaml",
+      "reports_dir": "reports/codex_runs/apply_hello_dev_20251115T183901Z (SSOT evidence dir)",
+      "note": "Hello S5 apply success (kind vpm-mini, READY=True)",
+      "updated_at": "2025-11-15T00:00:00Z"
     },
     "open_issues": [
       "S5 apply JSON を main の codex/inbox に自動で載せる経路設計",
