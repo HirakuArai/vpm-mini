@@ -24,6 +24,13 @@
 
 Note: STATE に環境の最新状況を十分反映できていなかったため、危うく dev クラスタ削除判断に傾きかけたことを忘れずにおく。
 
+#### Goal-M2 / Hello S5 成功ルート Evidence
+
+- kind `vpm-mini`（context: `kind-vpm-mini`）上の Knative Service `hello` は READY=True を維持している。hello / metrics-echo も同様に READY=True。
+- `codex/inbox/apply_hello_dev_20251115T183901Z.json` を Runner(exec) で処理し、`reports/codex_runs/apply_hello_dev_20251115T183901Z/{run.log, apply.log, after.yaml}` を生成。
+- `apply.log` 上では `kubectl diff/apply/get` がすべて `exit 0` で終了し、`kubectl -n default get ksvc hello` でも READY=True を確認。
+- この run を「Hello S5 成功ルートの SSOT Evidence」として扱い、Phase 2 Goal-M2 の技術的達成を記録した。
+
 ### PR と SSOT の扱いルール
 
 - まず、「この PR の変更内容は SSOT（main に残すべき情報）かどうか」で判断する。
