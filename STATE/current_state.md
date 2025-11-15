@@ -23,3 +23,21 @@
   - S5 apply 経由で hello-ksvc を更新 → READY=True を Evidence 付きで確認
 
 Note: STATE に環境の最新状況を十分反映できていなかったため、危うく dev クラスタ削除判断に傾きかけたことを忘れずにおく。
+
+### PR と SSOT の扱いルール
+
+- まず、「この PR の変更内容は SSOT（main に残すべき情報）かどうか」で判断する。
+  - コード／インフラ（scripts/**, infra/**, .github/**）
+  - ドキュメント／STATE／定義（STATE/**, docs/**, data/**）
+  - 将来も参照したい公式な Evidence（reports/** や codex/inbox/** のうち意味のあるもの）
+    は SSOT として main に残す。
+  - 一時的な実験や ad-hoc なログなど、今後の判断に使わないものは非SSOTとして扱い、役目が終わったら Close でよい。
+
+- SSOT な PR（本流）は、必ず「merge」または「Close＋理由コメント」で決着させる。
+  - 「Open PR = まだ決着していない議題のリスト」という前提を維持する。
+
+- 実験／デバッグ PR は、結果が本流PRや STATE／ドキュメントに反映された時点で Close するのが基本で、merge されないのが通常。
+  - 学びがあれば SSOT 側（STATE や docs、定義ファイルなど）に昇格させる。
+
+- 異常／要調査 PR は、その場で「捨てる（非SSOTとして Close）／修正して反映（SSOTとして別PRへ）／保留」の扱いを決める。
+  - 保留にする場合は、必ず「なぜ保留か」を PR コメントなどに明記して Open のまま残す。
