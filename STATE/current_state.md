@@ -30,6 +30,7 @@ Note: STATE に環境の最新状況を十分反映できていなかったた�
 - `codex/inbox/apply_hello_dev_20251115T183901Z.json` を Runner(exec) で処理し、`reports/codex_runs/apply_hello_dev_20251115T183901Z/{run.log, apply.log, after.yaml}` を生成。
 - `apply.log` 上では `kubectl diff/apply/get` がすべて `exit 0` で終了し、`kubectl -n default get ksvc hello` でも READY=True を確認。
 - この run を「Hello S5 成功ルートの SSOT Evidence」として扱い、Phase 2 Goal-M2 の技術的達成を記録した。
+- 2025-11-15: Hello S5 の S5 apply 成功 run (apply_hello_dev_20251115T183901Z) が STATE と vpm_memory_min.json の双方で整合していることを M-2 開始時点で再確認。
 
 ### PR と SSOT の扱いルール
 
