@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "このPRは「Hello S5 の apply パスの e2e スモーク（dev-only）」用途で、main に残す必要のない変更。apply_hello_dev_20251115T183901Z を本命ルートとして STATE/reports/メモリに記録済みのため、dev 専用の annotation/ask トリガを main に置かない方針。よって、本PRは実験完了として Close する。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "上記の方針でコメントを残し、PRをCloseします。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
