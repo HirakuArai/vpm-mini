@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "You want to close this item as non-SSOT (ephemeral) evidence/experiment in vpm-mini/main (Phase 2). The learnings have already been applied to the SSOT (code/state), so we will annotate and close the tracking issue, optionally label it, and archive/remove the ephemeral artifacts with a trace back to the applied change.",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "Acknowledged. The item will be closed as non-SSOT (ephemeral) with a trace to the applied SSOT changes. Provide ISSUE_NUMBER and PATH_TO_EXPERIMENT_OR_EVIDENCE_DIR (and optional PR/commit SHA) to finalize."
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
