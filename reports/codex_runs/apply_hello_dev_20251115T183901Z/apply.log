@@ -1,0 +1,67 @@
+[APPLY] manifest=infra/k8s/overlays/dev/hello-ksvc.yaml
+[APPLY] kubectl diff -f infra/k8s/overlays/dev/hello-ksvc.yaml
+Warning: Kubernetes default value is insecure, Knative may default this to secure in a future release: spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation, spec.template.spec.containers[0].securityContext.capabilities, spec.template.spec.containers[0].securityContext.runAsNonRoot, spec.template.spec.containers[0].securityContext.seccompProfile
+[INFO] diff exited 0
+[APPLY] kubectl apply -f infra/k8s/overlays/dev/hello-ksvc.yaml
+Warning: Kubernetes default value is insecure, Knative may default this to secure in a future release: spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation, spec.template.spec.containers[0].securityContext.capabilities, spec.template.spec.containers[0].securityContext.runAsNonRoot, spec.template.spec.containers[0].securityContext.seccompProfile
+service.serving.knative.dev/hello configured
+[INFO] apply exited 0
+[APPLY] kubectl get ksvc hello -n default -o yaml
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"serving.knative.dev/v1","kind":"Service","metadata":{"annotations":{},"name":"hello","namespace":"default"},"spec":{"template":{"spec":{"containers":[{"env":[{"name":"TARGET","value":"World"}],"image":"gcr.io/knative-samples/helloworld-go"}]}}}}
+    serving.knative.dev/creator: kubernetes-admin
+    serving.knative.dev/lastModifier: kubernetes-admin
+  creationTimestamp: "2025-11-09T20:34:03Z"
+  generation: 2
+  name: hello
+  namespace: default
+  resourceVersion: "466195"
+  uid: d7bc81eb-d4bc-4a4b-82fe-17d55688633f
+spec:
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      containerConcurrency: 0
+      containers:
+      - env:
+        - name: TARGET
+          value: World
+        image: gcr.io/knative-samples/helloworld-go
+        name: user-container
+        readinessProbe:
+          successThreshold: 1
+          tcpSocket:
+            port: 0
+        resources: {}
+      enableServiceLinks: false
+      timeoutSeconds: 300
+  traffic:
+  - latestRevision: true
+    percent: 100
+status:
+  address:
+    url: http://hello.default.svc.cluster.local
+  conditions:
+  - lastTransitionTime: "2025-11-11T17:52:07Z"
+    status: "True"
+    type: ConfigurationsReady
+  - lastTransitionTime: "2025-11-11T17:52:11Z"
+    status: "True"
+    type: Ready
+  - lastTransitionTime: "2025-11-11T17:52:11Z"
+    status: "True"
+    type: RoutesReady
+  latestCreatedRevisionName: hello-00002
+  latestReadyRevisionName: hello-00002
+  observedGeneration: 2
+  traffic:
+  - latestRevision: true
+    percent: 100
+    revisionName: hello-00002
+  url: http://hello.default.127.0.0.1.nip.io
+[INFO] captured state via ksvc
