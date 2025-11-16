@@ -63,10 +63,11 @@ jobs:
 
       - name: Build prompt
         shell: bash
+        env:
+          ISSUE_BODY: ${{ github.event_name == 'issue_comment' && github.event.comment.body || github.event.issue.body }}
         run: |
           set -euo pipefail
           mkdir -p out reports/ask
-          ISSUE_BODY="${{ github.event_name == 'issue_comment' && github.event.comment.body || github.event.issue.body }}"
           printf '%s\n' "$(cat tools/prompts/llm_relay_system.md)" > out/sys.txt
           printf 'context_header: repo=vpm-mini / branch=main / phase=Phase 2\n' > out/ctx.txt
           printf 'QUESTION\n%s\n' "$(echo "$ISSUE_BODY")" >> out/ctx.txt
