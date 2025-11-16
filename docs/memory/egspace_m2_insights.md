@@ -106,3 +106,9 @@ M2 の実験を通じて、以下のような「最低限の解像度ライン�
 ことが確認できた。
 
 今後、プロジェクト特性（内容やスケール）に応じて CONTEXT_JSON と North Star の解像度は調整し続ける必要があるが、本メモのラインは「M2 時点の実証済みな初期値」として再利用できる。
+
+## M2 / u_contract persist-report lane (2025-11-16)
+
+- `u_contract_policy v1` の `persist-report` カテゴリを、実 PR #742 / #737 / #684 で検証。
+- Codex がラベル `u_contract:persist-report` とコメントを付与し、人間側で `reports/**` のみ変更＋CI Green を確認したうえで 3 本ともマージ。
+- この条件（`reports/**` のみ＋CI Green）であれば、M2 フェーズでは「Codex による整理 → 人間の 1 クリック運用」で回せることを確認した。
