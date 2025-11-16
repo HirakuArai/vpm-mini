@@ -34,18 +34,32 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Detect mode
+        shell: sh
+        env:
+          GITHUB_EVENT_COMMENT_BODY: ${{ github.event.comment.body || github.event.issue.body || '' }}
         run: |
-          set -euo pipefail
-          BODY="${{ github.event.comment.body || github.event.issue.body || '' }}"
-          HEAD_LINE=$(printf '%s\n' "$BODY" | head -n1 | xargs)
+          set -eu
 
-          MODE="u_contract"
+          BODY="${GITHUB_EVENT_COMMENT_BODY:-}"
+
+          # 1 行目だけ取り出して前後の空白を削る
+          HEAD_LINE=$(printf '%s\n' "$BODY" | head -n1 | xargs || true)
+
+          ASK_MODE="u_contract"
+
           case "$HEAD_LINE" in
-            "/ask update_north_star"*) MODE="update_north_star" ;;
-            "/ask pr_groomer_suggest"*) MODE="pr_groomer_suggest" ;;
+            "/ask update_north_star"*)
+              ASK_MODE="update_north_star"
+              ;;
+            "/ask pr_groomer_suggest"*)
+              ASK_MODE="pr_groomer_suggest"
+              ;;
+            *)
+              ASK_MODE="u_contract"
+              ;;
           esac
 
-          echo "ASK_MODE=${MODE}" >> "$GITHUB_ENV"
+          echo "ASK_MODE=$ASK_MODE" >> "$GITHUB_ENV"
 
       - name: Build prompt
         run: |
