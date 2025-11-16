@@ -149,8 +149,8 @@ jobs:
           BODY="$(printf '%s\n%s\n%s\n' '```json' "$(cat out/u_contract.json)" '```')"
           gh api "repos/${REPO}/issues/${ISSUE_NUMBER}/comments" -f body="$BODY"
 
-      - name: Open Save-PR (always)
-        if: always()
+      - name: Open Save-PR (u_contract only)
+        if: ${{ env.ASK_MODE == 'u_contract' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
