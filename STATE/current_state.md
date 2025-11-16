@@ -50,3 +50,9 @@ Note: STATE に環境の最新状況を十分反映できていなかったた�
 
 - 異常／要調査 PR は、その場で「捨てる（非SSOTとして Close）／修正して反映（SSOTとして別PRへ）／保留」の扱いを決める。
   - 保留にする場合は、必ず「なぜ保留か」を PR コメントなどに明記して Open のまま残す。
+
+## Phase 2 / M2 snapshot (North Star & u_contract)
+
+- M2-1: Hello S5 向け /ask update_north_star ループを確立（CONTEXT_JSON → JSON patch → 人間の採用判断 → PR #754 → STATE / memory / egspace の4層を同期）。
+- M2-2: u_contract `persist-report` レーンを policy v1 + Codex ラベル付与 + 人間の 1クリックマージ（PR #742 / #737 / #684）で検証し、`reports/**` のみ変更 + CI Green であれば M2 半自動レーンとして運用可能なことを確認。
+- M2-3: metrics-echo 向け /ask update_north_star（Issue #764）を実行したが、現状の Evidence（手動 ready-check テキスト）では JSON patch は出ず plan / warnings のみ。North Star への反映は、監視設計と Evidence 形式の整理後に後続フェーズで再チャレンジする方針とした。
