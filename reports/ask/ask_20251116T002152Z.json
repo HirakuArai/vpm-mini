@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "reports/配下の変更のみだと Required チェックが起動せず、ブランチ保護により #723 をマージできない。解決には「reports/のみでも必ず1つの Required チェックを発火・成功させる仕組み」を作るか、サンプルを別経路で main に取り込む必要がある。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "Option A（集約 Required ゲート）を採用して進めてもよいですか？既存の build/test の実行内容が別ワークフローに分かれている場合は、それらをこのワークフローに移すか、必要な結果をこの required ジョブで検証する形に合わせます。要望があれば YAML をリポジトリ構成に合わせて具体化します。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
