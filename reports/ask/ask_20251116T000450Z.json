@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "本PRを、ask-entry 経路の代表 u_contract サンプルとして採用し、u_contract ポリシー（docs/memory/u_contract_policy.md, #739）および Task-M2 (#738) に準拠、Phase 2 の方針（ephemeral evidence を non-SSOTとして閉じる契約）とも整合しているため、内容変更なしで main にマージします。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "採用・マージ方針を承認しました。上記の手順で進めます。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
