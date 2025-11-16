@@ -33,6 +33,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Detect mode
+        run: |
+          set -euo pipefail
+          BODY="${{ github.event.comment.body || github.event.issue.body || '' }}"
+          HEAD_LINE=$(printf '%s\n' "$BODY" | head -n1 | xargs)
+
+          MODE="u_contract"
+          case "$HEAD_LINE" in
+            "/ask update_north_star"*) MODE="update_north_star" ;;
+            "/ask pr_groomer_suggest"*) MODE="pr_groomer_suggest" ;;
+          esac
+
+          echo "ASK_MODE=${MODE}" >> "$GITHUB_ENV"
+
       - name: Build prompt
         run: |
           set -euo pipefail
@@ -121,8 +135,8 @@ jobs:
           BODY="$(printf '%s\n%s\n%s\n' '```json' "$(cat out/u_contract.json)" '```')"
           gh api "repos/${REPO}/issues/${ISSUE_NUMBER}/comments" -f body="$BODY"
 
-      - name: Open Save-PR (always)
-        if: always()
+      - name: Open Save-PR (u_contract only)
+        if: ${{ env.ASK_MODE == 'u_contract' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
