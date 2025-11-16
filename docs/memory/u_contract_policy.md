@@ -1,146 +1,227 @@
 
-u_contract 永続化ポリシー（M-phase v0 ドラフト）
-1. 背景
+u_contract_policy v1（M2: ルール運用 → 半自動）
+1. 目的
 
-ask-entry からの /ask 実行時に、LLM への入力と出力の「契約」を JSON として残す仕組みがある。
+u_contract 系 PR（「理解の契約」のサンプルやレポート永続化など）が増えた際に、
 
-その一部として、ask: persist u_contract (...) というタイトルの PR が自動生成され、reports/ask/ask_*.json のようなファイルを main に永続化しようとしている。
+どの PR を 自動マージしてよいか
 
-現状、これらの PR が多数 Open のまま残っており、どこまでを SSOT として扱うかの方針が決まっていない。
+どの PR は 人間がレビューすべきか
 
-関連 Issue:
+どの PR は クローズ / アーカイブしてよいか
 
-Task-M2: u_contract 永続化ポリシー & PR 整理 (#738)
+を、一貫したルールで判断できるようにする。
 
-Ask: PR Groomer (M-phase) (#733) — u_contract 系 PR 群は category: needs-triage として一旦「要方針決定」に寄せた。
+本ポリシーは M2（ルール運用 → 半自動）フェーズを前提とし、
 
-2. u_contract の役割（整理）
+/ask pr_groomer_suggest
 
-u_contract は、LLM に投げる「入力」「期待する出力」「前提条件」などをまとめた 契約オブジェクト。
+/ask update_north_star
 
-主な目的は次の通り：
+Codex（devbox）
 
-/ask の挙動を後から再現できるようにする（再実行・デバッグ用）。
+と組み合わせて運用されることを想定している。
 
-「このタイミングで何を聞き、何を期待していたか」を Evidence として残す。
+2. 適用スコープ
 
-将来的には Guard / Swarm 側で「契約違反」を検知する材料になる。
+対象リポジトリ: HirakuArai/vpm-mini
 
-したがって、
+対象 PR:
 
-すべて の u_contract を無期限に main に残す必要はないが、
+タイトル・ラベル・パスなどから 「u_contract 系」と判定できる PR
 
-ある程度の範囲は 再現性と監査性のために残しておきたい。
+例:
 
-3. 要件（M-phase 時点での整理）
+タイトルに u_contract を含む
 
-M-phase で満たしたい要件を、いったん v0 として言語化する。
+ラベルに u_contract / u-contract などが付与されている
 
-再現性
+変更ファイルに docs/contract/ / docs/memory/*u_contract* などを含む
 
-直近の /ask 実行については、「どんな契約で投げたか」を後から見返せるようにしたい。
+対象モード:
 
-少なくとも「問題になった / 重要な」run については、契約をたどれること。
+/ask の ASK_MODE が u_contract 系のとき
 
-ノイズ抑制
+/ask pr_groomer_suggest のコンテキストに含まれる PR のうち、u_contract 系と判定されたもの
 
-main ブランチ上で、意味のない JSON ファイルが無限に増えていく状態は避けたい。
+3. カテゴリ定義（v1）
 
-PR 一覧も「契約 PR だらけ」にならないようにしたい。
+u_contract 系 PR を、まずは次の 3〜4 カテゴリに分類する。
 
-整理しやすさ
+3-1. persist-report（レポート永続化）
 
-将来 M-3 以降で、契約の集約やアーカイブを自動化できる余地を残しておく。
+意味:
 
-4. ポリシー v0（案）
+bot / Codex が生成したレポート（例: Evidence, cost sweep, run summary など）を
+reports/** 以下に永続化するだけの PR。
 
-※ 本セクションはドラフト。数値や閾値は今後調整する前提。
+典型的なシグナル:
 
-4.1 スコープ
+変更ファイルが reports/ 以下に限定されている。
 
-対象とする PR:
+コード・設定ファイル・STATE は変更しない。
 
-タイトルが ask: persist u_contract ... で始まる PR。
+PR 本文に「auto-generated」「persist report」などの文言がある。
 
-中身として、reports/ask/ask_*.json 等の u_contract JSON ファイルのみ追加・更新しているもの。
+デフォルトアクション（v1）:
 
-4.2 SSOT として残す範囲（v0 方針）
+🔄 CI Green なら auto-merge してよい候補。
 
-SSOT としては 「契約の型」と「代表的なサンプル」 が重要であり、すべての個別 run を同じ重みで残す必要はない。
+前提条件:
 
-v0 では次のように考える：
+CI Green（lint / tests / guards がすべて通っている）。
 
-「代表サンプル」として残すもの
+reports/ 以外に変更がないことを確認。
 
-特定のパイプ（例: ask-entry / PR-direct / Memory など）について、
+/ask 連携の想定:
 
-代表的な 1〜数本の u_contract を SSOT として残す。
+/ask pr_groomer_suggest が kind: persist-report などと判定した場合、
+このカテゴリにマップする。
 
-これらは docs/ からリンクするなどして「参照すべきサンプル」と位置づける。
+将来的には auto-merge ラベル付与 → auto-merge 有効化まで自動化する余地あり。
 
-「履歴」として残すもの
+3-2. sample-candidate（サンプル候補）
 
-直近 N 日分、または直近 N 本分の u_contract は、reports/ask/ 配下に JSON として残してよい。
+意味:
 
-ただし、この範囲は今後 M-3 で「ローテーション（古いものをアーカイブへ移動）」する前提。
+/ask 用の 代表サンプル / 教師データ候補 を追加・修正する PR。
 
-それ以外
+典型的なシグナル:
 
-それ以外の古い u_contract は、必要であれば別ブランチや外部ストレージにアーカイブする。
+docs/ や data/ 以下にサンプル JSON / Markdown / spec を追加している。
 
-main からは削除 / ローテーションしてもよい。
+PR 本文で「サンプル」「例」「template」などの文言がある。
 
-（N の具体値やアーカイブ先は、M-2 後半〜M-3 で決定する。）
+コードそのものよりも「ケース定義」「期待される入出力」の記述が中心。
 
-4.3 PR の扱い（v0）
+デフォルトアクション（v1）:
 
-ask: persist u_contract ... PR については、次のいずれかに分類する。
+👀 必ず人間がレビューする。auto-merge しない。
 
-SSOT サンプルとして残す PR
+理由:
 
-「この契約は今後も参照したい」という run が含まれている場合。
+サンプルは LLM の振る舞いに直接影響するため、
+意図と表現のズレを人間がチェックしたい。
 
-対応する JSON を SSOT として残す前提で、PR を merge する。
+/ask 連携の想定:
 
-通常履歴として残す PR
+/ask pr_groomer_suggest が kind: sample-candidate と判定した場合、
+このカテゴリにマップする。
 
-直近の run であり、N の範囲内の履歴として許容できる場合。
+レビュー完了後に sample-approved ラベルを付ける運用などを検討。
 
-JSON を残したいなら merge、不要なら別手段で JSON をアーカイブしてから Close。
+3-3. sample-archive（サンプル整理・アーカイブ）
 
-整理対象の PR
+意味:
 
-古い / 重複している / 代表サンプルとしても不要な場合。
+古いサンプルを整理・統合・アーカイブする PR。
 
-PR 上に「どこにアーカイブしたか」をコメントしてから Close する。
+典型的なシグナル:
 
-M-2 の間は、上記の分類と判断を 人間＋PR グルーマー で行い、
-将来的に M-3 で自動化（定期スイープ）を検討する。
+古いサンプルファイルの削除・移動が中心。
 
-5. 今後のステップ（M-2 → M-3）
+PR 本文で「archive」「cleanup」「obsolete」などの文言がある。
 
-M-2-α:
+デフォルトアクション（v1）:
 
-Open な u_contract 系 PR（#731, #723, #722, ...）を上記ポリシー v0 で分類する。
+👀 軽めの人間レビューを行う（レビューは必要だが、優先度は中程度）。
 
-代表サンプル候補の PR を数本選び、merge or 別の SSOT ファイルに統合する。
+LLM の参照範囲からサンプルが消える可能性があるため、
+一応の確認を通す。
 
-M-2-β:
+/ask 連携の想定:
 
-「直近 N 本を残す」など、暫定的な閾値を決めて、古い PR に対して Close or アーカイブを実施する。
+/ask pr_groomer_suggest が kind: sample-archive と判定した場合、
+このカテゴリにマップする。
 
-M-3:
+3-4. stale-or-obsolete（陳腐化・無効化候補）
 
-ask-entry のパイプラインを拡張し、
+意味:
 
-一定期間を過ぎた u_contract を自動でアーカイブ／削除する仕組みを検討する。
+すでに別の PR で代替されている、あるいはコンテキスト的に不要となった
+u_contract 系 PR。
 
-PR グルーマー（/ask pr_groomer_suggest）に u_contract 用のロジックを統合し、定期的な整理を自動化する。
+典型的なシグナル:
 
-6. このドキュメントの位置づけ
+長期間更新されていない（例: 3ヶ月以上 open）。
 
-本ドキュメントは M-phase における u_contract 永続化ポリシーのドラフト。
+似た内容の PR がすでに merge 済み。
 
-最終的な閾値や具体的な運用フローは、Task-M2 (#738) の議論と実験結果に基づいて更新する。
+Issue 側で「方針変更」「別Issueに統合」などが宣言されている。
 
-重要な変更があれば、STATE/current_state.md 側にも要点を反映する。
+デフォルトアクション（v1）:
+
+🧹 close / superseded としてクローズする候補。
+
+クローズ時には、コメントで:
+
+なぜクローズするか
+
+代替 PR / Issue がある場合はそのリンク
+を明記する。
+
+/ask 連携の想定:
+
+/ask pr_groomer_suggest が kind: stale / kind: superseded などと判定した場合、
+このカテゴリにマップする。
+
+4. 決定マトリクス（v1）
+
+u_contract 系 PR の扱いを、カテゴリ別にまとめる。
+
+category	典型シグナル	default action (v1)	/ask pr_groomer_suggest との対応
+persist-report	reports/** のみ変更、bot 生成レポート	CI Green なら auto-merge してよい	kind: persist-report → auto-merge 候補
+sample-candidate	サンプル / 教師データの追加・修正	必ず人間がレビュー（auto-merge しない）	kind: sample-candidate → review 必須
+sample-archive	古いサンプルの削除・統合	軽めのレビュー後に merge / close	kind: sample-archive → review 中〜低
+stale-or-obsolete	長期放置、代替 PR 済み、方針変更など	コメントを残して close / superseded	kind: stale / kind: superseded → close 候補
+5. 運用フロー（M2 時点）
+
+M2 フェーズでは、完全自動ではなく **「人間＋/ask＋Codex の半自動」**で運用する。
+
+PR グルーミング
+
+u_contract 系 PR をバッチで選び、/ask pr_groomer_suggest を実行。
+
+返ってきた JSON の kind / priority から、上記カテゴリにマップする。
+
+人間の判断（匙加減）
+
+各 PR について、上記ポリシーと実際の内容を見比べて、
+
+auto-merge する
+
+review に回す
+
+close する
+
+のいずれかを決定する。
+
+グレーゾーンが多い場合は、ポリシーの方を後で更新する。
+
+Codex による実行
+
+決定したアクションを Codex 実行に落とし込む（例: ラベル付与、merge、close コメントなど）。
+
+メモリ / EG-Space へのフィードバック
+
+大きな方針変更や例外ケースがあれば、
+
+docs/memory/u_contract_policy.md の更新
+
+docs/memory/egspace_m2_insights.md への追記
+
+を行う。
+
+6. 今後の拡張余地（v2 以降）
+
+/ask pr_groomer_suggest の JSON スキーマ拡張
+
+confidence / risk / needs_human_review フラグなどを追加。
+
+auto-merge のガード強化
+
+Self-Cost / Evidence Footers との連携。
+
+フェーズ進行に応じたカテゴリの細分化
+
+例: sample-candidate を「spec-based」と「log-based」に分ける など。
