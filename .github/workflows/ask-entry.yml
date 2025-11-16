@@ -62,6 +62,7 @@ jobs:
           echo "ASK_MODE=$ASK_MODE" >> "$GITHUB_ENV"
 
       - name: Build prompt
+        shell: bash
         run: |
           set -euo pipefail
           mkdir -p out reports/ask
