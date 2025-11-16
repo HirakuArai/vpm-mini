@@ -112,3 +112,7 @@ M2 の実験を通じて、以下のような「最低限の解像度ライン�
 - `u_contract_policy v1` の `persist-report` カテゴリを、実 PR #742 / #737 / #684 で検証。
 - Codex がラベル `u_contract:persist-report` とコメントを付与し、人間側で `reports/**` のみ変更＋CI Green を確認したうえで 3 本ともマージ。
 - この条件（`reports/**` のみ＋CI Green）であれば、M2 フェーズでは「Codex による整理 → 人間の 1 クリック運用」で回せることを確認した。
+
+## M2 / metrics-echo follow-up (plan-only /ask)
+
+- metrics-echo は Phase 2 / M2 で手動 Evidence に基づく `/ask update_north_star` を実行したが、state_patch/memory_patch は出ず plan-only で終了。監視設計と Evidence 形式を Phase 3 以降の宿題とし、詳細設計を `docs/memory/metrics_echo_design.md` にまとめた。
