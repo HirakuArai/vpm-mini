@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "You opened READY snapshot PR #778 that adds the first READY-side evidence for metrics-echo P3-2 at reports/metrics-echo/metrics_echo_ready_status_p3-2.md. I will review the PR contents, verify the file path and naming, check for consistency with the repository’s phase conventions, and run basic validations.",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "Acknowledged. I will perform the PR review and validation as outlined, verify the P3-2 evidence file, and confirm consistency with Phase 2 context before recommending merge."
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
