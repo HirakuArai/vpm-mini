@@ -225,3 +225,98 @@ Self-Cost / Evidence Footers との連携。
 フェーズ進行に応じたカテゴリの細分化
 
 例: sample-candidate を「spec-based」と「log-based」に分ける など。
+
+P3-3 persist-report セル MVP設計（Draft）
+
+本セクションでは、reports/** に蓄積される Evidence PR を、/ask + u_contract で
+「啓が見なくていいPR」と「啓が見るべきPR」に分けるための最小ポリシーを定義する。
+
+1. 対象
+
+対象PRは以下を満たすものとする：
+
+変更ファイルがすべて reports/ 以下
+
+CI が Green
+
+ラベルに persist-report（または u:persist-report）が付与されている
+
+2. /ask persist_report_mvp（役割）
+
+PR のメタ情報 + 変更ファイル一覧 + レポート本文の一部を CONTEXT_JSON として渡し、
+以下を JSON で返すことを期待する：
+
+summary: レポートの短い要約
+
+tags: 種類や重要度を表すラベルの配列
+
+action.suggested: "AUTO_MERGE_OK" | "REVIEW_REQUIRED" | "ARCHIVE_CANDIDATE"
+
+risk_level: "LOW" | "MEDIUM" | "HIGH"
+
+notes_for_humans: 人間が判断する際の補足メモ
+
+/ask のプロンプトでは、「啓の余白を増やす」観点を明示する：
+
+啓が見なくても安全なPRはできるだけ AUTO_MERGE_OK を提案する
+
+啓が見たほうがよいPRだけ REVIEW_REQUIRED に寄せる
+
+3. u_contract persist-report（MVPポリシー）
+
+u_contract 側では /ask の JSON を受け取り、次のように最終 decision を決める：
+
+AUTO_MERGE_OK
+
+条件：
+
+変更ファイルが reports/ 以下のみ
+
+CI Green
+
+/ask.action.suggested == "AUTO_MERGE_OK"
+
+/ask.risk_level == "LOW"
+
+意味：啓がレビューしなくてもよいと判断されるレポート。将来的には自動マージ候補。
+
+REVIEW_REQUIRED
+
+条件：
+
+/ask.action.suggested == "REVIEW_REQUIRED" または
+
+/ask.risk_level が "MEDIUM" 以上 または
+
+/ask の JSON が取得できない／パースに失敗する など
+
+意味：啓が一度目を通してから判断すべきPR。
+
+ARCHIVE_CANDIDATE
+
+条件：
+
+PRタイトルやラベル、/ask.tags に archive/stale/old-report 等のシグナルが含まれる
+
+かつ /ask.action.suggested == "ARCHIVE_CANDIDATE"
+
+意味：後でまとめてアーカイブ判定を行う候補。MVPでは実際のアーカイブは行わない。
+
+u_contract の出力例：
+
+decision: 上記3値のいずれか
+
+reason: 判定理由（1〜2行）
+
+notes: 人間が見るべきポイント（任意）
+
+4. Round 1 の運用方針
+
+P3-3 Round 1 では、reports/** を変更するPRを1本だけ選び、
+/ask persist_report_mvp + u_contract persist-report を手動トリガーで実行する。
+
+この段階では自動マージは行わず、「判定結果をレポートとして残す」ことをゴールとする。
+
+判定結果は、例えば reports/persist-report/ 以下に JSON or Markdown として保存する。
+
+STATE/current_state.md には、「P3-3 persist-report MVP Round 1 を実施し、判定結果を Evidence として保存した」旨を1行で追記する。
