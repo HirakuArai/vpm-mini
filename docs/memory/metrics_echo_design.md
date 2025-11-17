@@ -124,3 +124,32 @@ Phase 4 以降:
   - 必要なら North Star と STATE / EG-Space を更新する。
 
 このメモ自体は、Phase 3 の途中で更新・拡張されることを前提としたドラフトである。
+
+---
+
+## P3-2 SLI minimal design (Draft)
+
+- 対象期間（暫定）:
+  - 直近 60 分程度を想定（初回は「last 60 minutes」を目安とする）。
+- 指標（最小セット）:
+  - HTTP 成功率:
+    - 2xx / 全リクエスト数（0〜100%）
+  - リクエスト総数:
+    - 対象期間中の全リクエスト数
+  - エラー数:
+    - 対象期間中のエラー（例: 5xx）件数
+
+- Evidence ファイル案:
+  - パス: `reports/metrics-echo/metrics_echo_sli_p3-2.md`
+  - 内容イメージ:
+    - 取得時刻（例: ISO8601 / ローカル時刻）
+    - 対象期間（例: "last 60 minutes"）
+    - 成功率 [%]
+    - リクエスト数（total）
+    - エラー数（error count）
+
+- 備考:
+  - P3-2 では、まずは「READY + この最小 SLI」を Evidence として揃えたうえで、
+    `/ask update_north_star` の再実行を行う。
+  - SLI の定義や対象期間は、Phase 3 の運用状況を見ながら
+    Phase 4 以降で SLO 設計に昇格させることを想定している。
