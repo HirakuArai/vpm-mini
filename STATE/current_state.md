@@ -63,3 +63,23 @@ Note: STATE に環境の最新状況を十分反映できていなかったた�
 
 - **実行主体のエージェント化**
   - ソース改修やインフラ操作のデフォルト実行主体を、ローカル Mac Codex から LLMリレー / VM Codex を含むエージェントレーンへ移行し、人間による直接編集は「緊急 Hotfix 時の例外」として扱う。
+
+---
+
+### Phase 3 / P3-2 metrics-echo (first /ask retry, summary)
+
+- READY Evidence:
+  - PR #778 (`reports/metrics-echo/metrics_echo_ready_status_p3-2.md`) に、
+    `kubectl -n default get ksvc metrics-echo -o yaml` のスナップショットを保存済み。
+- SLI Evidence:
+  - PR #783 (`reports/metrics-echo/metrics_echo_sli_p3-2.md`) に、
+    devbox から metrics-echo の status.url へ HTTP リクエストを 20 回投げた結果を保存。
+  - 現時点ではすべて HTTP 000（接続失敗）となり、SUCCESS_RATE=0% という測定結果になった。
+- /ask update_north_star (Issue #774):
+  - READY と devbox からの到達性が食い違っている「証拠の不一致」として解釈され、
+    結果は plan-only（state_patch / memory_patch なし）。
+  - 追加の Evidence（クラスタ内からの probe、ログ、マルチ vantage SLI 等）を集めてから、
+    後続フェーズで North Star の扱いを再検討する方針とした。
+- 現段階での扱い:
+  - metrics-echo は、Phase 3 P3-2 の時点では North Star を固定せず、
+    READY / SLI Evidence を揃えたうえで「要追加 Evidence の監視セル」として棚上げする。
