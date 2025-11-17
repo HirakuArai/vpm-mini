@@ -88,3 +88,7 @@ Note: STATE に環境の最新状況を十分反映できていなかったた�
 docs/overview/vpm_mini_project_vision.md に明文化し、
 「属人タスクの外在化」と「本人にしか向き合えない領域のための余白づくり」を
 プロジェクトの中心目的として SSOT に刻印した。（Draft）
+
+- Phase 3 / P3-3 persist-report: Round 1 として PR #787 を対象に
+  /ask persist_report_mvp + u_contract persist-report を手動実行し、
+  判定結果を reports/persist-report/persist_report_result_pr787.{json,md} として Evidence 化した。
