@@ -1,0 +1,35 @@
+{
+  "pr_number": 787,
+  "pr_title": "ask: persist u_contract (reports/ask/ask_2025-11-17T0238.json)",
+  "pr_url": "https://github.com/HirakuArai/vpm-mini/pull/787",
+  "summary": "2025-11-17T02:38 に実行された /ask の結果（u_contract 関連）の JSON ログを、reports/ask/ 配下に保存するための Evidence PR。アプリケーションコードには変更を加えず、LLM 実行結果の記録のみを行っている。",
+  "tags": [
+    "ask-run",
+    "u_contract",
+    "persist-report",
+    "logs",
+    "reports-only",
+    "p3-3"
+  ],
+  "action": {
+    "suggested": "AUTO_MERGE_OK",
+    "confidence": 0.9,
+    "reasons": [
+      "変更ファイルが reports/ask/ 以下の JSON レポートのみであり、アプリケーションコードや設定値には影響しない。",
+      "内容は過去に実行された /ask の結果を残す Evidence であり、この PR をマージすることによる実行時リスクは極めて低い。"
+    ]
+  },
+  "risk_level": "LOW",
+  "notes_for_humans": [
+    "この PR は、/ask 実行ログ（u_contract 関連）の永続化であり、本番挙動やインフラ構成には影響しないタイプの変更です。",
+    "今後の persist-report セル設計では、この種の『reports/** のみを変更する Evidence PR』を優先的に AUTO_MERGE_OK に寄せていく想定です。"
+  ],
+  "u_contract": {
+    "decision": "AUTO_MERGE_OK",
+    "reason": "変更ファイルが reports/ask/ 以下の JSON レポートのみであり、/ask persist_report_mvp が AUTO_MERGE_OK かつ risk_level=LOW と判定しているため。アプリケーションコードや本番挙動への影響はなく、Evidence の追加として安全にマージ可能と判断した。",
+    "notes": [
+      "この種の reports-only / ask-run レポートは、今後も persist-report セルの AUTO_MERGE_OK の代表的なパターンになる想定。",
+      "Round 1 では自動マージせず、decision を Evidence として残すところまでをゴールとする。"
+    ]
+  }
+}
