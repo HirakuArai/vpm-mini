@@ -163,3 +163,27 @@ Phase 4 以降:
     `/ask update_north_star` の再実行を行う。
   - SLI の定義や対象期間は、Phase 3 の運用状況を見ながら
     Phase 4 以降で SLO 設計に昇格させることを想定している。
+
+---
+
+## P3-2 /ask update_north_star result (Phase 3, first retry)
+
+- READY Evidence:
+  - PR #778 (`reports/metrics-echo/metrics_echo_ready_status_p3-2.md`) に、
+    `kubectl -n default get ksvc metrics-echo -o yaml` のスナップショットを保存済み。
+- SLI Evidence:
+  - PR #783 (`reports/metrics-echo/metrics_echo_sli_p3-2.md`) に、
+    devbox から metrics-echo の status.url へ HTTP リクエストを 20 回投げた結果を保存。
+  - 現時点ではすべて HTTP 000（接続失敗）となり、SUCCESS_RATE=0% という測定結果になった。
+
+- /ask update_north_star の判断（Issue #774）:
+  - コントロールプレーン上では KService READY だが、
+    devbox からの probe は全て失敗している「証拠の不一致」として解釈。
+  - 結果は plan-only で、`state_patch` / `memory_patch` は生成しない方針が返却された。
+  - 追加の Evidence（クラスタ内からの probe、ログ、マルチ vantage SLI など）を集めてから、
+    後続フェーズで North Star の扱いを再検討する、という方向性。
+
+- 現段階での扱い:
+  - metrics-echo は「READY 状態と devbox からの到達性が一致していない監視セル」として扱う。
+  - Phase 3 P3-2 の時点では、North Star を固定せず、
+    READY / SLI Evidence を揃えたうえで plan-only の結果を記録するところまでをゴールとする。
