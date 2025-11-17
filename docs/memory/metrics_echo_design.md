@@ -124,3 +124,13 @@ Phase 4 以降:
   - 必要なら North Star と STATE / EG-Space を更新する。
 
 このメモ自体は、Phase 3 の途中で更新・拡張されることを前提としたドラフトである。
+
+---
+
+## P3-2 READY Evidence snapshot (Phase 3)
+
+- READY snapshot PR: #778  
+  - 追加ファイル: `reports/metrics-echo/metrics_echo_ready_status_p3-2.md`  
+  - 内容: `kubectl -n <namespace> get ksvc metrics-echo -o yaml` の生出力を Markdown レポートとして保存。
+- 上記レポートは、Issue #774 (P3-2: metrics-echo minimal SLI /ask retry) における
+  「READY 側 Evidence」の第一ステップとして扱う。
