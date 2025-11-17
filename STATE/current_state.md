@@ -83,3 +83,8 @@ Note: STATE に環境の最新状況を十分反映できていなかったた�
 - 現段階での扱い:
   - metrics-echo は、Phase 3 P3-2 の時点では North Star を固定せず、
     READY / SLI Evidence を揃えたうえで「要追加 Evidence の監視セル」として棚上げする。
+
+[Phase 共通] vpm-mini の背景・コア目的・個人G（啓のテストベッドとしての位置づけ）を
+docs/overview/vpm_mini_project_vision.md に明文化し、
+「属人タスクの外在化」と「本人にしか向き合えない領域のための余白づくり」を
+プロジェクトの中心目的として SSOT に刻印した。（Draft）
