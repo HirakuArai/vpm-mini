@@ -183,3 +183,26 @@ Phase 3 Kickoff に向けて、直近で取りやすいアクション例:
 2. metrics-echo について、READY / 成功率 Evidence の最小ライン（人手 + 既存メトリクス）から試しに 1 回 /ask を再実行してみる。
 3. Execution Policy を前提に、Codex / VM ごとの「役割分担メモ」を短く作る。
 
+
+---
+
+## 7. Phase 3 next focus after P3-2 (Draft)
+
+- metrics-echo / P3-2 (Round 1) の扱い:
+  - READY Evidence (#778) と簡易 SLI Evidence (#783, SUCCESS_RATE=0%) を揃えたうえで、
+    `/ask update_north_star` の再実行は plan-only（state_patch / memory_patch なし）となった。
+  - READY と devbox からの到達性が食い違っている「要追加 Evidence の監視セル」として、
+    Phase 3 P3-2 時点では North Star を固定せず棚上げする。
+- 次の実験フォーカス候補（P3-3〜）:
+  - persist-report レーン:
+    - Phase 2 / M2 で確立した「reports/** 限定 + CI Green → Codex 整理 + 1クリックマージ」の半自動レーンを、
+      Phase 3 では /ask + u_contract を組み合わせたセルとして拡張していく候補とする。
+    - 具体的には、reports/** の Evidence PR に対して:
+      - /ask による要約やラベリング
+      - u_contract `persist-report` ポリシーの見直し・拡張
+      - stale / archive 対応ルールの整理
+      などを小さな実験セルとして増やしていく。
+- このセッション終了時点の「次の一歩」イメージ:
+  - metrics-echo は P3-2 Round 1 の結果を設計メモ / STATE に刻印したうえで一旦棚上げ。
+  - 次の Phase 3 セッションでは、persist-report レーンを P3-3 の主対象候補として扱い、
+    どの Evidence PR から /ask + u_contract の実験を始めるかを検討する。
