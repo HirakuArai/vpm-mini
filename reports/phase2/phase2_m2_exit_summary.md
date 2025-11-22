@@ -2,7 +2,7 @@
 
 context_header: repo=vpm-mini / branch=main / phase=Phase 2 後半
 
-本レポートは、Phase 2 後半（M2: ルール運用 → 半自動）で確立したセル運用の成果を、Hello S5 / u_contract / metrics-echo / PR Groomer の 4 つの観点から短くまとめたものである。詳細な事実・ログは `STATE/current_state.md` および `docs/memory/**` を参照。
+本レポートは、Phase 2 後半（M2: ルール運用 → 半自動）で確立したセル運用の成果を、Hello S5 / u_contract / metrics-echo / PR Groomer の 4 つの観点から短くまとめたものである。詳細な事実・ログは `STATE/current_state.md` および `docs/memory/**` を参照。AI ループ全体の現状整理と Phase 2 から Phase 3 への橋渡しについては `docs/ops/ai_loop_current_state.md` も参照のこと。
 
 ---
 
