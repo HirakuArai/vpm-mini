@@ -30,7 +30,7 @@
 
 ### 1.3 Gap（δ: ギャップ）
 
-- PM Kai v1 の **入出力フォーマット（プロンプトと回答形式）がまだ固まっていない**。
+- PM Kai v1 の標準質問と出力フォーマットは spec に定義されたが、それを使った自動ループ（STATE/weekly 更新）や運用フローはこれから。
 - `STATE/vpm-mini/current_state.md` や週次レポートに、**実際の C/G/δ / Next 3 が継続的に書き込まれている状態**にはまだ至っていない。
 - 他プロジェクト向けの `docs/projects/<project_id>/project_definition.md` や `STATE/<project_id>/current_state.md` が未整備。
 - VM/GKE コスト縮退は一度完了したが、今後のための「月次インベントリレポート」などの軽い見張り仕組みは未設計。
@@ -74,7 +74,7 @@
 
 ## 2. Active Focus / Tasks（いまフォーカスしている課題）
 
-- [ ] **T-PM-1:** PM Kai v1 の「標準質問」と「回答フォーマット（C/G/δ + Next 3 + Evidence）」を定義する。
+- [x] **T-PM-1:** PM Kai v1 の「標準質問」と「回答フォーマット（C/G/δ + Next 3 + Evidence）」を定義する（PR #809 で実行）。
 - [ ] **T-PM-2:** `/ask` + GitHub Actions で、少なくとも週次で `STATE/vpm-mini/current_state.md` を更新提案できるワークフロー案を作る。
 - [ ] **T-PM-3:** `reports/vpm-mini/2025-11-23_weekly.md` を実際の内容で埋めて、週次レポートの最初の1枚を完成させる。
 - [ ] **T-INF-1:** VM/GKE コスト縮退の実績を STATE に記録し、将来のための簡易インベントリレポート（例: 月1回）をどう仕組み化するか検討する。
