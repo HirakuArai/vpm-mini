@@ -1,0 +1,112 @@
+name: PM Snapshot (vpm-mini)
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_id:
+        description: Target project_id (default: vpm-mini)
+        required: false
+        default: vpm-mini
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Gather context files
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROJECT_ID="${{ github.event.inputs.project_id }}"
+          mkdir -p /tmp/pm-context
+          cp "docs/projects/${PROJECT_ID}/project_definition.md" /tmp/pm-context/project_definition.md
+          cp "STATE/${PROJECT_ID}/current_state.md" /tmp/pm-context/current_state.md
+          latest_weekly=$(ls -1 "reports/${PROJECT_ID}"/*_weekly.md | sort | tail -n 1)
+          cp "$latest_weekly" /tmp/pm-context/weekly.md
+          cp "docs/pm/pm_snapshot_v1_spec.md" /tmp/pm-context/spec.md
+
+      - name: Build PM snapshot prompt
+        shell: bash
+        env:
+          PROJECT_ID: ${{ github.event.inputs.project_id }}
+        run: |
+          set -euo pipefail
+          cd /tmp/pm-context
+          python - << 'PY'
+          import os
+          import pathlib
+          import textwrap
+
+          base = pathlib.Path(".")
+          proj_def = (base / "project_definition.md").read_text(encoding="utf-8")
+          state = (base / "current_state.md").read_text(encoding="utf-8")
+          weekly = (base / "weekly.md").read_text(encoding="utf-8")
+          spec = (base / "spec.md").read_text(encoding="utf-8")
+          project_id = os.environ.get("PROJECT_ID", "vpm-mini")
+
+          prompt = f"""
+          あなたは Virtual Project Manager (PM Kai v1) です。
+          対象プロジェクト: {project_id}
+
+          以下の仕様にしたがって、プロジェクト {project_id} について pm_snapshot_v1 JSON と、その要約の Markdown ビューを生成してください。
+
+          === 出力仕様 (docs/pm/pm_snapshot_v1_spec.md) ===
+          {spec}
+
+          === project_definition (docs/projects/{project_id}/project_definition.md) ===
+          {proj_def}
+
+          === STATE/current_state (STATE/{project_id}/current_state.md) ===
+          {state}
+
+          === latest weekly report ===
+          {weekly}
+
+          手順:
+          1) まず pm_snapshot_v1 JSON を出力する
+          2) その直後の行に '---' を 1 行だけ出力する
+          3) 続けて Markdown ビューを出力する
+          """.strip()
+
+          out = base / "prompt.txt"
+          out.write_text(prompt, encoding="utf-8")
+          print(f"wrote prompt to {out}")
+          PY
+
+      - name: Call OpenAI for PM snapshot (gpt-5; strip fences)
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PROJECT_ID: ${{ github.event.inputs.project_id }}
+        run: |
+          set -euo pipefail
+          SNAP_DATE=$(date +%Y-%m-%d)
+          mkdir -p reports/pm_snapshots
+          prompt="$(cat /tmp/pm-context/prompt.txt)"
+
+          jq -n --arg sys "You are PM Kai v1. Follow the user prompt to produce pm_snapshot_v1 JSON, then '---', then a Markdown view." \
+                --arg usr "$prompt" '{
+            model:"gpt-5",
+            messages:[{role:"system",content:$sys},{role:"user",content:$usr}]
+          }' > /tmp/pm-context/req.json
+
+          curl -sS https://api.openai.com/v1/chat/completions \
+            -H "Authorization: Bearer ${OPENAI_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d @/tmp/pm-context/req.json \
+            | tee /tmp/pm-context/raw.json >/dev/null || true
+
+          jq -r '.choices[0].message.content // ""' /tmp/pm-context/raw.json > /tmp/pm-context/pm_snapshot.txt
+
+          # Strip outer fences if the model wrapped the whole response
+          awk 'NR==1{sub(/^```[a-zA-Z0-9_-]*[[:space:]]*/,"")} {buf=buf $0 ORS} END{sub(/```[[:space:]]*[\r\n]*$/,"",buf); printf "%s", buf}' \
+            /tmp/pm-context/pm_snapshot.txt > /tmp/pm-context/pm_snapshot.clean.txt
+
+          SNAP_OUT="reports/pm_snapshots/${SNAP_DATE}_${PROJECT_ID}.md"
+          cp /tmp/pm-context/pm_snapshot.clean.txt "$SNAP_OUT"
+
+          echo "Saved snapshot to $SNAP_OUT"
+          head -n 20 "$SNAP_OUT" || true
