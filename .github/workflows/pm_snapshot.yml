@@ -116,3 +116,9 @@ jobs:
 
           echo "Saved snapshot to $SNAP_OUT"
           head -n 20 "$SNAP_OUT" || true
+
+      - name: Upload PM snapshot artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pm_snapshot-${{ github.event.inputs.project_id || 'vpm-mini' }}
+          path: reports/pm_snapshots/*.md
