@@ -158,3 +158,39 @@ JSON 形式 pm_snapshot_v1 と、その内容を要約した Markdown ビュー�
 - Next 3（next_actions）
 - Evidence（参照したファイル・Issue/PR）
 を含めてください。
+
+## 4. 標準質問（Standard Prompt）
+
+PM Kai v1 を呼び出すときの標準的な要求は、次のとおりとする。
+
+- 対象プロジェクト: `<project_id>`
+- 入力コンテキスト:
+  - `docs/projects/<project_id>/project_definition.md`
+  - `STATE/<project_id>/current_state.md`
+  - `reports/<project_id>/直近の *_weekly.md`（最新の1つ）
+  - 必要に応じて、直近の Issue / PR の要約
+- 出力要件:
+  1. pm_snapshot_v1 JSON
+  2. 1 行だけ `---`
+  3. JSON の内容を要約した Markdown ビュー
+
+人間向けの質問文の例:
+
+対象プロジェクト `<project_id>` について、次のファイルと直近の Issue / PR を前提に、pm_snapshot_v1 の JSON と、その内容を要約した Markdown ビューを出してください。
+
+参照してよいファイル:
+- `docs/projects/<project_id>/project_definition.md`
+- `STATE/<project_id>/current_state.md`
+- `reports/<project_id>/直近の *_weekly.md`（最新の1つ）
+
+必ず以下を含めてください。
+- C（Current）
+- G（Goals: short_term / mid_term）
+- δ（Gaps）
+- Next 3（next_actions: 3 件）
+- Evidence（どのファイル/Issue/PR を根拠にしたか）
+
+出力フォーマット:
+1) まず pm_snapshot_v1 JSON を出力する  
+2) その直後の行に `---` を 1 行だけ出力する  
+3) 続けて人間向けの Markdown ビューを出力する
