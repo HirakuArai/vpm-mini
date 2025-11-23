@@ -4,9 +4,15 @@ on:
   workflow_dispatch:
     inputs:
       project_id:
-        description: Target project_id (default: vpm-mini)
+        description: "Target project_id (e.g. vpm-mini)"
         required: false
-        default: vpm-mini
+        default: "vpm-mini"
+  push:
+    paths:
+      - ".github/workflows/pm_snapshot.yml"
+  pull_request:
+    paths:
+      - ".github/workflows/pm_snapshot.yml"
 
 jobs:
   snapshot:
