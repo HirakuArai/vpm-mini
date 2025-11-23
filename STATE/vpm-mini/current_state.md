@@ -26,6 +26,7 @@
 - 別プロジェクト（例: 箱根E² / 会社業務プロジェクト）にも `project_definition / STATE / reports` を整備し、
   **vpm-mini と同じ仕組みで PM を回せる「マルチプロジェクト VPM」状態**にする。
 - EG-Space や 5セルを、まずは「論理的な視点・座標」として PM Kai の内部に導入し、物理インフラに依存しない形でテストする。
+- PM Kai が「実行提案 →（人間による実行）→ 実行結果の記録案 → 更新された実行提案」というレイヤーBの記録ループを、vpm-mini で一通り回せる状態にする（STATE / weekly / pm_snapshot の更新案を Kai が継続的に出せるようにする）。
 
 ### 1.3 Gap（δ: ギャップ）
 
@@ -33,6 +34,43 @@
 - `STATE/vpm-mini/current_state.md` や週次レポートに、**実際の C/G/δ / Next 3 が継続的に書き込まれている状態**にはまだ至っていない。
 - 他プロジェクト向けの `docs/projects/<project_id>/project_definition.md` や `STATE/<project_id>/current_state.md` が未整備。
 - VM/GKE コスト縮退は一度完了したが、今後のための「月次インベントリレポート」などの軽い見張り仕組みは未設計。
+
+## レイヤーB（記録・構造化ループ）のゴールとステップ
+
+**ゴール（Layer B）**
+
+- 実行力は人間や外部システムに任せたまま、
+  PM Kai が「実行提案 →（人間による実行）→ 実行結果の記録案 → 更新された実行提案」という記録ループを、自分で回せる状態にする。
+- 具体的には、実行後の状態変化を踏まえた STATE / weekly / pm_snapshot の更新案を Kai が出し続け、人間がそれをレビューしてマージする運用を確立する。
+
+**大まかなステップ**
+
+1. **B-1: 現状のパターンを STATE に明文化する**
+
+   - 「実行があったら pm_snapshot を回し、その結果を見ながら STATE / weekly を更新する」という今やっているパターンを、vpm-mini の公式フローとして STATE に書き残す。
+
+2. **B-2: PM Snapshot から STATE 更新案を生成する仕組みを構想する**
+
+   - pm_snapshot_v1 の JSON / Markdown を入力に、
+     「STATE/current_state.md の C/G/δ と Active Tasks をこう変えるべき」という差分案（patch）を Kai に生成させるイメージを固める。
+   - 最初は「提案テキストだけ」でよく、PR 化は後段で構わない。
+
+3. **B-3: STATE 更新案を PR として出すミニワークフローを設計する**
+
+   - 手動トリガ（workflow_dispatch）で、
+     1) 最新 pm_snapshot を取得
+     2) Kai に STATE 更新案を生成させる
+     3) STATE/vpm-mini/current_state.md を更新する PR を作成
+     という最小ループの設計案を作る。
+   - マージは必ず人間が行う前提にしておく。
+
+4. **B-4: vpm-mini でレイヤーBループを1サイクル回して検証する**
+
+   - 何か実行（または決定）があったタイミングで、
+     1) pm_snapshot を実行
+     2) B-3 のワークフローで STATE 更新PRを出す
+     3) 啓が内容をレビューしてマージ
+   - このサイクルを 1 回以上回し、「このやり方なら PM Kai に記録を任せていけそうだ」と判断できるか確認する。
 
 ## 2. Active Focus / Tasks（いまフォーカスしている課題）
 
