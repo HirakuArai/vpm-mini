@@ -10,6 +10,7 @@
 - `docs/projects/vpm-mini/project_definition.md` に、vpm-mini の目的・制約・成功条件・現フェーズの位置づけが SSOT として定義されている（PR #800）。
 - `STATE/vpm-mini/current_state.md` と `reports/vpm-mini/2025-11-23_weekly.md` に、2025-11-23 時点の C/G/δ と今週の進捗・Next3 が記録されている（PR #801, #802, #803, #810）。
 - `docs/pm/pm_snapshot_v1_spec.md` に、PM Kai v1 の出力仕様（pm_snapshot_v1）と標準質問（Standard Prompt）が定義されており、Actions 上で `pm_snapshot.yml` を手動実行すると PM Snapshot を生成できる状態になっている（PR #804, #805, #806, #807, #809）。
+- **`docs/pm/layer_b_update_flow.md` を追加し、レイヤーBの最小更新フロー v1 を定義。hakone-e2 で doc_update_proposal_v1 → STATE/weekly 反映の1サイクルを試行し、運用像の手応えを得た。**
 - GCP 側では devbox-codex VM を停止し、GKE Autopilot クラスタ `vpm-mini` と不要な PVC ディスクを削除して、将来の実験用の最小構成（ディスクのみ）に縮退済み（インフラコストはほぼゼロ）。
 
 ### 1.2 Goals（G: ゴール）
@@ -28,17 +29,18 @@
 
 ### 1.3 Gap（δ: ギャップ）
 
-- pm_snapshot_v1 の仕様と標準質問は定義されたが、**STATE / weekly / pm_snapshot をどう自動的に更新・連携させるか（レイヤーBの運用フロー）がまだ具体化されていない**。
-- `STATE/vpm-mini/current_state.md` や weekly が、現状は主に手動更新であり、PM Snapshot からの更新案生成〜PR 作成の流れは未実装。
-- 他プロジェクト用の `project_definition` / `STATE` / `reports` が未整備で、vpm-mini 以外のプロジェクトについては PM Kai のカバー範囲に入っていない。
-- PM Kai v1 を「週次の儀式」にどう組み込むか（pm_snapshot の実行タイミングと、どの程度 Next3 に従うか）の運用ルールがまだ仮置きである。
+- pm_snapshot_v1 の仕様と標準質問は定義済みで、**レイヤーBの最小更新フロー v1 も設計書として追加済み**。ただし、vpm-mini での実サイクル運用と PR 自動化は未実装。
+- `STATE/vpm-mini/current_state.md` や weekly は現状は主に手動更新であり、PM Snapshot からの更新案生成〜PR 作成の最小ループは「テキスト提案 → 人手PR」の段階にとどまっている。
+- 他プロジェクト用の `project_definition` / `STATE` / `reports` は未整備で、vpm-mini 以外は PM Kai のカバー範囲外。hakone-e2 では1サイクルの試行を済ませたが、vpm-mini での定常運用はこれから。
+- PM Kai v1 を「週次の儀式」にどう組み込むか（pm_snapshot の実行タイミングと Next3 の採用度合い）について、vpm-mini用の運用ルールを明文化し切れていない。
 
 ## 2. Active Focus / Tasks（いまフォーカスしている課題）
 
 - [x] **T-PM-1:** PM Kai v1 の標準質問と出力フォーマット（pm_snapshot_v1 + Markdown）を定義し、spec に追記する（PR #809 完了）。
-- [ ] **T-STATE-1:** この current_state を 2025-11-23 時点のベースラインとして調整し、C/G/δ と Active Tasks を「数週間はそのまま使える」レベルまで整える（今回の編集で進行中）。
-- [ ] **T-PM-2:** `/ask` + GitHub Actions による STATE / weekly 更新ループの設計を進める（pm_snapshot の結果から STATE 更新案を生成し PR にする最小フローの案を作る）。
-- [ ] **T-PM-3:** 他プロジェクト（例: 箱根E² or 会社業務）について、最初の `project_definition` / `STATE` / `weekly` を用意し、pm_snapshot を回してみる。
+- [ ] **T-STATE-1:** この current_state を 2025-11-23 ベースラインとして確定し、C/G/δ と Active Tasks を「数週間はそのまま使える」レベルまで整える（layer_b_update_flow への参照を追記）。
+- [ ] **T-PM-2:** `/ask` + GitHub Actions による STATE / weekly 更新ループの設計を進める（pm_snapshot の結果から STATE/weekly 更新案を生成する最小フロー案）。
+- [ ] **T-PM-3:** 他プロジェクト（例: 箱根E² or 会社業務）について、最初の `project_definition` / `STATE` / `weekly` を用意し、pm_snapshot を回してみる（hakone-e2 で doc_update_proposal_v1 → STATE/weekly の1サイクル試行済み）。
+- [ ] **T-PM-4:** vpm-mini で Kai による「STATE/weekly 更新案（テキスト）」生成 → 手動PR の最小サイクルを1回実施して検証する。
 - [ ] **T-INF-1:** VM/GKE 縮退後の GCP インベントリを月次レベルで確認する軽い仕組み（レポート or 手動チェック）を検討する（優先度はレイヤーBより低い）。
 
 ## レイヤーB（記録・構造化ループ）のゴールとステップ
@@ -90,3 +92,5 @@
   - `.github/workflows/pm_snapshot.yml`（PR #805, #806, #807）
 - インフラ縮退:
   - GCP 操作ログ（別セッションの記録）および STATE の記述に準拠。
+- レイヤーB更新フロー設計:
+  - `docs/pm/layer_b_update_flow.md`
