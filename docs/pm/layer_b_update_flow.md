@@ -31,6 +31,11 @@
   - `.github/workflows/pm_snapshot.yml`  
     - `workflow_dispatch` により `project_id=vpm-mini` で手動実行可能  
     - OpenAI を呼び出して `pm_snapshot_v1` を生成し、Markdown を artifact として保存
+- ドキュメント更新パイプラインとレビュー
+  - `docs/pm/doc_update_pipeline_v1.md`
+  - `docs/pm/doc_update_review_v1_spec.md`
+- Codex 適用ブリーフ
+  - `docs/ops/codex_brief_apply_doc_update_v1.md`
 
 本ドキュメントでは、これらを前提に **STATE / weekly 更新案を Kai に生成させるフロー** を設計する。
 
@@ -64,6 +69,12 @@
 6. **次の PM Snapshot で変化を確認**
    - 再度 pm_snapshot を実行し、新しい C/G/δ / Next 3 がどう変化したかを見る。
    - これを通じて、「提案 → 実行 → 記録 → 更新された提案」のループが回っているかを確認する。
+
+### 補足（v1 運用）
+
+- Kai が出す更新案は、doc_update_proposal_v1（JSON）として起票する。
+- レビューは `docs/pm/doc_update_review_v1_spec.md` に従って行い、必要に応じて修正のうえ PR を作成・マージする。
+- Codex を使って適用する場合は、`docs/ops/codex_brief_apply_doc_update_v1.md` のブリーフに従う。
 
 ## 4. Kai にやらせたい具体タスク（初期バージョン）
 
