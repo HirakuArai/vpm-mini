@@ -1,0 +1,205 @@
+# cell_roles: watcher, curator, planner, synthesizer
+
+name: Doc Update Proposal (PM)
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_id:
+        description: "Target project_id (e.g. vpm-mini, hakone-e2)"
+        required: true
+        default: "hakone-e2"
+      progress_summary:
+        description: "Summary of the recent progress/change (used as input to PM)"
+        required: true
+
+jobs:
+  propose_updates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Gather project SSOT files
+        run: |
+          set -e
+          PROJECT_ID="${{ github.event.inputs.project_id }}"
+          mkdir -p /tmp/doc-update-context
+
+          # project_definition
+          if [ -f "docs/projects/${PROJECT_ID}/project_definition.md" ]; then
+            cp "docs/projects/${PROJECT_ID}/project_definition.md" /tmp/doc-update-context/project_definition.md
+          fi
+
+          # STATE
+          if [ -f "STATE/${PROJECT_ID}/current_state.md" ]; then
+            cp "STATE/${PROJECT_ID}/current_state.md" /tmp/doc-update-context/current_state.md
+          fi
+
+          # latest weekly (if any)
+          if [ -d "reports/${PROJECT_ID}" ]; then
+            latest_weekly=$(ls -1 "reports/${PROJECT_ID}"/*_weekly.md 2>/dev/null | sort | tail -n 1 || true)
+            if [ -n "$latest_weekly" ]; then
+              cp "$latest_weekly" /tmp/doc-update-context/weekly.md
+            fi
+          fi
+
+          # PM specs
+          if [ -f "docs/pm/pm_snapshot_v1_spec.md" ]; then
+            cp "docs/pm/pm_snapshot_v1_spec.md" /tmp/doc-update-context/pm_snapshot_v1_spec.md
+          fi
+          if [ -f "docs/pm/layer_b_update_flow.md" ]; then
+            cp "docs/pm/layer_b_update_flow.md" /tmp/doc-update-context/layer_b_update_flow.md
+          fi
+
+      - name: Build doc update proposal prompt
+        env:
+          PROJECT_ID: ${{ github.event.inputs.project_id }}
+          PROGRESS_SUMMARY: ${{ github.event.inputs.progress_summary }}
+        run: |
+          set -e
+          cd /tmp/doc-update-context
+
+          python - << 'PY'
+          import os
+          import pathlib
+          import textwrap
+
+          base = pathlib.Path(".")
+
+          def read_if_exists(path: str) -> str:
+            p = base / path
+            return p.read_text(encoding="utf-8") if p.exists() else ""
+
+          project_def = read_if_exists("project_definition.md")
+          state = read_if_exists("current_state.md")
+          weekly = read_if_exists("weekly.md")
+          pm_spec = read_if_exists("pm_snapshot_v1_spec.md")
+          layer_b = read_if_exists("layer_b_update_flow.md")
+          project_id = os.environ.get("PROJECT_ID", "")
+          progress_summary = os.environ.get("PROGRESS_SUMMARY", "")
+
+          schema_desc = textwrap.dedent("""
+          あなたは Virtual Project Manager です。
+          5セルの観点では、主に Curator（何が重要かを見極める）、Planner（どこに手を入れるか決める）、Synthesizer（人間が読める文章にまとめる）の役割を担っています。
+
+          以下の JSON 形式 doc_update_proposal_v1 で、ドキュメント更新提案を返してください。
+
+          doc_update_proposal_v1 の構造:
+
+          {
+            "schema_version": "doc_update_proposal_v1",
+            "project_id": "<project_id>",
+            "generated_at": "<ISO8601>",
+
+            "summary": "一言サマリ（日本語）",
+
+            "updates": [
+              {
+                "target": {
+                  "path": "STATE/hakone-e2/current_state.md",
+                  "doc_type": "state",          // "state" | "weekly" | "project_definition" | "other"
+                  "section_hint": "1.1 Current（C）" // どのあたりを変えるかのヒント（見出し名など）
+                },
+                "reason": "なぜこのドキュメントを更新すべきか（日本語）",
+                "change_type": "edit_paragraph",   // "add" | "edit_paragraph" | "append_list_item" | "other"
+                "suggestion_markdown": "ここに差し替え後 or 追記候補のMarkdownテキスト",
+                "confidence": "high"               // "high" | "medium" | "low"
+              }
+            ],
+
+            "no_change": [
+              {
+                "path": "docs/projects/hakone-e2/project_definition.md",
+                "reason": "今回の進捗ではこのドキュメントは変えなくてよいと判断した理由。"
+              }
+            ],
+
+            "notes": [
+              "補足メモ。仮定や前提条件など。"
+            ]
+          }
+
+          JSON だけを出力してください。前後に説明文やコードフェンスは不要です。
+          """)
+
+          prompt = f"""
+          対象プロジェクト: {project_id}
+
+          以下の情報が与えられています。
+
+          === 進捗サマリ ===
+          {progress_summary}
+
+          === project_definition (docs/projects/{project_id}/project_definition.md) ===
+          {project_def}
+
+          === STATE/current_state (STATE/{project_id}/current_state.md) ===
+          {state}
+
+          === latest weekly report (reports/{project_id}/*_weekly.md) ===
+          {weekly}
+
+          === PM Snapshot 仕様 (docs/pm/pm_snapshot_v1_spec.md) ===
+          {pm_spec}
+
+          === Layer B 更新フロー (docs/pm/layer_b_update_flow.md) ===
+          {layer_b}
+
+          あなたの役割は、「今回の進捗を踏まえて、どのドキュメントをどう更新すべきか」を判断し、
+          doc_update_proposal_v1 のJSONとして提案することです。
+
+          次の点に注意してください:
+          - どのドキュメントを更新候補とみなすか、なぜそう判断したかを必ず書いてください。
+          - 変える必要がないと判断したドキュメントについても、no_change に理由を書いてください（必要な範囲で）。
+          - suggestion_markdown は、実際にコピペして使えるMarkdownの断片になるように書いてください。
+          - 出力は doc_update_proposal_v1 の JSON オブジェクトのみとし、前後に何も付けないでください。
+
+          {schema_desc}
+          """.strip()
+
+          out = base / "prompt.txt"
+          out.write_text(prompt, encoding="utf-8")
+          print(f"wrote prompt to {out}")
+          PY
+
+      - name: Call OpenAI for doc update proposal
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PROJECT_ID: ${{ github.event.inputs.project_id }}
+        run: |
+          set -e
+          PROJECT_ID="${{ github.event.inputs.project_id }}"
+          SNAP_DATE=$(date +%Y-%m-%d)
+          mkdir -p reports/doc_update_proposals
+          prompt="$(cat /tmp/doc-update-context/prompt.txt)"
+
+          jq -n --arg sys "You are a Virtual Project Manager. Return only doc_update_proposal_v1 JSON." \
+                --arg usr "$prompt" '{
+            model:"gpt-5",
+            response_format:{type:"json_object"},
+            messages:[{role:"system",content:$sys},{role:"user",content:$usr}]
+          }' > /tmp/doc-update-context/req.json
+
+          curl -sS https://api.openai.com/v1/chat/completions \
+            -H "Authorization: Bearer ${OPENAI_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d @/tmp/doc-update-context/req.json \
+            | tee /tmp/doc-update-context/raw.json >/dev/null || true
+
+          jq -r '.choices[0].message.content // ""' /tmp/doc-update-context/raw.json > /tmp/doc-update-context/proposal.txt
+
+          # Strip outer fences if any
+          awk 'NR==1{sub(/^```[a-zA-Z0-9_-]*[[:space:]]*/,"")} {buf=buf $0 ORS} END{sub(/```[[:space:]]*[\r\n]*$/,"",buf); printf "%s", buf}' \
+            /tmp/doc-update-context/proposal.txt > /tmp/doc-update-context/proposal.clean.json
+
+          SNAP_OUT="reports/doc_update_proposals/${SNAP_DATE}_${PROJECT_ID}.json"
+          cp /tmp/doc-update-context/proposal.clean.json "$SNAP_OUT"
+
+          echo "Saved proposal to $SNAP_OUT"
+          head -n 50 "$SNAP_OUT" || true
+
+      - name: Upload doc update proposal artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc_update_proposal-${{ github.event.inputs.project_id }}
+          path: reports/doc_update_proposals/*.json
