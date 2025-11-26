@@ -9,9 +9,10 @@ on:
         description: "Target project_id (e.g. vpm-mini, hakone-e2)"
         required: true
         default: "hakone-e2"
-      progress_summary:
-        description: "Summary of the recent progress/change (used as input to PM)"
+      proposal_path:
+        description: "Path to doc_update_proposal_v1 JSON in the repo"
         required: true
+        default: "reports/doc_update_proposals/2025-11-24-vpm-mini.json"
 
 jobs:
   propose_updates:
