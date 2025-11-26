@@ -23,22 +23,14 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Show context
-        run: |
-          echo "project_id=${{ github.event.inputs.project_id }}"
-          echo "proposal_path=${{ github.event.inputs.proposal_path }}"
-          ls -R
-
-      - name: Load proposal JSON
-        id: load_proposal
+      - name: Validate proposal JSON exists
         run: |
           PROPOSAL_PATH="${{ github.event.inputs.proposal_path }}"
           if [ ! -f "${PROPOSAL_PATH}" ]; then
             echo "Proposal JSON not found: ${PROPOSAL_PATH}" >&2
             exit 1
           fi
-          echo "[Sho] Found proposal JSON: ${PROPOSAL_PATH}"
-          cp "${PROPOSAL_PATH}" proposal.json
+          echo "[Sho v2] Found proposal JSON: ${PROPOSAL_PATH}"
 
       - name: Generate doc_update_review_v1 (placeholder)
         id: generate_review
@@ -72,7 +64,7 @@ jobs:
 }
 JSON
 
-          echo "[Sho] Wrote placeholder doc_update_review_v1.json"
+          echo "[Sho v2] Wrote placeholder doc_update_review_v1.json"
 
       - name: Upload review JSON as artifact
         uses: actions/upload-artifact@v4
