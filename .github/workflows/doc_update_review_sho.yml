@@ -1,0 +1,81 @@
+name: Doc Update Review (Sho v2)
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_id:
+        description: "Project ID (e.g. vpm-mini)"
+        required: true
+        default: "vpm-mini"
+      proposal_path:
+        description: "Path to doc_update_proposal_v1 JSON in the repo"
+        required: true
+        default: "reports/doc_update_proposals/2025-11-24-vpm-mini.json"
+
+jobs:
+  review_doc_update_proposal:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Show context
+        run: |
+          echo "project_id=${{ github.event.inputs.project_id }}"
+          echo "proposal_path=${{ github.event.inputs.proposal_path }}"
+          ls -R
+
+      - name: Load proposal JSON
+        id: load_proposal
+        run: |
+          PROPOSAL_PATH="${{ github.event.inputs.proposal_path }}"
+          if [ ! -f "${PROPOSAL_PATH}" ]; then
+            echo "Proposal JSON not found: ${PROPOSAL_PATH}" >&2
+            exit 1
+          fi
+          echo "[Sho] Found proposal JSON: ${PROPOSAL_PATH}"
+          cp "${PROPOSAL_PATH}" proposal.json
+
+      - name: Generate doc_update_review_v1 (placeholder)
+        id: generate_review
+        run: |
+          PROPOSAL_PATH="${{ github.event.inputs.proposal_path }}"
+          PROJECT_ID="${{ github.event.inputs.project_id }}"
+          NOW="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+
+          cat > doc_update_review_v1.json << JSON
+{
+  "schema_version": "doc_update_review_v1",
+  "project_id": "${PROJECT_ID}",
+  "proposal_ref": "${PROPOSAL_PATH}",
+  "generated_at": "${NOW}",
+  "overall_assessment": {
+    "summary": "placeholder review by Sho v2: このレビューは枠組みテスト用のダミーです。",
+    "risk_level": "low"
+  },
+  "update_judgements": [
+    {
+      "target_path": "STATE/vpm-mini/current_state.md",
+      "section_hint": "n/a (placeholder)",
+      "decision": "accept",
+      "reason": "placeholder: 本番実装では proposal.json を解析して judgement を生成します。"
+    }
+  ],
+  "notes": [
+    "この doc_update_review_v1.json は Doc Update Review (Sho v2) workflow の枠組みテスト用です。",
+    "将来、Sho は proposal.json の中身を読み、各 updates に対する judgement を生成します。"
+  ]
+}
+JSON
+
+          echo "[Sho] Wrote placeholder doc_update_review_v1.json"
+
+      - name: Upload review JSON as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc_update_review_v1_${{ github.event.inputs.project_id }}
+          path: doc_update_review_v1.json
