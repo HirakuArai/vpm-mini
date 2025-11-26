@@ -23,18 +23,35 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Validate proposal JSON exists
+      - name: Resolve and validate proposal JSON
+        env:
+          PROJECT_ID: ${{ github.event.inputs.project_id }}
+          INPUT_PROPOSAL_PATH: ${{ github.event.inputs.proposal_path }}
         run: |
-          PROPOSAL_PATH="${{ github.event.inputs.proposal_path }}"
+          PROJECT_ID="${PROJECT_ID}"
+          PROPOSAL_PATH="${INPUT_PROPOSAL_PATH}"
+
+          if [ -z "${PROPOSAL_PATH}" ]; then
+            echo "[Sho v1] proposal_path が空なので、最新の proposal を自動検出します..."
+            latest=$(ls -1 "reports/doc_update_proposals/"*"_${PROJECT_ID}".json 2>/dev/null | sort | tail -n 1 || true)
+            if [ -z "${latest}" ]; then
+              echo "No proposal JSON found for project_id=${PROJECT_ID} under reports/doc_update_proposals/" >&2
+              exit 1
+            fi
+            PROPOSAL_PATH="${latest}"
+          fi
+
           if [ ! -f "${PROPOSAL_PATH}" ]; then
             echo "Proposal JSON not found: ${PROPOSAL_PATH}" >&2
             exit 1
           fi
-          echo "[Sho v1] Found proposal JSON: ${PROPOSAL_PATH}"
+
+          echo "[Sho v1] Using proposal JSON: ${PROPOSAL_PATH}"
+          echo "PROPOSAL_PATH=${PROPOSAL_PATH}" >> "$GITHUB_ENV"
 
       - name: Generate doc_update_review_v1 via Python (Sho v1)
         env:
-          PROPOSAL_PATH: ${{ github.event.inputs.proposal_path }}
+          PROPOSAL_PATH: ${{ env.PROPOSAL_PATH }}
           PROJECT_ID: ${{ github.event.inputs.project_id }}
         run: |
           python - << 'PY'
