@@ -1,6 +1,4 @@
-# cell_roles: watcher, curator, planner, synthesizer
-
-name: Doc Update Review Debug (based on Doc Update Proposal)
+name: Doc Update Review Debug (Sho v2)
 
 on:
   workflow_dispatch:
@@ -15,7 +13,6 @@ on:
         default: "reports/doc_update_proposals/2025-11-24-vpm-mini.json"
 
 jobs:
-
   review_doc_update_proposal:
     runs-on: ubuntu-latest
 
@@ -35,42 +32,49 @@ jobs:
           fi
           echo "[Sho debug] Found proposal JSON: ${PROPOSAL_PATH}"
 
-      - name: Generate doc_update_review_v1 (placeholder)
-        id: generate_review
+      - name: Generate doc_update_review_v1 via Python (placeholder)
+        env:
+          PROPOSAL_PATH: ${{ github.event.inputs.proposal_path }}
+          PROJECT_ID: ${{ github.event.inputs.project_id }}
         run: |
-          PROPOSAL_PATH="${{ github.event.inputs.proposal_path }}"
-          PROJECT_ID="${{ github.event.inputs.project_id }}"
-          NOW="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          python - << 'PY'
+          import json, os, datetime, pathlib
 
-          cat > doc_update_review_v1.json << JSON
-{
-  "schema_version": "doc_update_review_v1",
-  "project_id": "${PROJECT_ID}",
-  "proposal_ref": "${PROPOSAL_PATH}",
-  "generated_at": "${NOW}",
-  "overall_assessment": {
-    "summary": "placeholder review by Sho debug: このレビューは枠組みテスト用のダミーです。",
-    "risk_level": "low"
-  },
-  "update_judgements": [
-    {
-      "target_path": "STATE/vpm-mini/current_state.md",
-      "section_hint": "n/a (placeholder)",
-      "decision": "accept",
-      "reason": "placeholder: 本番実装では proposal.json を解析して judgement を生成します。"
-    }
-  ],
-  "notes": [
-    "この doc_update_review_v1.json は Doc Update Review Debug workflow の枠組みテスト用です。",
-    "将来、Sho は proposal.json の中身を読み、各 updates に対する judgement を生成します。"
-  ]
-}
-JSON
+          proposal_path = os.environ["PROPOSAL_PATH"]
+          project_id = os.environ["PROJECT_ID"]
+          now = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 
-          echo "[Sho debug] Wrote placeholder doc_update_review_v1.json"
+          data = {
+              "schema_version": "doc_update_review_v1",
+              "project_id": project_id,
+              "proposal_ref": proposal_path,
+              "generated_at": now,
+              "overall_assessment": {
+                  "summary": "placeholder review by Sho debug: このレビューは枠組みテスト用のダミーです。",
+                  "risk_level": "low",
+              },
+              "update_judgements": [
+                  {
+                      "target_path": "STATE/vpm-mini/current_state.md",
+                      "section_hint": "n/a (placeholder)",
+                      "decision": "accept",
+                      "reason": "placeholder: 本番実装では proposal.json を解析して judgement を生成します。",
+                  }
+              ],
+              "notes": [
+                  "この doc_update_review_v1.json は Doc Update Review Debug workflow の枠組みテスト用です。",
+                  "将来、Sho は proposal.json の中身を読み、各 updates に対する judgement を生成します。",
+              ],
+          }
+
+          out = pathlib.Path("doc_update_review_v1.json")
+          out.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+          print(f"Wrote {out}")
+          PY
 
       - name: Upload review JSON as artifact
         uses: actions/upload-artifact@v4
         with:
           name: doc_update_review_v1_${{ github.event.inputs.project_id }}
+        
           path: doc_update_review_v1.json
