@@ -1,3 +1,5 @@
+# cell_roles: watcher, curator, planner, synthesizer
+
 name: Doc Update Review Debug (based on Doc Update Proposal)
 
 on:
@@ -13,6 +15,7 @@ on:
         default: "reports/doc_update_proposals/2025-11-24-vpm-mini.json"
 
 jobs:
+
   review_doc_update_proposal:
     runs-on: ubuntu-latest
 
