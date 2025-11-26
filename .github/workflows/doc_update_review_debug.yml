@@ -30,9 +30,9 @@ jobs:
             echo "Proposal JSON not found: ${PROPOSAL_PATH}" >&2
             exit 1
           fi
-          echo "[Sho debug] Found proposal JSON: ${PROPOSAL_PATH}"
+          echo "[Sho v1] Found proposal JSON: ${PROPOSAL_PATH}"
 
-      - name: Generate doc_update_review_v1 via Python (placeholder)
+      - name: Generate doc_update_review_v1 via Python (Sho v1)
         env:
           PROPOSAL_PATH: ${{ github.event.inputs.proposal_path }}
           PROJECT_ID: ${{ github.event.inputs.project_id }}
@@ -42,6 +42,65 @@ jobs:
 
           proposal_path = os.environ["PROPOSAL_PATH"]
           project_id = os.environ["PROJECT_ID"]
+
+          with open(proposal_path, encoding="utf-8") as f:
+              proposal = json.load(f)
+
+          updates = proposal.get("updates", [])
+          no_change = proposal.get("no_change", [])
+
+          confidences = {u.get("confidence", "") for u in updates}
+          if "low" in confidences:
+              risk_level = "high"
+          elif "medium" in confidences:
+              risk_level = "medium"
+          else:
+              risk_level = "low"
+
+          # overall summary
+          conf_summary = ", ".join(sorted(c for c in confidences if c)) or "n/a"
+          overall_summary = (
+              f"{project_id} 向け doc_update_proposal_v1 に対する Sho v1 の自動レビュー。"
+              f" updates={len(updates)} 件, no_change={len(no_change)} 件, "
+              f"confidence 分布={conf_summary}。"
+          )
+
+          update_judgements = []
+          for u in updates:
+              target = u.get("target", {})
+              path = target.get("path", "")
+              section_hint = target.get("section_hint", "")
+              conf = u.get("confidence", "")
+              base_reason = (u.get("reason") or "").strip()
+
+              if conf == "low":
+                  decision = "reject"
+                  reason = (
+                      "confidence=low のため、Sho v1 としては自動採用せず、人間レビューを強く推奨します。"
+                  )
+              elif conf == "medium":
+                  decision = "accept"
+                  reason = (
+                      "confidence=medium のため、自動採用は可能ですが、人間レビューを推奨します。"
+                  )
+              else:
+                  decision = "accept"
+                  reason = (
+                      "confidence=high のため、Sho v1 としては自動採用してよいと判断します。"
+                  )
+
+              if base_reason:
+                  reason = reason + f" 提案者の理由: {base_reason}"
+
+              update_judgements.append(
+                  {
+                      "target_path": path,
+                      "section_hint": section_hint,
+                      "decision": decision,
+                      "reason": reason,
+                  }
+              )
+
           now = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 
           data = {
@@ -50,20 +109,14 @@ jobs:
               "proposal_ref": proposal_path,
               "generated_at": now,
               "overall_assessment": {
-                  "summary": "placeholder review by Sho debug: このレビューは枠組みテスト用のダミーです。",
-                  "risk_level": "low",
+                  "summary": overall_summary,
+                  "risk_level": risk_level,
               },
-              "update_judgements": [
-                  {
-                      "target_path": "STATE/vpm-mini/current_state.md",
-                      "section_hint": "n/a (placeholder)",
-                      "decision": "accept",
-                      "reason": "placeholder: 本番実装では proposal.json を解析して judgement を生成します。",
-                  }
-              ],
+              "update_judgements": update_judgements,
               "notes": [
-                  "この doc_update_review_v1.json は Doc Update Review Debug workflow の枠組みテスト用です。",
-                  "将来、Sho は proposal.json の中身を読み、各 updates に対する judgement を生成します。",
+                  "この doc_update_review_v1.json は Sho v1 による自動レビュー結果です。",
+                  "最終的な採否の判断は、人間（啓＋ChatGPT）による確認を前提としています。",
+                  "confidence と対象ドキュメントの種類に基づき、accept/reject と human review の必要度を示しています。",
               ],
           }
 
@@ -76,5 +129,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: doc_update_review_v1_${{ github.event.inputs.project_id }}
-        
           path: doc_update_review_v1.json
