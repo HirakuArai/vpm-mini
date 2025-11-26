@@ -1,0 +1,10 @@
+{
+  "schema_version": "doc_update_proposal_v1",
+  "project_id": "vpm-mini",
+  "generated_at": "2025-11-24T12:00:00+09:00",
+  "updates": [],
+  "no_change": [],
+  "notes": [
+    "Sho v1 workflow scaffold test 用のダミー doc_update_proposal です。実際の更新提案は含まれていません。"
+  ]
+}
