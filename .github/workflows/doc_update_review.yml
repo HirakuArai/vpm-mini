@@ -12,6 +12,12 @@ on:
         required: true
         default: "reports/doc_update_proposals/2025-11-24-vpm-mini.json"
 
+  # 将来、push や他のトリガーを追加したい場合はここに書く。
+  # 例:
+  # push:
+  #   paths:
+  #     - ".github/workflows/doc_update_review.yml"
+
 jobs:
   review_doc_update_proposal:
     runs-on: ubuntu-latest
