@@ -105,3 +105,25 @@
   - `docs/pm/doc_update_review_v1_spec.md`（PR #817）
 - Codex ブリーフ:
   - `docs/ops/codex_brief_apply_doc_update_v1.md`（PR #818）
+
+## 運用ルール（Layer B / doc_update）v1（ドラフト）
+
+vpm-mini における Doc Update（レイヤーB）の最小サイクルについて、現時点の運用ルールをメモ（v1ドラフト）。
+
+- **Aya（Doc Update Proposal (PM)）**
+  - 啓が Actions UI から workflow_dispatch を実行し、`project_id` と `progress_summary` を渡す。
+  - 提案は `reports/doc_update_proposals/YYYY-MM-DD_project_id.json` として生成される（Artifact にも保存）。
+
+- **Sho（Doc Update Review Debug / Sho v1）**
+  - 通常は project_id=`vpm-mini` で実行し、`proposal_path` が空の場合は `reports/doc_update_proposals/*_vpm-mini.json` のうち最新を自動選択してレビュー対象とする。
+  - 出力は `doc_update_review_v1.json` として Artifact に保存。採否は当面 Human gate（啓＋ChatGPT）で判断。
+
+- **Apply（Codex + PR）**
+  - Sho v1 で accept 相当と判断された proposal は、Mac 側の Codex が apply 用ブランチ＋PRを作成。
+  - 反映対象は主に `STATE/vpm-mini/current_state.md`（Current / Gap / Evidence）と `reports/vpm-mini/*_weekly.md`。
+  - 啓が PR の diff を確認し、問題なければ merge して反映。
+
+- **Human gate（当面の方針）**
+  - `risk_level=high` の場合は必ず人間レビューを行い、自動適用しない。
+  - `risk_level=medium` / `low` の場合も、Phase 2 の間は啓＋ChatGPTが最終採否を確認（自動適用は次フェーズ以降）。
+  - Sho v1 の review ロジック（confidence や doc_type の扱い）は、この運用ルールに照らして少しずつチューニングしていく。
