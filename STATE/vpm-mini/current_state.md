@@ -9,8 +9,9 @@
 - フェーズ: Phase 2。インフラ（VM/GKE）を一旦縮退し、「GitHub + LLM の PM Kai v1」にフォーカスしている。
 - プロジェクトの SSOT は `docs/projects/vpm-mini/project_definition.md` に定義済み（PR #800）。`STATE/vpm-mini/current_state.md` と `reports/vpm-mini/2025-11-23_weekly.md` に 2025-11-23 時点の C/G/δ と進捗を記録（PR #801, #802, #803, #810）。
 - `docs/pm/pm_snapshot_v1_spec.md` に pm_snapshot_v1 の仕様と標準質問を定義し、`.github/workflows/pm_snapshot.yml` から手動実行で Snapshot を生成可能（PR #804, #805, #806, #807, #809）。
-- レイヤーB最小更新フロー v1 を `docs/pm/layer_b_update_flow.md` に定義。加えて、`docs/pm/doc_update_pipeline_v1.md` と `docs/pm/doc_update_review_v1_spec.md` を追加し、doc_update_proposal_v1 の提案〜レビューの枠組みを整備。Codex 用の適用ブリーフ `docs/ops/codex_brief_apply_doc_update_v1.md` も用意（PR #817, #818）。これらを前提に、vpm-mini 自身でも doc_update_proposal_v1 による STATE / weekly 更新案の提示を開始する方針。
-- GCP 側は devbox-codex VM 停止、GKE Autopilot クラスタ `vpm-mini` と不要 PVC を削除済みで、将来実験用の最小構成（ディスクのみ）に縮退。
+- レイヤーB最小更新フロー v1 を `docs/pm/layer_b_update_flow.md` に定義。`docs/pm/doc_update_pipeline_v1.md` と `docs/pm/doc_update_review_v1_spec.md` を追加し、doc_update_proposal_v1 の提案〜レビューの枠組みを整備（PR #817, #818）。
+- 5セル観点の整理として `docs/pm/roles_v1.md` を追加し、Kai / Aya / Sho などのロールと5セル構成を定義（PR #820）。また、`docs/pm/blackboard_v1_draft.md` を追加し、Aya↔Sho の伝言形式（「駅の黒板」プロトコル）を整理（PR #821）。
+- Sho v1 の Doc Update Review Debug ワークフローを整備し、`doc_update_review_v1.json` を Python で生成できる体制を構築（PR #822〜#835）。今後、Aya→Sho→Human→反映 のループを vpm-mini で実際に回していく方針。
 
 ### 1.2 Goals（G: ゴール）
 
@@ -29,7 +30,8 @@
 ### 1.3 Gap（δ）
 
 - pm_snapshot_v1 の仕様とレイヤーB最小更新フロー v1 は定義済みだが、vpm-mini での実サイクル運用（doc_update_proposal_v1 → STATE/weekly 反映 → 次の Snapshot）の実践が未了。
-- Kai による STATE/weekly の差分提案を doc_update_proposal_v1 JSON として起票し、doc_update_review_v1_spec に従ってレビューする手順は設計済みだが、運用ルール（トリガー、責任分担、採否基準）が明文化されていない。
+- roles_v1 と blackboard_v1_draft により役割と伝言形式は概ね明確化されたが、運用ルール（トリガー、責任分担、採否基準）の軽量版を STATE か関連ドキュメントに明文化する作業が未了。
+- Sho v1 Debug ワークフローにより `doc_update_review_v1.json` 生成の検証環境は整ったが、vpm-mini 向けの定常運用（Actions からの起動、アサイン、レビュー手順）に組み込む段取りが未整備。
 - PR 自動化（pm_snapshot 実行直後に更新案ブランチを作成する最小フロー）の設計と検証が未完。
 - マルチプロジェクト展開に向けた他プロジェクトの project_definition / STATE / reports 整備は未着手（hakone-e2 は試行のみ）。
 
@@ -86,6 +88,10 @@
   - `STATE/vpm-mini/current_state.md`（本ファイル。PR #801, #803, #808, #810 等で更新）
 - 週次レポート:
   - `reports/vpm-mini/2025-11-23_weekly.md`（PR #802, #803, #810）
+- 5セル・黒板・レビューWF:
+  - `docs/pm/roles_v1.md`（PR #820）
+  - `docs/pm/blackboard_v1_draft.md`（PR #821）
+  - Sho v1 Debug ワークフロー（`doc_update_review_v1.json` 生成、PR #822〜#835）
 - PM仕様:
   - `docs/pm/pm_snapshot_v1_spec.md`（PR #804, #809）
 - PM Snapshot ワークフロー:
