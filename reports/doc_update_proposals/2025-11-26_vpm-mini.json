@@ -1,0 +1,84 @@
+{
+  "schema_version": "doc_update_proposal_v1",
+  "project_id": "vpm-mini",
+  "generated_at": "2025-11-26T18:00:00+09:00",
+  "summary": "Sho v1 デバッグWFと黒板/ロール文書の追加を STATE と次週 weekly に反映し、レイヤーB初回サイクル実施に備える更新案です。",
+  "updates": [
+    {
+      "target": {
+        "path": "STATE/vpm-mini/current_state.md",
+        "doc_type": "state",
+        "section_hint": "### 1.1 Current（C: 現在地）"
+      },
+      "reason": "11/27 時点の進捗（roles_v1, blackboard_v1 の追加と Sho v1 デバッグWF整備）が現状サマリに未反映のため、C（現在地）を最新化します。",
+      "change_type": "edit_paragraph",
+      "suggestion_markdown": "### 1.1 Current（C: 現在地）\n\n- フェーズ: Phase 2。インフラ（VM/GKE）を一旦縮退し、「GitHub + LLM の PM Kai v1」にフォーカスしている。\n- プロジェクトの SSOT は `docs/projects/vpm-mini/project_definition.md` に定義済み（PR #800）。`STATE/vpm-mini/current_state.md` と `reports/vpm-mini/2025-11-23_weekly.md` に 2025-11-23 時点の C/G/δ と進捗を記録（PR #801, #802, #803, #810）。\n- `docs/pm/pm_snapshot_v1_spec.md` に pm_snapshot_v1 の仕様と標準質問を定義し、`.github/workflows/pm_snapshot.yml` から手動実行で Snapshot を生成可能（PR #804, #805, #806, #807, #809）。\n- レイヤーB最小更新フロー v1 を `docs/pm/layer_b_update_flow.md` に定義。`docs/pm/doc_update_pipeline_v1.md` と `docs/pm/doc_update_review_v1_spec.md` を追加し、doc_update_proposal_v1 の提案〜レビューの枠組みを整備（PR #817, #818）。\n- 5セル観点の整理として `docs/pm/roles_v1.md` を追加し、Kai / Aya / Sho などのロールと5セル構成を定義（PR #820）。また、`docs/pm/blackboard_v1_draft.md` を追加し、Aya↔Sho の伝言形式（「駅の黒板」プロトコル）を整理（PR #821）。\n- Sho v1 の Doc Update Review Debug ワークフローを整備し、`doc_update_review_v1.json` を Python で生成できる体制を構築（PR #822〜#835）。今後、Aya→Sho→Human→反映 のループを vpm-mini で実際に回していく方針。",
+      "confidence": "high"
+    },
+    {
+      "target": {
+        "path": "STATE/vpm-mini/current_state.md",
+        "doc_type": "state",
+        "section_hint": "### 1.3 Gap（δ）"
+      },
+      "reason": "roles/blackboard の整備と Sho v1 デバッグWFによりギャップの一部性質が変化。未了事項を明確化し、次の実行焦点をシャープにします。",
+      "change_type": "edit_paragraph",
+      "suggestion_markdown": "### 1.3 Gap（δ）\n\n- pm_snapshot_v1 の仕様とレイヤーB最小更新フロー v1 は定義済みだが、vpm-mini での実サイクル運用（doc_update_proposal_v1 → STATE/weekly 反映 → 次の Snapshot）の実践が未了。\n- roles_v1 と blackboard_v1_draft により役割と伝言形式は概ね明確化されたが、運用ルール（トリガー、責任分担、採否基準）の軽量版を STATE か関連ドキュメントに明文化する作業が未了。\n- Sho v1 Debug ワークフローにより `doc_update_review_v1.json` 生成の検証環境は整ったが、vpm-mini 向けの定常運用（Actions からの起動、アサイン、レビュー手順）に組み込む段取りが未整備。\n- PR 自動化（pm_snapshot 実行直後に更新案ブランチを作成する最小フロー）の設計と検証が未完。\n- マルチプロジェクト展開に向けた他プロジェクトの project_definition / STATE / reports 整備は未着手（hakone-e2 は試行のみ）。",
+      "confidence": "high"
+    },
+    {
+      "target": {
+        "path": "STATE/vpm-mini/current_state.md",
+        "doc_type": "state",
+        "section_hint": "## 3. Evidence Links（証拠リンク）"
+      },
+      "reason": "新規追加された基盤ドキュメント（roles_v1, blackboard_v1）と Sho v1 デバッグWFの進捗を Evidence に追記して可観測性を高めます。",
+      "change_type": "append_list_item",
+      "suggestion_markdown": "- 5セル・ロール定義:\n  - `docs/pm/roles_v1.md`（Kai / Aya / Sho ほかのロールと5セル構成の定義。PR #820）\n- 黒板プロトコル:\n  - `docs/pm/blackboard_v1_draft.md`（Aya↔Sho の伝言形式（駅の黒板）を整理。PR #821）\n- Doc Update Review Debug:\n  - Sho v1 のデバッグワークフロー（`doc_update_review_v1.json` を Python で生成する仕組み、PR #822〜#835）",
+      "confidence": "high"
+    },
+    {
+      "target": {
+        "path": "reports/vpm-mini/2025-11-30_weekly.md",
+        "doc_type": "weekly",
+        "section_hint": "新規作成"
+      },
+      "reason": "11/27 までの進捗（roles/blackboard の追加、Sho v1 デバッグWF整備）を週次として記録し、次の実行（Layer B 初回サイクル）に向けた Next 3 を明確化します。",
+      "change_type": "add",
+      "suggestion_markdown": "# Weekly Report: vpm-mini / 2025-11-30\n\n## 1. 今週のサマリー（Summary）\n\n- 5セル観点の `roles_v1` と Aya↔Sho の「駅の黒板」プロトコル草案を追加し、役割と伝言形式を明確化。\n- Sho v1 の Doc Update Review Debug ワークフローを整備し、`doc_update_review_v1.json` を Python で生成可能に。レビュー手順の検証基盤が整った。\n- 次週以降、vpm-mini 本体で Aya→Sho→Human→反映 のレイヤーB最小サイクルを実運用で回す準備が整った。\n\n## 2. 今週やったこと（Done）\n\n- [x] `docs/pm/roles_v1.md` を追加（Kai / Aya / Sho などのロールと5セル構成を定義、PR #820）。\n- [x] `docs/pm/blackboard_v1_draft.md` を追加（Aya↔Sho の伝言形式（駅の黒板）を整理、PR #821）。\n- [x] Sho v1 の Doc Update Review Debug ワークフローを整備し、`doc_update_review_v1.json` を Python で生成できるようにした（PR #822〜#835）。\n\n## 3. 進捗の観点からみた C/G/δ\n\n- **Current（C）**\n  - PM Kai v1 の仕様・フロー（pm_snapshot, doc_update_proposal/review）が一通り揃い、roles/blackboard により役割と伝言形式も固まってきた。\n  - Sho v1 デバッグWFでレビュー手順の検証が可能になったが、vpm-mini での実サイクル運用はまだ。\n\n- **Goals（G）**\n  - 短期: vpm-mini でレイヤーB最小サイクル（pm_snapshot → STATE/weekly 更新案 → PR → マージ）を1回以上回し、運用に耐えることを確認する。\n  - 中期: マルチプロジェクト展開に備え、project_id 前提の構造と PM Kai v1 の出力安定化を進める。\n\n- **Gap（δ）**\n  - 運用ルール（トリガー、責任分担、採否基準）の軽量版を STATE か関連ドキュメントに明文化する必要がある。\n  - デバッグWFを定常運用に組み込む段取り（Actions 起動、アサイン、レビュー動線）が未整備。\n  - pm_snapshot 後の自動PR（最小）設計・実装・検証が未完。\n\n## 4. リスク・懸念（Risks / Concerns）\n\n- 初回サイクルが遅れると、仕様と現物運用の乖離が生じやすく、レビュー基準の実効性検証が後ろ倒しになる。\n\n## 5. Next 3（来週やるべきこと候補）\n\n1. vpm-mini でレイヤーB最小サイクルを1回実施（pm_snapshot → Kai による STATE/weekly 更新案 → 手動PR → レビュー/マージ）。\n2. 運用ルール（トリガー、責任分担、採否基準）の軽量版を STATE に追記し、`doc_update_review_v1_spec.md` と参照関係を明確化。\n3. pm_snapshot 実行後に更新案ブランチを切る最小の自動PRフロー案（設計メモ）を作成。\n\n## 6. Evidence Links\n\n- ロール/黒板:\n  - `docs/pm/roles_v1.md`（PR #820）\n  - `docs/pm/blackboard_v1_draft.md`（PR #821）\n- レビューWF:\n  - Sho v1 Debug ワークフロー（`doc_update_review_v1.json` 生成、PR #822〜#835）\n- 既存仕様/フロー:\n  - `docs/pm/pm_snapshot_v1_spec.md`\n  - `docs/pm/layer_b_update_flow.md`\n  - `docs/pm/doc_update_pipeline_v1.md`\n  - `docs/pm/doc_update_review_v1_spec.md`",
+      "confidence": "high"
+    }
+  ],
+  "no_change": [
+    {
+      "path": "docs/projects/vpm-mini/project_definition.md",
+      "reason": "目的・スコープ・成功条件・制約・現フェーズに変化はなく、今回の進捗は運用基盤整備に関する内容のため。"
+    },
+    {
+      "path": "reports/vpm-mini/2025-11-23_weekly.md",
+      "reason": "過去の週次は事実記録として固定し、追記は新しい週次（2025-11-30）で扱うため。"
+    },
+    {
+      "path": "docs/pm/pm_snapshot_v1_spec.md",
+      "reason": "標準質問とJSON/Markdown仕様は v1 として安定。今回の変更は運用側（roles/blackboard, review debug）であり仕様更新不要。"
+    },
+    {
+      "path": "docs/pm/layer_b_update_flow.md",
+      "reason": "設計 v1 は現状に整合。roles/blackboard は補助資料であり、フロー本文の改訂は初回サイクル検証後に実施予定。"
+    },
+    {
+      "path": "docs/pm/doc_update_pipeline_v1.md",
+      "reason": "パイプラインの骨子は v1 として妥当。Sho v1 デバッグWFは実装詳細であり、まずは STATE/Evidence に追記して可観測性を確保する。"
+    },
+    {
+      "path": "docs/pm/doc_update_review_v1_spec.md",
+      "reason": "レビュー基準の仕様自体は変更不要。軽量運用ルールは STATE に追記し、必要があれば次フェーズで spec に反映する。"
+    }
+  ],
+  "notes": [
+    "generated_at はJST基準。",
+    "Sho v1 デバッグWFの具体パスはPR参照のため STATE/Evidence ではPR番号で示しています（#822〜#835）。",
+    "本提案は自動化を伴わない最小反映（STATEのC/δ更新＋次週weekly新規作成）に留めています。マージ後に pm_snapshot を再実行し、差分が期待通りか確認してください。",
+    "運用ルール（トリガー/責任分担/採否基準）の軽量案は、STATE内に短く追記し、将来的に doc_update_review_v1_spec へ昇格させる方針を推奨します。"
+  ]
+}
