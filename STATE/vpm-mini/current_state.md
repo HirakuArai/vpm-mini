@@ -30,21 +30,20 @@
 ### 1.3 Gap（δ）
 
 - pm_snapshot_v1 の仕様とレイヤーB最小更新フロー v1 は定義済みだが、vpm-mini での実サイクル運用（doc_update_proposal_v1 → STATE/weekly 反映 → 次の Snapshot）の実践が未了。
-- roles_v1 と blackboard_v1_draft により役割と伝言形式は概ね明確化されたが、運用ルール（トリガー、責任分担、採否基準）の軽量版を STATE か関連ドキュメントに明文化する作業が未了。
-- Sho v1 Debug ワークフローにより `doc_update_review_v1.json` 生成の検証環境は整ったが、vpm-mini 向けの定常運用（Actions からの起動、アサイン、レビュー手順）に組み込む段取りが未整備。
+- 運用ルール（トリガー、責任分担、採否基準）の軽量版は本 STATE に v1 として追記済み。今後、実運用を通じてチューニング（閾値や例外時の扱い）を行う必要がある。
+- Sho v1 Debug ワークフローにより `doc_update_review_v1.json` 生成の検証環境は整ったが、vpm-mini 向けの定常運用（Actions からの起動、アサイン、レビュー動線）に組み込む段取りが未整備。
 - PR 自動化（pm_snapshot 実行直後に更新案ブランチを作成する最小フロー）の設計と検証が未完。
 - マルチプロジェクト展開に向けた他プロジェクトの project_definition / STATE / reports 整備は未着手（hakone-e2 は試行のみ）。
-
 ## 2. Active Focus / Tasks（いまフォーカスしている課題）
 
 - [x] **T-PM-1:** PM Kai v1 の標準質問と出力フォーマット（pm_snapshot_v1 + Markdown）を定義し、spec に追記する（PR #809 完了）。
 - [ ] **T-STATE-1:** この current_state を 2025-11-23 ベースラインとして確定し、C/G/δ と Active Tasks を「数週間はそのまま使える」レベルまで整える（layer_b_update_flow への参照を追記）。
 - [ ] **T-PM-2:** `/ask` + GitHub Actions による STATE / weekly 更新ループの設計を進める（pm_snapshot の結果から STATE/weekly 更新案を生成する最小フロー案）。
 - [ ] **T-PM-3:** 他プロジェクト（例: 箱根E² or 会社業務）について、最初の `project_definition` / `STATE` / `weekly` を用意し、pm_snapshot を回してみる（hakone-e2 で doc_update_proposal_v1 → STATE/weekly の1サイクル試行済み）。
-- [ ] **T-PM-4:** vpm-mini で Kai による「STATE/weekly 更新案（テキスト）」生成 → 手動PR の最小サイクルを1回実施して検証する。
+- [ ] **T-PM-4:** vpm-mini で Kai による「STATE/weekly 更新案（テキスト）」生成 → 手動PR の最小サイクルを1回実施して検証する（owner: 啓、期限: 2025-12-07 目安）。
 - [ ] **T-INF-1:** VM/GKE 縮退後の GCP インベントリを月次レベルで確認する軽い仕組み（レポート or 手動チェック）を検討する（優先度はレイヤーBより低い）。
-- [ ] **T-DOC-1:** doc_update_proposal_v1 を vpm-mini に適用し、STATE/weekly 更新案 → 手動PR → マージの1サイクルを実施する（docs/pm/doc_update_pipeline_v1.md・docs/pm/doc_update_review_v1_spec.md に準拠。適用には `docs/ops/codex_brief_apply_doc_update_v1.md` を使用）（優先度: 高）
-
+- [ ] **T-DOC-1:** doc_update_proposal_v1 を vpm-mini に適用し、STATE/weekly 更新案 → 手動PR → マージの1サイクルを実施する（docs/pm/doc_update_pipeline_v1.md・docs/pm/doc_update_review_v1_spec.md に準拠。適用には `docs/ops/codex_brief_apply_doc_update_v1.md` を使用）（優先度: 高、owner: 啓、期限: 2025-12-07 目安）。
+- [ ] **T-AUTO-1:** pm_snapshot 実行後に更新案ブランチを切る最小の自動PRフロー案（設計メモ）を作成する（owner: 啓、期限: 2025-12-07 目安）。
 ## レイヤーB（記録・構造化ループ）のゴールとステップ
 
 **ゴール（Layer B）**
@@ -88,6 +87,7 @@
   - `STATE/vpm-mini/current_state.md`（本ファイル。PR #801, #803, #808, #810 等で更新）
 - 週次レポート:
   - `reports/vpm-mini/2025-11-23_weekly.md`（PR #802, #803, #810）
+  - `reports/vpm-mini/2025-11-30_weekly.md`
 - 5セル・黒板・レビューWF:
   - `docs/pm/roles_v1.md`（PR #820）
   - `docs/pm/blackboard_v1_draft.md`（PR #821）
@@ -105,7 +105,6 @@
   - `docs/pm/doc_update_review_v1_spec.md`（PR #817）
 - Codex ブリーフ:
   - `docs/ops/codex_brief_apply_doc_update_v1.md`（PR #818）
-
 ## 運用ルール（Layer B / doc_update）v1（ドラフト）
 
 vpm-mini における Doc Update（レイヤーB）の最小サイクルについて、現時点の運用ルールをメモ（v1ドラフト）。
