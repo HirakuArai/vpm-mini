@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "提供された progress_summary を SSOT に反映するためのドキュメント更新提案を作成します。Phase 2 の決定事項: 1) VPM は「管理に専念する」ドクトリン、2) 内部の仕事を P1 ask_pm_v1 / P2 decision_support_v1（spec 追加済）/ P3 doc_update_pm_v1（SSOT 更新は Aya 経由）に整理、3) Phase 2 の Hana は“軽量な窓口ロール”としてラベル付け＋ルーティングに専念、4) API/自動ルーティングは Phase 2 のスコープ外（将来課題）。これらを SSOT と運用プレイブックに追加します。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "上記 4 点の追加/更新で Phase 2 の決定事項を SSOT に反映します。内容とパスに問題なければ承認ください。承認後、これらの変更で PR を作成します。必要ならファイル構成や命名を調整します。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
