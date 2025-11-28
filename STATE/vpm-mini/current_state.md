@@ -1,6 +1,6 @@
 # STATE: vpm-mini / current_state
 
-最終更新: 2025-11-23 by 啓
+最終更新: 2025-11-30 by 啓
 
 ## 1. Snapshot（C / G / δ）
 
@@ -44,6 +44,7 @@
 - [ ] **T-PM-4:** vpm-mini で Kai による「STATE/weekly 更新案（テキスト）」生成 → 手動PR の最小サイクルを1回実施して検証する。
 - [ ] **T-INF-1:** VM/GKE 縮退後の GCP インベントリを月次レベルで確認する軽い仕組み（レポート or 手動チェック）を検討する（優先度はレイヤーBより低い）。
 - [ ] **T-DOC-1:** doc_update_proposal_v1 を vpm-mini に適用し、STATE/weekly 更新案 → 手動PR → マージの1サイクルを実施する（docs/pm/doc_update_pipeline_v1.md・docs/pm/doc_update_review_v1_spec.md に準拠。適用には `docs/ops/codex_brief_apply_doc_update_v1.md` を使用）（優先度: 高）
+- [ ] **T-AUTO-1:** pm_snapshot 実行後に更新案ブランチを切る最小の自動PRフロー案（設計メモ）を作成する（owner: 啓、期限: 2025-12-07 目安）
 
 ## レイヤーB（記録・構造化ループ）のゴールとステップ
 
@@ -127,3 +128,4 @@ vpm-mini における Doc Update（レイヤーB）の最小サイクルにつ�
   - `risk_level=high` の場合は必ず人間レビューを行い、自動適用しない。
   - `risk_level=medium` / `low` の場合も、Phase 2 の間は啓＋ChatGPTが最終採否を確認（自動適用は次フェーズ以降）。
   - Sho v1 の review ロジック（confidence や doc_type の扱い）は、この運用ルールに照らして少しずつチューニングしていく。
+- 参照: `docs/pm/doc_update_pipeline_v1.md`（提案〜適用の流れ）、`docs/pm/doc_update_review_v1_spec.md`（Sho v1 レビュー仕様）、`docs/pm/blackboard_v1_draft.md`（Aya↔Sho の伝言形式）
