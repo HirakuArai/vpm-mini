@@ -4,25 +4,111 @@ name: Doc Update Proposal (PM)
 
 on:
   workflow_dispatch:
+    # progress_summary is read from blackboard Issue #841; workflow inputs only require project_id
     inputs:
       project_id:
         description: "Target project_id (e.g. vpm-mini, hakone-e2)"
         required: true
-        default: "hakone-e2"
-      progress_summary:
-        description: "Summary of the recent progress/change (used as input to PM)"
-        required: true
+        default: "vpm-mini"
 
 jobs:
   propose_updates:
     runs-on: ubuntu-latest
+    env:
+      BOARD_ISSUE_NUMBER: "841" # [board] doc_update_blackboard_v1 (Issue #841)
+      PROJECT_ID: ${{ github.event.inputs.project_id }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Find Aya entry from blackboard
+        id: find_aya_entry
+        uses: actions/github-script@v7
+        env:
+          BOARD_ISSUE_NUMBER: ${{ env.BOARD_ISSUE_NUMBER }}
+          PROJECT_ID: ${{ env.PROJECT_ID }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumber = parseInt(process.env.BOARD_ISSUE_NUMBER, 10);
+            const projectId = process.env.PROJECT_ID;
+
+            if (!issueNumber) {
+              core.setFailed("BOARD_ISSUE_NUMBER is not set or invalid.");
+              return;
+            }
+            if (!projectId) {
+              core.setFailed("PROJECT_ID is required.");
+              return;
+            }
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              per_page: 100,
+            });
+
+            const candidates = [];
+            for (const comment of comments) {
+              const body = comment.body || "";
+              if (!body.includes("<!-- blackboard:doc_update_v1 -->")) {
+                continue;
+              }
+              const fenceMatch = body.match(/```json\s*([\s\S]*?)```/m);
+              const inlineMatch = body.match(/json\s+({[\s\S]*})/m);
+              const jsonText = fenceMatch?.[1] ?? inlineMatch?.[1];
+              if (!jsonText) continue;
+
+              let entry;
+              try {
+                entry = JSON.parse(jsonText);
+              } catch (error) {
+                core.info(`Skipping comment ${comment.id}: failed to parse JSON (${error}).`);
+                continue;
+              }
+
+              if (
+                entry?.to === "Aya" &&
+                entry?.kind === "doc_update_proposal_request" &&
+                entry?.status === "open" &&
+                entry?.project_id === projectId
+              ) {
+                const createdAt =
+                  entry.created_at ||
+                  comment.created_at ||
+                  comment.createdAt ||
+                  comment.updated_at;
+                const ts = Date.parse(createdAt) || 0;
+                candidates.push({ entry, ts });
+              }
+            }
+
+            if (!candidates.length) {
+              core.setFailed("No open doc_update_proposal_request to Aya found on the blackboard.");
+              return;
+            }
+
+            candidates.sort((a, b) => b.ts - a.ts);
+            const latest = candidates[0].entry;
+            core.info(`Selected Aya entry with id: ${latest.id || "unknown"}`);
+            core.setOutput("aya_entry", JSON.stringify(latest));
+
+      - name: Prepare progress summary from blackboard entry
+        id: prepare_progress_summary
+        run: |
+          set -euo pipefail
+
+          printf '%s' '${{ steps.find_aya_entry.outputs.aya_entry }}' > aya_entry.json
+
+          jq -e '.payload_ref.value' aya_entry.json >/dev/null
+          jq -r '.payload_ref.value' aya_entry.json > progress_summary.md
+
+          echo "progress_summary_path=progress_summary.md" >> "$GITHUB_OUTPUT"
 
       - name: Gather project SSOT files
         run: |
           set -e
-          PROJECT_ID="${{ github.event.inputs.project_id }}"
+          PROJECT_ID="${PROJECT_ID}"
           mkdir -p /tmp/doc-update-context
 
           # project_definition
@@ -53,8 +139,8 @@ jobs:
 
       - name: Build doc update proposal prompt
         env:
-          PROJECT_ID: ${{ github.event.inputs.project_id }}
-          PROGRESS_SUMMARY: ${{ github.event.inputs.progress_summary }}
+          PROJECT_ID: ${{ env.PROJECT_ID }}
+          PROGRESS_SUMMARY_PATH: ${{ steps.prepare_progress_summary.outputs.progress_summary_path }}
         run: |
           set -e
           cd /tmp/doc-update-context
@@ -70,13 +156,22 @@ jobs:
             p = base / path
             return p.read_text(encoding="utf-8") if p.exists() else ""
 
+          def read_progress_summary(path: str) -> str:
+            if not path:
+              return ""
+            p = pathlib.Path(path)
+            if p.exists():
+              return p.read_text(encoding="utf-8")
+            return ""
+
           project_def = read_if_exists("project_definition.md")
           state = read_if_exists("current_state.md")
           weekly = read_if_exists("weekly.md")
           pm_spec = read_if_exists("pm_snapshot_v1_spec.md")
           layer_b = read_if_exists("layer_b_update_flow.md")
           project_id = os.environ.get("PROJECT_ID", "")
-          progress_summary = os.environ.get("PROGRESS_SUMMARY", "")
+          progress_summary_path = os.environ.get("PROGRESS_SUMMARY_PATH", "")
+          progress_summary = read_progress_summary(progress_summary_path)
 
           schema_desc = textwrap.dedent("""
           あなたは Virtual Project Manager です。
@@ -165,10 +260,10 @@ jobs:
       - name: Call OpenAI for doc update proposal
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          PROJECT_ID: ${{ github.event.inputs.project_id }}
+          PROJECT_ID: ${{ env.PROJECT_ID }}
         run: |
           set -e
-          PROJECT_ID="${{ github.event.inputs.project_id }}"
+          PROJECT_ID="${PROJECT_ID}"
           SNAP_DATE=$(date +%Y-%m-%d)
           mkdir -p reports/doc_update_proposals
           prompt="$(cat /tmp/doc-update-context/prompt.txt)"
@@ -192,14 +287,70 @@ jobs:
           awk 'NR==1{sub(/^```[a-zA-Z0-9_-]*[[:space:]]*/,"")} {buf=buf $0 ORS} END{sub(/```[[:space:]]*[\r\n]*$/,"",buf); printf "%s", buf}' \
             /tmp/doc-update-context/proposal.txt > /tmp/doc-update-context/proposal.clean.json
 
-          SNAP_OUT="reports/doc_update_proposals/${SNAP_DATE}_${PROJECT_ID}.json"
+          SNAP_OUT="doc_update_proposal_v1.json"
+          ARCHIVE_OUT="reports/doc_update_proposals/${SNAP_DATE}_${PROJECT_ID}.json"
           cp /tmp/doc-update-context/proposal.clean.json "$SNAP_OUT"
+          cp /tmp/doc-update-context/proposal.clean.json "$ARCHIVE_OUT"
 
-          echo "Saved proposal to $SNAP_OUT"
+          echo "Saved proposal to $SNAP_OUT (archive: $ARCHIVE_OUT)"
           head -n 50 "$SNAP_OUT" || true
 
       - name: Upload doc update proposal artifact
         uses: actions/upload-artifact@v4
         with:
-          name: doc_update_proposal-${{ github.event.inputs.project_id }}
-          path: reports/doc_update_proposals/*.json
+          name: doc_update_proposal_v1_${{ github.run_id }}
+          path: doc_update_proposal_v1.json
+          retention-days: 14
+
+      - name: Add Aya→Sho blackboard comment
+        uses: actions/github-script@v7
+        env:
+          BOARD_ISSUE_NUMBER: ${{ env.BOARD_ISSUE_NUMBER }}
+          PROJECT_ID: ${{ env.PROJECT_ID }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumber = parseInt(process.env.BOARD_ISSUE_NUMBER, 10);
+            const projectId = process.env.PROJECT_ID;
+            if (!issueNumber) {
+              core.setFailed("BOARD_ISSUE_NUMBER is not set or invalid.");
+              return;
+            }
+            if (!projectId) {
+              core.setFailed("PROJECT_ID is required.");
+              return;
+            }
+
+            const now = new Date();
+            const id = `${now.toISOString()}_${projectId}_ayatosho_${context.runId}`;
+            const payloadRef = {
+              type: "actions_artifact",
+              workflow_run_id: context.runId,
+              artifact_name: `doc_update_proposal_v1_${context.runId}`,
+            };
+
+            const entry = {
+              id,
+              from: "Aya",
+              to: "Sho",
+              project_id: projectId,
+              kind: "doc_update_review_request",
+              payload_ref: payloadRef,
+              status: "open",
+              created_at: now.toISOString(),
+            };
+
+            const body = [
+              "<!-- blackboard:doc_update_v1 -->",
+              "json",
+              JSON.stringify(entry, null, 2),
+            ].join("\n");
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body,
+            });
+
+            core.info(`Posted Aya→Sho blackboard comment with id: ${id}`);
