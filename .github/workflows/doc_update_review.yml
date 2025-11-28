@@ -1,90 +1,252 @@
+# cell_roles: watcher, curator, planner, synthesizer
+
 name: Doc Update Review (Sho)
 
 on:
   workflow_dispatch:
     inputs:
       project_id:
-        description: "Project ID (e.g. vpm-mini)"
+        description: "Target project_id (e.g. vpm-mini, hakone-e2)"
         required: true
         default: "vpm-mini"
-      proposal_path:
-        description: "Path to doc_update_proposal_v1 JSON in the repo"
-        required: true
-        default: "reports/doc_update_proposals/2025-11-24-vpm-mini.json"
-
-  # 将来、push や他のトリガーを追加したい場合はここに書く。
-  # 例:
-  # push:
-  #   paths:
-  #     - ".github/workflows/doc_update_review.yml"
 
 jobs:
-  review_doc_update_proposal:
+  review:
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
-
+      actions: read
+      issues: write
+    env:
+      BOARD_ISSUE_NUMBER: "841" # [board] doc_update_blackboard_v1 (Issue #841)
+      PROJECT_ID: ${{ github.event.inputs.project_id }}
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Show context
-        run: |
-          echo "project_id=${{ github.event.inputs.project_id }}"
-          echo "proposal_path=${{ github.event.inputs.proposal_path }}"
-          ls -R
+      - name: Find Sho entry from blackboard
+        id: find_sho_entry
+        uses: actions/github-script@v7
+        env:
+          BOARD_ISSUE_NUMBER: ${{ env.BOARD_ISSUE_NUMBER }}
+          PROJECT_ID: ${{ env.PROJECT_ID }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumber = parseInt(process.env.BOARD_ISSUE_NUMBER, 10);
+            const projectId = process.env.PROJECT_ID;
 
-      - name: Load proposal JSON
-        id: load_proposal
+            if (!issueNumber) {
+              core.setFailed("BOARD_ISSUE_NUMBER is not set or invalid.");
+              return;
+            }
+            if (!projectId) {
+              core.setFailed("PROJECT_ID is required.");
+              return;
+            }
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              per_page: 100,
+            });
+
+            const candidates = [];
+            for (const comment of comments) {
+              const body = comment.body || "";
+              if (!body.includes("<!-- blackboard:doc_update_v1 -->")) {
+                continue;
+              }
+              const fenceMatch = body.match(/```json\s*([\s\S]*?)```/m);
+              const inlineMatch = body.match(/json\s+({[\s\S]*})/m);
+              const jsonText = fenceMatch?.[1] ?? inlineMatch?.[1];
+              if (!jsonText) continue;
+
+              let entry;
+              try {
+                entry = JSON.parse(jsonText);
+              } catch (error) {
+                core.info(`Skipping comment ${comment.id}: failed to parse JSON (${error}).`);
+                continue;
+              }
+
+              if (
+                entry?.to === "Sho" &&
+                entry?.from === "Aya" &&
+                entry?.kind === "doc_update_review_request" &&
+                entry?.status === "open" &&
+                entry?.project_id === projectId
+              ) {
+                const createdAt =
+                  entry.created_at ||
+                  comment.created_at ||
+                  comment.createdAt ||
+                  comment.updated_at;
+                const ts = Date.parse(createdAt) || 0;
+                candidates.push({ entry, ts });
+              }
+            }
+
+            if (!candidates.length) {
+              core.setFailed("No open doc_update_review_request to Sho found on the blackboard.");
+              return;
+            }
+
+            candidates.sort((a, b) => b.ts - a.ts);
+            const latest = candidates[0].entry;
+            core.info(`Selected Sho entry with id: ${latest.id || "unknown"}`);
+            core.setOutput("sho_entry", JSON.stringify(latest));
+
+      - name: Download doc update proposal artifact
+        id: download_proposal
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PROPOSAL_PATH="${{ github.event.inputs.proposal_path }}"
-          if [ ! -f "${PROPOSAL_PATH}" ]; then
-            echo "Proposal JSON not found: ${PROPOSAL_PATH}" >&2
+          set -euo pipefail
+
+          printf '%s' '${{ steps.find_sho_entry.outputs.sho_entry }}' > sho_entry.json
+
+          ARTIFACT_NAME=$(jq -r '.payload_ref.artifact_name // empty' sho_entry.json)
+          RUN_ID=$(jq -r '.payload_ref.workflow_run_id // empty' sho_entry.json)
+
+          if [ -z "$ARTIFACT_NAME" ] || [ -z "$RUN_ID" ]; then
+            echo "Missing artifact reference in Sho entry."
             exit 1
           fi
-          echo "[Sho] Found proposal JSON: ${PROPOSAL_PATH}"
-          # 将来ここで proposal.json を LLM に渡す。
-          cp "${PROPOSAL_PATH}" proposal.json
 
-      - name: Generate doc_update_review_v1 (placeholder)
+          OWNER_REPO="${GITHUB_REPOSITORY}"
+          API="https://api.github.com/repos/${OWNER_REPO}"
+
+          echo "Fetching artifacts for run ${RUN_ID} to find ${ARTIFACT_NAME}..."
+          ARTIFACTS_JSON=$(curl -sSL \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "${API}/actions/runs/${RUN_ID}/artifacts")
+
+          DOWNLOAD_URL=$(printf '%s' "$ARTIFACTS_JSON" | jq -r --arg NAME "$ARTIFACT_NAME" '.artifacts[] | select(.name == $NAME) | .archive_download_url' | head -n1)
+
+          if [ -z "$DOWNLOAD_URL" ] || [ "$DOWNLOAD_URL" = "null" ]; then
+            echo "Artifact ${ARTIFACT_NAME} not found in run ${RUN_ID}"
+            exit 1
+          fi
+
+          curl -sSL \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H "Accept: application/octet-stream" \
+            -o artifact.zip \
+            "$DOWNLOAD_URL"
+
+          unzip -o artifact.zip
+
+          if [ ! -f doc_update_proposal_v1.json ]; then
+            echo "doc_update_proposal_v1.json not found after extracting artifact."
+            ls -la
+            exit 1
+          fi
+
+          echo "proposal_path=doc_update_proposal_v1.json" >> "$GITHUB_OUTPUT"
+
+      - name: Generate doc update review (auto-accept v1)
         id: generate_review
         run: |
-          # TODO: ここを Sho (LLM) による本物のレビュー生成に差し替える。
-          # v1 ではワークフローの枠を先に作るため、ダミーの doc_update_review_v1.json を生成する。
-          PROPOSAL_PATH="${{ github.event.inputs.proposal_path }}"
-          PROJECT_ID="${{ github.event.inputs.project_id }}"
-          NOW="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          set -euo pipefail
 
-          cat > doc_update_review_v1.json << JSON
-{
-  "schema_version": "doc_update_review_v1",
-  "project_id": "${PROJECT_ID}",
-  "proposal_ref": "${PROPOSAL_PATH}",
-  "generated_at": "${NOW}",
-  "overall_assessment": {
-    "summary": "placeholder review by Sho v1: このレビューは枠組みテスト用のダミーです。",
-    "risk_level": "low"
-  },
-  "update_judgements": [
-    {
-      "target_path": "STATE/vpm-mini/current_state.md",
-      "section_hint": "n/a (placeholder)",
-      "decision": "accept",
-      "reason": "placeholder: 本番実装では proposal.json を解析して judgement を生成します。"
-    }
-  ],
-  "notes": [
-    "この doc_update_review_v1.json は Doc Update Review (Sho) workflow v1 の枠組みテスト用です。",
-    "将来、Sho は proposal.json の中身を読み、各 updates に対する judgement を生成します。"
-  ]
-}
-JSON
+          python - << 'PY'
+          import datetime
+          import json
+          import pathlib
 
-          echo "[Sho] Wrote placeholder doc_update_review_v1.json"
+          proposal_path = pathlib.Path("doc_update_proposal_v1.json")
+          proposal = json.loads(proposal_path.read_text(encoding="utf-8"))
 
-      - name: Upload review JSON as artifact
+          updates = proposal.get("updates", [])
+          review_updates = []
+          for u in updates:
+            ru = dict(u)
+            ru["status"] = "accept"
+            ru["risk"] = "low"
+            ru["reviewer_comment"] = "v1 auto-accept by Sho; human review still recommended."
+            review_updates.append(ru)
+
+          review = {
+            "schema_version": "doc_update_review_v1",
+            "project_id": proposal.get("project_id", ""),
+            "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            "decision": "auto_accept_all",
+            "updates": review_updates,
+            "no_change": proposal.get("no_change", []),
+            "notes": [
+              "Auto-generated Sho v1 review: accepts all updates; please double-check manually."
+            ],
+          }
+
+          out = pathlib.Path("doc_update_review_v1.json")
+          out.write_text(json.dumps(review, ensure_ascii=False, indent=2), encoding="utf-8")
+          print(f"Wrote {out}")
+          PY
+
+          echo "review_path=doc_update_review_v1.json" >> "$GITHUB_OUTPUT"
+
+      - name: Upload doc update review artifact
         uses: actions/upload-artifact@v4
         with:
-          name: doc_update_review_v1_${{ github.event.inputs.project_id }}
+          name: doc_update_review_v1_${{ github.run_id }}
           path: doc_update_review_v1.json
+          retention-days: 14
+
+      - name: Add Sho→Aya blackboard comment
+        uses: actions/github-script@v7
+        env:
+          BOARD_ISSUE_NUMBER: ${{ env.BOARD_ISSUE_NUMBER }}
+          PROJECT_ID: ${{ env.PROJECT_ID }}
+          SHO_ENTRY: ${{ steps.find_sho_entry.outputs.sho_entry }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumber = parseInt(process.env.BOARD_ISSUE_NUMBER, 10);
+            const projectId = process.env.PROJECT_ID;
+            const shoEntry = JSON.parse(process.env.SHO_ENTRY || "{}");
+            if (!issueNumber) {
+              core.setFailed("BOARD_ISSUE_NUMBER is not set or invalid.");
+              return;
+            }
+            if (!projectId) {
+              core.setFailed("PROJECT_ID is required.");
+              return;
+            }
+            const inReplyTo = shoEntry.id;
+
+            const now = new Date();
+            const id = `${now.toISOString()}_${projectId}_shotoaya_${context.runId}`;
+            const payloadRef = {
+              type: "actions_artifact",
+              workflow_run_id: context.runId,
+              artifact_name: `doc_update_review_v1_${context.runId}`,
+            };
+
+            const entry = {
+              id,
+              from: "Sho",
+              to: "Aya",
+              project_id: projectId,
+              kind: "doc_update_review_result",
+              payload_ref: payloadRef,
+              in_reply_to: inReplyTo,
+              status: "done",
+              created_at: now.toISOString(),
+            };
+
+            const body = [
+              "<!-- blackboard:doc_update_v1 -->",
+              "json",
+              JSON.stringify(entry, null, 2),
+            ].join("\n");
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body,
+            });
+
+            core.info(`Posted Sho→Aya blackboard comment with id: ${id}`);

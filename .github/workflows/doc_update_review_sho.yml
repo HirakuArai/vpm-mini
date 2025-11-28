@@ -35,36 +35,59 @@ jobs:
       - name: Generate doc_update_review_v1 (placeholder)
         id: generate_review
         run: |
+          set -euo pipefail
           PROPOSAL_PATH="${{ github.event.inputs.proposal_path }}"
           PROJECT_ID="${{ github.event.inputs.project_id }}"
-          NOW="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
-          cat > doc_update_review_v1.json << JSON
-{
-  "schema_version": "doc_update_review_v1",
-  "project_id": "${PROJECT_ID}",
-  "proposal_ref": "${PROPOSAL_PATH}",
-  "generated_at": "${NOW}",
-  "overall_assessment": {
-    "summary": "placeholder review by Sho v2: このレビューは枠組みテスト用のダミーです。",
-    "risk_level": "low"
-  },
-  "update_judgements": [
-    {
-      "target_path": "STATE/vpm-mini/current_state.md",
-      "section_hint": "n/a (placeholder)",
-      "decision": "accept",
-      "reason": "placeholder: 本番実装では proposal.json を解析して judgement を生成します。"
-    }
-  ],
-  "notes": [
-    "この doc_update_review_v1.json は Doc Update Review (Sho v2) workflow の枠組みテスト用です。",
-    "将来、Sho は proposal.json の中身を読み、各 updates に対する judgement を生成します。"
-  ]
-}
-JSON
+          python - << 'PY'
+          import datetime
+          import json
+          import os
+          import pathlib
+          import sys
 
-          echo "[Sho v2] Wrote placeholder doc_update_review_v1.json"
+          proposal_path = pathlib.Path(os.environ["PROPOSAL_PATH"])
+          project_id = os.environ["PROJECT_ID"]
+          if not proposal_path.exists():
+            print(f"Proposal JSON not found: {proposal_path}", file=sys.stderr)
+            sys.exit(1)
+
+          proposal = json.loads(proposal_path.read_text(encoding="utf-8"))
+          updates = proposal.get("updates", [])
+
+          judgments = []
+          for upd in updates:
+            target = upd.get("target", {})
+            target_path = target.get("path") or upd.get("target_path", "")
+            section_hint = target.get("section_hint") or upd.get("section_hint", "")
+            judgments.append({
+              "target_path": target_path,
+              "section_hint": section_hint,
+              "decision": "accept",
+              "risk": "low",
+              "reason": "auto-accept v1; human review still recommended.",
+            })
+
+          now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+          review = {
+            "schema_version": "doc_update_review_v1",
+            "project_id": project_id,
+            "proposal_ref": str(proposal_path),
+            "generated_at": now,
+            "overall_assessment": {
+              "summary": "auto-accept v1 by Sho (blackboard)",
+              "risk_level": "low",
+            },
+            "update_judgements": judgments,
+            "notes": [
+              "Auto-generated Sho v2 review: accepts all updates; please double-check manually."
+            ],
+          }
+
+          out = pathlib.Path("doc_update_review_v1.json")
+          out.write_text(json.dumps(review, ensure_ascii=False, indent=2), encoding="utf-8")
+          print(f"Wrote {out}")
+          PY
 
       - name: Upload review JSON as artifact
         uses: actions/upload-artifact@v4
