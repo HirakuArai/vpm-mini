@@ -114,49 +114,43 @@ jobs:
             exit 1
           fi
 
-          OWNER_REPO="${GITHUB_REPOSITORY}"
-          API="https://api.github.com/repos/${OWNER_REPO}"
+          echo "Downloading artifact ${ARTIFACT_NAME} from run ${RUN_ID}..."
+          gh run download "$RUN_ID" -n "$ARTIFACT_NAME"
 
-          echo "Fetching artifacts for run ${RUN_ID} to find ${ARTIFACT_NAME}..."
-          ARTIFACTS_JSON=$(curl -sSL \
-            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            "${API}/actions/runs/${RUN_ID}/artifacts")
+          if [ -f doc_update_proposal_v1.json ]; then
+            PROPOSAL_PATH="doc_update_proposal_v1.json"
+          else
+            PROPOSAL_PATH=$(find . -maxdepth 3 -name 'doc_update_proposal_v1.json' | head -n1 || true)
+          fi
 
-          DOWNLOAD_URL=$(printf '%s' "$ARTIFACTS_JSON" | jq -r --arg NAME "$ARTIFACT_NAME" '.artifacts[] | select(.name == $NAME) | .archive_download_url' | head -n1)
-
-          if [ -z "$DOWNLOAD_URL" ] || [ "$DOWNLOAD_URL" = "null" ]; then
-            echo "Artifact ${ARTIFACT_NAME} not found in run ${RUN_ID}"
+          if [ -z "$PROPOSAL_PATH" ]; then
+            echo "doc_update_proposal_v1.json not found in downloaded artifact."
+            ls -R .
             exit 1
           fi
 
-          curl -sSL \
-            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-            -H "Accept: application/octet-stream" \
-            -o artifact.zip \
-            "$DOWNLOAD_URL"
-
-          unzip -o artifact.zip
-
-          if [ ! -f doc_update_proposal_v1.json ]; then
-            echo "doc_update_proposal_v1.json not found after extracting artifact."
-            ls -la
-            exit 1
-          fi
-
-          echo "proposal_path=doc_update_proposal_v1.json" >> "$GITHUB_OUTPUT"
+          echo "Using proposal at $PROPOSAL_PATH"
+          echo "proposal_path=$PROPOSAL_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Generate doc update review (auto-accept v1)
         id: generate_review
+        env:
+          PROPOSAL_PATH: ${{ steps.download_proposal.outputs.proposal_path }}
         run: |
           set -euo pipefail
 
           python - << 'PY'
           import datetime
           import json
+          import os
           import pathlib
+          import sys
 
-          proposal_path = pathlib.Path("doc_update_proposal_v1.json")
+          proposal_path = pathlib.Path(os.environ.get("PROPOSAL_PATH") or "doc_update_proposal_v1.json")
+          if not proposal_path.exists():
+            print(f"Proposal JSON not found: {proposal_path}", file=sys.stderr)
+            sys.exit(1)
+
           proposal = json.loads(proposal_path.read_text(encoding="utf-8"))
 
           updates = proposal.get("updates", [])
