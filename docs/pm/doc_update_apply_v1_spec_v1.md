@@ -21,7 +21,7 @@ context_header: repo=vpm-mini / branch=main / phase=Phase 2 (Layer B / doc_updat
 - 前提を満たさない場合は apply を中止し、エラー扱い（PR を作らない）。
 
 ## 3. 出力仕様（Tsugu が行うこと）
-- ファイル更新: review の change_list に従い target_files を更新（v1 は全体差し替えを基本）。
+- ファイル更新: review の target_files[].final_content を用いて対象ファイルを全置換（v1 は全体差し替えのみ）。
 - Git 操作:
   - ブランチ名: 例 feature/doc-update-apply-2025-11-30 または feature/doc-update-apply-{review_run_id}
   - コミットメッセージ案: docs(state): apply doc_update_review_v1 {date or run_id}
@@ -35,8 +35,8 @@ context_header: repo=vpm-mini / branch=main / phase=Phase 2 (Layer B / doc_updat
 - auto-merge は使わず、必ず人間レビューを経てマージする。問題があれば Tsugu PR を修正/クローズする。
 
 ## 5. 反映方法（apply 単位）
-- review の change_list 単位: ファイル単位の「全体差し替え」または「特定セクション差し替え」を想定。
-- Tsugu v1 はシンプルに「ファイル全体差し替え」を基本とし、セクション単位のマージは v2 以降に検討。doc_update 側で置き換え範囲を決める前提。
+- review の target_files 単位: 各 path について final_content を 1 つ持つ前提（複数や欠落はエラー）。
+- Tsugu v1 は「ファイル全体差し替え」を行い、セクション単位のマージは v2 以降に検討。doc_update 側で置き換え範囲を決めて final_content を作る前提。
 
 ## 6. 運用フロー（v1 想定）
 - Aya: 黒板 entry に基づいて doc_update_proposal_v1.json を生成。

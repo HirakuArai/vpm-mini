@@ -66,7 +66,7 @@ def validate_review(review: Dict):
 
     per_path = {}
     for upd in updates:
-        path = upd.get("target", {}).get("path")
+        path = upd.get("target", {}).get("path") or upd.get("target_path")
         if not path:
             sys.stderr.write("Update without target path; aborting\n")
             sys.exit(1)
@@ -78,16 +78,16 @@ def validate_review(review: Dict):
         if upd.get("risk") != "low":
             sys.stderr.write(f"Update risk is not low for {path}\n")
             sys.exit(1)
+        final_content = upd.get("final_content")
+        if not isinstance(final_content, str) or not final_content.strip():
+            sys.stderr.write(f"final_content missing or invalid for {path}\n")
+            sys.exit(1)
         if path in per_path:
             sys.stderr.write(
-                f"Multiple updates for the same path not supported (path={path})\n"
+                f"Multiple final_content entries for the same path (path={path})\n"
             )
             sys.exit(1)
-        content = upd.get("suggestion_markdown")
-        if not content or not isinstance(content, str):
-            sys.stderr.write(f"suggestion_markdown missing or invalid for {path}\n")
-            sys.exit(1)
-        per_path[path] = content
+        per_path[path] = final_content
     return per_path
 
 
