@@ -134,10 +134,11 @@ Kai に求めるアウトプット（テキスト）:
 
 というセミ自動の形から始める。
 
-## 6. 現時点のステータス（2025-11-23）
+## 6. 現時点のステータス（2025-11-30）
 
 - PM Snapshot 仕様（pm_snapshot_v1）と標準質問は `docs/pm/pm_snapshot_v1_spec.md` に定義済み（PR #804, #809）。
 - vpm-mini の current_state ベースラインは `STATE/vpm-mini/current_state.md` に反映済み（PR #811）。
 - `pm_snapshot.yml` ワークフローから、vpm-mini に対する PM Snapshot を手動で生成可能（PR #805, #806, #807）。
-- 本ドキュメント（layer_b_update_flow）は、レイヤーBの「設計書 v1」として位置づける。今後、実際のループを回しながら必要に応じて更新していく。
+- 5セル観点の `roles_v1` と Aya↔Sho の `blackboard` ドラフトを追加（PR #820, #821）。
+- Sho v1 の Doc Update Review Debug ワークフローを整備し、`doc_update_review_v1.json` を生成できる検証基盤が整った（PR #822〜#835）。
 - hakone-e2 プロジェクトにて、doc_update_proposal_v1 → STATE/weekly 反映の1サイクルを実施し、手順の妥当性を予備確認済み。vpm-mini への適用はこれから。
