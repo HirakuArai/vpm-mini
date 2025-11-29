@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "pm_snapshot はレビュー用スナップショットであり、C/G/δ/Next 候補を整理する起点。実行は現実の Ops。実施済みの変更に追随して Aya/Sho/doc_update レーンが STATE / docs / weekly を PR→レビュー→マージで更新する。pm_snapshot 自身は STATE/weekly を直接更新する主語にはならない。この新しい理解に合わせて指定セクションの文言を刷新する。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "上記の文言で各セクションを更新提案します。差分形式や粒度の調整が必要であれば指示ください。承認後、PR を準備します。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
