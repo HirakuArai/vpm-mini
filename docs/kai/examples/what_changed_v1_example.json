@@ -1,0 +1,92 @@
+{
+  "kind": "what_changed_v1",
+  "project_id": "vpm-mini",
+  "time_window": {
+    "from": "2025-11-22",
+    "to": "2025-11-29"
+  },
+  "highlights": [
+    {
+      "rank": 1,
+      "category": "layer_b",
+      "title": "Layer B / Doc Update レーンの cycle-1 が完了。",
+      "summary": "Aya→Sho→Tsugu/Apply の最小サイクルが初めて一巡し、STATE/vpm-mini/current_state.md に反映された。",
+      "evidence": [
+        {
+          "type": "issue",
+          "id": 841,
+          "title": "[board] doc_update_blackboard_v1",
+          "url": "https://github.com/HirakuArai/vpm-mini/issues/841"
+        },
+        {
+          "type": "pr",
+          "id": 847,
+          "title": "Apply: Layer B rules v1 (STATE)",
+          "url": "https://github.com/HirakuArai/vpm-mini/pull/847"
+        },
+        {
+          "type": "pr",
+          "id": 849,
+          "title": "Apply: Evidence & Gap update",
+          "url": "https://github.com/HirakuArai/vpm-mini/pull/849"
+        },
+        {
+          "type": "state_file",
+          "path": "STATE/vpm-mini/current_state.md",
+          "section": "#layer-b-doc-update-v1"
+        }
+      ]
+    }
+  ],
+  "by_category": {
+    "workflows": [
+      {
+        "name": "Doc Update Proposal (PM)",
+        "runs": 1,
+        "last_run_status": "success",
+        "last_run_at": "2025-11-28T12:00:00+09:00",
+        "notes": "黒板 entry をトリガーに doc_update_proposal_v1 を生成。"
+      },
+      {
+        "name": "Doc Update Review (Sho v2)",
+        "runs": 1,
+        "last_run_status": "success",
+        "last_run_at": "2025-11-28T13:00:00+09:00",
+        "notes": "auto-accept v1 (risk=low) が動作。"
+      }
+    ],
+    "prs": [
+      {
+        "number": 847,
+        "title": "Apply: Layer B rules v1 (STATE)",
+        "state": "merged",
+        "merged_at": "2025-11-29T10:00:00+09:00",
+        "impact": "STATE の Layer B 運用ルールを v1 に更新。"
+      },
+      {
+        "number": 849,
+        "title": "Apply: Evidence & Gap update",
+        "state": "merged",
+        "merged_at": "2025-11-29T10:10:00+09:00",
+        "impact": "Gap と Evidence を最新の認識に更新。"
+      }
+    ],
+    "state_docs": [
+      {
+        "path": "STATE/vpm-mini/current_state.md",
+        "summary": "Layer B セクションを追加／更新し、Gap/Tasks/Evidence を整理。",
+        "impact_level": "high"
+      }
+    ]
+  },
+  "risks": [
+    {
+      "id": "r-001",
+      "summary": "Gen / PM Snapshot がまだ Layer B cycle-1 完了を反映していない。",
+      "suggested_action": "次回 PM Snapshot で C/G/δ に cycle-1 完了を取り込む。"
+    }
+  ],
+  "open_questions": [
+    "Layer B 以外のレーンをいつ Kai-0 の対象に広げるか？"
+  ]
+}

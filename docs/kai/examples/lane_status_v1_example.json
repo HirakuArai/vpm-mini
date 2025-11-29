@@ -1,0 +1,79 @@
+{
+  "kind": "lane_status_v1",
+  "project_id": "vpm-mini",
+  "lane": {
+    "layer": "layer_b",
+    "name": "doc_update"
+  },
+  "as_of": "2025-11-29T12:00:00+09:00",
+  "cycle": {
+    "latest_cycle_id": "cycle-1",
+    "status": "completed",
+    "started_at": "2025-11-28T00:00:00+09:00",
+    "completed_at": "2025-11-29T00:00:00+09:00",
+    "steps": {
+      "aya": {
+        "status": "completed",
+        "latest_entry": {
+          "blackboard_issue": 841,
+          "blackboard_comment_id": 0,
+          "actions_workflow": "Doc Update Proposal (PM)",
+          "actions_run_id": 0,
+          "artifact_path": "reports/doc_update_proposals/2025-11-28-vpm-mini.json",
+          "updated_at": "2025-11-28T12:00:00+09:00",
+          "summary": "STATE/vpm-mini/current_state.md の Layer B セクション更新案を生成。"
+        }
+      },
+      "sho": {
+        "status": "completed",
+        "latest_entry": {
+          "actions_workflow": "Doc Update Review (Sho v2)",
+          "actions_run_id": 0,
+          "artifact_path": "reports/doc_update_reviews/2025-11-28-vpm-mini.json",
+          "review_mode": "auto_accept_v1",
+          "risk": "low",
+          "updated_at": "2025-11-28T13:00:00+09:00",
+          "summary": "提案を auto-accept v1 (risk=low) と判定。"
+        }
+      },
+      "tsugu": {
+        "status": "completed",
+        "latest_entry": {
+          "apply_mode": "codex_apply",
+          "prs": [
+            {
+              "number": 847,
+              "title": "Apply: Layer B rules v1 (STATE)",
+              "state": "merged"
+            },
+            {
+              "number": 849,
+              "title": "Apply: Evidence & Gap update",
+              "state": "merged"
+            }
+          ],
+          "updated_at": "2025-11-29T10:00:00+09:00",
+          "summary": "STATE/vpm-mini/current_state.md を提案どおり置き換え。"
+        }
+      }
+    }
+  },
+  "state_view": {
+    "state_file": "STATE/vpm-mini/current_state.md",
+    "section_anchor": "#layer-b-doc-update-v1",
+    "digest": "Layer B 最小サイクル（Aya→Sho→Tsugu/Apply→STATE更新）が cycle-1 まで完了。",
+    "known_gaps": [
+      "Gen / PM Snapshot への連携は未実装。",
+      "Kai 自身はまだ ChatGPT 上の概念のみ。"
+    ]
+  },
+  "next_suggested_actions": [
+    {
+      "id": "b-002",
+      "title": "Gen / PM Snapshot を黒板レーンに接続。",
+      "owner": "Kai",
+      "priority": "M",
+      "suggested_lane": "pm_snapshot"
+    }
+  ]
+}
