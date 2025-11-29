@@ -7,6 +7,9 @@ on:
         description: "Target project_id (e.g. vpm-mini)"
         required: false
         default: "vpm-mini"
+      as_of_date:
+        description: "Snapshot date in JST (YYYY-MM-DD)"
+        required: true
   push:
     paths:
       - ".github/workflows/pm_snapshot.yml"
@@ -28,6 +31,11 @@ jobs:
         run: |
           set -euo pipefail
           PROJECT_ID="${{ github.event.inputs.project_id }}"
+          AS_OF_DATE="${{ github.event.inputs.as_of_date }}"
+          if [ -z "${AS_OF_DATE:-}" ]; then
+            echo "as_of_date is required (YYYY-MM-DD, JST)" >&2
+            exit 1
+          fi
           mkdir -p /tmp/pm-context
           cp "docs/projects/${PROJECT_ID}/project_definition.md" /tmp/pm-context/project_definition.md
           cp "STATE/${PROJECT_ID}/current_state.md" /tmp/pm-context/current_state.md
@@ -39,8 +47,13 @@ jobs:
         shell: bash
         env:
           PROJECT_ID: ${{ github.event.inputs.project_id }}
+          AS_OF_DATE: ${{ github.event.inputs.as_of_date }}
         run: |
           set -euo pipefail
+          if [ -z "${AS_OF_DATE:-}" ]; then
+            echo "AS_OF_DATE is required (YYYY-MM-DD, JST)" >&2
+            exit 1
+          fi
           cd /tmp/pm-context
           python - << 'PY'
           import os
@@ -53,12 +66,14 @@ jobs:
           weekly = (base / "weekly.md").read_text(encoding="utf-8")
           spec = (base / "spec.md").read_text(encoding="utf-8")
           project_id = os.environ.get("PROJECT_ID", "vpm-mini")
+          as_of_date = os.environ["AS_OF_DATE"]
 
           prompt = f"""
           あなたは Virtual Project Manager (PM Kai v1) です。
           対象プロジェクト: {project_id}
+          対象日付 (as_of_date, JST): {as_of_date}
 
-          以下の仕様にしたがって、プロジェクト {project_id} について pm_snapshot_v1 JSON と、その要約の Markdown ビューを生成してください。
+          以下の仕様にしたがって、as_of_date={as_of_date} (JST) の pm_snapshot_v1 JSON と、その要約の Markdown ビューを生成してください。
 
           === 出力仕様 (docs/pm/pm_snapshot_v1_spec.md) ===
           {spec}
@@ -76,6 +91,7 @@ jobs:
           1) まず pm_snapshot_v1 JSON を出力する
           2) その直後の行に '---' を 1 行だけ出力する
           3) 続けて Markdown ビューを出力する
+          4) Markdown 冒頭かメタ情報に as_of_date: {as_of_date} (JST) を明記する
           """.strip()
 
           out = base / "prompt.txt"
@@ -87,9 +103,13 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           PROJECT_ID: ${{ github.event.inputs.project_id }}
+          AS_OF_DATE: ${{ github.event.inputs.as_of_date }}
         run: |
           set -euo pipefail
-          SNAP_DATE=$(date +%Y-%m-%d)
+          if [ -z "${AS_OF_DATE:-}" ]; then
+            echo "AS_OF_DATE is required (YYYY-MM-DD, JST)" >&2
+            exit 1
+          fi
           mkdir -p reports/pm_snapshots
           prompt="$(cat /tmp/pm-context/prompt.txt)"
 
@@ -111,7 +131,7 @@ jobs:
           awk 'NR==1{sub(/^```[a-zA-Z0-9_-]*[[:space:]]*/,"")} {buf=buf $0 ORS} END{sub(/```[[:space:]]*[\r\n]*$/,"",buf); printf "%s", buf}' \
             /tmp/pm-context/pm_snapshot.txt > /tmp/pm-context/pm_snapshot.clean.txt
 
-          SNAP_OUT="reports/pm_snapshots/${SNAP_DATE}_${PROJECT_ID}.md"
+          SNAP_OUT="reports/pm_snapshots/${AS_OF_DATE}_${PROJECT_ID}.md"
           cp /tmp/pm-context/pm_snapshot.clean.txt "$SNAP_OUT"
 
           echo "Saved snapshot to $SNAP_OUT"
@@ -121,4 +141,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: pm_snapshot-${{ github.event.inputs.project_id || 'vpm-mini' }}
-          path: reports/pm_snapshots/*.md
+          path: reports/pm_snapshots/${{ github.event.inputs.as_of_date }}_${{ github.event.inputs.project_id || 'vpm-mini' }}.md
