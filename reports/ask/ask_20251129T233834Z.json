@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "Add a single new evidence link line for docs/pm/doc_update_apply_v1_spec_v1.md to section “3. Evidence Links” in STATE/vpm-mini/current_state.md, keeping existing structure/order intact and appending to the end of that section.",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "I will append a single bullet at the end of section 3 using the label “Tsugu doc_update apply v1 spec” and a relative path ../../docs/pm/doc_update_apply_v1_spec_v1.md, without changing existing items. Please confirm if the label text or link style should mirror a specific existing pattern (e.g., different bullet marker or link title). If confirmed, I’ll proceed with the above steps."
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
