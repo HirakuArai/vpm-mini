@@ -1,0 +1,51 @@
+name: Kai-assist (vpm-mini)
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_id:
+        description: "Project ID"
+        required: true
+        default: "vpm-mini"
+      task_type:
+        description: "Kai-assist task type"
+        required: true
+        default: "inspect_pm_snapshot_prompt_v1"
+      notes:
+        description: "Optional human notes for Kai"
+        required: false
+
+jobs:
+  kai_assist:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run Kai-assist
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          set -euo pipefail
+          PROJECT_ID="${{ github.event.inputs.project_id }}"
+          TASK_TYPE="${{ github.event.inputs.task_type }}"
+          NOTES="${{ github.event.inputs.notes }}"
+          mkdir -p reports/kai
+          python tools/kai/assist_v1.py \
+            --project-id "$PROJECT_ID" \
+            --task-type "$TASK_TYPE" \
+            --notes "${NOTES:-}" \
+            --output-json "reports/kai/assist_response.json"
+
+      - name: Upload Kai-assist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kai_assist_v1
+          path: reports/kai/assist_response.json
