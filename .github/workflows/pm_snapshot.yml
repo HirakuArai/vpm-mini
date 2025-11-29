@@ -73,7 +73,7 @@ jobs:
           対象プロジェクト: {project_id}
           対象日付 (as_of_date, JST): {as_of_date}
 
-          以下の仕様にしたがって、as_of_date={as_of_date} (JST) の pm_snapshot_v1 JSON と、その要約の Markdown ビューを生成してください。
+          以下の仕様にしたがって、as_of_date={as_of_date} (JST) の状況をもとに、pm_snapshot_v1 JSON とその要約の Markdown ビューを「レビュー用スナップショット」として生成してください。この Workflow 自体は STATE や weekly レポートを直接更新しません。
 
           === 出力仕様 (docs/pm/pm_snapshot_v1_spec.md) ===
           {spec}
@@ -113,7 +113,7 @@ jobs:
           mkdir -p reports/pm_snapshots
           prompt="$(cat /tmp/pm-context/prompt.txt)"
 
-          jq -n --arg sys "You are PM Kai v1. Follow the user prompt to produce pm_snapshot_v1 JSON, then '---', then a Markdown view." \
+          jq -n --arg sys "You are PM Kai v1. Follow the user prompt to produce a pm_snapshot_v1 JSON snapshot and then '---' and a Markdown view for review. Your job is only to describe the current C/G/δ and candidate Next actions; you do not directly update STATE or weekly reports. Your output is used later by humans and the Aya/Sho/doc_update lane to decide and reflect actual changes." \
                 --arg usr "$prompt" '{
             model:"gpt-5",
             messages:[{role:"system",content:$sys},{role:"user",content:$usr}]
