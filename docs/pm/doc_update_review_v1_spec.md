@@ -139,9 +139,28 @@ doc_update_proposal_v1.updates[] に対する、Reviewer Kai の判断。
   - 将来的に "accept_with_edits" を導入する際、
     Proposer の suggestion_markdown を上書きしたいときに使用する。
 
+### 3.4 target_files / final_content（Tsugu apply v1 用）
+
+Tsugu が機械適用する際に参照するフィールド。各ファイルにつき 1 エントリとし、**final_content に適用後の全文を含める**。
+
+- target (object, required)
+  - path: STATE/ または docs/ 配下のファイルパス
+- change_type (string, required)  
+  - v1 は `"replace_whole_file"` のみ
+- final_content (string, required)  
+  - 適用後の完成形全文。見出しや箇条書きなど既存構造を保った上で、提案を反映した本文。
+- risk (string, required)  
+  - `"low"` でないものは Tsugu v1 では適用しない
+- reviewer_comment (string, optional)  
+  - 補足メモ。auto_accept_v1 では「人間レビュー推奨」などを記載
+
+備考:
+- suggestion_markdown や section_hint は参考情報。Tsugu v1 は final_content を使って全置換する。
+- 同一 path の複数エントリは持たない（1ファイル1エントリ）。
+
 ---
 
-### 3.4 notes[]
+### 3.5 notes[]
 
 Reviewer Kai からの補足メモ。
 

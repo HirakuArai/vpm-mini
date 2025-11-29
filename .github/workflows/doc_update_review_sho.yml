@@ -154,19 +154,45 @@ jobs:
           proposal = json.loads(proposal_path.read_text(encoding="utf-8"))
 
           updates = proposal.get("updates", [])
-          review_updates = []
+          per_path = {}
           for u in updates:
+            target = u.get("target", {}) or {}
+            path = target.get("path") or u.get("target_path")
+            if not path:
+              print("Skipping update without target path", file=sys.stderr)
+              continue
+
+            current_content = ""
+            file_path = pathlib.Path(path)
+            if file_path.exists():
+              current_content = file_path.read_text(encoding="utf-8")
+
+            suggestion = (
+              u.get("final_content")
+              or u.get("suggestion_markdown")
+              or target.get("after")
+              or ""
+            )
+
             ru = dict(u)
             ru["status"] = "accept"
             ru["risk"] = "low"
             ru["reviewer_comment"] = "v1 auto-accept by Sho; human review still recommended."
-            review_updates.append(ru)
+            ru["change_type"] = "replace_whole_file"
+            ru["final_content"] = suggestion if suggestion else current_content
+
+            # ensure one entry per path (latest wins if duplicates)
+            ru["target"] = {"path": path, **{k: v for k, v in target.items() if k != "path"}}
+            per_path[path] = ru
+
+          review_updates = list(per_path.values())
 
           review = {
             "schema_version": "doc_update_review_v1",
             "project_id": proposal.get("project_id", ""),
             "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "decision": "auto_accept_all",
+            "review_mode": "auto_accept_v1",
             "updates": review_updates,
             "no_change": proposal.get("no_change", []),
             "notes": [
