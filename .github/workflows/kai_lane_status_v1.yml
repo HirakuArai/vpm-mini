@@ -1,0 +1,36 @@
+name: Kai lane_status_v1 (vpm-mini Layer B)
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_id:
+        description: "Project ID"
+        required: true
+        default: "vpm-mini"
+
+jobs:
+  lane_status:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate lane_status_v1
+        env:
+          PROJECT_ID: ${{ inputs.project_id }}
+        run: |
+          python tools/kai/lane_status_v1.py --project-id "$PROJECT_ID" --output "reports/kai/lane_status_v1.json"
+
+      - name: Upload lane_status_v1 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kai_lane_status_v1
+          path: reports/kai/lane_status_v1.json
