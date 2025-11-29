@@ -57,13 +57,22 @@ def parse_model_output(raw: str) -> tuple[Dict[str, Any], str, list[str]]:
 
     payload = data.get("payload") or {}
     summary_md = data.get("summary_md") or ""
-    notes = data.get("notes") or []
+    notes_raw = data.get("notes")
+
     if not isinstance(payload, dict):
         raise ValueError("payload must be an object")
     if not isinstance(summary_md, str):
-        raise ValueError("summary_md must be a string")
-    if not isinstance(notes, list):
-        raise ValueError("notes must be a list")
+        summary_md = str(summary_md)
+
+    if notes_raw is None:
+        notes: list[str] = []
+    elif isinstance(notes_raw, list):
+        notes = notes_raw
+    elif isinstance(notes_raw, str):
+        notes = [notes_raw] if notes_raw.strip() else []
+    else:
+        notes = [str(notes_raw)]
+
     return payload, summary_md, notes
 
 
@@ -138,6 +147,10 @@ def main() -> None:
     output_path = Path(args.output_json)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
+    human_notes = []
+    if args.notes and args.notes.strip():
+        human_notes = [args.notes]
+
     try:
         raw_reply = call_openai(api_key=api_key, messages=messages)
         payload, summary_md, model_notes = parse_model_output(raw_reply)
@@ -149,12 +162,14 @@ def main() -> None:
         summary_md = f"Failed to generate task response: {exc}"
         notes = [f"error: {exc}"]
 
-    notes = [
-        "source: .github/workflows/pm_snapshot.yml",
-        f"task: {args.task_type}",
-    ] + notes
-    if args.notes:
-        notes.append(f"human_notes: {args.notes}")
+    notes = (
+        [
+            "source: .github/workflows/pm_snapshot.yml",
+            f"task: {args.task_type}",
+        ]
+        + notes
+        + human_notes
+    )
 
     response: Dict[str, Any] = {
         "version": "kai_task_response_v1",
