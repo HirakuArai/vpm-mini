@@ -135,6 +135,8 @@ def create_branch_commit_pr(branch: str, run_id: str, files: List[str]):
             branch,
             "--base",
             "main",
+            "--label",
+            "evidence",
         ]
     )
 
