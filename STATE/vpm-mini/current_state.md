@@ -34,96 +34,22 @@
 - Sho v1 Debug ワークフローにより `doc_update_review_v1.json` 生成の検証環境は整ったが、vpm-mini 向けの定常運用（Actions からの起動、アサイン、レビュー動線）に組み込む段取りが未整備。
 - PR 自動化（pm_snapshot 実行直後に更新案ブランチを作成する最小フロー）の設計と検証が未完。
 - マルチプロジェクト展開に向けた他プロジェクトの project_definition / STATE / reports 整備は未着手（hakone-e2 は試行のみ）。
+
 ## 2. Active Focus / Tasks（いまフォーカスしている課題）
 
 - [x] **T-PM-1:** PM Kai v1 の標準質問と出力フォーマット（pm_snapshot_v1 + Markdown）を定義し、spec に追記する（PR #809 完了）。
 - [ ] **T-STATE-1:** この current_state を 2025-11-23 ベースラインとして確定し、C/G/δ と Active Tasks を「数週間はそのまま使える」レベルまで整える（layer_b_update_flow への参照を追記）。
-- [ ] **T-PM-2:** `/ask` + GitHub Actions による STATE / weekly 更新ループの設計を進める（pm_snapshot の結果から STATE/weekly 更新案を生成する最小フロー案）。
-- [ ] **T-PM-3:** 他プロジェクト（例: 箱根E² or 会社業務）について、最初の `project_definition` / `STATE` / `weekly` を用意し、pm_snapshot を回してみる（hakone-e2 で doc_update_proposal_v1 → STATE/weekly の1サイクル試行済み）。
+- [ ] **T-PM-2:** `/ask` + GitHub Actions による STATE / weekly 更新ループの設計を進める（pm_snapshot の結果から STATE/weekly 更新案を生成する最小フロー案）（owner: 啓、期限: 2025-12-07 目安）。
+- [ ] **T-PM-3:** 他プロジェクト（例: 箱根E² or 会社業務）について、最初の `project_definition` / `STATE` / `weekly` を用意し、pm_snapshot を回してみる（hakone-e2 で doc_update_proposal_v1 → STATE/weekly の1サイクル試行済み）（owner: 啓、期限: 2025-12-14 目安）。
 - [ ] **T-PM-4:** vpm-mini で Kai による「STATE/weekly 更新案（テキスト）」生成 → 手動PR の最小サイクルを1回実施して検証する（owner: 啓、期限: 2025-12-07 目安）。
 - [ ] **T-INF-1:** VM/GKE 縮退後の GCP インベントリを月次レベルで確認する軽い仕組み（レポート or 手動チェック）を検討する（優先度はレイヤーBより低い）。
 - [ ] **T-DOC-1:** doc_update_proposal_v1 を vpm-mini に適用し、STATE/weekly 更新案 → 手動PR → マージの1サイクルを実施する（docs/pm/doc_update_pipeline_v1.md・docs/pm/doc_update_review_v1_spec.md に準拠。適用には `docs/ops/codex_brief_apply_doc_update_v1.md` を使用）（優先度: 高、owner: 啓、期限: 2025-12-07 目安）。
 - [ ] **T-AUTO-1:** pm_snapshot 実行後に更新案ブランチを切る最小の自動PRフロー案（設計メモ）を作成する（owner: 啓、期限: 2025-12-07 目安）。
 - [ ] **T-WF-1:** Sho v1 Debug ワークフローを定常運用に組み込む（Actions 起動・アサイン・レビュー動線の整備）（owner: 啓、期限: 2025-12-07 目安）。
+
 ## レイヤーB（記録・構造化ループ）のゴールとステップ
 
 **ゴール（Layer B）**
 
 - 実行力は人間や外部システムに任せたまま、PM Kai が「実行提案 →（人間による実行）→ 実行結果の記録案 → 更新された実行提案」という記録ループを、自分で回せる状態にする。
-- 具体的には、実行後の状態変化を踏まえた STATE / weekly / pm_snapshot の更新案を Kai が出し続け、人間がそれをレビューしてマージする運用を確立する。
-
-**大まかなステップ**
-
-1. **B-1: 現状のパターンを STATE に明文化する**
-
-   - 「実行があったら pm_snapshot を回し、その結果を見ながら STATE / weekly を更新する」というパターンを、vpm-mini の公式フローとして STATE に書き残す（本ファイルの更新で進行中）。
-
-2. **B-2: PM Snapshot から STATE 更新案を生成する仕組みを構想する**
-
-   - pm_snapshot_v1 の JSON / Markdown を入力に、「STATE/current_state.md の C/G/δ と Active Tasks をこう変えるべき」という差分案（patch）を Kai に生成させるイメージを固める。
-   - 最初は「提案テキストだけ」でよく、PR 化は後段で構わない。
-
-3. **B-3: STATE 更新案を PR として出すミニワークフローを設計する**
-
-   - 手動トリガ（workflow_dispatch）で、
-     1) 最新 pm_snapshot を取得  
-     2) Kai に STATE 更新案を生成させる  
-     3) STATE/vpm-mini/current_state.md を更新する PR を作成  
-     という最小ループの設計案を作る。
-   - マージは必ず人間が行う前提にしておく。
-
-4. **B-4: vpm-mini でレイヤーBループを1サイクル回して検証する**
-
-   - 何か実行（または決定）があったタイミングで、
-     1) pm_snapshot を実行  
-     2) B-3 のワークフローで STATE 更新PRを出す  
-     3) 啓が内容をレビューしてマージ  
-   - このサイクルを 1 回以上回し、「このやり方なら PM Kai に記録を任せていけそうだ」と判断できるか確認する。
-
-## 3. Evidence Links（証拠リンク）
-
-- プロジェクト定義:
-  - `docs/projects/vpm-mini/project_definition.md`（PR #800）
-- STATE:
-  - `STATE/vpm-mini/current_state.md`（本ファイル。PR #801, #803, #808, #810 等で更新）
-- 週次レポート:
-  - `reports/vpm-mini/2025-11-23_weekly.md`（PR #802, #803, #810）
-  - `reports/vpm-mini/2025-11-30_weekly.md`
-- 5セル・黒板・レビューWF:
-  - `docs/pm/roles_v1.md`（PR #820）
-  - `docs/pm/blackboard_v1_draft.md`（PR #821）
-  - Sho v1 Debug ワークフロー（`doc_update_review_v1.json` 生成、PR #822〜#835）
-- PM仕様:
-  - `docs/pm/pm_snapshot_v1_spec.md`（PR #804, #809）
-- PM Snapshot ワークフロー:
-  - `.github/workflows/pm_snapshot.yml`（PR #805, #806, #807）
-- インフラ縮退:
-  - GCP 操作ログ（別セッションの記録）および STATE の記述に準拠。
-- レイヤーB更新フロー設計:
-  - `docs/pm/layer_b_update_flow.md`
-- ドキュメント更新パイプライン:
-  - `docs/pm/doc_update_pipeline_v1.md`（PR #817）
-  - `docs/pm/doc_update_review_v1_spec.md`（PR #817）
-- Codex ブリーフ:
-  - `docs/ops/codex_brief_apply_doc_update_v1.md`（PR #818）
-## 運用ルール（Layer B / doc_update）v1（ドラフト）
-
-vpm-mini における Doc Update（レイヤーB）の最小サイクルについて、現時点の運用ルールをメモ（v1ドラフト）。
-
-- **Aya（Doc Update Proposal (PM)）**
-  - 啓が Actions UI から workflow_dispatch を実行し、`project_id` と `progress_summary` を渡す。
-  - 提案は `reports/doc_update_proposals/YYYY-MM-DD_project_id.json` として生成される（Artifact にも保存）。
-
-- **Sho（Doc Update Review Debug / Sho v1）**
-  - 通常は project_id=`vpm-mini` で実行し、`proposal_path` が空の場合は `reports/doc_update_proposals/*_vpm-mini.json` のうち最新を自動選択してレビュー対象とする。
-  - 出力は `doc_update_review_v1.json` として Artifact に保存。採否は当面 Human gate（啓＋ChatGPT）で判断。
-
-- **Apply（Codex + PR）**
-  - Sho v1 で accept 相当と判断された proposal は、Mac 側の Codex が apply 用ブランチ＋PRを作成。
-  - 反映対象は主に `STATE/vpm-mini/current_state.md`（Current / Gap / Evidence）と `reports/vpm-mini/*_weekly.md`。
-  - 啓が PR の diff を確認し、問題なければ merge して反映。
-
-- **Human gate（当面の方針）**
-  - `risk_level=high` の場合は必ず人間レビューを行い、自動適用しない。
-  - `risk_level=medium` / `low` の場合も、Phase 2 の間は啓＋ChatGPTが最終採否を確認（自動適用は次フェーズ以降）。
-  - Sho v1 の review ロジック（confidence や doc_type の扱い）は、この運用ルールに照らして少しずつチューニングしていく。
+- 具体的には、実行後の状態変化を踏まえた STATE / weekly / pm_snapshot の更新
