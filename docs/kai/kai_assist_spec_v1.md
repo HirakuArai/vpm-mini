@@ -92,7 +92,21 @@ context_header: repo=vpm-mini / branch=main / phase=Phase 2 (Kai-0 / Kai-assist 
   - recommendations: 配列（黒板選択ロジックの修正案、処理した entry の source_id を proposal/review JSON に記録する案など）
 - summary_md: 調査結果の要点を数行で Markdown 要約。
 
-## 5. 将来の task_type 拡張メモ
+## 6. task_type: inspect_ci_for_tsugu_pr_v1
+- 目的: .github/workflows 下の CI ワークフロー（evidence-dod / healthcheck / k8s-validate / knative-ready / test-and-artifacts など）を読み、Tsugu PR（author=github-actions, head_ref=feature/doc-update-apply-*）で Required checks が走らない理由と、どう条件を変えれば動くかを findings / recommendations として返す。
+- 入力 params 想定:
+  - target_checks: ["evidence-dod", "healthcheck", "k8s-validate", "knative-ready", "test-and-artifacts"]
+  - include_files: ".github/workflows/*.yml", ".github/workflows/*.yaml"
+  - notes（任意）: Tsugu PR の head_ref パターンなど補足コメント
+- 出力 payload 構造案:
+  - kind: "inspect_ci_for_tsugu_pr_v1"
+  - project_id: "vpm-mini"
+  - target_checks: 上記チェック名配列
+  - findings: 配列（check_name, workflows, location, snippet, issue, suggestion）
+  - recommendations: 配列（if 条件や paths の修正案、branch protection 設定の見直しなど）
+- summary_md: 調査結果の短い Markdown サマリ（数行）
+
+## 7. 将来の task_type 拡張メモ
 - inspect_workflow_v1: 任意の Workflow の役割とリスクを要約。
 - propose_state_patch_v1: ある snapshot を前提に、STATE の特定セクション更新案を JSON パッチで提案。
 - これらも kai_task_request_v1 / kai_task_response_v1 を共通で使い、task_type と payload の中身だけ変える方針。

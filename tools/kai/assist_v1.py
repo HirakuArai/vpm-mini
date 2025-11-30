@@ -131,6 +131,43 @@ def build_messages_doc_update_proposal(
     return [{"role": "system", "content": system}, {"role": "user", "content": user}]
 
 
+def build_messages_ci_tsugu(
+    task_type: str,
+    project_id: str,
+    notes: str,
+    workflows: dict[str, str],
+    target_checks: list[str],
+) -> list[dict[str, str]]:
+    system = (
+        "You are Kai-assist v1 for vpm-mini. Follow kai_assist_spec_v1 intent. "
+        "Return JSON only, no code fences. Fields: payload, summary_md, notes. "
+        "Align payload with kind=inspect_ci_for_tsugu_pr_v1 (findings, recommendations)."
+    )
+
+    workflows_text = "\n\n".join(
+        [f"### {name}\n{content}" for name, content in workflows.items()]
+    )
+
+    user = (
+        f"task_type={task_type}\n"
+        f"project_id={project_id}\n"
+        f"target_checks={target_checks}\n"
+        f"notes={notes or '(none)'}\n"
+        "Goal: Inspect CI workflows to see why required checks for Tsugu PRs "
+        "(author=github-actions, head_ref like feature/doc-update-apply-*) are not running. "
+        "Identify which workflows map to the target checks, the conditions preventing them from running, "
+        "and how to adjust conditions so Tsugu PRs also trigger them.\n"
+        "Please return JSON with keys:\n"
+        '- payload: {kind, project_id, target_workflow: "ci/.github/workflows", target_checks, '
+        "findings:[{check_name,workflows,location,snippet,issue,suggestion}], "
+        "recommendations:[...]} (keep concise)\n"
+        "- summary_md: short Markdown summary (2-4 bullet lines)\n"
+        "- notes: optional extra notes\n"
+        f"Workflows content:\n{workflows_text}"
+    )
+    return [{"role": "system", "content": system}, {"role": "user", "content": user}]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Kai-assist v1 executor.")
     parser.add_argument(
@@ -139,7 +176,10 @@ def main() -> None:
     parser.add_argument(
         "--task-type",
         required=True,
-        help="Kai-assist task type (inspect_pm_snapshot_prompt_v1 or inspect_doc_update_proposal_flow_v1).",
+        help=(
+            "Kai-assist task type "
+            "(inspect_pm_snapshot_prompt_v1 | inspect_doc_update_proposal_flow_v1 | inspect_ci_for_tsugu_pr_v1)."
+        ),
     )
     parser.add_argument("--notes", default="", help="Optional human notes.")
     parser.add_argument(
@@ -185,6 +225,31 @@ def main() -> None:
             proposal_workflow=proposal_wf_content,
         )
         sources.append("source: .github/workflows/doc_update_proposal.yml")
+    elif args.task_type == "inspect_ci_for_tsugu_pr_v1":
+        workflow_dir = Path(".github/workflows")
+        workflows = {}
+        for path in sorted(workflow_dir.glob("*.yml")) + sorted(
+            workflow_dir.glob("*.yaml")
+        ):
+            try:
+                workflows[path.name] = read_file(path)
+            except FileNotFoundError:
+                continue
+        target_checks = [
+            "evidence-dod",
+            "healthcheck",
+            "k8s-validate",
+            "knative-ready",
+            "test-and-artifacts",
+        ]
+        messages = build_messages_ci_tsugu(
+            task_type=args.task_type,
+            project_id=args.project_id,
+            notes=args.notes,
+            workflows=workflows,
+            target_checks=target_checks,
+        )
+        sources.append("source: .github/workflows/*.yml")
     else:
         print(f"Unsupported task_type: {args.task_type}", file=sys.stderr)
         sys.exit(1)
