@@ -4,7 +4,7 @@ on:
     types: [opened, synchronize, labeled, reopened]
 jobs:
   evidence-dod:
-    if: contains(github.event.pull_request.labels.*.name, 'evidence')
+    if: contains(github.event.pull_request.labels.*.name, 'evidence') || startsWith(github.head_ref, 'feature/doc-update-apply-')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -13,22 +13,22 @@ jobs:
           test -f reports/daily.md
           grep -q '^FOOTER:' reports/daily.md
   healthcheck:
-    if: contains(github.event.pull_request.labels.*.name, 'evidence')
+    if: contains(github.event.pull_request.labels.*.name, 'evidence') || startsWith(github.head_ref, 'feature/doc-update-apply-')
     runs-on: ubuntu-latest
     steps:
       - run: echo ok
   k8s-validate:
-    if: contains(github.event.pull_request.labels.*.name, 'evidence')
+    if: contains(github.event.pull_request.labels.*.name, 'evidence') || startsWith(github.head_ref, 'feature/doc-update-apply-')
     runs-on: ubuntu-latest
     steps:
       - run: echo ok
   knative-ready:
-    if: contains(github.event.pull_request.labels.*.name, 'evidence')
+    if: contains(github.event.pull_request.labels.*.name, 'evidence') || startsWith(github.head_ref, 'feature/doc-update-apply-')
     runs-on: ubuntu-latest
     steps:
       - run: echo ok
   test-and-artifacts:
-    if: contains(github.event.pull_request.labels.*.name, 'evidence')
+    if: contains(github.event.pull_request.labels.*.name, 'evidence') || startsWith(github.head_ref, 'feature/doc-update-apply-')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
