@@ -130,6 +130,8 @@ def create_branch_commit_pr(branch: str, run_id: str, files: List[str]):
             f"Docs: apply doc_update_review_v1 (run {run_id}) to STATE/docs",
             "--body",
             "\n".join(body_lines),
+            "--head",
+            branch,
         ]
     )
 
