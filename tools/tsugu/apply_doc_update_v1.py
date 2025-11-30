@@ -114,6 +114,7 @@ def create_branch_commit_pr(branch: str, run_id: str, files: List[str]):
     run_cmd(
         ["git", "commit", "-m", f"docs(state): apply doc_update_review_v1 run {run_id}"]
     )
+    run_cmd(["git", "push", "-u", "origin", branch])
 
     body_lines = [
         f"Applied doc_update_review_v1 from Actions run `{run_id}`.",
@@ -132,6 +133,8 @@ def create_branch_commit_pr(branch: str, run_id: str, files: List[str]):
             "\n".join(body_lines),
             "--head",
             branch,
+            "--base",
+            "main",
         ]
     )
 
