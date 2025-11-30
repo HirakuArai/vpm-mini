@@ -75,6 +75,23 @@ context_header: repo=vpm-mini / branch=main / phase=Phase 2 (Kai-0 / Kai-assist 
     - ".github/workflows/pm_snapshot.yml の system プロンプト内で、pm_snapshot の責務を「C/G/δ/Next を整理すること」に限定する一文を追加する。"
     - "レイヤーBサイクルの説明文は、『pm_snapshot → 現実のアクション → Aya/Sho/doc_update → PR → STATE追随』という形に書き換える。"
 
+## 5. task_type: inspect_doc_update_proposal_flow_v1
+- 目的: Doc Update Proposal (PM) workflow と黒板読み取りロジックを調査し、黒板 Issue #841 のどのエントリをどう選び、どのフィールドをプロンプトに使っているかを確認する。payload_ref / target_docs / change_intent を見落としていないか、今回のような manual_note リクエストが拾われなかった理由と修正案を findings / recommendations で返す。
+- 入力 params 想定:
+  - target_workflow: "doc_update_proposal_pm"
+  - include_files:
+    - ".github/workflows/doc_update_proposal.yml"
+    - Aya が黒板を読むスクリプト（存在する場合）
+  - blackboard_issue: 841
+  - notes（任意）: 人間から Kai への追加コメント
+- 出力 payload 構造案:
+  - kind: "inspect_doc_update_proposal_flow_v1"
+  - project_id: "vpm-mini"
+  - target_workflow: "doc_update_proposal_pm"
+  - findings: 配列（location, snippet, issue, suggestion を含む）
+  - recommendations: 配列（黒板選択ロジックの修正案、処理した entry の source_id を proposal/review JSON に記録する案など）
+- summary_md: 調査結果の要点を数行で Markdown 要約。
+
 ## 5. 将来の task_type 拡張メモ
 - inspect_workflow_v1: 任意の Workflow の役割とリスクを要約。
 - propose_state_patch_v1: ある snapshot を前提に、STATE の特定セクション更新案を JSON パッチで提案。
