@@ -73,6 +73,7 @@
 ### 補足（v1 運用）
 
 - Kai が出す更新案は、doc_update_proposal_v1（JSON）として起票する。
+- 出力ファイル配置: Kai が生成した提案は `reports/doc_update_proposals/YYYY-MM-DD_<project_id>.json` として保存し、Sho v1 のレビュー入力とする。
 - レビューは `docs/pm/doc_update_review_v1_spec.md` に従って行い、必要に応じて修正のうえ PR を作成・マージする。
 - Codex を使って適用する場合は、`docs/ops/codex_brief_apply_doc_update_v1.md` のブリーフに従う。
 
@@ -140,5 +141,4 @@ Kai に求めるアウトプット（テキスト）:
 - vpm-mini の current_state ベースラインは `STATE/vpm-mini/current_state.md` に反映済み（PR #811）。
 - `pm_snapshot.yml` ワークフローから、vpm-mini に対する PM Snapshot を手動で生成可能（PR #805, #806, #807）。
 - 5セル観点の `roles_v1` と Aya↔Sho の `blackboard` ドラフトを追加（PR #820, #821）。
-- Sho v1 の Doc Update Review Debug ワークフローを整備し、`doc_update_review_v1.json` を生成できる検証基盤が整った（PR #822〜#835）。
-- hakone-e2 プロジェクトにて、doc_update_proposal_v1 → STATE/weekly 反映の1サイクルを実施し、手順の妥当性を予備確認済み。vpm-mini への適用はこれから。
+- Sho v1 の Doc Update Review Debug ワークフローを整備し、`doc_update_review_v1.json` を生成でき
