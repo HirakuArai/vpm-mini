@@ -136,6 +136,8 @@ jobs:
         id: generate_review
         env:
           PROPOSAL_PATH: ${{ steps.download_proposal.outputs.proposal_path }}
+          # pragma: allowlist secret
+          OPENAI_API_KEY_REVIEW: ${{ secrets.OPENAI_API_KEY }} # pragma: allowlist secret
         run: |
           set -euo pipefail
 
@@ -145,13 +147,45 @@ jobs:
           import os
           import pathlib
           import sys
+          import urllib.request
 
           proposal_path = pathlib.Path(os.environ.get("PROPOSAL_PATH") or "doc_update_proposal_v1.json")
+          api_key = os.environ.get("OPENAI_API_KEY_REVIEW")
           if not proposal_path.exists():
             print(f"Proposal JSON not found: {proposal_path}", file=sys.stderr)
             sys.exit(1)
+          if not api_key:
+            print("OPENAI_API_KEY is required for Sho review", file=sys.stderr)
+            sys.exit(1)
 
           proposal = json.loads(proposal_path.read_text(encoding="utf-8"))
+
+          def call_openai(system: str, user: str) -> str:
+            payload = {
+              "model": "gpt-4o",
+              "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+              ],
+              "temperature": 0.2,
+              "max_tokens": 2000,
+            }
+            data = json.dumps(payload).encode("utf-8")
+            req = urllib.request.Request(
+              "https://api.openai.com/v1/chat/completions",
+              data=data,
+              headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}",
+              },
+            )
+            with urllib.request.urlopen(req, timeout=90) as resp:
+              body = resp.read().decode("utf-8")
+            try:
+              return json.loads(body)["choices"][0]["message"]["content"]
+            except Exception as exc:  # noqa: BLE001
+              print(f"OpenAI response parse error: {body}", file=sys.stderr)
+              raise exc
 
           updates = proposal.get("updates", [])
           per_path = {}
@@ -173,13 +207,29 @@ jobs:
               or target.get("after")
               or ""
             )
+            notes = u.get("reason") or ""
+
+            system_prompt = (
+              "You are Sho (Doc Update Review). Given the current file and Aya's proposal snippet, "
+              "produce the complete updated file content. Preserve headings and unrelated sections unless change is implied. "
+              "Return only the full updated file text; no JSON or fences."
+            )
+            user_prompt = (
+              f"target_path: {path}\n"
+              f"current_file:\n{current_content}\n\n"
+              f"proposal_snippet:\n{suggestion}\n\n"
+              f"notes:\n{notes}\n\n"
+              "Write the full updated file content reflecting the proposal and notes. Keep structure, only adjust what is needed."
+            )
+
+            final_content = call_openai(system_prompt, user_prompt).strip()
 
             ru = dict(u)
             ru["status"] = "accept"
             ru["risk"] = "low"
             ru["reviewer_comment"] = "v1 auto-accept by Sho; human review still recommended."
             ru["change_type"] = "replace_whole_file"
-            ru["final_content"] = suggestion if suggestion else current_content
+            ru["final_content"] = final_content or current_content
 
             # ensure one entry per path (latest wins if duplicates)
             ru["target"] = {"path": path, **{k: v for k, v in target.items() if k != "path"}}
