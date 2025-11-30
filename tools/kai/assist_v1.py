@@ -76,7 +76,7 @@ def parse_model_output(raw: str) -> tuple[Dict[str, Any], str, list[str]]:
     return payload, summary_md, notes
 
 
-def build_messages(
+def build_messages_pm_snapshot(
     task_type: str, project_id: str, notes: str, pm_snapshot_yaml: str
 ) -> list[dict[str, str]]:
     system = (
@@ -102,6 +102,35 @@ def build_messages(
     return [{"role": "system", "content": system}, {"role": "user", "content": user}]
 
 
+def build_messages_doc_update_proposal(
+    task_type: str,
+    project_id: str,
+    notes: str,
+    proposal_workflow: str,
+) -> list[dict[str, str]]:
+    system = (
+        "You are Kai-assist v1 for vpm-mini. Follow kai_assist_spec_v1 intent. "
+        "Return JSON only, no code fences. Fields: payload, summary_md, notes. "
+        "Align payload with kind=inspect_doc_update_proposal_flow_v1 (findings, recommendations)."
+    )
+    user = (
+        f"task_type={task_type}\n"
+        f"project_id={project_id}\n"
+        f"notes={notes or '(none)'}\n"
+        "Goal: Inspect doc_update_proposal workflow and blackboard handling to see which entries are selected "
+        "from Issue #841 and which fields are used in prompts. Identify why a manual_note / target_docs-only request "
+        "might be skipped and propose fixes.\n"
+        "Please return JSON with keys:\n"
+        "- payload: {kind, project_id, target_workflow, findings:[{location,snippet,issue,suggestion}], recommendations:[...]} (concise)\n"
+        "- summary_md: short Markdown summary (2-4 bullet lines)\n"
+        "- notes: optional extra notes\n"
+        "Sources follow:\n"
+        "### Workflow (.github/workflows/doc_update_proposal.yml)\n"
+        f"{proposal_workflow}\n"
+    )
+    return [{"role": "system", "content": system}, {"role": "user", "content": user}]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Kai-assist v1 executor.")
     parser.add_argument(
@@ -110,7 +139,7 @@ def main() -> None:
     parser.add_argument(
         "--task-type",
         required=True,
-        help="Kai-assist task type (inspect_pm_snapshot_prompt_v1).",
+        help="Kai-assist task type (inspect_pm_snapshot_prompt_v1 or inspect_doc_update_proposal_flow_v1).",
     )
     parser.add_argument("--notes", default="", help="Optional human notes.")
     parser.add_argument(
@@ -120,28 +149,45 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    if args.task_type != "inspect_pm_snapshot_prompt_v1":
-        print(f"Unsupported task_type: {args.task_type}", file=sys.stderr)
-        sys.exit(1)
-
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         print("OPENAI_API_KEY is required", file=sys.stderr)
         sys.exit(1)
 
-    pm_snapshot_path = Path(".github/workflows/pm_snapshot.yml")
-    try:
-        pm_snapshot_content = read_file(pm_snapshot_path)
-    except FileNotFoundError as exc:
-        print(str(exc), file=sys.stderr)
-        sys.exit(1)
+    messages: list[dict[str, str]]
+    sources: list[str] = []
 
-    messages = build_messages(
-        task_type=args.task_type,
-        project_id=args.project_id,
-        notes=args.notes,
-        pm_snapshot_yaml=pm_snapshot_content,
-    )
+    if args.task_type == "inspect_pm_snapshot_prompt_v1":
+        pm_snapshot_path = Path(".github/workflows/pm_snapshot.yml")
+        try:
+            pm_snapshot_content = read_file(pm_snapshot_path)
+        except FileNotFoundError as exc:
+            print(str(exc), file=sys.stderr)
+            sys.exit(1)
+        messages = build_messages_pm_snapshot(
+            task_type=args.task_type,
+            project_id=args.project_id,
+            notes=args.notes,
+            pm_snapshot_yaml=pm_snapshot_content,
+        )
+        sources.append("source: .github/workflows/pm_snapshot.yml")
+    elif args.task_type == "inspect_doc_update_proposal_flow_v1":
+        proposal_wf_path = Path(".github/workflows/doc_update_proposal.yml")
+        try:
+            proposal_wf_content = read_file(proposal_wf_path)
+        except FileNotFoundError as exc:
+            print(str(exc), file=sys.stderr)
+            sys.exit(1)
+        messages = build_messages_doc_update_proposal(
+            task_type=args.task_type,
+            project_id=args.project_id,
+            notes=args.notes,
+            proposal_workflow=proposal_wf_content,
+        )
+        sources.append("source: .github/workflows/doc_update_proposal.yml")
+    else:
+        print(f"Unsupported task_type: {args.task_type}", file=sys.stderr)
+        sys.exit(1)
 
     request_id = f"{iso_now()}_{args.task_type}_{args.project_id}"
     output_path = Path(args.output_json)
@@ -162,14 +208,7 @@ def main() -> None:
         summary_md = f"Failed to generate task response: {exc}"
         notes = [f"error: {exc}"]
 
-    notes = (
-        [
-            "source: .github/workflows/pm_snapshot.yml",
-            f"task: {args.task_type}",
-        ]
-        + notes
-        + human_notes
-    )
+    notes = sources + [f"task: {args.task_type}"] + notes + human_notes
 
     response: Dict[str, Any] = {
         "version": "kai_task_response_v1",
