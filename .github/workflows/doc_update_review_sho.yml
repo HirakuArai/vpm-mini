@@ -173,13 +173,16 @@ jobs:
               or target.get("after")
               or ""
             )
+            final_content = current_content.rstrip()
+            if suggestion:
+              final_content = f"{current_content.rstrip()}\n\n{suggestion.rstrip()}\n"
 
             ru = dict(u)
             ru["status"] = "accept"
             ru["risk"] = "low"
             ru["reviewer_comment"] = "v1 auto-accept by Sho; human review still recommended."
             ru["change_type"] = "replace_whole_file"
-            ru["final_content"] = suggestion if suggestion else current_content
+            ru["final_content"] = final_content or current_content
 
             # ensure one entry per path (latest wins if duplicates)
             ru["target"] = {"path": path, **{k: v for k, v in target.items() if k != "path"}}

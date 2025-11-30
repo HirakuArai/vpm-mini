@@ -148,7 +148,7 @@ Tsugu が機械適用する際に参照するフィールド。各ファイル�
 - change_type (string, required)  
   - v1 は `"replace_whole_file"` のみ
 - final_content (string, required)  
-  - 適用後の完成形全文。見出しや箇条書きなど既存構造を保った上で、提案を反映した本文。
+  - 適用後の完成形全文。見出しや箇条書きなど既存構造を保った上で、提案を反映した本文（replace_whole_file の場合はファイル全体が入る）。
 - risk (string, required)  
   - `"low"` でないものは Tsugu v1 では適用しない
 - reviewer_comment (string, optional)  
