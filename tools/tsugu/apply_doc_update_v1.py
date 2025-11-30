@@ -12,7 +12,17 @@ from typing import Dict, List
 def run_cmd(
     cmd: List[str], cwd: Path | None = None, check: bool = True
 ) -> subprocess.CompletedProcess:
-    return subprocess.run(cmd, cwd=cwd, check=check, capture_output=True, text=True)
+    print("+ " + " ".join(cmd))
+    result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, check=False)
+    if result.stdout:
+        print(result.stdout)
+    if result.stderr:
+        print(result.stderr, file=sys.stderr)
+    if check and result.returncode != 0:
+        raise subprocess.CalledProcessError(
+            result.returncode, cmd, output=result.stdout, stderr=result.stderr
+        )
+    return result
 
 
 def ensure_clean_git():
