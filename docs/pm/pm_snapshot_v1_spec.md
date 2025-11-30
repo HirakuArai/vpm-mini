@@ -143,23 +143,7 @@ PM Kai v1 の「一次出力」は、以下の JSON 構造とする。
 
 - 補足メモ
 
-## 4. 標準質問（Standard Prompt）のイメージ
-
-PM Kai v1 を呼び出すときの標準質問は、次のようにする。
-
-対象プロジェクト: <project_id>
-以下のファイル内容と直近の Issue/PR を踏まえて、
-JSON 形式 pm_snapshot_v1 と、その内容を要約した Markdown ビューの両方を出力してください。
-
-必ず:
-- C（Current）
-- G（Goals: short_term / mid_term）
-- δ（Gaps）
-- Next 3（next_actions）
-- Evidence（参照したファイル・Issue/PR）
-を含めてください。
-
-## 4. 標準質問（Standard Prompt）
+## 5. 標準質問（Standard Prompt）
 
 PM Kai v1 を呼び出すときの標準的な要求は、次のとおりとする。
 
