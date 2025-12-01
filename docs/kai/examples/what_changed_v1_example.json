@@ -41,7 +41,7 @@
   "by_category": {
     "workflows": [
       {
-        "name": "Doc Update Proposal (PM)",
+        "name": "Doc Update Proposal (Aya)",
         "runs": 1,
         "last_run_status": "success",
         "last_run_at": "2025-11-28T12:00:00+09:00",

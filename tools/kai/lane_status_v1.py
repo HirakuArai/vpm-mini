@@ -33,7 +33,7 @@ def build_lane_status(project_id: str) -> Dict[str, Any]:
                     "latest_entry": {
                         "blackboard_issue": 841,
                         "blackboard_comment_id": 0,
-                        "actions_workflow": "Doc Update Proposal (PM)",
+                        "actions_workflow": "Doc Update Proposal (Aya)",
                         "actions_run_id": 0,
                         "artifact_path": "reports/doc_update_proposals/2025-11-28-vpm-mini.json",
                         "updated_at": "2025-11-28T12:00:00+09:00",
