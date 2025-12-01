@@ -79,7 +79,7 @@ jobs:
                   comment.createdAt ||
                   comment.updated_at;
                 const ts = Date.parse(createdAt) || 0;
-                candidates.push({ entry, ts });
+                candidates.push({ entry, ts, comment });
               }
             }
 
@@ -89,9 +89,11 @@ jobs:
             }
 
             candidates.sort((a, b) => b.ts - a.ts);
-            const latest = candidates[0].entry;
-            core.info(`Selected Aya entry with id: ${latest.id || "unknown"}`);
-            core.setOutput("aya_entry", JSON.stringify(latest));
+            const latest = candidates[0];
+            core.info(`Selected Aya entry with id: ${latest.entry.id || "unknown"}`);
+            core.setOutput("aya_entry", JSON.stringify(latest.entry));
+            core.setOutput("comment_id", String(latest.comment?.id || latest.entry?.source_comment_id || ""));
+            core.setOutput("issue_number", String(issueNumber));
 
       - name: Prepare progress summary from blackboard entry
         id: prepare_progress_summary
@@ -342,27 +344,71 @@ jobs:
           path: doc_update_proposal_v1.json
           retention-days: 14
 
-      - name: Add Aya→Sho blackboard comment
+      - name: Mark Aya request as done on blackboard
         uses: actions/github-script@v7
         env:
-          BOARD_ISSUE_NUMBER: ${{ env.BOARD_ISSUE_NUMBER }}
+          AYA_ENTRY: ${{ steps.find_aya_entry.outputs.aya_entry }}
+          COMMENT_ID: ${{ steps.find_aya_entry.outputs.comment_id }}
+          ISSUE_NUMBER: ${{ steps.find_aya_entry.outputs.issue_number }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const entry = JSON.parse(process.env.AYA_ENTRY || "{}");
+            const commentId = parseInt(process.env.COMMENT_ID || "", 10);
+            const issueNumber = parseInt(process.env.ISSUE_NUMBER || "", 10);
+            if (!commentId || Number.isNaN(commentId)) {
+              core.setFailed("comment_id is missing; cannot update blackboard entry.");
+              return;
+            }
+            if (!issueNumber || Number.isNaN(issueNumber)) {
+              core.setFailed("issue_number is missing; cannot update blackboard entry.");
+              return;
+            }
+
+            const now = new Date().toISOString();
+            entry.status = "done";
+            entry.updated_at = now;
+
+            const body = [
+              "<!-- blackboard:doc_update_v1 -->",
+              "",
+              "json",
+              JSON.stringify(entry, null, 2),
+            ].join("\n");
+
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: commentId,
+              body,
+            });
+
+            core.info(`Updated Aya request comment ${commentId} on issue ${issueNumber} to status=done`);
+
+      - name: Add Sho review_request blackboard comment
+        uses: actions/github-script@v7
+        env:
+          AYA_ENTRY: ${{ steps.find_aya_entry.outputs.aya_entry }}
+          ISSUE_NUMBER: ${{ steps.find_aya_entry.outputs.issue_number }}
           PROJECT_ID: ${{ env.PROJECT_ID }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const issueNumber = parseInt(process.env.BOARD_ISSUE_NUMBER, 10);
-            const projectId = process.env.PROJECT_ID;
-            if (!issueNumber) {
-              core.setFailed("BOARD_ISSUE_NUMBER is not set or invalid.");
-              return;
-            }
-            if (!projectId) {
-              core.setFailed("PROJECT_ID is required.");
+            const issueNumber = parseInt(process.env.ISSUE_NUMBER || "", 10);
+            if (!issueNumber || Number.isNaN(issueNumber)) {
+              core.setFailed("issue_number is missing; cannot post Sho review_request.");
               return;
             }
 
-            const now = new Date();
-            const id = `${now.toISOString()}_${projectId}_ayatosho_${context.runId}`;
+            const requestEntry = JSON.parse(process.env.AYA_ENTRY || "{}");
+            const requestId = requestEntry.id || `doc-update-${context.runId}`;
+            const now = new Date().toISOString();
+
+            const targetDocs = Array.isArray(requestEntry.target_docs) ? requestEntry.target_docs : [];
+            const summary =
+              (requestEntry.payload && typeof requestEntry.payload.summary === "string" && requestEntry.payload.summary) ||
+              `Review request for blackboard entry ${requestId}`;
+
             const payloadRef = {
               type: "actions_artifact",
               workflow_run_id: context.runId,
@@ -370,18 +416,29 @@ jobs:
             };
 
             const entry = {
-              id,
+              id: `${requestId}-review`,
               from: "Aya",
               to: "Sho",
-              project_id: projectId,
+              project_id: process.env.PROJECT_ID,
               kind: "doc_update_review_request",
-              payload_ref: payloadRef,
               status: "open",
-              created_at: now.toISOString(),
+              payload_ref: payloadRef,
+              payload: {
+                summary,
+                refs: {
+                  proposal_artifact_name: payloadRef.artifact_name,
+                  proposal_workflow_run_id: payloadRef.workflow_run_id,
+                  source_board_id: requestId,
+                },
+              },
+              target_docs: targetDocs,
+              created_at: now,
+              updated_at: now,
             };
 
             const body = [
               "<!-- blackboard:doc_update_v1 -->",
+              "",
               "json",
               JSON.stringify(entry, null, 2),
             ].join("\n");
@@ -393,4 +450,4 @@ jobs:
               body,
             });
 
-            core.info(`Posted Aya→Sho blackboard comment with id: ${id}`);
+            core.info(`Posted Sho review_request entry with id ${entry.id} on issue ${issueNumber}`);
