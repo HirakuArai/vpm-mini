@@ -83,7 +83,7 @@ jobs:
                   comment.createdAt ||
                   comment.updated_at;
                 const ts = Date.parse(createdAt) || 0;
-                candidates.push({ entry, ts });
+                candidates.push({ entry, ts, comment });
               }
             }
 
@@ -92,10 +92,12 @@ jobs:
               return;
             }
 
-            candidates.sort((a, b) => b.ts - a.ts);
-            const latest = candidates[0].entry;
-            core.info(`Selected Sho entry with id: ${latest.id || "unknown"}`);
-            core.setOutput("sho_entry", JSON.stringify(latest));
+            candidates.sort((a, b) => a.ts - b.ts);
+            const oldest = candidates[0];
+            core.info(`Selected Sho entry with id: ${oldest.entry.id || "unknown"}`);
+            core.setOutput("sho_entry", JSON.stringify(oldest.entry));
+            core.setOutput("comment_id", String(oldest.comment?.id || oldest.entry?.source_comment_id || ""));
+            core.setOutput("issue_number", String(issueNumber));
 
       - name: Download doc update proposal artifact
         id: download_proposal
@@ -138,7 +140,7 @@ jobs:
           PROPOSAL_PATH: ${{ steps.download_proposal.outputs.proposal_path }}
           # pragma: allowlist secret
           OPENAI_API_KEY_REVIEW: ${{ secrets.OPENAI_API_KEY }} # pragma: allowlist secret
-        run: |
+        run: | # pragma: allowlist secret
           set -euo pipefail
 
           python - << 'PY'
@@ -264,6 +266,47 @@ jobs:
           path: doc_update_review_v1.json
           retention-days: 14
 
+      - name: Mark Sho review_request as done on blackboard
+        uses: actions/github-script@v7
+        env:
+          SHO_ENTRY: ${{ steps.find_sho_entry.outputs.sho_entry }}
+          COMMENT_ID: ${{ steps.find_sho_entry.outputs.comment_id }}
+          ISSUE_NUMBER: ${{ steps.find_sho_entry.outputs.issue_number }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const entry = JSON.parse(process.env.SHO_ENTRY || "{}");
+            const commentId = parseInt(process.env.COMMENT_ID || "", 10);
+            const issueNumber = parseInt(process.env.ISSUE_NUMBER || "", 10);
+            if (!commentId || Number.isNaN(commentId)) {
+              core.setFailed("comment_id is missing; cannot update blackboard entry.");
+              return;
+            }
+            if (!issueNumber || Number.isNaN(issueNumber)) {
+              core.setFailed("issue_number is missing; cannot update blackboard entry.");
+              return;
+            }
+
+            const now = new Date().toISOString();
+            entry.status = "done";
+            entry.updated_at = now;
+
+            const body = [
+              "<!-- blackboard:doc_update_v1 -->",
+              "",
+              "json",
+              JSON.stringify(entry, null, 2),
+            ].join("\n");
+
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: commentId,
+              body,
+            });
+
+            core.info(`Updated Sho review_request comment ${commentId} on issue ${issueNumber} to status=done`);
+
       - name: Add Sho→Aya blackboard comment
         uses: actions/github-script@v7
         env:
@@ -308,9 +351,9 @@ jobs:
 
             const body = [
               "<!-- blackboard:doc_update_v1 -->",
-              "```json",
+              "",
+              "json",
               JSON.stringify(entry, null, 2),
-              "```",
             ].join("\n");
 
             await github.rest.issues.createComment({
