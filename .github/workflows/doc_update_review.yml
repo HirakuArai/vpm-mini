@@ -237,6 +237,77 @@ jobs:
 
             core.info(`Updated Sho review_request comment ${commentId} on issue ${issueNumber} to status=done`);
 
+      - name: Add Sho→Tsugu apply_request blackboard comment
+        uses: actions/github-script@v7
+        env:
+          SHO_ENTRY: ${{ steps.find_sho_entry.outputs.sho_entry }}
+          ISSUE_NUMBER: ${{ steps.find_sho_entry.outputs.issue_number }}
+          PROJECT_ID: ${{ env.PROJECT_ID }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumber = parseInt(process.env.ISSUE_NUMBER || "", 10);
+            if (!issueNumber || Number.isNaN(issueNumber)) {
+              core.setFailed("issue_number is missing; cannot post Sho→Tsugu apply_request.");
+              return;
+            }
+
+            const requestEntry = JSON.parse(process.env.SHO_ENTRY || "{}");
+            const requestId = requestEntry.id || `doc-update-${context.runId}`;
+            const now = new Date().toISOString();
+
+            const targetDocs = Array.isArray(requestEntry.target_docs) ? requestEntry.target_docs : [];
+            const payloadRefs = (requestEntry.payload && requestEntry.payload.refs) || {};
+            const proposalArtifactName =
+              payloadRefs.proposal_artifact_name ||
+              (requestEntry.payload_ref && requestEntry.payload_ref.artifact_name) ||
+              "";
+            const proposalRunId =
+              payloadRefs.proposal_workflow_run_id ||
+              (requestEntry.payload_ref && requestEntry.payload_ref.workflow_run_id) ||
+              "";
+            const summary =
+              (requestEntry.payload && typeof requestEntry.payload.summary === "string" && requestEntry.payload.summary) ||
+              `Apply request based on review ${requestId}`;
+
+            const entry = {
+              id: `${requestId}-apply`,
+              from: "Sho",
+              to: "Tsugu",
+              project_id: process.env.PROJECT_ID,
+              kind: "doc_update_apply_request",
+              status: "open",
+              payload: {
+                summary,
+                refs: {
+                  proposal_artifact_name: proposalArtifactName,
+                  proposal_workflow_run_id: proposalRunId,
+                  review_artifact_name: `doc_update_review_v1_${context.runId}`,
+                  review_workflow_run_id: context.runId,
+                  source_board_id: requestId,
+                },
+              },
+              target_docs: targetDocs,
+              created_at: now,
+              updated_at: now,
+            };
+
+            const body = [
+              "<!-- blackboard:doc_update_v1 -->",
+              "",
+              "json",
+              JSON.stringify(entry, null, 2),
+            ].join("\n");
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body,
+            });
+
+            core.info(`Posted Sho→Tsugu apply_request entry with id ${entry.id} on issue ${issueNumber}`);
+
       - name: Add Sho→Aya blackboard comment
         uses: actions/github-script@v7
         env:
