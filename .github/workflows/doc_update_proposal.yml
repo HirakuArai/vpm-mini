@@ -1,6 +1,6 @@
 # cell_roles: watcher, curator, planner, synthesizer
 
-name: Doc Update Proposal (PM)
+name: Doc Update Proposal (Aya)
 
 on:
   workflow_dispatch:

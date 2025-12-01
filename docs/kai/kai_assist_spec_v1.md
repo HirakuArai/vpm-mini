@@ -76,7 +76,7 @@ context_header: repo=vpm-mini / branch=main / phase=Phase 2 (Kai-0 / Kai-assist 
     - "レイヤーBサイクルの説明文は、『pm_snapshot → 現実のアクション → Aya/Sho/doc_update → PR → STATE追随』という形に書き換える。"
 
 ## 5. task_type: inspect_doc_update_proposal_flow_v1
-- 目的: Doc Update Proposal (PM) workflow と黒板読み取りロジックを調査し、黒板 Issue #841 のどのエントリをどう選び、どのフィールドをプロンプトに使っているかを確認する。payload_ref / target_docs / change_intent を見落としていないか、今回のような manual_note リクエストが拾われなかった理由と修正案を findings / recommendations で返す。
+- 目的: Doc Update Proposal (Aya) workflow と黒板読み取りロジックを調査し、黒板 Issue #841 のどのエントリをどう選び、どのフィールドをプロンプトに使っているかを確認する。payload_ref / target_docs / change_intent を見落としていないか、今回のような manual_note リクエストが拾われなかった理由と修正案を findings / recommendations で返す。
 - 入力 params 想定:
   - target_workflow: "doc_update_proposal_pm"
   - include_files:
