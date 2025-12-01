@@ -332,3 +332,37 @@ kind ごとの payload schema
 kind / payload / roles contract を追加定義
 
 という方針で拡張していく。
+
+## 6. Doc Update v1 (Aya) 実装ノート
+
+### 6.1 Human → Aya エントリの最小要件
+
+現行の Aya 実装（doc_update_proposal_v1 生成）は、黒板 entry から次のフィールドを前提に処理する：
+
+- `to = "Aya"`
+- `status = "open"`
+- `project_id = "vpm-mini"`
+- `kind = "doc_update_proposal_request"`
+- `payload_ref.value`（進捗サマリーのパス。例: `"progress_summary.md"`）
+
+core spec では `payload` や `target_docs` を必須フィールドとして設計しているが、Aya 実装 v1 は `payload_ref` を利用しており、`payload` / `target_docs` の存在や構造までは検証していない。  
+Doc Update v1 における Human → Aya entry の「実装上の互換セット」は上記フィールドとし、`payload` / `target_docs` は将来的に寄せたい理想フィールドとして位置づける。
+
+### 6.2 コメントフォーマットの実装差分メモ
+
+core spec の推奨フォーマット：
+
+```
+<!-- blackboard:doc_update_v1 -->
+
+json
+{ ... JSON ... }
+```
+
+現行 Aya 実装は互換性のため、次のゆらぎも受け入れている：
+
+- ヘッダ行の直後に `json` 行、その直後に JSON が続く（空行なし）パターン。
+- JSON がコードフェンス ```json ... ``` で囲まれているパターン。
+
+新規に黒板 entry を書く場合は推奨フォーマット（空行あり・フェンスなし JSON）に寄せることを推奨するが、既存エントリとの互換性のため当面は上記ゆらぎも許容する。  
+core spec で定義した `payload` などのフィールドは理想形として保持しつつ、Doc Update v1 (Aya) では 6.1 の最小要件に依存していることを明示する。

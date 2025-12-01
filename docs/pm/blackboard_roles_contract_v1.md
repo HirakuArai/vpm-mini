@@ -240,6 +240,12 @@ Aya → Sho 宛ての "doc_update_review_request" entry の例:
 
 v1 の実装状況に合わせて、「Aya が黒板に書くかどうか」は段階的に導入してよい。
 
+#### Implementation note (v1 現状)
+
+- Aya は Human → Aya のエントリから、`to` / `status` / `project_id` / `kind` に加え、`payload_ref.value`（進捗サマリーのパス）を利用する。  
+- 現時点では core spec の `payload` / `target_docs` / `updated_at` などは pick ロジックで検証していない。  
+- Doc Update v1 に合わせる場合は、Human → Aya エントリに `payload_ref.value` を含めることが実装上の前提となる。将来的に `payload` や `target_docs` の利用・検証を強化し、core spec に近づける余地がある。
+
 3.2.4 エラー時の扱い（方針）
 
 必須フィールド欠落などで entry を解釈できない場合は、
