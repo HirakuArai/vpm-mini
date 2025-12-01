@@ -100,10 +100,50 @@ jobs:
 
           printf '%s' '${{ steps.find_aya_entry.outputs.aya_entry }}' > aya_entry.json
 
-          jq -e '.payload_ref.value' aya_entry.json >/dev/null
-          jq -r '.payload_ref.value' aya_entry.json > progress_summary.md
+          python - << 'PY'
+          import json
+          import os
+          import pathlib
+          import sys
 
-          echo "progress_summary_path=progress_summary.md" >> "$GITHUB_OUTPUT"
+          AYA_ENTRY = pathlib.Path("aya_entry.json")
+          SUMMARY_OUT = pathlib.Path("progress_summary.md")
+
+          def load_summary_from_file(path_str: str) -> str:
+            """Load summary text from a given path (relative or absolute)."""
+            path = pathlib.Path(path_str)
+            if not path.is_file():
+              raise FileNotFoundError(f"payload_ref.value path not found: {path}")
+            return path.read_text(encoding="utf-8")
+
+          def extract_summary(entry: dict) -> str:
+            """Doc Update v1 (Aya) summary resolution: prefer payload.summary; fall back to payload_ref.value file content."""
+            payload = entry.get("payload") or {}
+            summary = payload.get("summary")
+            if isinstance(summary, str) and summary.strip():
+              return summary
+
+            payload_ref = entry.get("payload_ref") or {}
+            ref_value = payload_ref.get("value")
+            if isinstance(ref_value, str) and ref_value.strip():
+              return load_summary_from_file(ref_value)
+
+            raise ValueError("No payload.summary and no payload_ref.value found in entry")
+
+          def main() -> None:
+            entry = json.loads(AYA_ENTRY.read_text(encoding="utf-8"))
+            summary_text = extract_summary(entry)
+            SUMMARY_OUT.write_text(summary_text, encoding="utf-8")
+            print(f"Wrote summary to {SUMMARY_OUT}")
+
+            github_output = os.environ.get("GITHUB_OUTPUT")
+            if github_output:
+              with open(github_output, "a", encoding="utf-8") as fh:
+                fh.write(f"progress_summary_path={SUMMARY_OUT}\n")
+
+          if __name__ == "__main__":
+            main()
+          PY
 
       - name: Gather project SSOT files
         run: |
