@@ -88,11 +88,11 @@ jobs:
               return;
             }
 
-            candidates.sort((a, b) => b.ts - a.ts);
-            const latest = candidates[0];
-            core.info(`Selected Aya entry with id: ${latest.entry.id || "unknown"}`);
-            core.setOutput("aya_entry", JSON.stringify(latest.entry));
-            core.setOutput("comment_id", String(latest.comment?.id || latest.entry?.source_comment_id || ""));
+            candidates.sort((a, b) => a.ts - b.ts);
+            const oldest = candidates[0];
+            core.info(`Selected Aya entry with id: ${oldest.entry.id || "unknown"}`);
+            core.setOutput("aya_entry", JSON.stringify(oldest.entry));
+            core.setOutput("comment_id", String(oldest.comment?.id || oldest.entry?.source_comment_id || ""));
             core.setOutput("issue_number", String(issueNumber));
 
       - name: Prepare progress summary from blackboard entry
