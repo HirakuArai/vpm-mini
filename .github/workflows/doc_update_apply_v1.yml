@@ -158,13 +158,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
+          rm -f tsugu_entry.json
           python tools/tsugu/apply_doc_update_v1.py \
             --project-id "${{ env.PROJECT_ID }}" \
             --review-run-id "${{ steps.prepare_apply_inputs.outputs.review_run_id }}" \
             --review-artifact-name "${{ steps.prepare_apply_inputs.outputs.review_artifact_name }}"
 
       - name: Mark Tsugu apply_request as done on blackboard
-        if: ${{ steps.apply_doc_update.outcome == 'success' && steps.find_tsugu_entry.outputs.tsugu_entry != '' }}
+        if: ${{ success() && steps.find_tsugu_entry.outputs.tsugu_entry != '' }}
         uses: actions/github-script@v7
         env:
           TSUGU_ENTRY: ${{ steps.find_tsugu_entry.outputs.tsugu_entry }}
@@ -210,7 +211,7 @@ jobs:
             core.info(`Updated Tsugu apply_request comment ${commentId} on issue ${issueNumber} to status=done`);
 
       - name: Add Tsugu→Gen pm_snapshot_request blackboard comment
-        if: ${{ steps.apply_doc_update.outcome == 'success' && steps.find_tsugu_entry.outputs.tsugu_entry != '' }}
+        if: ${{ success() && steps.find_tsugu_entry.outputs.tsugu_entry != '' }}
         uses: actions/github-script@v7
         env:
           TSUGU_ENTRY: ${{ steps.find_tsugu_entry.outputs.tsugu_entry }}
