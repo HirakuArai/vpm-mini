@@ -135,11 +135,13 @@ jobs:
           ENTRY_JSON="${TSUGU_ENTRY:-}"
           REVIEW_RUN_ID="${INPUT_REVIEW_RUN_ID:-}"
           REVIEW_ARTIFACT_NAME="${INPUT_REVIEW_ARTIFACT_NAME:-doc_update_review_v1}"
+          TSUGU_ENTRY_FILE="${RUNNER_TEMP:-/tmp}/tsugu_entry.json"
 
           if [ -n "$ENTRY_JSON" ]; then
-            printf '%s' "$ENTRY_JSON" > tsugu_entry.json
-            REVIEW_RUN_ID=$(jq -r '.payload.refs.review_workflow_run_id // ""' tsugu_entry.json)
-            REVIEW_ARTIFACT_NAME=$(jq -r '.payload.refs.review_artifact_name // "doc_update_review_v1"' tsugu_entry.json)
+            printf '%s' "$ENTRY_JSON" > "$TSUGU_ENTRY_FILE"
+            REVIEW_RUN_ID=$(jq -r '.payload.refs.review_workflow_run_id // ""' "$TSUGU_ENTRY_FILE")
+            REVIEW_ARTIFACT_NAME=$(jq -r '.payload.refs.review_artifact_name // "doc_update_review_v1"' "$TSUGU_ENTRY_FILE")
+            rm -f "$TSUGU_ENTRY_FILE"
           fi
 
           if [ -z "$REVIEW_RUN_ID" ]; then
@@ -151,6 +153,7 @@ jobs:
           echo "review_artifact_name=$REVIEW_ARTIFACT_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Apply doc_update_review_v1 and create PR
+        id: apply_doc_update
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -161,7 +164,7 @@ jobs:
             --review-artifact-name "${{ steps.prepare_apply_inputs.outputs.review_artifact_name }}"
 
       - name: Mark Tsugu apply_request as done on blackboard
-        if: ${{ success() && steps.find_tsugu_entry.outputs.tsugu_entry != '' }}
+        if: ${{ steps.apply_doc_update.outcome == 'success' && steps.find_tsugu_entry.outputs.tsugu_entry != '' }}
         uses: actions/github-script@v7
         env:
           TSUGU_ENTRY: ${{ steps.find_tsugu_entry.outputs.tsugu_entry }}
@@ -207,7 +210,7 @@ jobs:
             core.info(`Updated Tsugu apply_request comment ${commentId} on issue ${issueNumber} to status=done`);
 
       - name: Add Tsugu→Gen pm_snapshot_request blackboard comment
-        if: ${{ success() && steps.find_tsugu_entry.outputs.tsugu_entry != '' }}
+        if: ${{ steps.apply_doc_update.outcome == 'success' && steps.find_tsugu_entry.outputs.tsugu_entry != '' }}
         uses: actions/github-script@v7
         env:
           TSUGU_ENTRY: ${{ steps.find_tsugu_entry.outputs.tsugu_entry }}
