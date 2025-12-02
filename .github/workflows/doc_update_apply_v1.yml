@@ -159,6 +159,7 @@ jobs:
         run: |
           set -euo pipefail
           rm -f tsugu_entry.json
+          git status --porcelain
           python tools/tsugu/apply_doc_update_v1.py \
             --project-id "${{ env.PROJECT_ID }}" \
             --review-run-id "${{ steps.prepare_apply_inputs.outputs.review_run_id }}" \
