@@ -135,11 +135,13 @@ jobs:
           ENTRY_JSON="${TSUGU_ENTRY:-}"
           REVIEW_RUN_ID="${INPUT_REVIEW_RUN_ID:-}"
           REVIEW_ARTIFACT_NAME="${INPUT_REVIEW_ARTIFACT_NAME:-doc_update_review_v1}"
+          TSUGU_ENTRY_FILE="${RUNNER_TEMP:-/tmp}/tsugu_entry.json"
 
           if [ -n "$ENTRY_JSON" ]; then
-            printf '%s' "$ENTRY_JSON" > tsugu_entry.json
-            REVIEW_RUN_ID=$(jq -r '.payload.refs.review_workflow_run_id // ""' tsugu_entry.json)
-            REVIEW_ARTIFACT_NAME=$(jq -r '.payload.refs.review_artifact_name // "doc_update_review_v1"' tsugu_entry.json)
+            printf '%s' "$ENTRY_JSON" > "$TSUGU_ENTRY_FILE"
+            REVIEW_RUN_ID=$(jq -r '.payload.refs.review_workflow_run_id // ""' "$TSUGU_ENTRY_FILE")
+            REVIEW_ARTIFACT_NAME=$(jq -r '.payload.refs.review_artifact_name // "doc_update_review_v1"' "$TSUGU_ENTRY_FILE")
+            rm -f "$TSUGU_ENTRY_FILE"
           fi
 
           if [ -z "$REVIEW_RUN_ID" ]; then
@@ -151,10 +153,13 @@ jobs:
           echo "review_artifact_name=$REVIEW_ARTIFACT_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Apply doc_update_review_v1 and create PR
+        id: apply_doc_update
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
+          rm -f tsugu_entry.json
+          git status --porcelain
           python tools/tsugu/apply_doc_update_v1.py \
             --project-id "${{ env.PROJECT_ID }}" \
             --review-run-id "${{ steps.prepare_apply_inputs.outputs.review_run_id }}" \
