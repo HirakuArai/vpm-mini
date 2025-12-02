@@ -8,8 +8,9 @@ on:
         required: true
         default: "vpm-mini"
       review_run_id:
-        description: "GitHub Actions run id that produced doc_update_review_v1 artifact"
-        required: true
+        description: "GitHub Actions run id that produced doc_update_review_v1 artifact (optional when using blackboard)."
+        required: false
+        default: ""
       review_artifact_name:
         description: "Artifact name for doc_update_review_v1"
         required: false
@@ -22,6 +23,10 @@ jobs:
       contents: write
       actions: read
       pull-requests: write
+      issues: write
+    env:
+      BOARD_ISSUE_NUMBER: "841" # [board] doc_update_blackboard_v1 (Issue #841)
+      PROJECT_ID: ${{ github.event.inputs.project_id }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,12 +41,247 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Find Tsugu entry from blackboard
+        id: find_tsugu_entry
+        if: ${{ github.event.inputs.review_run_id == '' }}
+        uses: actions/github-script@v7
+        env:
+          BOARD_ISSUE_NUMBER: ${{ env.BOARD_ISSUE_NUMBER }}
+          PROJECT_ID: ${{ env.PROJECT_ID }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumber = parseInt(process.env.BOARD_ISSUE_NUMBER, 10);
+            const projectId = process.env.PROJECT_ID;
+
+            if (!issueNumber) {
+              core.setFailed("BOARD_ISSUE_NUMBER is not set or invalid.");
+              return;
+            }
+            if (!projectId) {
+              core.setFailed("PROJECT_ID is required.");
+              return;
+            }
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              per_page: 100,
+            });
+
+            const candidates = [];
+            for (const comment of comments) {
+              const body = comment.body || "";
+              if (!body.includes("<!-- blackboard:doc_update_v1 -->")) {
+                continue;
+              }
+              const fenceMatch = body.match(/```json\s*([\s\S]*?)```/m);
+              const inlineMatch = body.match(/json\s+({[\s\S]*})/m);
+              const jsonText = fenceMatch?.[1] ?? inlineMatch?.[1];
+              if (!jsonText) continue;
+
+              let entry;
+              try {
+                entry = JSON.parse(jsonText);
+              } catch (error) {
+                core.info(`Skipping comment ${comment.id}: failed to parse JSON (${error}).`);
+                continue;
+              }
+
+              if (
+                entry?.to === "Tsugu" &&
+                entry?.kind === "doc_update_apply_request" &&
+                entry?.status === "open" &&
+                entry?.project_id === projectId
+              ) {
+                const createdAt =
+                  entry.created_at ||
+                  entry.ts ||
+                  comment.created_at ||
+                  comment.createdAt ||
+                  comment.updated_at;
+                const ts =
+                  Date.parse(entry.created_at || "") ||
+                  Date.parse(entry.ts || "") ||
+                  Number(entry.ts) ||
+                  Date.parse(createdAt) ||
+                  0;
+                candidates.push({ entry, ts, comment });
+              }
+            }
+
+            if (!candidates.length) {
+              core.setFailed("No open doc_update_apply_request to Tsugu found on the blackboard.");
+              return;
+            }
+
+            candidates.sort((a, b) => a.ts - b.ts);
+            const oldest = candidates[0];
+            core.info(`Selected Tsugu entry with id: ${oldest.entry.id || "unknown"}`);
+            core.setOutput("tsugu_entry", JSON.stringify(oldest.entry));
+            core.setOutput("comment_id", String(oldest.comment?.id || oldest.entry?.source_comment_id || ""));
+            core.setOutput("issue_number", String(issueNumber));
+
+      - name: Prepare apply inputs
+        id: prepare_apply_inputs
+        env:
+          TSUGU_ENTRY: ${{ steps.find_tsugu_entry.outputs.tsugu_entry }}
+          INPUT_REVIEW_RUN_ID: ${{ github.event.inputs.review_run_id }}
+          INPUT_REVIEW_ARTIFACT_NAME: ${{ github.event.inputs.review_artifact_name }}
+        run: |
+          set -euo pipefail
+
+          ENTRY_JSON="${TSUGU_ENTRY:-}"
+          REVIEW_RUN_ID="${INPUT_REVIEW_RUN_ID:-}"
+          REVIEW_ARTIFACT_NAME="${INPUT_REVIEW_ARTIFACT_NAME:-doc_update_review_v1}"
+
+          if [ -n "$ENTRY_JSON" ]; then
+            printf '%s' "$ENTRY_JSON" > tsugu_entry.json
+            REVIEW_RUN_ID=$(jq -r '.payload.refs.review_workflow_run_id // ""' tsugu_entry.json)
+            REVIEW_ARTIFACT_NAME=$(jq -r '.payload.refs.review_artifact_name // "doc_update_review_v1"' tsugu_entry.json)
+          fi
+
+          if [ -z "$REVIEW_RUN_ID" ]; then
+            echo "review_run_id is required (from blackboard or workflow input)."
+            exit 1
+          fi
+
+          echo "review_run_id=$REVIEW_RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "review_artifact_name=$REVIEW_ARTIFACT_NAME" >> "$GITHUB_OUTPUT"
+
       - name: Apply doc_update_review_v1 and create PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           python tools/tsugu/apply_doc_update_v1.py \
-            --project-id "${{ github.event.inputs.project_id }}" \
-            --review-run-id "${{ github.event.inputs.review_run_id }}" \
-            --review-artifact-name "${{ github.event.inputs.review_artifact_name }}"
+            --project-id "${{ env.PROJECT_ID }}" \
+            --review-run-id "${{ steps.prepare_apply_inputs.outputs.review_run_id }}" \
+            --review-artifact-name "${{ steps.prepare_apply_inputs.outputs.review_artifact_name }}"
+
+      - name: Mark Tsugu apply_request as done on blackboard
+        if: ${{ success() && steps.find_tsugu_entry.outputs.tsugu_entry != '' }}
+        uses: actions/github-script@v7
+        env:
+          TSUGU_ENTRY: ${{ steps.find_tsugu_entry.outputs.tsugu_entry }}
+          COMMENT_ID: ${{ steps.find_tsugu_entry.outputs.comment_id }}
+          ISSUE_NUMBER: ${{ steps.find_tsugu_entry.outputs.issue_number }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const entry = JSON.parse(process.env.TSUGU_ENTRY || "{}");
+            const commentId = parseInt(process.env.COMMENT_ID || "", 10);
+            const issueNumber = parseInt(process.env.ISSUE_NUMBER || "", 10);
+            if (!commentId || Number.isNaN(commentId)) {
+              core.setFailed("comment_id is missing; cannot update blackboard entry.");
+              return;
+            }
+            if (!issueNumber || Number.isNaN(issueNumber)) {
+              core.setFailed("issue_number is missing; cannot update blackboard entry.");
+              return;
+            }
+
+            const jstIso = () => {
+              const now = new Date();
+              const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+              return jst.toISOString().replace(/Z$/, "+09:00");
+            };
+            entry.status = "done";
+            entry.updated_at = jstIso();
+
+            const body = [
+              "<!-- blackboard:doc_update_v1 -->",
+              "",
+              "json",
+              JSON.stringify(entry, null, 2),
+            ].join("\n");
+
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: commentId,
+              body,
+            });
+
+            core.info(`Updated Tsugu apply_request comment ${commentId} on issue ${issueNumber} to status=done`);
+
+      - name: Add Tsugu→Gen pm_snapshot_request blackboard comment
+        if: ${{ success() && steps.find_tsugu_entry.outputs.tsugu_entry != '' }}
+        uses: actions/github-script@v7
+        env:
+          TSUGU_ENTRY: ${{ steps.find_tsugu_entry.outputs.tsugu_entry }}
+          ISSUE_NUMBER: ${{ steps.find_tsugu_entry.outputs.issue_number }}
+          PROJECT_ID: ${{ env.PROJECT_ID }}
+          REVIEW_RUN_ID: ${{ steps.prepare_apply_inputs.outputs.review_run_id }}
+          REVIEW_ARTIFACT_NAME: ${{ steps.prepare_apply_inputs.outputs.review_artifact_name }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumber = parseInt(process.env.ISSUE_NUMBER || "", 10);
+            if (!issueNumber || Number.isNaN(issueNumber)) {
+              core.setFailed("issue_number is missing; cannot post pm_snapshot_request.");
+              return;
+            }
+
+            const entry = JSON.parse(process.env.TSUGU_ENTRY || "{}");
+            const jstIso = () => {
+              const now = new Date();
+              const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+              return jst.toISOString().replace(/Z$/, "+09:00");
+            };
+
+            const now = jstIso();
+            const payloadRefs = (entry.payload && entry.payload.refs) || {};
+            const targetDocs = Array.isArray(entry.target_docs) ? entry.target_docs : [];
+            const requestId = entry.id || `doc-update-apply-${process.env.REVIEW_RUN_ID || context.runId}`;
+
+            const summaryFromRequest =
+              (entry.payload && typeof entry.payload.summary === "string" && entry.payload.summary.trim()) || "";
+            const summary = summaryFromRequest
+              ? `Doc update applied: ${summaryFromRequest} — please generate pm_snapshot and verify consistency.`
+              : "Doc update applied; please generate pm_snapshot and verify consistency.";
+
+            const refs = {
+              proposal_artifact_name: payloadRefs.proposal_artifact_name || "",
+              proposal_workflow_run_id: payloadRefs.proposal_workflow_run_id || "",
+              review_artifact_name:
+                process.env.REVIEW_ARTIFACT_NAME || payloadRefs.review_artifact_name || "",
+              review_workflow_run_id:
+                process.env.REVIEW_RUN_ID || payloadRefs.review_workflow_run_id || "",
+              apply_branch: `feature/doc-update-apply-${process.env.REVIEW_RUN_ID || payloadRefs.review_workflow_run_id || ""}`,
+              apply_workflow_run_id: String(context.runId),
+              source_board_id: requestId,
+            };
+
+            const snapshotEntry = {
+              id: `${requestId}-pm_snapshot`,
+              from: "Tsugu",
+              to: "Gen",
+              project_id: process.env.PROJECT_ID || entry.project_id,
+              kind: "pm_snapshot_request",
+              status: "open",
+              payload: {
+                summary,
+                refs,
+              },
+              target_docs: targetDocs,
+              created_at: now,
+              updated_at: now,
+            };
+
+            const body = [
+              "<!-- blackboard:doc_update_v1 -->",
+              "",
+              "json",
+              JSON.stringify(snapshotEntry, null, 2),
+            ].join("\n");
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body,
+            });
+
+            core.info(`Posted Tsugu→Gen pm_snapshot_request entry with id ${snapshotEntry.id} on issue ${issueNumber}`);
