@@ -44,12 +44,11 @@
 - [ ] **T-PM-4:** vpm-mini で Kai による「STATE/weekly 更新案（テキスト）」生成 → 手動PR の最小サイクルを1回実施して検証する（owner: 啓、期限: 2025-12-07 目安）。
 - [ ] **T-INF-1:** VM/GKE 縮退後の GCP インベントリを月次レベルで確認する軽い仕組み（レポート or 手動チェック）を検討する（優先度はレイヤーBより低い）。
 - [ ] **T-DOC-1:** doc_update_proposal_v1 を vpm-mini に適用し、STATE/weekly 更新案 → 手動PR → マージの1サイクルを実施する（docs/pm/doc_update_pipeline_v1.md・docs/pm/doc_update_review_v1_spec.md に準拠。適用には `docs/ops/codex_brief_apply_doc_update_v1.md` を使用）（優先度: 高、owner: 啓、期限: 2025-12-07 目安）。
+  - 提案ファイルの配置: `reports/doc_update_proposals/YYYY-MM-DD_vpm-mini.json`
+  - レビュー支援: Sho v1 Debug WF で `doc_update_review_v1.json` を生成（`docs/pm/doc_update_review_v1_spec.md` 準拠）
+  - 適用手順: `docs/ops/codex_brief_apply_doc_update_v1.md` に従って PR を作成
+  - 参照: `docs/pm/doc_update_pipeline_v1.md`
 - [ ] **T-AUTO-1:** pm_snapshot 実行後に更新案ブランチを切る最小の自動PRフロー案（設計メモ）を作成する（owner: 啓、期限: 2025-12-07 目安）。
 - [ ] **T-WF-1:** Sho v1 Debug ワークフローを定常運用に組み込む（Actions 起動・アサイン・レビュー動線の整備）（owner: 啓、期限: 2025-12-07 目安）。
 
-## レイヤーB（記録・構造化ループ）のゴールとステップ
-
-**ゴール（Layer B）**
-
-- 実行力は人間や外部システムに任せたまま、PM Kai が「実行提案 →（人間による実行）→ 実行結果の記録案 → 更新された実行提案」という記録ループを、自分で回せる状態にする。
-- 具体的には、実行後の状態変化を踏まえた STATE / weekly / pm_snapshot の更新
+## レイヤーB（記録・
