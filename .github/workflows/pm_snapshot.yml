@@ -1,4 +1,4 @@
-name: PM Snapshot (vpm-mini)
+name: PM Snapshot (Gen, vpm-mini)
 
 on:
   workflow_dispatch:
@@ -9,9 +9,10 @@ on:
         default: "vpm-mini"
       as_of_date:
         description: "Snapshot date in JST (YYYY-MM-DD)"
-        required: true
+        required: false
+        default: ""
       use_blackboard:
-        description: "If true, pick pm_snapshot_request for Gen from the blackboard (doc_update_v1). Set to false to skip blackboard."
+        description: "If true, allow blackboard-driven runs; when false, as_of_date must be provided."
         required: false
         default: "true"
   push:
@@ -34,6 +35,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Resolve snapshot date
+        id: resolve_snapshot_date
+        run: |
+          set -euo pipefail
+          USE_BLACKBOARD="${{ github.event.inputs.use_blackboard }}"
+          SNAPSHOT_DATE="${{ github.event.inputs.as_of_date }}"
+
+          if [ "${USE_BLACKBOARD}" != "false" ] && [ -z "${SNAPSHOT_DATE}" ]; then
+            SNAPSHOT_DATE=$(TZ=Asia/Tokyo date +%Y-%m-%d)
+            echo "as_of_date was empty; blackboard mode active, using JST today: ${SNAPSHOT_DATE}"
+          fi
+
+          if [ "${USE_BLACKBOARD}" = "false" ] && [ -z "${SNAPSHOT_DATE}" ]; then
+            echo "as_of_date is required when use_blackboard is false." >&2
+            exit 1
+          fi
+
+          echo "as_of_date=${SNAPSHOT_DATE}" >> "$GITHUB_OUTPUT"
       - name: Find Gen entry from blackboard
         id: find_gen_entry
         if: ${{ github.event.inputs.use_blackboard != 'false' }}
@@ -118,10 +137,12 @@ jobs:
 
       - name: Gather context files
         shell: bash
+        env:
+          RESOLVED_AS_OF_DATE: ${{ steps.resolve_snapshot_date.outputs.as_of_date }}
         run: |
           set -euo pipefail
           PROJECT_ID="${{ github.event.inputs.project_id }}"
-          AS_OF_DATE="${{ github.event.inputs.as_of_date }}"
+          AS_OF_DATE="${RESOLVED_AS_OF_DATE}"
           if [ -z "${AS_OF_DATE:-}" ]; then
             echo "as_of_date is required (YYYY-MM-DD, JST)" >&2
             exit 1
@@ -137,7 +158,7 @@ jobs:
         shell: bash
         env:
           PROJECT_ID: ${{ github.event.inputs.project_id }}
-          AS_OF_DATE: ${{ github.event.inputs.as_of_date }}
+          AS_OF_DATE: ${{ steps.resolve_snapshot_date.outputs.as_of_date }}
         run: |
           set -euo pipefail
           if [ -z "${AS_OF_DATE:-}" ]; then
@@ -193,7 +214,7 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           PROJECT_ID: ${{ github.event.inputs.project_id }}
-          AS_OF_DATE: ${{ github.event.inputs.as_of_date }}
+          AS_OF_DATE: ${{ steps.resolve_snapshot_date.outputs.as_of_date }}
         run: |
           set -euo pipefail
           if [ -z "${AS_OF_DATE:-}" ]; then
@@ -231,7 +252,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: pm_snapshot-${{ github.event.inputs.project_id || 'vpm-mini' }}
-          path: reports/pm_snapshots/${{ github.event.inputs.as_of_date }}_${{ github.event.inputs.project_id || 'vpm-mini' }}.md
+          path: reports/pm_snapshots/${{ steps.resolve_snapshot_date.outputs.as_of_date }}_${{ github.event.inputs.project_id || 'vpm-mini' }}.md
 
       - name: Mark Gen pm_snapshot_request as done on blackboard
         if: ${{ success() && steps.find_gen_entry.outputs.gen_entry != '' }}
