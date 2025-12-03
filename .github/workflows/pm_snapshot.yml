@@ -299,3 +299,74 @@ jobs:
             });
 
             core.info(`Updated Gen pm_snapshot_request comment ${commentId} on issue ${issueNumber} to status=done`);
+
+      - name: Add Gen→Hana pm_snapshot_done blackboard comment
+        if: ${{ success() && steps.find_gen_entry.outputs.gen_entry != '' }}
+        uses: actions/github-script@v7
+        env:
+          GEN_ENTRY: ${{ steps.find_gen_entry.outputs.gen_entry }}
+          ISSUE_NUMBER: ${{ steps.find_gen_entry.outputs.issue_number }}
+          RESOLVED_AS_OF_DATE: ${{ steps.resolve_snapshot_date.outputs.as_of_date }}
+          PROJECT_ID: ${{ env.PROJECT_ID }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const entry = JSON.parse(process.env.GEN_ENTRY || "{}");
+            const issueNumber = parseInt(process.env.ISSUE_NUMBER || "", 10);
+            const projectId = entry.project_id || process.env.PROJECT_ID || "vpm-mini";
+            const asOfDate = process.env.RESOLVED_AS_OF_DATE || "";
+            if (!issueNumber || Number.isNaN(issueNumber)) {
+              core.setFailed("issue_number is missing; cannot add pm_snapshot_done comment.");
+              return;
+            }
+            if (!asOfDate) {
+              core.setFailed("as_of_date is missing; cannot build pm_snapshot_done card.");
+              return;
+            }
+
+            const jstIso = () => {
+              const now = new Date();
+              const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+              return jst.toISOString().replace(/Z$/, "+09:00");
+            };
+
+            const snapshotPath = `reports/pm_snapshots/${asOfDate}_${projectId}.md`;
+            const nowTs = jstIso();
+            const card = {
+              id: `${entry.id || "pm_snapshot"}-done`,
+              from: "Gen",
+              to: "Hana",
+              project_id: projectId,
+              kind: "pm_snapshot_done",
+              status: "open",
+              payload: {
+                summary:
+                  (entry.payload && entry.payload.summary) ||
+                  `pm_snapshot completed for cycle ${entry.id || "unknown"}`,
+                refs: {
+                  snapshot_file_path: snapshotPath,
+                  snapshot_as_of_date: asOfDate,
+                  pm_snapshot_workflow_run_id: process.env.GITHUB_RUN_ID,
+                  source_board_id: entry.id || "",
+                },
+              },
+              target_docs: Array.isArray(entry.target_docs) ? entry.target_docs : [],
+              created_at: nowTs,
+              updated_at: nowTs,
+            };
+
+            const body = [
+              "<!-- blackboard:doc_update_v1 -->",
+              "",
+              "json",
+              JSON.stringify(card, null, 2),
+            ].join("\n");
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body,
+            });
+
+            core.info(`Posted pm_snapshot_done card for entry ${entry.id || "unknown"} to Hana on issue ${issueNumber}`);
