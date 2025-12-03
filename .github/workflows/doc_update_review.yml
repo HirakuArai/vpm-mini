@@ -150,6 +150,8 @@ jobs:
 
       - name: Generate doc update review (auto-accept v1)
         id: generate_review
+        env:
+          SHO_ENTRY: ${{ steps.find_sho_entry.outputs.sho_entry }}
         run: |
           set -euo pipefail
 
@@ -157,9 +159,26 @@ jobs:
           import datetime
           import json
           import pathlib
+          import os
 
           proposal_path = pathlib.Path("doc_update_proposal_v1.json")
           proposal = json.loads(proposal_path.read_text(encoding="utf-8"))
+          sho_entry = json.loads(os.environ.get("SHO_ENTRY", "{}"))
+
+          entry_payload = sho_entry.get("payload") or {}
+          entry_refs = entry_payload.get("refs") or {}
+          entry_target_docs = sho_entry.get("target_docs") or []
+          proposal_target_docs = proposal.get("target_docs") or []
+          combined_target_docs = []
+          for doc in (entry_target_docs + proposal_target_docs):
+            if doc and doc not in combined_target_docs:
+              combined_target_docs.append(doc)
+          source_board_id = (
+            entry_refs.get("source_board_id")
+            or sho_entry.get("source_board_id")
+            or sho_entry.get("id")
+            or ""
+          )
 
           updates = proposal.get("updates", [])
           review_updates = []
@@ -168,13 +187,22 @@ jobs:
             ru["status"] = "accept"
             ru["risk"] = "low"
             ru["reviewer_comment"] = "v1 auto-accept by Sho; human review still recommended."
+            if combined_target_docs:
+              ru["target_docs"] = combined_target_docs
             review_updates.append(ru)
+
+          entry_summary = entry_payload.get("summary") or ""
+          proposal_summary = proposal.get("summary") or ""
+          intent_summary = entry_summary or proposal_summary
 
           review = {
             "schema_version": "doc_update_review_v1",
             "project_id": proposal.get("project_id", ""),
             "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "decision": "auto_accept_all",
+            "source_board_id": source_board_id,
+            "target_docs": combined_target_docs,
+            "intent_summary": intent_summary,
             "updates": review_updates,
             "no_change": proposal.get("no_change", []),
             "notes": [
@@ -185,6 +213,13 @@ jobs:
           out = pathlib.Path("doc_update_review_v1.json")
           out.write_text(json.dumps(review, ensure_ascii=False, indent=2), encoding="utf-8")
           print(f"Wrote {out}")
+
+          gho = os.environ.get("GITHUB_OUTPUT")
+          if gho:
+            with open(gho, "a", encoding="utf-8") as f:
+              f.write(f"combined_target_docs={json.dumps(combined_target_docs, ensure_ascii=False)}\n")
+              f.write(f"intent_summary={intent_summary}\n")
+              f.write(f"source_board_id={source_board_id}\n")
           PY
 
           echo "review_path=doc_update_review_v1.json" >> "$GITHUB_OUTPUT"
@@ -202,6 +237,9 @@ jobs:
           SHO_ENTRY: ${{ steps.find_sho_entry.outputs.sho_entry }}
           COMMENT_ID: ${{ steps.find_sho_entry.outputs.comment_id }}
           ISSUE_NUMBER: ${{ steps.find_sho_entry.outputs.issue_number }}
+          TARGET_DOCS_JSON: ${{ steps.generate_review.outputs.combined_target_docs }}
+          SOURCE_BOARD_ID: ${{ steps.generate_review.outputs.source_board_id }}
+          INTENT_SUMMARY: ${{ steps.generate_review.outputs.intent_summary }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -248,6 +286,9 @@ jobs:
           SHO_ENTRY: ${{ steps.find_sho_entry.outputs.sho_entry }}
           ISSUE_NUMBER: ${{ steps.find_sho_entry.outputs.issue_number }}
           PROJECT_ID: ${{ env.PROJECT_ID }}
+          TARGET_DOCS_JSON: ${{ steps.generate_review.outputs.combined_target_docs }}
+          SOURCE_BOARD_ID: ${{ steps.generate_review.outputs.source_board_id }}
+          INTENT_SUMMARY: ${{ steps.generate_review.outputs.intent_summary }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -267,7 +308,16 @@ jobs:
             const requestId = requestEntry.id || `doc-update-${context.runId}`;
             const now = jstIso();
 
-            const targetDocs = Array.isArray(requestEntry.target_docs) ? requestEntry.target_docs : [];
+            const targetDocsEnv = process.env.TARGET_DOCS_JSON || "[]";
+            let combinedTargetDocs;
+            try {
+              combinedTargetDocs = JSON.parse(targetDocsEnv);
+            } catch {
+              combinedTargetDocs = [];
+            }
+            const targetDocs =
+              (Array.isArray(combinedTargetDocs) && combinedTargetDocs.length && combinedTargetDocs) ||
+              (Array.isArray(requestEntry.target_docs) ? requestEntry.target_docs : []);
             const payloadRefs = (requestEntry.payload && requestEntry.payload.refs) || {};
             const proposalArtifactName =
               payloadRefs.proposal_artifact_name ||
@@ -277,8 +327,18 @@ jobs:
               payloadRefs.proposal_workflow_run_id ||
               (requestEntry.payload_ref && requestEntry.payload_ref.workflow_run_id) ||
               "";
+            const sourceBoardId =
+              payloadRefs.source_board_id ||
+              process.env.SOURCE_BOARD_ID ||
+              requestEntry.source_board_id ||
+              requestEntry.id ||
+              "";
+            const intentSummary =
+              (requestEntry.payload && requestEntry.payload.summary) ||
+              process.env.INTENT_SUMMARY ||
+              "";
             const summary =
-              (requestEntry.payload && typeof requestEntry.payload.summary === "string" && requestEntry.payload.summary) ||
+              (typeof intentSummary === "string" && intentSummary) ||
               `Apply request based on review ${requestId}`;
 
             const entry = {
@@ -295,7 +355,7 @@ jobs:
                   proposal_workflow_run_id: proposalRunId,
                   review_artifact_name: `doc_update_review_v1_${context.runId}`,
                   review_workflow_run_id: context.runId,
-                  source_board_id: requestId,
+                  source_board_id: sourceBoardId,
                 },
               },
               target_docs: targetDocs,
