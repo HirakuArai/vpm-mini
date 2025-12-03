@@ -395,6 +395,64 @@ C/G/δ/Next の補助情報として扱う可能性はあるが、
 
 本 contract v1 では範囲外とする。
 
+3.6 Hana
+3.6.1 役割
+
+プロジェクトオーナー（僕＋ChatGPT）と AI ロール（Aya / Kai / Gen）の間の
+「黒板レベルの通訳・ルーティング役」を担う。
+
+自分で評価・分岐判断は行わず、kind / target で指定された行き先に
+決まった形式でカードを転送・生成する。
+
+3.6.2 Hana が pick するカード（黒板）
+
+Hana が「自分の仕事」として拾う entry:
+
+- to が "Hana"
+- status が "open"
+- project_id が "vpm-mini"
+- kind が次のいずれか
+  - "hana_task"（僕＋ChatGPT からの依頼。payload.target を持つ）
+  - "pm_snapshot_done"（Gen からの通知。v1 では pm_snapshot_request の status 変更を拾ってもよい）
+  - "hana_analysis_result"（Kai からの調査結果）
+
+allowed_kinds（v1）:
+
+{"hana_task", "pm_snapshot_done", "hana_analysis_result"}
+
+補足: "pm_snapshot_done" は from が "Gen" であることを前提とし、
+to が "Hana" でなくても Gen による status 変更をトリガに拾う運用を許容する。
+
+3.6.3 Hana が生成するカード
+
+- Aya 宛て doc_update_proposal_request:
+  - from: "Hana"
+  - to: "Aya"
+  - project_id: "vpm-mini"
+  - kind: "doc_update_proposal_request"
+  - status: "open"
+  - payload.summary / payload.details は 僕＋ChatGPT から受け取った意図に基づく
+- Kai 宛て hana_to_kai_analysis_request:
+  - from: "Hana"
+  - to: "Kai"
+  - project_id: "vpm-mini"
+  - kind: "hana_to_kai_analysis_request"
+  - status: "open"
+  - payload に対象となる review_run_id や diff 情報への参照を入れる
+- 僕＋ChatGPT 向けの通知:
+  - Hana は Gen snapshot / Kai result / 実行チェーンの evidence を束ねて、
+    「このサイクルの結果セット」を知らせる（黒板カードまたは reports/hana/* を想定）
+
+3.6.4 分岐ルール
+
+Hana 自身は「どこに投げるか」を自分で決めない。
+
+hana_task や hana_to_kai_analysis_request などの kind / target に従い、
+決まった行き先（Aya / Kai / 僕＋ChatGPT）にのみカードを生成する。
+
+v1 では、判断ロジックは 常に外部（僕＋ChatGPT）で行い、
+Hana は指示された target に正確にルーティングするだけ として扱う。
+
 4. Doc Update レーンの「ぐるり一周」例
 
 ここでは、黒板を使った Doc Update レーンが
