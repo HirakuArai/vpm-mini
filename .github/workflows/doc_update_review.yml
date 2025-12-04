@@ -224,6 +224,76 @@ jobs:
 
           echo "review_path=doc_update_review_v1.json" >> "$GITHUB_OUTPUT"
 
+      - name: Self-check Sho review for auto-apply (Hana v1)
+        id: self_check
+        env:
+          REVIEW_PATH: ${{ steps.generate_review.outputs.review_path }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          import pathlib
+          import re
+          import sys
+
+          review_path = pathlib.Path(os.environ.get("REVIEW_PATH") or "doc_update_review_v1.json")
+          if not review_path.is_file():
+            print(f"review JSON not found: {review_path}", file=sys.stderr)
+            sys.exit(1)
+
+          allowed = {"STATE/current_state.md", "docs/pm/layer_b_update_flow.md"}
+          data = json.loads(review_path.read_text(encoding="utf-8"))
+          updates = data.get("updates", [])
+
+          ok = True
+          reasons: list[str] = []
+          seen_allowed: set[str] = set()
+
+          for update in updates:
+            target = update.get("target") or {}
+            path = target.get("path") or ""
+            if not path:
+              continue
+            if path not in allowed:
+              ok = False
+              reasons.append(f"unexpected target: {path}")
+              continue
+
+            seen_allowed.add(path)
+            final_content = str(update.get("final_content") or "")
+            old_path = pathlib.Path(path)
+            try:
+              old_content = old_path.read_text(encoding="utf-8")
+            except FileNotFoundError:
+              reasons.append(f"missing current file: {path}")
+              continue
+
+            old_lines = len(old_content.splitlines())
+            new_lines = len(final_content.splitlines())
+            if old_lines and (new_lines / old_lines) < 0.7:
+              ok = False
+              reasons.append(f"truncation risk for {path} ({new_lines}/{old_lines} lines)")
+
+            last_line = final_content.rstrip("\n").split("\n")[-1].strip()
+            if not last_line or not re.search(r"[A-Za-z0-9\u3040-\u30ff\u4e00-\u9fff]", last_line):
+              ok = False
+              reasons.append(f"suspicious last line in {path}: '{last_line}'")
+
+          if not seen_allowed:
+            reasons.append("no target files updated; self-check skipped on content but treated as pass")
+
+          summary = "; ".join(reasons) if reasons else "all checks passed"
+          print(f"auto_apply_ok={ok}")
+          print(f"self_check_summary={summary}")
+
+          gho = os.environ.get("GITHUB_OUTPUT")
+          if gho:
+            with open(gho, "a", encoding="utf-8") as f:
+              f.write(f"auto_apply_ok={'true' if ok else 'false'}\n")
+              f.write(f"self_check_summary={summary}\n")
+          PY
+
       - name: Upload doc update review artifact
         uses: actions/upload-artifact@v4
         with:
@@ -282,6 +352,7 @@ jobs:
 
       - name: Add Sho→Tsugu apply_request blackboard comment
         uses: actions/github-script@v7
+        if: ${{ success() && steps.self_check.outputs.auto_apply_ok == 'true' }}
         env:
           SHO_ENTRY: ${{ steps.find_sho_entry.outputs.sho_entry }}
           ISSUE_NUMBER: ${{ steps.find_sho_entry.outputs.issue_number }}
