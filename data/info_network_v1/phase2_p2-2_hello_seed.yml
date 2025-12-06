@@ -1,0 +1,94 @@
+project_id: "vpm-mini"
+scope: "phase2-p2-2-hello"
+
+nodes:
+  - id: "P2-2-GOAL-001"
+    subject: "p2-2-hello-ksvc@dev"
+    kind: "purpose"
+    statement: "Phase 2 では、dev環境で Hello KService を READY=True まで安定して動かせるようにする。"
+    phase: "phase2"
+    lane: "infra"
+    scope: "phase2-p2-2-hello"
+    status: "active"
+    author: "kei"
+    created_at: "2025-12-06T10:00:00+09:00"
+    evidence_refs: []
+    tags: ["phase2", "p2-2", "hello-ksvc", "knative"]
+
+  - id: "P2-2-EXPECTED-READY-001"
+    subject: "p2-2-hello-ksvc@dev"
+    kind: "expected_state"
+    statement: "dev環境で kubectl get ksvc hello が READY=True を安定して返す。"
+    phase: "phase2"
+    lane: "infra"
+    scope: "phase2-p2-2-hello"
+    status: "active"
+    author: "kei"
+    created_at: "2025-12-06T10:05:00+09:00"
+    evidence_refs: []
+    tags: ["phase2", "p2-2", "expected", "hello-ksvc"]
+
+  - id: "P2-2-ACTUAL-READY-FLAP-001"
+    subject: "p2-2-hello-ksvc@dev"
+    kind: "actual_state"
+    statement: "2025-12-06時点では、hello KService は apply 後しばらく READY=False が続くことがある。"
+    phase: "phase2"
+    lane: "infra"
+    scope: "phase2-p2-2-hello"
+    status: "active"
+    author: "kei"
+    created_at: "2025-12-06T10:10:00+09:00"
+    evidence_refs:
+      - "reports/kind_knative_logs/2025-12-06-hello-ksvc.txt"
+    tags: ["phase2", "p2-2", "actual", "issue"]
+
+  - id: "P2-2-CONSTRAINT-CLUSTER-SCOPE-001"
+    subject: "kind+knative@dev"
+    kind: "constraint"
+    statement: "P2-2 の検証は devbox 上の kind+Knative 環境で行い、GKE には影響を与えない。"
+    phase: "phase2"
+    lane: "infra"
+    scope: "phase2-p2-2-hello"
+    status: "active"
+    author: "kei"
+    created_at: "2025-12-06T10:12:00+09:00"
+    evidence_refs: []
+    tags: ["phase2", "p2-2", "constraint", "kind", "knative"]
+
+  - id: "P2-2-DECISION-USE-KNATIVE-001"
+    subject: "p2-2-hello-ksvc@dev"
+    kind: "decision"
+    statement: "P2-2 の Hello サービスは Knative Service (KService) で実装し、ClusterIP Service には戻さない。"
+    phase: "phase2"
+    lane: "pm"
+    scope: "phase2-p2-2-hello"
+    status: "active"
+    author: "kei"
+    created_at: "2025-12-06T10:15:00+09:00"
+    evidence_refs: []
+    tags: ["phase2", "p2-2", "decision", "knative"]
+
+relations:
+  - id: "REL-P2-2-EXPECTED-REFINES-P2-2-GOAL"
+    type: "refines"
+    from: "P2-2-EXPECTED-READY-001"
+    to: "P2-2-GOAL-001"
+    note: "P2-2 のゴールを「READY=True が安定して返る」という具体的な期待状態に落とし込んだ。"
+
+  - id: "REL-P2-2-ACTUAL-BLOCKS-P2-2-EXPECTED"
+    type: "blocks"
+    from: "P2-2-ACTUAL-READY-FLAP-001"
+    to: "P2-2-EXPECTED-READY-001"
+    note: "READY=False が続く現状は、期待状態の達成を妨げている。"
+
+  - id: "REL-P2-2-CONSTRAINT-SUPPORTS-P2-2-GOAL"
+    type: "supports"
+    from: "P2-2-CONSTRAINT-CLUSTER-SCOPE-001"
+    to: "P2-2-GOAL-001"
+    note: "検証を devbox 上に限定する制約は、GKE コスト抑制と安全性の面で P2-2 の遂行を支えている。"
+
+  - id: "REL-P2-2-DECISION-REFINES-P2-2-GOAL"
+    type: "refines"
+    from: "P2-2-DECISION-USE-KNATIVE-001"
+    to: "P2-2-GOAL-001"
+    note: "P2-2 のゴールを、Knative Service ベースで達成するという方針を明示した意思決定。"
