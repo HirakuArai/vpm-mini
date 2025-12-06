@@ -133,6 +133,8 @@ jobs:
               "- constraint / assumption / decision のノードは、対応する種類の文が source_texts に存在する場合にのみ生成してください。",
               "- CPU/メモリ/コスト制約やロールバック方針など、「一般的にありそうな内容」を勝手に追加してはいけません。",
               "- max_nodes は最大値であり、事実が少なければノード数が少ないままで構いません。",
+              "- refines の relation は、常により具体的なノード（子）からより抽象的なノード（親）へ向かって張ってください（expected_state から purpose へなど）。",
+              "- decision ノードは、明確な意思決定（〜することにした、〜しないこととした）の文が source_texts に存在する場合にのみ生成し、Issue 番号との紐付けは tags や evidence_refs で表現してください。",
               "",
               "タスク:",
               "- blackboard entry (info_network_build_request_v1) に含まれる scope / notes / source_texts を読み、",

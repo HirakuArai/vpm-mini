@@ -212,6 +212,7 @@ v1では、代表的な 4 種を用意する：
 
 - `refines`  
   - 上位の目的/期待を、より具体的な目的/期待に分解する。
+  - relation の向きは「より具体的なノード（子）」→「より抽象的なノード（親）」とし、例として expected_state が purpose を refines する場合は `from=expected_state`, `to=purpose` とする。
 
 - `supports`  
   - 上位の目的/期待の達成に「寄与する」（あれば嬉しい・進みやすくなる）。

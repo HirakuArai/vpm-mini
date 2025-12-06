@@ -83,7 +83,15 @@ relations:
 - 仮定・前提（〜と仮定している、〜という前提で、など）: assumption
 - 意思決定（〜することにした、〜しないこととした）: decision
 
-### 3.3 創作禁止（最重要）
+### 3.3 refines の向きについて
+
+expected_state と purpose の関係を表現するときは、expected_state ノードが purpose ノードを refines するように relation を張る（from=expected_state, to=purpose）。
+
+### 3.4 decision の使いどころ
+
+decision は「方針・設計・運用レベルの意思決定」を表す場合にのみ使う。単に「Issue #XXX で管理する」「この Issue で扱う」といった管理メモは decision ではなく、tags や evidence_refs で表現する。
+
+### 3.5 創作禁止（最重要）
 
 Aya は、次のことをしてはいけない。
 
