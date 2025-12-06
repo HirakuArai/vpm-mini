@@ -15,6 +15,9 @@ on:
 jobs:
   build_info_network:
     runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: ${{ github.event.inputs.project_id }}
+      BOARD_ISSUE_NUMBER: ${{ github.event.inputs.board_issue }}
 
     steps:
       - name: Checkout repo
@@ -25,15 +28,13 @@ jobs:
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          board_issue: ${{ github.event.inputs.board_issue }}
-          project_id: ${{ github.event.inputs.project_id }}
           script: |
             const core = require("@actions/core");
-            const issueNumber = parseInt(core.getInput("board_issue"), 10);
-            const projectId = core.getInput("project_id");
+            const issueNumber = parseInt(process.env.BOARD_ISSUE_NUMBER, 10);
+            const projectId = process.env.PROJECT_ID;
 
-            if (!issueNumber || Number.isNaN(issueNumber)) {
-              core.setFailed(`Invalid board_issue: ${core.getInput("board_issue")}`);
+            if (!issueNumber) {
+              core.setFailed("BOARD_ISSUE_NUMBER is not set or invalid.");
               return;
             }
 
@@ -45,62 +46,58 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issueNumber,
-                per_page: 100
-              }
+                per_page: 100,
+              },
             );
 
-            let latest = null;
-
-            for (const c of comments) {
-              const body = c.body || "";
-              const marker = "<!-- blackboard:doc_update_v1 -->";
-              const idx = body.indexOf(marker);
-              if (idx === -1) continue;
-
-              const after = body.slice(idx + marker.length);
-
-              // Doc Update Proposal (Aya) と同様に "json" の後ろを JSON とみなす
-              const jsonTag = "json";
-              const jsonIdx = after.indexOf(jsonTag);
-              if (jsonIdx === -1) continue;
-
-              const jsonText = after.slice(jsonIdx + jsonTag.length).trim();
-              let entry;
-              try {
-                entry = JSON.parse(jsonText);
-              } catch (e) {
-                core.warning(`Failed to parse JSON from comment ${c.id}: ${e}`);
+            const candidates = [];
+            for (const comment of comments) {
+              const body = comment.body || "";
+              if (!body.includes("<!-- blackboard:doc_update_v1 -->")) {
                 continue;
               }
 
-              if (!entry) continue;
-              if (entry.to !== "Aya") continue;
-              if (entry.project_id !== projectId) continue;
-              if (entry.kind !== "info_network_build_request_v1") continue;
-              if (entry.status !== "open") continue;
+              const fenceMatch = body.match(/```json\s*([\s\S]*?)```/m);
+              const inlineMatch = body.match(/json\s+({[\s\S]*})/m);
+              const jsonText = fenceMatch?.[1] ?? inlineMatch?.[1];
+              if (!jsonText) continue;
 
-              if (!latest) {
-                latest = entry;
-              } else {
-                const prev = new Date(latest.updated_at || latest.created_at || 0);
-                const cur = new Date(entry.updated_at || entry.created_at || 0);
-                if (cur > prev) {
-                  latest = entry;
-                }
+              let entry;
+              try {
+                entry = JSON.parse(jsonText);
+              } catch (error) {
+                core.info(`Skipping comment ${comment.id}: failed to parse JSON (${error}).`);
+                continue;
+              }
+
+              if (
+                entry?.to === "Aya" &&
+                entry?.kind === "info_network_build_request_v1" &&
+                entry?.status === "open" &&
+                entry?.project_id === projectId
+              ) {
+                const createdAt =
+                  entry.created_at ||
+                  comment.created_at ||
+                  comment.createdAt ||
+                  comment.updated_at;
+                const ts = Date.parse(createdAt) || 0;
+                candidates.push({ entry, ts, comment });
               }
             }
 
-            if (!latest) {
+            if (!candidates.length) {
               core.setFailed("No open info_network_build_request_v1 to Aya found on the blackboard.");
               return;
             }
 
-            core.info(`Found info_network_build_request_v1: id=${latest.id}, scope=${latest.payload && latest.payload.scope}`);
+            candidates.sort((a, b) => a.ts - b.ts);
+            const oldest = candidates[0];
+            core.info(`Selected Aya info_network entry with id: ${oldest.entry.id || "unknown"}`);
 
-            core.setOutput("entry", JSON.stringify(latest));
-            core.setOutput("scope", latest.payload && latest.payload.scope ? latest.payload.scope : "");
-            core.setOutput("summary", latest.payload && latest.payload.summary ? latest.payload.summary : "");
-            core.setOutput("target_docs", JSON.stringify(latest.target_docs || []));
+            core.setOutput("entry", JSON.stringify(oldest.entry));
+            core.setOutput("comment_id", String(oldest.comment?.id || oldest.entry?.source_comment_id || ""));
+            core.setOutput("issue_number", String(issueNumber));
 
       - name: Build prompt for Aya info_network_builder_v1
         id: build_prompt
@@ -225,7 +222,7 @@ EOSH
       - name: Post Aya info_network proposal as comment
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_NUMBER: ${{ github.event.inputs.board_issue }}
+          ISSUE_NUMBER: ${{ steps.find.outputs.issue_number }}
         run: |
           {
             echo "Aya info_network proposal YAML:"
@@ -240,19 +237,32 @@ EOSH
       - name: Mark Aya request as done on blackboard
         uses: actions/github-script@v7
         env:
-          BOARD_ISSUE: ${{ github.event.inputs.board_issue }}
+          BOARD_ISSUE_NUMBER: ${{ steps.find.outputs.issue_number }}
+          COMMENT_ID: ${{ steps.find.outputs.comment_id }}
           ENTRY_JSON: ${{ steps.find.outputs.entry }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const issueNumber = parseInt(process.env.BOARD_ISSUE, 10);
+            const issueNumber = parseInt(process.env.BOARD_ISSUE_NUMBER, 10);
+            const commentId = parseInt(process.env.COMMENT_ID || "", 10);
             const entry = JSON.parse(process.env.ENTRY_JSON || "{}");
             if (!issueNumber || Number.isNaN(issueNumber)) {
-              core.setFailed("BOARD_ISSUE is missing.");
+              core.setFailed("BOARD_ISSUE_NUMBER is missing.");
               return;
             }
+            if (!commentId || Number.isNaN(commentId)) {
+              core.setFailed("COMMENT_ID is missing; cannot update blackboard entry.");
+              return;
+            }
+
+            const jstIso = () => {
+              const now = new Date();
+              const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+              return jst.toISOString().replace(/Z$/, "+09:00");
+            };
+
             entry.status = "done";
-            entry.updated_at = new Date().toISOString();
+            entry.updated_at = jstIso();
 
             const body = [
               "<!-- blackboard:doc_update_v1 -->",
@@ -261,11 +271,11 @@ EOSH
               JSON.stringify(entry, null, 2),
             ].join("\n");
 
-            await github.rest.issues.createComment({
+            await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: issueNumber,
+              comment_id: commentId,
               body,
             });
 
-            core.info(`Marked entry ${entry.id || ""} as done on issue #${issueNumber}`);
+            core.info(`Updated blackboard comment ${commentId} on issue #${issueNumber} to status=done`);
