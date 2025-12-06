@@ -32,7 +32,6 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            // core is provided by github-script; no need to require("@actions/core")
             const issueNumber = parseInt(process.env.BOARD_ISSUE_NUMBER, 10);
             const projectId = process.env.PROJECT_ID;
 
@@ -58,7 +57,6 @@ jobs:
               const body = comment.body || "";
               if (!body.includes("<!-- blackboard:doc_update_v1 -->")) continue;
 
-              // doc_update_proposal.yml と同じ fence / inline 両対応の JSON 抽出
               const fenceMatch = body.match(/```json\s*([\s\S]*?)```/m);
               const inlineMatch = body.match(/json\s+({[\s\S]*})/m);
               const jsonText = fenceMatch?.[1] ?? inlineMatch?.[1];
@@ -93,7 +91,6 @@ jobs:
               return;
             }
 
-            // いちばん古い open を採用（doc_update と同じパターン）
             candidates.sort((a, b) => a.ts - b.ts);
             const oldest = candidates[0];
 
@@ -102,7 +99,7 @@ jobs:
             core.setOutput("entry", JSON.stringify(oldest.entry));
             core.setOutput("issue_number", String(issueNumber));
 
-      - name: Call OpenAI for info_network build
+      - name: Call OpenAI for info_network build (segmenter only)
         id: call
         uses: actions/github-script@v7
         env:
@@ -113,7 +110,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require("fs");
-            // core is provided by github-script; no need to require("@actions/core")
 
             const entry = JSON.parse(process.env.ENTRY_JSON || "{}");
             const projectId = process.env.PROJECT_ID || "vpm-mini";
@@ -124,7 +120,7 @@ jobs:
             const entryText = JSON.stringify(entry, null, 2);
 
             const systemPrompt = [
-              "あなたは Aya: info_network_builder_v1 として動作します。",
+              "あなたは Aya: info_network_builder_v1 (segmenter mode) として動作します。",
               "",
               "前提:",
               "- docs/pm/info_network_overview_v1.md で定義された info_node / info_relation v1 のルールに従ってください。",
@@ -132,8 +128,15 @@ jobs:
               `- project_id は常に \"${projectId}\" とします (v1 の前提)。`,
               "- scope は blackboard entry の payload.scope に従います。",
               "",
+              "重要な制約:",
+              "- source_texts に明示的に書かれていない事実・制約・前提・意思決定・目的を、新しく作らないでください。",
+              "- constraint / assumption / decision のノードは、対応する種類の文が source_texts に存在する場合にのみ生成してください。",
+              "- CPU/メモリ/コスト制約やロールバック方針など、「一般的にありそうな内容」を勝手に追加してはいけません。",
+              "- max_nodes は最大値であり、事実が少なければノード数が少ないままで構いません。",
+              "",
               "タスク:",
-              "- blackboard entry (info_network_build_request_v1) と、そこに記載された scope / notes / source_texts を読み、scope に対応する info_node と info_relation の案を作成してください。",
+              "- blackboard entry (info_network_build_request_v1) に含まれる scope / notes / source_texts を読み、",
+              "  scope に対応する info_node と info_relation の案を作成してください。",
               "- 1ノード = 1 subject × 1 kind × 1文 のルールを守ってください。",
               "- kind は purpose / expected_state / actual_state / constraint / assumption / decision のいずれかを使ってください。",
               "- relation type は refines / supports / blocks / depends_on のいずれかを使ってください。",
@@ -147,7 +150,7 @@ jobs:
             ].join("\n");
 
             const userPrompt = [
-              "### info_network_overview_v1 + Aya role spec",
+              "### info_network_overview_v1 + Aya segmenter role spec",
               "",
               spec,
               "",
@@ -157,7 +160,7 @@ jobs:
               "",
               entryText,
               "",
-              "上記を踏まえて、指定された scope についての info_network_v1 YAML を生成してください。"
+              "上記を踏まえて、指定された scope についての info_node / info_relation を YAML で生成してください。"
             ].join("\n");
 
             const res = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -204,7 +207,7 @@ jobs:
         run: |
           ISSUE="${{ steps.find.outputs.issue_number }}"
           {
-            echo 'Aya info_network proposal YAML:'
+            echo 'Aya info_network (segmenter) YAML:'
             echo
             echo '```yaml'
             cat info_network_aya.yml
