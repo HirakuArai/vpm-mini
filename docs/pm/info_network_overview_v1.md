@@ -223,6 +223,9 @@ v1では、代表的な 4 種を用意する：
 - `depends_on`  
   - 実務上の依存関係（順序・手続き・前提条件）。
 
+上記4種類以外の文字列を relation の `type` に使ってはならない（例: `assumption` など）。  
+`assumption` は info_node の `kind` としてのみ使い、relation の `type` としては使わない。
+
 ### 5.4 不変条件（v1ルール）
 
 - `from` / `to` は、必ず既存の `info_node.id` を指す。
