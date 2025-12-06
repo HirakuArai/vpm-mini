@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "与えられた STATE / Issue / 設計 / ログ（創作禁止）を最大30ノードで info_node と info_relation に分解し、refines は常に子→親（より具体→より抽象）、decision ノードは明確な決定文がある場合のみ生成、今回は設計ノートは提案/推奨レベルのため decision は作らない。Evidence/STATE/ログは evidence_for などでゴールや期待状態に紐付ける。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "- docs/pm/info_network_overview_v1.md および info_network_aya_builder_v1.md の segmenter ルールに従い、創作なしで分解しました。- refines は常に 子(具体)→親(抽象) で接続しました。- 設計ノートは推奨段階であり、明確な承認/決定文がないため decision ノードは作成していません。- Evidence/ログは evidence_for で DoD/期待状態/ゴールに紐付けました。- ノード数は29で max_nodes=30 以内です。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
