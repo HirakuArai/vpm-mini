@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "与えられた STATE と Issue の原文のみを材料に、創作なし・segmenterモードで info_node と info_relation に分解します。refines は「具体→抽象」の向きで統一し、明確な意思決定文がないため decision ノードは作りません。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "上記のノード/リレーションで最大30ノード以内に分解しました（decisionノード生成なし、refinesは子→親の向きで統一）。追加の結線や粒度調整が必要であれば指示してください。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
