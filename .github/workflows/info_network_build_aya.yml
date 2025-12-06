@@ -23,73 +23,84 @@ jobs:
       - name: Find Aya info_network request from blackboard
         id: find
         uses: actions/github-script@v7
-        env:
-          BOARD_ISSUE: ${{ github.event.inputs.board_issue }}
-          PROJECT_ID: ${{ github.event.inputs.project_id }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          board_issue: ${{ github.event.inputs.board_issue }}
+          project_id: ${{ github.event.inputs.project_id }}
           script: |
-            const issueNumber = parseInt(process.env.BOARD_ISSUE, 10);
-            const projectId = process.env.PROJECT_ID;
+            const core = require("@actions/core");
+            const issueNumber = parseInt(core.getInput("board_issue"), 10);
+            const projectId = core.getInput("project_id");
 
             if (!issueNumber || Number.isNaN(issueNumber)) {
-              core.setFailed("BOARD_ISSUE is required.");
-              return;
-            }
-            if (!projectId) {
-              core.setFailed("PROJECT_ID is required.");
+              core.setFailed(`Invalid board_issue: ${core.getInput("board_issue")}`);
               return;
             }
 
-            core.info(`Searching issue #${issueNumber} for info_network_build_request_v1 (to=Aya, project_id=${projectId})`);
+            core.info(`Searching blackboard issue #${issueNumber} for info_network_build_request_v1 to Aya (project_id=${projectId})...`);
 
-            const comments = await github.paginate(github.rest.issues.listComments, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issueNumber,
-              per_page: 100,
-            });
+            const comments = await github.paginate(
+              github.rest.issues.listComments,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                per_page: 100
+              }
+            );
 
             let latest = null;
-            for (const comment of comments) {
-              const body = comment.body || "";
-              if (!body.includes("<!-- blackboard:doc_update_v1 -->")) continue;
 
-              const fenceMatch = body.match(/```json\s*([\s\S]*?)```/m);
-              const inlineMatch = body.match(/json\s+({[\s\S]*})/m);
-              const jsonText = fenceMatch?.[1] ?? inlineMatch?.[1];
-              if (!jsonText) continue;
+            for (const c of comments) {
+              const body = c.body || "";
+              const marker = "<!-- blackboard:doc_update_v1 -->";
+              const idx = body.indexOf(marker);
+              if (idx === -1) continue;
 
+              const after = body.slice(idx + marker.length);
+
+              // Doc Update Proposal (Aya) と同様に "json" の後ろを JSON とみなす
+              const jsonTag = "json";
+              const jsonIdx = after.indexOf(jsonTag);
+              if (jsonIdx === -1) continue;
+
+              const jsonText = after.slice(jsonIdx + jsonTag.length).trim();
               let entry;
               try {
                 entry = JSON.parse(jsonText);
-              } catch (err) {
-                core.info(`Skip comment ${comment.id}: JSON parse error ${err}`);
+              } catch (e) {
+                core.warning(`Failed to parse JSON from comment ${c.id}: ${e}`);
                 continue;
               }
 
-              if (
-                entry?.to === "Aya" &&
-                entry?.kind === "info_network_build_request_v1" &&
-                entry?.status === "open" &&
-                entry?.project_id === projectId
-              ) {
-                const ts = Date.parse(entry.updated_at || entry.created_at || comment.updated_at || comment.created_at || 0);
-                if (!latest || ts > latest.ts) {
-                  latest = { entry, ts };
+              if (!entry) continue;
+              if (entry.to !== "Aya") continue;
+              if (entry.project_id !== projectId) continue;
+              if (entry.kind !== "info_network_build_request_v1") continue;
+              if (entry.status !== "open") continue;
+
+              if (!latest) {
+                latest = entry;
+              } else {
+                const prev = new Date(latest.updated_at || latest.created_at || 0);
+                const cur = new Date(entry.updated_at || entry.created_at || 0);
+                if (cur > prev) {
+                  latest = entry;
                 }
               }
             }
 
             if (!latest) {
-              core.setFailed("No open info_network_build_request_v1 to Aya found.");
+              core.setFailed("No open info_network_build_request_v1 to Aya found on the blackboard.");
               return;
             }
 
-            core.setOutput("entry", JSON.stringify(latest.entry));
-            core.setOutput("scope", latest.entry.payload?.scope || "");
-            core.setOutput("summary", latest.entry.payload?.summary || "");
-            core.setOutput("target_docs", JSON.stringify(latest.entry.target_docs || []));
+            core.info(`Found info_network_build_request_v1: id=${latest.id}, scope=${latest.payload && latest.payload.scope}`);
+
+            core.setOutput("entry", JSON.stringify(latest));
+            core.setOutput("scope", latest.payload && latest.payload.scope ? latest.payload.scope : "");
+            core.setOutput("summary", latest.payload && latest.payload.summary ? latest.payload.summary : "");
+            core.setOutput("target_docs", JSON.stringify(latest.target_docs || []));
 
       - name: Build prompt for Aya info_network_builder_v1
         id: build_prompt
