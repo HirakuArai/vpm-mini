@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "依頼は、Phase 2 の P2-2 (Hello KService READY=True) に関する記述のみを対象に、docs/pm/info_network_overview_v1.md と docs/pm/info_network_aya_builder_v1.md の segmenter ルールで info_node / info_relation を生成すること。創作禁止・max_nodes=30・refines は子(具体)→親(抽象)・decision は明示的な意思決定文がある場合のみ生成、という制約に厳密に従う。現時点では実テキストが未提示のため、ノード生成は着手不可。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "ソース本文が未提供のため、現時点ではノード生成は開始できません。次のいずれかをご提供ください: 1) STATE/current_state.md の Phase 2 内 P2-2 該当部分の本文、2) P2-2 を扱う Issue/PR のタイトルと本文（番号が分かれば番号も）、3) docs/pm/ 配下にある Hello KService に関する設計メモの該当抜粋。これらを受領次第、segmenter モードで最大30ノードに収めて構築します。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
