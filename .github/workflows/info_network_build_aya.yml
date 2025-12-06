@@ -32,7 +32,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const core = require("@actions/core");
+            // core is provided by github-script; no need to require("@actions/core")
             const issueNumber = parseInt(process.env.BOARD_ISSUE_NUMBER, 10);
             const projectId = process.env.PROJECT_ID;
 
@@ -113,7 +113,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require("fs");
-            const core = require("@actions/core");
+            // core is provided by github-script; no need to require("@actions/core")
 
             const entry = JSON.parse(process.env.ENTRY_JSON || "{}");
             const projectId = process.env.PROJECT_ID || "vpm-mini";
