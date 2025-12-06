@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "Phase 2 P2-2 (Hello KService READY=True) について、info_network_v1 の小規模な追加（ノード3〜8個＋リレーション数個）を、project_id=vpm-mini・scope=phase2-p2-2-hello に限定し、docs/pm/info_network_overview_v1.md と docs/pm/info_network_aya_builder_v1.md のv1ルールに準拠、かつ既存 seed data/info_network_v1/phase2_p2-2_hello_seed.yml と整合する形で生成・提案する。ソースは STATE/current_state.md の該当セクションと P2-2 関連の Issue/PR（例: #571）を一次情報として用いる。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "上記プランで進めます。実行にあたり、(1) STATE/current_state.md の P2-2 節と (2) 対象 Issue/PR（例: #571）の特定が必要です。これらの参照が可能であればドラフト（3〜8ノード＋数件リレーション）を data/info_network_v1/phase2_p2-2_hello_add_001.yml として作成し、seed と整合検証後に PR を起票します。Revision 名称や正確な Issue/PR 番号は取得後に確定します。ご了承いただければ実行に移ります。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
