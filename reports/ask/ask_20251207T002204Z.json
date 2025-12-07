@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "提供された STATE（C/G/δ）、Active Tasks、Evidence Links を、そのまま事実ベースで info_node / info_relation に分解します。relation は refines / supports のみ使用し、向きは「具体→抽象（refines）」に統一します。意思決定は本文にある「scene JSONで扱う方向を決めた」のみ decision ノード化し、依存関係や新規提案は作りません（創作禁止・segmenter準拠）。ノード総数は40以下に抑えます。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "ルール（segmenter mode、創作禁止、relationは refines/supports、decisionは明示文のみ）に従い、最大40ノード内で分解しました。依存関係・新規制約の創作は行っていません。必要に応じて追加の粒度調整やリンク強化（supports の補強）の指示をください。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
