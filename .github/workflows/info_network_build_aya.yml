@@ -98,6 +98,7 @@ jobs:
 
             core.setOutput("entry", JSON.stringify(oldest.entry));
             core.setOutput("issue_number", String(issueNumber));
+            core.setOutput("comment_id", String(oldest.comment?.id || ""));
 
       - name: Call OpenAI for info_network build (segmenter only)
         id: call
@@ -226,27 +227,35 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ENTRY_JSON: ${{ steps.find.outputs.entry }}
-          ISSUE_NUMBER: ${{ steps.find.outputs.issue_number }}
+          COMMENT_ID: ${{ steps.find.outputs.comment_id }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const entry = JSON.parse(process.env.ENTRY_JSON || "{}");
-            const issueNumber = parseInt(process.env.ISSUE_NUMBER, 10);
+            const commentId = parseInt(process.env.COMMENT_ID, 10);
+
+            if (!commentId) {
+              core.setFailed("COMMENT_ID is not set or invalid.");
+              return;
+            }
 
             entry.status = "done";
             entry.updated_at = new Date().toISOString();
 
+            // Rebuild the blackboard comment body with status=done
             const bodyLines = [
               "<!-- blackboard:doc_update_v1 -->",
               "",
-              "json",
-              JSON.stringify(entry, null, 2)
+              "```json",
+              JSON.stringify(entry, null, 2),
+              "```",
+              ""
             ];
             const body = bodyLines.join("\n");
 
-            await github.rest.issues.createComment({
+            await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: issueNumber,
-              body
+              comment_id: commentId,
+              body,
             });
