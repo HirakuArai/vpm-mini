@@ -84,7 +84,6 @@ def call_openai(
     payload = {
         "model": model,
         "messages": messages,
-        "temperature": 0.2,
         "response_format": {"type": "json_object"},
     }
     data = json.dumps(payload).encode("utf-8")
@@ -422,7 +421,9 @@ def main() -> int:
         )
         snapshot = parse_snapshot(raw)
     except Exception as exc:  # noqa: BLE001
-        print(f"Failed to generate snapshot: {exc}", file=sys.stderr)
+        print(
+            f"Failed to generate snapshot (model={args.model}): {exc}", file=sys.stderr
+        )
         return 1
 
     write_json(Path(args.output), snapshot)
