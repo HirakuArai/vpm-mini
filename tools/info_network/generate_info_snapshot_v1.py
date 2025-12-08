@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import socket
 import sys
 import textwrap
 from pathlib import Path
@@ -12,6 +13,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1"
+DEFAULT_OPENAI_TIMEOUT_SEC = 300
 
 
 def read_text(path: Path, label: str) -> str:
@@ -77,10 +79,24 @@ def get_openai_base_url() -> str:
     return base
 
 
+def get_openai_timeout_sec() -> float:
+    raw = os.getenv("OPENAI_TIMEOUT_SEC", "").strip()
+    if not raw:
+        return float(DEFAULT_OPENAI_TIMEOUT_SEC)
+    try:
+        value = float(raw)
+    except ValueError as exc:  # noqa: BLE001
+        raise RuntimeError(f"Invalid OPENAI_TIMEOUT_SEC: {raw!r}") from exc
+    if value <= 0:
+        raise RuntimeError(f"Invalid OPENAI_TIMEOUT_SEC (must be >0): {raw!r}")
+    return value
+
+
 def call_openai(
     api_key: str, messages: List[Dict[str, str]], model: str, base_url: str
 ) -> str:
     url = f"{base_url}/chat/completions"
+    timeout_sec = get_openai_timeout_sec()
     payload = {
         "model": model,
         "messages": messages,
@@ -96,13 +112,21 @@ def call_openai(
         },
     )
     try:
-        with urlopen(req, timeout=120) as resp:
+        with urlopen(req, timeout=timeout_sec) as resp:
             body = resp.read().decode("utf-8")
     except HTTPError as exc:
         detail = exc.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"OpenAI HTTPError: {exc.code} {detail}") from exc
+        raise RuntimeError(
+            f"OpenAI HTTPError (model={model}, timeout={timeout_sec}s): {exc.code} {detail}"
+        ) from exc
+    except socket.timeout as exc:
+        raise RuntimeError(
+            f"OpenAI timeout (model={model}, timeout={timeout_sec}s): {exc}"
+        ) from exc
     except URLError as exc:
-        raise RuntimeError(f"OpenAI URLError: {exc.reason}") from exc
+        raise RuntimeError(
+            f"OpenAI URLError (model={model}, timeout={timeout_sec}s): {exc.reason}"
+        ) from exc
 
     try:
         content = json.loads(body)["choices"][0]["message"]["content"]
