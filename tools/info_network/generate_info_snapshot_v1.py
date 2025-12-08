@@ -11,6 +11,8 @@ from typing import Any, Dict, List
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1"
+
 
 def read_text(path: Path, label: str) -> str:
     if not path.exists():
@@ -65,10 +67,20 @@ def build_messages(schema: str, job: str, current_state: str) -> List[Dict[str, 
     return [{"role": "system", "content": system}, {"role": "user", "content": user}]
 
 
+def get_openai_base_url() -> str:
+    base = os.getenv("OPENAI_BASE_URL", "").strip()
+    if not base:
+        base = DEFAULT_OPENAI_BASE_URL
+    base = base.rstrip("/")
+    if not base.startswith("http"):
+        raise RuntimeError(f"Invalid OPENAI_BASE_URL: {base!r}")
+    return base
+
+
 def call_openai(
     api_key: str, messages: List[Dict[str, str]], model: str, base_url: str
 ) -> str:
-    url = f"{base_url.rstrip('/')}/chat/completions"
+    url = f"{base_url}/chat/completions"
     payload = {
         "model": model,
         "messages": messages,
@@ -396,7 +408,11 @@ def main() -> int:
     if not api_key:
         print("OPENAI_API_KEY is required", file=sys.stderr)
         return 1
-    base_url = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
+    try:
+        base_url = get_openai_base_url()
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
 
     messages = build_messages(schema_doc, job_doc, current_state)
 
