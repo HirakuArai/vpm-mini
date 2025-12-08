@@ -1,0 +1,38 @@
+name: Hakone-e2 Info Snapshot v1
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build_info_snapshot:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Read hakone-e2 current_state
+        id: read_state
+        run: |
+          CONTENT=$(cat STATE/hakone-e2/current_state.md)
+          CONTENT="${CONTENT//'%'/'%25'}"
+          CONTENT="${CONTENT//$'\n'/'%0A'}"
+          CONTENT="${CONTENT//$'\r'/'%0D'}"
+          echo "content=$CONTENT" >> $GITHUB_OUTPUT
+
+      - name: Call OpenAI (Kai+Aya) - TODO
+        id: call_openai
+        run: |
+          echo "TODO: chatops.yml と同様のパターンで OpenAI API を呼び出し、"
+          echo "docs/pm/info_network_v1_schema.md と docs/projects/hakone-e2/info_network_job_v1.md に従って"
+          echo "JSON 形式の { kai_plan, aya_output } を生成する処理を追加する。"
+          echo "現時点ではまだ実装しない。"
+
+      - name: Save JSON artifacts placeholder
+        run: |
+          mkdir -p reports/hakone-e2
+          echo '{ "status": "placeholder" }' > reports/hakone-e2/info_snapshot_v1_raw.json
+          echo "Saved placeholder reports/hakone-e2/info_snapshot_v1_raw.json"
