@@ -7,6 +7,7 @@ import os
 import socket
 import sys
 import textwrap
+import time
 from pathlib import Path
 from typing import Any, Dict, List
 from urllib.error import HTTPError, URLError
@@ -14,6 +15,7 @@ from urllib.request import Request, urlopen
 
 DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1"
 DEFAULT_OPENAI_TIMEOUT_SEC = 300
+MAX_OPENAI_RETRIES = 3
 
 
 def read_text(path: Path, label: str) -> str:
@@ -103,36 +105,62 @@ def call_openai(
         "response_format": {"type": "json_object"},
     }
     data = json.dumps(payload).encode("utf-8")
-    req = Request(
-        url,
-        data=data,
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}",
-        },
-    )
-    try:
-        with urlopen(req, timeout=timeout_sec) as resp:
-            body = resp.read().decode("utf-8")
-    except HTTPError as exc:
-        detail = exc.read().decode("utf-8", errors="replace")
-        raise RuntimeError(
-            f"OpenAI HTTPError (model={model}, timeout={timeout_sec}s): {exc.code} {detail}"
-        ) from exc
-    except socket.timeout as exc:
-        raise RuntimeError(
-            f"OpenAI timeout (model={model}, timeout={timeout_sec}s): {exc}"
-        ) from exc
-    except URLError as exc:
-        raise RuntimeError(
-            f"OpenAI URLError (model={model}, timeout={timeout_sec}s): {exc.reason}"
-        ) from exc
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}",
+    }
+    backoff = {1: 1, 2: 3}
+    last_err: Exception | None = None
 
-    try:
-        content = json.loads(body)["choices"][0]["message"]["content"]
-    except Exception as exc:  # noqa: BLE001
-        raise RuntimeError(f"Unexpected OpenAI response: {body}") from exc
-    return content
+    for attempt in range(1, MAX_OPENAI_RETRIES + 1):
+        req = Request(url, data=data, headers=headers)
+        try:
+            with urlopen(req, timeout=timeout_sec) as resp:
+                body = resp.read().decode("utf-8")
+            content = json.loads(body)["choices"][0]["message"]["content"]
+            return content
+        except HTTPError as exc:
+            detail = exc.read().decode("utf-8", errors="replace")
+            status = getattr(exc, "code", None)
+            retriable = status is not None and 500 <= int(status) < 600
+            last_err = RuntimeError(
+                f"OpenAI HTTPError (model={model}, attempt={attempt}/{MAX_OPENAI_RETRIES}, timeout={timeout_sec}s): {status} {detail}"
+            )
+        except socket.timeout as exc:
+            retriable = True
+            last_err = RuntimeError(
+                f"OpenAI timeout (model={model}, attempt={attempt}/{MAX_OPENAI_RETRIES}, timeout={timeout_sec}s): {exc}"
+            )
+        except URLError as exc:
+            reason = getattr(exc, "reason", exc)
+            reason_text = str(reason)
+            retriable = (
+                "Remote end closed" in reason_text
+                or "Connection reset" in reason_text
+                or isinstance(reason, socket.timeout)
+            )
+            last_err = RuntimeError(
+                f"OpenAI URLError (model={model}, attempt={attempt}/{MAX_OPENAI_RETRIES}, timeout={timeout_sec}s): {reason_text}"
+            )
+        except Exception as exc:  # noqa: BLE001
+            retriable = False
+            last_err = RuntimeError(
+                f"Unexpected OpenAI response (model={model}, attempt={attempt}/{MAX_OPENAI_RETRIES}): {exc}"
+            )
+
+        if not retriable or attempt == MAX_OPENAI_RETRIES:
+            assert last_err is not None
+            raise last_err
+
+        sleep_sec = backoff.get(attempt, 10)
+        print(
+            f"Warn: OpenAI call failed (attempt={attempt}/{MAX_OPENAI_RETRIES}, retry in {sleep_sec}s): {last_err}",
+            file=sys.stderr,
+        )
+        time.sleep(sleep_sec)
+
+    assert last_err is not None
+    raise last_err
 
 
 def parse_snapshot(raw_text: str) -> Dict[str, Any]:
