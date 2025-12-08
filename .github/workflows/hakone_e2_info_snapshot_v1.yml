@@ -23,16 +23,30 @@ jobs:
           CONTENT="${CONTENT//$'\r'/'%0D'}"
           echo "content=$CONTENT" >> $GITHUB_OUTPUT
 
-      - name: Call OpenAI (Kai+Aya) - TODO
-        id: call_openai
+      - name: Generate hakone-e2 info snapshot (Kai+Aya)
+        id: generate_snapshot
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
         run: |
-          echo "TODO: chatops.yml と同様のパターンで OpenAI API を呼び出し、"
-          echo "docs/pm/info_network_v1_schema.md と docs/projects/hakone-e2/info_network_job_v1.md に従って"
-          echo "JSON 形式の { kai_plan, aya_output } を生成する処理を追加する。"
-          echo "現時点ではまだ実装しない。"
+          python tools/info_network/generate_info_snapshot_v1.py \
+            --current-state STATE/hakone-e2/current_state.md \
+            --schema-doc docs/pm/info_network_v1_schema.md \
+            --job-doc docs/projects/hakone-e2/info_network_job_v1.md \
+            --model gpt-5 \
+            --output reports/hakone-e2/info_snapshot_v1_raw.json
 
-      - name: Save JSON artifacts placeholder
+      - name: Apply info snapshot to data/hakone-e2
+        id: apply_snapshot
         run: |
-          mkdir -p reports/hakone-e2
-          echo '{ "status": "placeholder" }' > reports/hakone-e2/info_snapshot_v1_raw.json
-          echo "Saved placeholder reports/hakone-e2/info_snapshot_v1_raw.json"
+          python tools/info_network/apply_info_snapshot_v1.py \
+            --input reports/hakone-e2/info_snapshot_v1_raw.json \
+            --nodes data/hakone-e2/info_nodes_v1.json \
+            --relations data/hakone-e2/info_relations_v1.json
+          echo "Applied snapshot to data/hakone-e2/info_nodes_v1.json and info_relations_v1.json"
+
+      - name: Upload snapshot JSON artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hakone-e2-info-snapshot-v1
+          path: reports/hakone-e2/info_snapshot_v1_raw.json
