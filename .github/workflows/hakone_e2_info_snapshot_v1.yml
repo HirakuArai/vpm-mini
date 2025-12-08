@@ -27,6 +27,7 @@ jobs:
         id: generate_snapshot
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          # OPENAI_BASE_URL is optional; script defaults to https://api.openai.com/v1
           OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
         run: |
           python tools/info_network/generate_info_snapshot_v1.py \
