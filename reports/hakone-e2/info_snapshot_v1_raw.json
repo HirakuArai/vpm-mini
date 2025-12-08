@@ -1,0 +1,42 @@
+{
+  "aya_output": {
+    "info_nodes": [
+      {
+        "id": "hakone-e2:fact:project_meta:dummy-1",
+        "project_id": "hakone-e2",
+        "kind": "fact",
+        "subkind": "project_meta",
+        "title": "ダミーノード1",
+        "summary": "テスト用のダミーノード。",
+        "body": "これはテストです。",
+        "scope": {
+          "project_phase": "phase1",
+          "lane": "pm_core",
+          "file": "STATE/hakone-e2/current_state.md",
+          "section_anchor": "dummy"
+        },
+        "status": "active",
+        "importance": "low",
+        "created_at": "2025-11-30T00:00:00+09:00",
+        "updated_at": "2025-11-30T00:00:00+09:00",
+        "source_refs": [],
+        "authored_by": "kai",
+        "review_status": "unreviewed"
+      }
+    ],
+    "info_relations": [
+      {
+        "id": "hakone-e2:rel:dummy-1",
+        "project_id": "hakone-e2",
+        "type": "belongs_to",
+        "from": "hakone-e2:fact:project_meta:dummy-1",
+        "to": "hakone-e2:fact:project_meta:root",
+        "strength": 0.9,
+        "status": "active",
+        "source_refs": [],
+        "created_at": "2025-11-30T00:00:00+09:00",
+        "updated_at": "2025-11-30T00:00:00+09:00"
+      }
+    ]
+  }
+}
