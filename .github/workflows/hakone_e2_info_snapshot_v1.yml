@@ -34,7 +34,7 @@ jobs:
             --current-state STATE/hakone-e2/current_state.md \
             --schema-doc docs/pm/info_network_v1_schema.md \
             --job-doc docs/projects/hakone-e2/info_network_job_v1.md \
-            --model gpt-5 \
+            --model gpt-4.1 \
             --output reports/hakone-e2/info_snapshot_v1_raw.json
 
       - name: Apply info snapshot to data/hakone-e2
