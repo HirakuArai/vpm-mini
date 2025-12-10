@@ -1,0 +1,17 @@
+info_source_bundle_v1:
+  project_id: "hakone-e2"
+  source_type: "state_doc"
+  source_id: "sample_state_doc_v1"
+  title: "Sample hakone-e2 state doc bundle"
+  time_range:
+    from: "2025-11-30"
+    to: "2025-11-30"
+  raw_text: |
+    これはテスト用のダミー current_state 抜粋です。
+    C/G/δ のサマリや、H2-*** タスクを想定した1〜2行程度の文章にしておく。
+  hints:
+    - "Current / Goals / Gap に対応しそうな部分があれば、それぞれ fact/state_snapshot ノードにしてください。"
+    - "タスクっぽい文があれば task/pm_task ノードにしてください。"
+  tags:
+    - "sample"
+    - "kind:state_doc"
