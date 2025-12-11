@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "STATE/vpm-mini/current_state.md の「3. Evidence Links」セクションに、レイヤB/doc_update apply レーンのエビデンスとして docs/pm/doc_update_apply_v1_spec_v1.md を指す参照行を、既存構造を崩さない最小限の1行追加で追記する。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "上記の最小変更で対応します。既存の箇条書き記法が '-' 以外の場合は、その記法に合わせて同一内容の1行のみ追加します。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
