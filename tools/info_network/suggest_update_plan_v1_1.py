@@ -318,6 +318,7 @@ def build_messages(
         You are PM Kai proposing an info_update_plan_v1.1. Output MUST be pure JSON (no Markdown, no code fences).
         Your job: suggest only the semantic parts (obsolete, supersedes, questions). Do NOT change add/update/add_relations/update_relations from the seed.
         Be safe: if unsure, leave supersedes/obsolete empty and add a question for the owner.
+        Each supersedes suggestion MUST include a numeric confidence between 0 and 1 (required). If unsure, still provide a low confidence value and add a question.
         Output keys:
         project_id, source_snapshot_id, generated_at,
         matches, add, add_relations, update, update_relations,
@@ -339,6 +340,7 @@ def build_messages(
             "- Propose supersedes: which new decisions replace which old ones.\n"
             "- If a new decision replaces an old one, add supersedes {new, old:[...]}; optionally mark obsolete[].\n"
             "- If uncertain, add a question and leave supersedes/obsolete empty.\n"
+            "- Each supersedes suggestion MUST include confidence (0-1). If you are unsure, still provide a low confidence value and add a question.\n"
             "- Respond with JSON ONLY.",
         ]
     )
@@ -352,6 +354,7 @@ def build_notes(
     questions: List[Dict[str, Any]],
     gated: List[Dict[str, Any]],
     threshold: float,
+    validation_errors: List[str],
 ) -> str:
     lines: List[str] = []
     lines.append(f"Step4 v1.1 proposal for snapshot={snapshot_name}")
@@ -387,7 +390,33 @@ def build_notes(
     else:
         lines.append("questions: none")
 
+    if validation_errors:
+        lines.append("validation errors (confidence):")
+        for err in validation_errors:
+            lines.append(f"- {err}")
+
     return "\n".join(lines)
+
+
+def validate_confidences(suggestions: List[Dict[str, Any]]) -> tuple[bool, List[str]]:
+    errors: List[str] = []
+    for idx, s in enumerate(suggestions):
+        if not isinstance(s, dict):
+            errors.append(f"index {idx}: not an object")
+            continue
+        if "confidence" not in s:
+            errors.append(f"index {idx}: missing confidence")
+            continue
+        try:
+            conf = float(s.get("confidence"))
+        except Exception:
+            errors.append(
+                f"index {idx}: non-numeric confidence {s.get('confidence')!r}"
+            )
+            continue
+        if not (0.0 <= conf <= 1.0):
+            errors.append(f"index {idx}: out-of-range confidence {conf}")
+    return (len(errors) == 0, errors)
 
 
 # -------------------------------
@@ -482,6 +511,48 @@ def main() -> None:
     except json.JSONDecodeError as exc:  # noqa: BLE001
         raise SystemExit(f"Failed to parse model response as JSON: {exc}")
 
+    # Validate confidence; retry once with an explicit reminder if invalid.
+    def parse_ai_payload(raw: str) -> Dict[str, Any]:
+        cleaned = strip_code_fences(raw)
+        return json.loads(cleaned)
+
+    ai_supersedes = ai.get("supersedes", []) or []
+    ai_questions = ai.get("questions", []) or []
+    valid_conf, conf_errors = validate_confidences(ai_supersedes)
+    validation_errors = list(conf_errors)
+
+    if not valid_conf:
+        retry_messages = list(messages) + [
+            {
+                "role": "user",
+                "content": "Your previous output was invalid: "
+                + "; ".join(conf_errors)
+                + " Please return valid JSON only. Each supersedes suggestion MUST include a numeric confidence between 0 and 1.",
+            }
+        ]
+        content_retry = call_openai(api_key, retry_messages, model, base_url)
+        try:
+            ai = parse_ai_payload(content_retry)
+            ai_supersedes = ai.get("supersedes", []) or []
+            ai_questions = ai.get("questions", []) or []
+            valid_conf, conf_errors = validate_confidences(ai_supersedes)
+            validation_errors = list(conf_errors)
+        except Exception as exc:  # noqa: BLE001
+            valid_conf = False
+            validation_errors.append(f"retry parse failed: {exc}")
+
+    # If still invalid after retry, fall back to safest path.
+    if not valid_conf:
+        ai_supersedes = []
+        ai_questions = list(ai_questions)
+        ai_questions.append(
+            {
+                "about_new": None,
+                "question": "supersedes suggestions lacked valid confidence; owner confirmation required before applying.",
+                "options": ["確認後適用", "適用しない"],
+            }
+        )
+
     # Assemble final plan: start from seed, then overlay AI semantic proposals.
     plan = dict(seed_plan)
     plan["project_id"] = "hakone-e2"
@@ -495,8 +566,8 @@ def main() -> None:
             f"Invalid SUPERCEDES_MIN_CONFIDENCE: {threshold_raw!r}"
         ) from exc
 
-    ai_supersedes = ai.get("supersedes", []) or []
-    ai_questions = ai.get("questions", []) or []
+    # ai_supersedes/ai_questions were validated above; reuse them here.
+    ai_questions = ai_questions or ai.get("questions", []) or []
     accepted_supersedes: List[Dict[str, Any]] = []
     gated_supersedes: List[Dict[str, Any]] = []
     obsolete_set: set[str] = set()
@@ -538,6 +609,7 @@ def main() -> None:
         questions=plan.get("questions", []),
         gated=gated_supersedes,
         threshold=threshold,
+        validation_errors=validation_errors,
     )
 
     save_json(Path(args.output), plan)
