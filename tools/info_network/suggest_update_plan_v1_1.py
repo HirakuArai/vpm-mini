@@ -355,6 +355,7 @@ def build_notes(
     gated: List[Dict[str, Any]],
     threshold: float,
     validation_errors: List[str],
+    excluded_count: int,
 ) -> str:
     lines: List[str] = []
     lines.append(f"Step4 v1.1 proposal for snapshot={snapshot_name}")
@@ -389,6 +390,8 @@ def build_notes(
         )
     else:
         lines.append("questions: none")
+
+    lines.append(f"excluded noop decisions from consideration: {excluded_count}")
 
     if validation_errors:
         lines.append("validation errors (confidence):")
@@ -477,21 +480,23 @@ def main() -> None:
             canonical_nodes, canonical_rels, snap_nodes, snap_rels, snapshot_name
         )
 
+    noop_ids = set(seed_plan.get("noop", []) or [])
     canonical_decisions = summarize_decisions(canonical_nodes)
-    snapshot_decisions = summarize_decisions(snap_nodes)
+    all_snapshot_decisions = summarize_decisions(snap_nodes)
+    snapshot_decisions = [
+        d for d in all_snapshot_decisions if d.get("id") not in noop_ids
+    ]
+    excluded_count = len(all_snapshot_decisions) - len(snapshot_decisions)
 
     generated_at = datetime.now().astimezone().isoformat(timespec="seconds")
 
     # If there are no decision nodes to compare, skip model call and return seed as-is.
     if not canonical_decisions or not snapshot_decisions:
         seed_plan["generated_at"] = generated_at
-        seed_plan.setdefault("questions", []).append(
-            {
-                "question": "No decision nodes to compare; nothing to suggest.",
-                "about_new": None,
-                "options": [],
-            }
-        )
+        seed_plan["questions"] = []
+        note = seed_plan.get("notes", "")
+        note_suffix = "No decision nodes to compare; nothing to suggest."
+        seed_plan["notes"] = f"{note}\n{note_suffix}".strip()
         save_json(Path(args.output), seed_plan)
         print("No decisions found; wrote seed plan with notice.")
         return
@@ -610,6 +615,7 @@ def main() -> None:
         gated=gated_supersedes,
         threshold=threshold,
         validation_errors=validation_errors,
+        excluded_count=excluded_count,
     )
 
     save_json(Path(args.output), plan)
