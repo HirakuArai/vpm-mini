@@ -1,0 +1,59 @@
+{
+  "project_id": "hakone-e2",
+  "source_snapshot_id": "snapshot_new_decision_only_v0_3.json",
+  "generated_at": "2025-12-15T05:33:37+09:00",
+  "matches": [
+    {
+      "new": "hakone-e2:decision:api_migration:2025-12-09-01",
+      "existing": []
+    }
+  ],
+  "add": [
+    {
+      "id": "hakone-e2:decision:api_migration:2025-12-09-01",
+      "project_id": "hakone-e2",
+      "kind": "decision",
+      "subkind": "design_decision",
+      "title": "Decision: ノード化はOpenAI API + 分割処理へ切り替える（新方針）",
+      "summary": "ChatGPT対話でのノード化が粒度・ノード数の面で安定しないため、API呼び出しと分割設計に切り替える。",
+      "body": "supersedes候補提案のスモーク用snapshot",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "MEMO/smoke",
+        "section_anchor": "new_decision"
+      },
+      "status": "active",
+      "importance": "high",
+      "created_at": "2025-12-09T00:00:00+09:00",
+      "updated_at": "2025-12-09T00:00:00+09:00",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "smoke_new_decision_only"
+        }
+      ],
+      "authored_by": "kei",
+      "review_status": "unreviewed"
+    }
+  ],
+  "add_relations": [],
+  "update": [],
+  "update_relations": [],
+  "obsolete": [
+    "hakone-e2:decision:chatgpt_only:2025-12-01-01"
+  ],
+  "obsolete_relations": [],
+  "supersedes": [
+    {
+      "new": "hakone-e2:decision:api_migration:2025-12-09-01",
+      "old": [
+        "hakone-e2:decision:chatgpt_only:2025-12-01-01"
+      ]
+    }
+  ],
+  "notes": "",
+  "noop": [],
+  "noop_relations": [],
+  "questions": []
+}
