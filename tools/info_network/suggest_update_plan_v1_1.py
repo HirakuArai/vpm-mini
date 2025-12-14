@@ -350,6 +350,8 @@ def build_notes(
     snapshot_name: str,
     supersedes: List[Dict[str, Any]],
     questions: List[Dict[str, Any]],
+    gated: List[Dict[str, Any]],
+    threshold: float,
 ) -> str:
     lines: List[str] = []
     lines.append(f"Step4 v1.1 proposal for snapshot={snapshot_name}")
@@ -366,6 +368,17 @@ def build_notes(
             )
     else:
         lines.append("supersedes proposals: none")
+
+    if gated:
+        lines.append(f"gated (confidence < {threshold}):")
+        for s in gated:
+            new_id = s.get("new")
+            old_ids = s.get("old", [])
+            conf = s.get("confidence", "n/a")
+            rationale = s.get("rationale") or "(no rationale provided)"
+            lines.append(
+                f"- new={new_id} old={old_ids} confidence={conf} rationale={rationale}"
+            )
 
     if questions:
         lines.append(
@@ -474,14 +487,57 @@ def main() -> None:
     plan["project_id"] = "hakone-e2"
     plan["source_snapshot_id"] = snapshot_name
     plan["generated_at"] = generated_at
-    plan["obsolete"] = ai.get("obsolete", []) or []
+    threshold_raw = os.getenv("SUPERCEDES_MIN_CONFIDENCE", "0.85").strip()
+    try:
+        threshold = float(threshold_raw)
+    except ValueError as exc:  # noqa: BLE001
+        raise SystemExit(
+            f"Invalid SUPERCEDES_MIN_CONFIDENCE: {threshold_raw!r}"
+        ) from exc
+
+    ai_supersedes = ai.get("supersedes", []) or []
+    ai_questions = ai.get("questions", []) or []
+    accepted_supersedes: List[Dict[str, Any]] = []
+    gated_supersedes: List[Dict[str, Any]] = []
+    obsolete_set: set[str] = set()
+    questions: List[Dict[str, Any]] = list(ai_questions)
+
+    for s in ai_supersedes:
+        if not isinstance(s, dict):
+            continue
+        new_id = s.get("new")
+        old_ids = s.get("old", []) or []
+        if not new_id or not isinstance(old_ids, list):
+            continue
+        try:
+            conf = float(s.get("confidence", 0.0) or 0.0)
+        except Exception:
+            conf = 0.0
+        if conf < threshold:
+            gated_supersedes.append(s)
+            questions.append(
+                {
+                    "about_new": new_id,
+                    "question": f"Supersedes候補のconfidenceが低い({conf} < {threshold})ため確認が必要: new={new_id}, old候補={old_ids}",
+                    "options": ["採用する", "採用しない"],
+                }
+            )
+            continue
+        accepted_supersedes.append(s)
+        for oid in old_ids:
+            if oid:
+                obsolete_set.add(oid)
+
+    plan["obsolete"] = list(obsolete_set)
     plan["obsolete_relations"] = ai.get("obsolete_relations", []) or []
-    plan["supersedes"] = ai.get("supersedes", []) or []
-    plan["questions"] = ai.get("questions", [])
+    plan["supersedes"] = accepted_supersedes
+    plan["questions"] = questions
     plan["notes"] = build_notes(
         snapshot_name=snapshot_name,
         supersedes=plan.get("supersedes", []),
         questions=plan.get("questions", []),
+        gated=gated_supersedes,
+        threshold=threshold,
     )
 
     save_json(Path(args.output), plan)
