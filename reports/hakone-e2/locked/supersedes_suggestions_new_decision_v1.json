@@ -1,0 +1,17 @@
+{
+  "project_id": "hakone-e2",
+  "snapshot": "snapshot_new_decision_only_v0_3.json",
+  "model": "gpt-4.1",
+  "generated_at": "2024-06-25T16:00:00Z",
+  "suggestions": [
+    {
+      "new": "hakone-e2:decision:api_migration:2025-12-09-01",
+      "old": [
+        "hakone-e2:decision:chatgpt_only:2025-12-01-01"
+      ],
+      "confidence": 0.95,
+      "rationale": "The new decision explicitly states a shift in approach to node structuring, moving away from the previous method that used only ChatGPT interactions to a new strategy centered on API calls and split processing. The new decision appears to supersede the prior approach due to stated stability issues, and both relate to the exact same workflow and scope area."
+    }
+  ],
+  "questions": []
+}
