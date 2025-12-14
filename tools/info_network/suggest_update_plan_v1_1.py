@@ -346,6 +346,37 @@ def build_messages(
     return [{"role": "system", "content": system}, {"role": "user", "content": user}]
 
 
+def build_notes(
+    snapshot_name: str,
+    supersedes: List[Dict[str, Any]],
+    questions: List[Dict[str, Any]],
+) -> str:
+    lines: List[str] = []
+    lines.append(f"Step4 v1.1 proposal for snapshot={snapshot_name}")
+
+    if supersedes:
+        lines.append("supersedes proposals:")
+        for s in supersedes:
+            new_id = s.get("new")
+            old_ids = s.get("old", [])
+            conf = s.get("confidence", "n/a")
+            rationale = s.get("rationale") or "(no rationale provided)"
+            lines.append(
+                f"- new={new_id} old={old_ids} confidence={conf} rationale={rationale}"
+            )
+    else:
+        lines.append("supersedes proposals: none")
+
+    if questions:
+        lines.append(
+            f"questions present: {len(questions)}. Owner confirmation required; do not auto-apply."
+        )
+    else:
+        lines.append("questions: none")
+
+    return "\n".join(lines)
+
+
 # -------------------------------
 # Main
 # -------------------------------
@@ -446,8 +477,12 @@ def main() -> None:
     plan["obsolete"] = ai.get("obsolete", []) or []
     plan["obsolete_relations"] = ai.get("obsolete_relations", []) or []
     plan["supersedes"] = ai.get("supersedes", []) or []
-    plan["notes"] = ai.get("notes", plan.get("notes", ""))
     plan["questions"] = ai.get("questions", [])
+    plan["notes"] = build_notes(
+        snapshot_name=snapshot_name,
+        supersedes=plan.get("supersedes", []),
+        questions=plan.get("questions", []),
+    )
 
     save_json(Path(args.output), plan)
     print(
