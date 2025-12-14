@@ -1,7 +1,7 @@
 {
   "project_id": "hakone-e2",
   "source_snapshot_id": "snapshot_new_decision_only_v0_3.json",
-  "generated_at": "2025-12-15T05:33:37+09:00",
+  "generated_at": "2025-12-15T06:00:25+09:00",
   "matches": [
     {
       "new": "hakone-e2:decision:api_migration:2025-12-09-01",
@@ -52,7 +52,7 @@
       ]
     }
   ],
-  "notes": "",
+  "notes": "Step4 v1.1 proposal for snapshot=snapshot_new_decision_only_v0_3.json\nsupersedes proposals:\n- new=hakone-e2:decision:api_migration:2025-12-09-01 old=['hakone-e2:decision:chatgpt_only:2025-12-01-01'] confidence=n/a rationale=(no rationale provided)\nquestions: none",
   "noop": [],
   "noop_relations": [],
   "questions": []
