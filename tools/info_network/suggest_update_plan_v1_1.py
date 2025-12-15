@@ -401,6 +401,8 @@ def build_notes(
     validation_errors: List[str],
     excluded_count: int,
     matches: List[Dict[str, Any]],
+    filtered_supersedes: int,
+    filtered_obsolete: int,
 ) -> str:
     lines: List[str] = []
     lines.append(f"Step4 v1.1 proposal for snapshot={snapshot_name}")
@@ -440,6 +442,10 @@ def build_notes(
     lines.append(
         f"matches proposed: {len(matches)} (multi={len([m for m in matches if len(m.get('existing', [])) > 1])})"
     )
+    if filtered_supersedes or filtered_obsolete:
+        lines.append(
+            f"filtered (not in matches): supersedes_old={filtered_supersedes}, obsolete={filtered_obsolete}"
+        )
 
     if validation_errors:
         lines.append("validation errors (confidence):")
@@ -667,6 +673,50 @@ def main() -> None:
     plan["supersedes"] = accepted_supersedes
     plan["questions"] = questions
     plan["matches"] = ai.get("matches", [])
+
+    # v1.3 safety: only adopt supersedes/obsolete old ids that appear in matches.existing
+    matches = plan.get("matches", []) or []
+    allowed_old_ids = {oid for m in matches for oid in (m.get("existing") or []) if oid}
+    orig_obsolete = plan.get("obsolete", []) or []
+    kept_obsolete = [oid for oid in orig_obsolete if oid in allowed_old_ids]
+    dropped_obsolete = [oid for oid in orig_obsolete if oid not in allowed_old_ids]
+
+    filtered_supersedes_count = 0
+    new_supersedes: List[Dict[str, Any]] = []
+    dropped_pairs: List[Dict[str, Any]] = []
+    for s in plan.get("supersedes", []):
+        if not isinstance(s, dict):
+            continue
+        olds = [oid for oid in (s.get("old", []) or []) if oid in allowed_old_ids]
+        if olds:
+            s2 = dict(s)
+            s2["old"] = olds
+            new_supersedes.append(s2)
+        else:
+            filtered_supersedes_count += 1
+            dropped_pairs.append({"new": s.get("new"), "old": s.get("old", [])})
+
+    plan["obsolete"] = kept_obsolete
+    plan["supersedes"] = new_supersedes
+
+    if dropped_obsolete:
+        questions.append(
+            {
+                "about_new": None,
+                "question": f"obsolete候補がmatchesに含まれないため自動採用しない: {dropped_obsolete}",
+                "options": ["matchesに追加して採用", "採用しない"],
+            }
+        )
+    for dp in dropped_pairs:
+        questions.append(
+            {
+                "about_new": dp.get("new"),
+                "question": f"supersedes old候補がmatchesに含まれないため自動採用しない: {dp.get('old')}",
+                "options": ["matchesに追加して採用", "採用しない"],
+            }
+        )
+    plan["questions"] = questions
+
     plan["notes"] = build_notes(
         snapshot_name=snapshot_name,
         supersedes=plan.get("supersedes", []),
@@ -676,6 +726,8 @@ def main() -> None:
         validation_errors=validation_errors,
         excluded_count=excluded_count,
         matches=plan.get("matches", []),
+        filtered_supersedes=filtered_supersedes_count,
+        filtered_obsolete=len(dropped_obsolete),
     )
 
     save_json(Path(args.output), plan)
