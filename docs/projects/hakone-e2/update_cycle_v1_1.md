@@ -39,6 +39,9 @@
   `python - <<'EOF' ... EOF` などで questions を外して別名で保存
 - apply  
   `python tools/info_network/apply_info_update_plan_v1.py --plan <approved_plan.json> --nodes data/hakone-e2/info_nodes_v1.json --relations data/hakone-e2/info_relations_v1.json`
+ - questions がある場合の承認ループ  
+   `python tools/info_network/approve_update_plan_v1.py --input <suggestion_plan.json> --output <approved_plan.json> --mode interactive`  
+   ※ approve/reject/interactive（デフォルト）で questions を解消してから apply する
 
 ## 既知のTODO
 - 2-1 内部矛盾チェックの具体化（矛盾検出/オーナー確認フロー）
