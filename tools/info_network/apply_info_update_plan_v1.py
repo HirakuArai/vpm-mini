@@ -114,13 +114,17 @@ def main() -> int:
     # Nodes: obsolete
     nodes, n_obsoleted = apply_obsolete(plan.get("obsolete", []) or [], nodes)
 
-    # Relations: add + update
-    relations, r_added1, r_updated1 = upsert(
-        relations, plan.get("add_relations", []) or []
+    # Relations: add + update (skip supersedes provided in snapshots; use plan.supersedes instead)
+    raw_add_rels = plan.get("add_relations", []) or []
+    raw_upd_rels = plan.get("update_relations", []) or []
+    add_rels = [r for r in raw_add_rels if r.get("type") != "supersedes"]
+    upd_rels = [r for r in raw_upd_rels if r.get("type") != "supersedes"]
+    skipped_supersedes_relations = (len(raw_add_rels) - len(add_rels)) + (
+        len(raw_upd_rels) - len(upd_rels)
     )
-    relations, r_added2, r_updated2 = upsert(
-        relations, plan.get("update_relations", []) or []
-    )
+
+    relations, r_added1, r_updated1 = upsert(relations, add_rels)
+    relations, r_added2, r_updated2 = upsert(relations, upd_rels)
 
     # Relations: obsolete
     relations, r_obsoleted = apply_obsolete(
@@ -156,7 +160,9 @@ def main() -> int:
         f"nodes: added {n_added1+n_added2}, updated_add {n_updated1}, updated {n_updated2}, obsoleted {n_obsoleted}, total {len(nodes)}"
     )
     print(
-        f"relations: added {r_added1+r_added2}, updated_add {r_updated1}, updated {r_updated2}, obsoleted {r_obsoleted}, supersedes_added {sup_added}, total {len(relations)}"
+        f"relations: added {r_added1+r_added2}, updated_add {r_updated1}, updated {r_updated2}, "
+        f"obsoleted {r_obsoleted}, supersedes_added {sup_added}, "
+        f"skipped_snapshot_supersedes={skipped_supersedes_relations}, total {len(relations)}"
     )
     return 0
 
