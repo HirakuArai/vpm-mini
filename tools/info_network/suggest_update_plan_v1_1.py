@@ -286,6 +286,34 @@ def summarize_decisions(nodes: List[Dict[str, Any]]) -> List[Dict[str, str]]:
     return out
 
 
+def summarize_match_nodes(
+    nodes: List[Dict[str, Any]], allowed_kinds: set[str], exclude_ids: set[str]
+) -> List[Dict[str, str]]:
+    out: List[Dict[str, str]] = []
+    for n in nodes:
+        if not isinstance(n, dict):
+            continue
+        nid = n.get("id")
+        if not nid or nid in exclude_ids:
+            continue
+        kind = n.get("kind")
+        subkind = n.get("subkind")
+        if kind not in allowed_kinds:
+            continue
+        if kind == "fact" and subkind != "gap":
+            continue
+        out.append(
+            {
+                "id": nid,
+                "kind": kind,
+                "subkind": subkind or "",
+                "title": n.get("title", ""),
+                "summary": truncate(n.get("summary", "") or ""),
+            }
+        )
+    return out
+
+
 def build_messages(
     project_id: str,
     snapshot_name: str,
@@ -293,6 +321,8 @@ def build_messages(
     seed_plan: Dict[str, Any],
     canonical_decisions: List[Dict[str, str]],
     snapshot_decisions: List[Dict[str, str]],
+    canonical_match_nodes: List[Dict[str, str]],
+    snapshot_match_nodes: List[Dict[str, str]],
 ) -> List[Dict[str, str]]:
     seed_summary = textwrap.dedent(
         f"""
@@ -313,12 +343,23 @@ def build_messages(
             )
         return "\n".join(lines)
 
+    def format_match_nodes(title: str, items: List[Dict[str, str]]) -> str:
+        if not items:
+            return f"{title}: none\n"
+        lines = [f"{title} (count={len(items)}):"]
+        for i in items[:50]:
+            lines.append(
+                f"- id={i.get('id')} | kind={i.get('kind')}/{i.get('subkind','')} | title={i.get('title','')} | summary={i.get('summary','')}"
+            )
+        return "\n".join(lines)
+
     system = textwrap.dedent(
         """
         You are PM Kai proposing an info_update_plan_v1.1. Output MUST be pure JSON (no Markdown, no code fences).
         Your job: suggest only the semantic parts (obsolete, supersedes, questions). Do NOT change add/update/add_relations/update_relations from the seed.
         Be safe: if unsure, leave supersedes/obsolete empty and add a question for the owner.
         Each supersedes suggestion MUST include a numeric confidence between 0 and 1 (required). If unsure, still provide a low confidence value and add a question.
+        Additionally, propose matches between new snapshot nodes and existing canonical nodes (kind ∈ {decision, process, task, fact/gap}). Each match is {new, existing:[...], confidence(optional), rationale}. Return zero matches if unclear.
         Output keys:
         project_id, source_snapshot_id, generated_at,
         matches, add, add_relations, update, update_relations,
@@ -335,12 +376,15 @@ def build_messages(
             seed_summary,
             format_decisions("existing decisions (canonical)", canonical_decisions),
             format_decisions("new decisions (snapshot)", snapshot_decisions),
+            format_match_nodes("match candidates (canonical)", canonical_match_nodes),
+            format_match_nodes("match candidates (snapshot)", snapshot_match_nodes),
             "Instructions:\n"
             "- Keep add/update fields exactly as the seed provides.\n"
             "- Propose supersedes: which new decisions replace which old ones.\n"
             "- If a new decision replaces an old one, add supersedes {new, old:[...]}; optionally mark obsolete[].\n"
             "- If uncertain, add a question and leave supersedes/obsolete empty.\n"
             "- Each supersedes suggestion MUST include confidence (0-1). If you are unsure, still provide a low confidence value and add a question.\n"
+            "- Propose matches: list of {new, existing:[...], confidence(optional), rationale}. If unclear, use existing=[].\n"
             "- Respond with JSON ONLY.",
         ]
     )
@@ -356,6 +400,7 @@ def build_notes(
     threshold: float,
     validation_errors: List[str],
     excluded_count: int,
+    matches: List[Dict[str, Any]],
 ) -> str:
     lines: List[str] = []
     lines.append(f"Step4 v1.1 proposal for snapshot={snapshot_name}")
@@ -392,6 +437,9 @@ def build_notes(
         lines.append("questions: none")
 
     lines.append(f"excluded noop decisions from consideration: {excluded_count}")
+    lines.append(
+        f"matches proposed: {len(matches)} (multi={len([m for m in matches if len(m.get('existing', [])) > 1])})"
+    )
 
     if validation_errors:
         lines.append("validation errors (confidence):")
@@ -488,6 +536,14 @@ def main() -> None:
     ]
     excluded_count = len(all_snapshot_decisions) - len(snapshot_decisions)
 
+    allowed_match_kinds = {"decision", "process", "task", "fact"}
+    canonical_match_nodes = summarize_match_nodes(
+        canonical_nodes, allowed_match_kinds, exclude_ids=set()
+    )
+    snapshot_match_nodes = summarize_match_nodes(
+        snap_nodes, allowed_match_kinds, exclude_ids=noop_ids
+    )
+
     generated_at = datetime.now().astimezone().isoformat(timespec="seconds")
 
     # If there are no decision nodes to compare, skip model call and return seed as-is.
@@ -508,6 +564,8 @@ def main() -> None:
         seed_plan,
         canonical_decisions,
         snapshot_decisions,
+        canonical_match_nodes,
+        snapshot_match_nodes,
     )
     content = call_openai(api_key, messages, model, base_url)
     content = strip_code_fences(content)
@@ -608,6 +666,7 @@ def main() -> None:
     plan["obsolete_relations"] = ai.get("obsolete_relations", []) or []
     plan["supersedes"] = accepted_supersedes
     plan["questions"] = questions
+    plan["matches"] = ai.get("matches", [])
     plan["notes"] = build_notes(
         snapshot_name=snapshot_name,
         supersedes=plan.get("supersedes", []),
@@ -616,6 +675,7 @@ def main() -> None:
         threshold=threshold,
         validation_errors=validation_errors,
         excluded_count=excluded_count,
+        matches=plan.get("matches", []),
     )
 
     save_json(Path(args.output), plan)
