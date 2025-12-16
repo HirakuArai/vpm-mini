@@ -1,0 +1,48 @@
+info_source_bundle_v1:
+  project_id: "hakone-e2"
+  source_type: "memo"
+  source_id: "scene_0001_evidence_plan_v1_20251217-061234"
+  title: "hakone-e2: scene_0001 evidence plan v1"
+  time_range:
+    from: "2025-12-17"
+    to: "2025-12-17"
+  raw_text: |
+    # hakone-e2: scene_0001 evidence plan v1（推測なし）
+    
+    ## 目的
+    scene_0001 を「断定/仮説分離」「出典つき」で確定するために、
+    先に evidence（一次/準一次）を収集する計画を作る。
+    
+    ## 対象
+    - 既存: docs/projects/hakone-e2/scenes/scene_0001_stub_v1.md
+    - 目標: scene_0001 を “filled v1” に更新（ただし推測で事実を埋めない）
+    
+    ## 収集したい情報（埋めたい項目）
+    - 年/大会回/日付（確定値）
+    - 区間・出来事の客観記述（何が起きたか）
+    - 関係者（選手/チーム）と役割
+    - 結果（記録/順位変動など）※出典つき
+    - 当日の条件（天候など）※必要なら
+    - 反応（実況/公式コメント/主要メディア）※“エモ”の根拠候補
+    
+    ## Evidence の優先順位（v1）
+    1. 公式記録（大会公式、大学公式、主催/中継の公式ページ）
+    2. 準一次（主要放送局/新聞社/大手スポーツメディアの当日記事）
+    3. まとめ記事・SNS（仮説の補助。断定の根拠にはしない）
+    
+    ## 作業ステップ（v1）
+    1. evidence候補URLを3〜5本リスト化（source_id付き）
+    2. 各URLから「客観事実」「引用できる短文（<=25 words相当）」「要約」を抽出
+    3. 抽出結果を bundle（source_type=memo または source_type=scene_evidence）として保存
+    4. update cycle に流し、scene_0001 の gap を潰すタスクに落とす
+    
+    ## DoD
+    - evidence候補URLが列挙され、何を確定したいか（gap）が明文化されている
+    - update cycle で task/gap として info_network に反映される
+  hints:
+    - "これは scene_0001 を埋めるための evidence 収集計画。推測で事実を埋めず、gap/task を構造化してよい。"
+    - "既存 decision を supersede/obsolete しない（additive only）。"
+  tags:
+    - "kind:memo"
+    - "topic:scene_0001"
+    - "topic:evidence_plan"
