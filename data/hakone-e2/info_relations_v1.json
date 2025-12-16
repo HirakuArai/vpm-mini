@@ -816,40 +816,6 @@
     "updated_at": "2025-12-17T04:54:17+09:00"
   },
   {
-    "id": "hakone-e2:rel:20251217-009",
-    "project_id": "hakone-e2",
-    "type": "evidence_for",
-    "from": "hakone-e2:decision:ops-v1-fix-v1",
-    "to": "hakone-e2:task:h2-ops-1-done-v1",
-    "strength": 1.0,
-    "status": "active",
-    "source_refs": [
-      {
-        "kind": "file",
-        "value": "ops_data_rules_v1_20251217-045417"
-      }
-    ],
-    "created_at": "2025-12-17T04:54:17+09:00",
-    "updated_at": "2025-12-17T04:54:17+09:00"
-  },
-  {
-    "id": "hakone-e2:rel:20251217-010",
-    "project_id": "hakone-e2",
-    "type": "derived_from",
-    "from": "hakone-e2:meta:ops-rules-note-v1",
-    "to": "hakone-e2:decision:ops-v1-fix-v1",
-    "strength": 0.7,
-    "status": "active",
-    "source_refs": [
-      {
-        "kind": "file",
-        "value": "ops_data_rules_v1_20251217-045417"
-      }
-    ],
-    "created_at": "2025-12-17T04:54:17+09:00",
-    "updated_at": "2025-12-17T04:54:17+09:00"
-  },
-  {
     "id": "hakone-e2:rel:20251217-011",
     "project_id": "hakone-e2",
     "type": "refers_to",
@@ -882,5 +848,260 @@
     ],
     "created_at": "2025-12-17T04:54:17+09:00",
     "updated_at": "2025-12-17T04:54:17+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-17-001",
+    "project_id": "hakone-e2",
+    "type": "part_of",
+    "from": "hakone-e2:process:update_cycle_flow:2025-12-17-01",
+    "to": "hakone-e2:fact:engine_design_v1:2025-12-17-01",
+    "strength": 0.95,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-17-002",
+    "project_id": "hakone-e2",
+    "type": "part_of",
+    "from": "hakone-e2:process:bundle_input_flow:2025-12-17-01",
+    "to": "hakone-e2:fact:engine_design_v1:2025-12-17-01",
+    "strength": 0.9,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-17-003",
+    "project_id": "hakone-e2",
+    "type": "part_of",
+    "from": "hakone-e2:process:questions_gate:2025-12-17-01",
+    "to": "hakone-e2:process:update_cycle_flow:2025-12-17-01",
+    "strength": 0.85,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-17-004",
+    "project_id": "hakone-e2",
+    "type": "part_of",
+    "from": "hakone-e2:process:approve_apply_handling:2025-12-17-01",
+    "to": "hakone-e2:process:update_cycle_flow:2025-12-17-01",
+    "strength": 0.85,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-17-005",
+    "project_id": "hakone-e2",
+    "type": "part_of",
+    "from": "hakone-e2:process:json_integrity_check:2025-12-17-01",
+    "to": "hakone-e2:process:update_cycle_flow:2025-12-17-01",
+    "strength": 0.8,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-17-006",
+    "project_id": "hakone-e2",
+    "type": "part_of",
+    "from": "hakone-e2:process:pr_merge_flow:2025-12-17-01",
+    "to": "hakone-e2:process:update_cycle_flow:2025-12-17-01",
+    "strength": 0.8,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-17-007",
+    "project_id": "hakone-e2",
+    "type": "evidence_for",
+    "from": "hakone-e2:decision:questions_gate_must:2025-12-17-01",
+    "to": "hakone-e2:process:questions_gate:2025-12-17-01",
+    "strength": 0.95,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-17-008",
+    "project_id": "hakone-e2",
+    "type": "refers_to",
+    "from": "hakone-e2:guideline:update_plan_policy:2025-12-17-01",
+    "to": "hakone-e2:decision:long_term_policy:2025-12-17-01",
+    "strength": 0.75,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-17-009",
+    "project_id": "hakone-e2",
+    "type": "refers_to",
+    "from": "hakone-e2:task:T-PM-003",
+    "to": "hakone-e2:guideline:update_plan_policy:2025-12-17-01",
+    "strength": 0.9,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-17-010",
+    "project_id": "hakone-e2",
+    "type": "belongs_to",
+    "from": "hakone-e2:task:T-PM-001",
+    "to": "hakone-e2:fact:engine_design_v1:2025-12-17-01",
+    "strength": 0.9,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-17-011",
+    "project_id": "hakone-e2",
+    "type": "belongs_to",
+    "from": "hakone-e2:task:T-PM-002",
+    "to": "hakone-e2:process:update_cycle_flow:2025-12-17-01",
+    "strength": 0.85,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-17-012",
+    "project_id": "hakone-e2",
+    "type": "belongs_to",
+    "from": "hakone-e2:task:T-PM-004",
+    "to": "hakone-e2:norm:ops_commit_policy:2025-12-17-01",
+    "strength": 0.9,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-17-013",
+    "project_id": "hakone-e2",
+    "type": "refers_to",
+    "from": "hakone-e2:guideline:ssot_directory:2025-12-17-01",
+    "to": "hakone-e2:norm:ssot_policy:2025-12-17-01",
+    "strength": 0.85,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-17-014",
+    "project_id": "hakone-e2",
+    "type": "evidence_for",
+    "from": "hakone-e2:decision:long_term_policy:2025-12-17-01",
+    "to": "hakone-e2:guideline:update_plan_policy:2025-12-17-01",
+    "strength": 0.85,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-17-015",
+    "project_id": "hakone-e2",
+    "type": "refers_to",
+    "from": "hakone-e2:guideline:bundle_unit:2025-12-17-01",
+    "to": "hakone-e2:process:bundle_input_flow:2025-12-17-01",
+    "strength": 0.8,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00"
   }
 ]
