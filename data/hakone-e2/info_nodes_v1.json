@@ -2148,5 +2148,302 @@
     ],
     "authored_by": "kai",
     "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:scene_stub_0001:2025-12-17-01",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "scene_stub",
+    "title": "箱根駅伝シーン・スタブ0001（型）",
+    "summary": "箱根駅伝e2プロジェクトで具体シーンを構造的に扱うための初期スタブ。詳細属性は未確定で gap ノードに分離記述。",
+    "body": "データ駆動型E2分析・情動仮説検証のため、sceneの骨格・型をこのノードで定義。具体内容はgap参照、以降で埋める。現状は1件目のサンプル。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "scene-stub/stub_0001_20251217-052853.md",
+      "section_anchor": null
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:gap:scene_stub_0001:year",
+    "project_id": "hakone-e2",
+    "kind": "gap",
+    "subkind": "year",
+    "title": "シーン該当年 不明",
+    "summary": "このシーンが属する箱根駅伝大会（年度）が未確定。",
+    "body": "シーンの該当年情報（例:2024, 2025等）は現時点で未確定。参照可能なソース・インスタンスからの引き継ぎ待ち。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "scene-stub/stub_0001_20251217-052853.md",
+      "section_anchor": null
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:gap:scene_stub_0001:section_team_person",
+    "project_id": "hakone-e2",
+    "kind": "gap",
+    "subkind": "section_team_person",
+    "title": "区間・チーム・選手 情報不明",
+    "summary": "どの区間、どのチーム、どの選手かが未確定。",
+    "body": "箱根駅伝のどの区間で、どのチーム・選手に関わるシーンかが後述時点で不明。事実埋め込みを待つ。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "scene-stub/stub_0001_20251217-052853.md",
+      "section_anchor": null
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:gap:scene_stub_0001:event_objective",
+    "project_id": "hakone-e2",
+    "kind": "gap",
+    "subkind": "objective_event",
+    "title": "シーン出来事の客観記述 不明",
+    "summary": "シーンで実際に起こったことの客観的記述が現時点で未記載。",
+    "body": "何が起きたかの客観記載が必要。内容確定後にここへ埋め込む運用。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "scene-stub/stub_0001_20251217-052853.md",
+      "section_anchor": null
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:gap:scene_stub_0001:primary_source",
+    "project_id": "hakone-e2",
+    "kind": "gap",
+    "subkind": "primary_source",
+    "title": "一次ソース 情報不明",
+    "summary": "出来事の裏付けとなる一次ソース（記事・公式記録・映像等）が未確定。",
+    "body": "当該シーンの裏付けとして必要な一次情報源が現時点で未記述。情報収集プロセスの進行待ち。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "scene-stub/stub_0001_20251217-052853.md",
+      "section_anchor": null
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:gap:scene_stub_0001:emotion_hypothesis",
+    "project_id": "hakone-e2",
+    "kind": "gap",
+    "subkind": "emotion_hypothesis",
+    "title": "エモ瞬間（観客感情ピーク仮説）言語化 未記載",
+    "summary": "観客の感情ピークとなる瞬間仮説の明文化が未記載。",
+    "body": "e2の枠組みで重要な『エモ瞬間』仮説の明文記述がこの時点では不明。仮説モデルや情緒的説明付与に将来展開。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "scene-stub/stub_0001_20251217-052853.md",
+      "section_anchor": null
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:meta:scene_struct_type",
+    "project_id": "hakone-e2",
+    "kind": "meta",
+    "subkind": "info_model_note",
+    "title": "scene型スタブ構造定義ノート",
+    "summary": "箱根駅伝E2シーン情報の型定義・ガイド役ノード。",
+    "body": "scene構造をgap型で分解し、事実×必要情報gapの分離定義例を提示。今後のsceneデータの蓄積設計にも援用。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "scene-stub/stub_0001_20251217-052853.md",
+      "section_anchor": null
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:scene_stub_def:2025-12-17-01",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "scene_struct_definition",
+    "title": "sceneスタブ定義（属性セット・gap展開）",
+    "summary": "scene型ノードで保持すべき主要属性セット（year, 区間・チーム、出来事、ソース、感情仮説）と未確定gap分解モデル。",
+    "body": "箱根駅伝プロジェクトのscene情報構成管理のため、属性分解・gap展開をモデル記述。今後埋め込み可能な枠組みを提供。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "scene-stub/stub_0001_20251217-052853.md",
+      "section_anchor": null
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:meta:scene_gap_note",
+    "project_id": "hakone-e2",
+    "kind": "meta",
+    "subkind": "info_model_note",
+    "title": "scene gap管理のPMメモ",
+    "summary": "sceneの各gap情報を構造分離し進捗管理・運用するPM視点の設計メモ。",
+    "body": "gap属性ごとの進行管理と記載手順、データ獲得後のgap埋め方運用note。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "scene-stub/stub_0001_20251217-052853.md",
+      "section_anchor": null
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:process:scene_stub_additive",
+    "project_id": "hakone-e2",
+    "kind": "process",
+    "subkind": "additive_only",
+    "title": "sceneスタブ構造：additive only運用手順",
+    "summary": "現状は既存fact/decisionのsupersedeを行わず、スタブ情報を追記専用運用とするプロセスフロー。",
+    "body": "シーン属性未確定時のPMフロー／gapノード分岐方式、および既存ノードの非更新（obsoleted化禁止）ルール。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "scene-stub/stub_0001_20251217-052853.md",
+      "section_anchor": null
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:scene_stub_0001:gap_set",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "scene_gap_set",
+    "title": "sceneスタブ0001 gap一覧要約",
+    "summary": "sceneスタブ#0001で埋まっていない主要gap項目（year, 区間・チーム・選手, event, primary_source, emotion_hypothesis）のまとめ。",
+    "body": "PM視点でgap対応必須属性として全gapノードの一覧と対応進捗を整理。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "scene-stub/stub_0001_20251217-052853.md",
+      "section_anchor": null
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
   }
 ]
