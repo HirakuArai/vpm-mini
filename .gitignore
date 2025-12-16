@@ -25,3 +25,8 @@ reports/icr_history.csv
 .DS_Store
 reports/think/*
 !reports/think/.gitkeep
+
+# hakone-e2: run intermediates (keep approved_plan.json and *bundle*.yaml tracked as evidence)
+reports/hakone-e2/runs/**/snapshot_raw.json
+reports/hakone-e2/runs/**/seed_plan_*.json
+reports/hakone-e2/runs/**/suggestion_plan_*.json

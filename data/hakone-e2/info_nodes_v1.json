@@ -1662,5 +1662,491 @@
     ],
     "authored_by": "kai",
     "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:engine_design_v1:2025-12-17-01",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "project_meta",
+    "title": "hakone-e2 更新エンジン方式・構成（engine_design）v1確定",
+    "summary": "info_source_bundle_v1単位で安全な更新を行うエンジン設計。『propose→questions→approve→apply』サイクルに基づき運用、SSOTの厳格な管理と最小運用ルールを制定した。",
+    "body": "この設計はbundle型入力、明確な運用ルールとコミット証跡、SSOTの2ファイル運用、DoD要件などによりhakone-e2のcanonicalを安全に進化させられる。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "engine_design_v1_20251217-051413",
+      "section_anchor": "all"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:process:bundle_input_flow:2025-12-17-01",
+    "project_id": "hakone-e2",
+    "kind": "process",
+    "subkind": "lane_spec",
+    "title": "bundle型入力フローの定義",
+    "summary": "更新エンジンの最小単位はinfo_source_bundle_v1。bundleはrun dir内に格納、入力・出力の対応を担保する。",
+    "body": "入力バンドルの粒度や配置（reports/hakone-e2/runs/以下）を厳格管理する運用フロー。project_id, source_type, source_id等の必須要素を含む。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "engine_design_v1_20251217-051413",
+      "section_anchor": "入力単位"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:norm:ssot_policy:2025-12-17-01",
+    "project_id": "hakone-e2",
+    "kind": "norm",
+    "subkind": "ssot_policy",
+    "title": "SSOTポリシー（2ファイル運用）",
+    "summary": "SSOTはdata/hakone-e2以下のinfo_nodes_v1.json/info_relations_v1.jsonに厳格集約。中間生成物の原則コミット禁止。",
+    "body": "canonicalの定義と改変は2つのSSOTファイルで管理。snapshot_raw/seed_plan/suggestion_planなどの中間物は運用で追跡しない。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "engine_design_v1_20251217-051413",
+      "section_anchor": "SSOT（canonical）"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:process:update_cycle_flow:2025-12-17-01",
+    "project_id": "hakone-e2",
+    "kind": "process",
+    "subkind": "lane_spec",
+    "title": "更新サイクル主手順",
+    "summary": "bundleから始まり、questions→approve/applyを経てSSOT更新するフロー。questions>0時は人間判断で停止、0なら自動適用。",
+    "body": "バンドル作成→サイクル実行（snapshot等生成）→questions判定→approve/apply→json整合性チェック→PR化の流れ。questionsは安全装置とする。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "engine_design_v1_20251217-051413",
+      "section_anchor": "更新サイクル"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:process:questions_gate:2025-12-17-01",
+    "project_id": "hakone-e2",
+    "kind": "process",
+    "subkind": "lane_spec",
+    "title": "questionsゲート設計",
+    "summary": "questions生成判定で停止・人間判断を挟む安全装置ステップを正式導入。",
+    "body": "questionsが1件以上出たらapprove/applyを停止、人間対応に切り替える。このGateがシステムリスクを低減する。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "engine_design_v1_20251217-051413",
+      "section_anchor": "更新サイクル"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:T-PM-001",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "engine_design v1文書のdocs反映",
+    "summary": "現設計文書（engine_design v1）自体をdocs配下に配置する。",
+    "body": "設計のベースとしてこの文書の確定版をリポジトリに明記する。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "engine_design_v1_20251217-051413",
+      "section_anchor": "DoD"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:T-PM-002",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "update cycleの実運用検証",
+    "summary": "設計に従い、バンドルを元にupdate cycle動作を実行・記録・確認。",
+    "body": "docsの記録やSSOTの差分も管理。questionsゲートや各安全装置の検証含む。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "engine_design_v1_20251217-051413",
+      "section_anchor": "DoD"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:process:approve_apply_handling:2025-12-17-01",
+    "project_id": "hakone-e2",
+    "kind": "process",
+    "subkind": "lane_spec",
+    "title": "approve/apply手順設計",
+    "summary": "questions==0時のみ自動でapprove/applyを進め、json妥当性・endpointチェックまで自動フロー。",
+    "body": "approve/applyの安全性・整合性担保、questionゲートからの自動判定遷移の仕様化。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "engine_design_v1_20251217-051413",
+      "section_anchor": "更新サイクル"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:process:json_integrity_check:2025-12-17-01",
+    "project_id": "hakone-e2",
+    "kind": "process",
+    "subkind": "lane_spec",
+    "title": "json妥当性・endpoint整合性チェック",
+    "summary": "approve/apply後にid重複・endpoint欠損等を自動検証する手順を固定。",
+    "body": "エラー時はPR化せず、追跡コミットとせず巻き戻し可能にする。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "engine_design_v1_20251217-051413",
+      "section_anchor": "更新サイクル"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:guideline:update_plan_policy:2025-12-17-01",
+    "project_id": "hakone-e2",
+    "kind": "guideline",
+    "subkind": "pm_guideline",
+    "title": "update plan取り扱いガイドライン",
+    "summary": "add/update/supersedeは原則として長期decisionの消去を避け、補助decisionで短期運用する。",
+    "body": "削除や上書きは極力最小化し、長期設計判断を担保するようupdate/obsolete/supersedeを全体設計する。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "engine_design_v1_20251217-051413",
+      "section_anchor": "出力"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:norm:ops_commit_policy:2025-12-17-01",
+    "project_id": "hakone-e2",
+    "kind": "norm",
+    "subkind": "update_policy",
+    "title": "最小運用ルール（コミット証跡・中間生成物管理）",
+    "summary": "approved_plan.json, bundle.yaml, docs等の証跡を強く追跡し、snapshot_raw等中間生成物は管理外とする。",
+    "body": "原則docsの最終成果物・証跡のみrepository運用の中心で扱う。中間生成物は一時作業物として運用に含めない。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "engine_design_v1_20251217-051413",
+      "section_anchor": "最小運用ルール"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:guideline:bundle_unit:2025-12-17-01",
+    "project_id": "hakone-e2",
+    "kind": "guideline",
+    "subkind": "pm_guideline",
+    "title": "bundle単位運用ガイドライン",
+    "summary": "bundle単位入力・リソース配置・管理を厳格運用として推奨。",
+    "body": "run dir以下を入力と出力の必須拠点と位置づけ、バンドル一貫管理を推進。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "engine_design_v1_20251217-051413",
+      "section_anchor": "入力単位"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:guideline:ssot_directory:2025-12-17-01",
+    "project_id": "hakone-e2",
+    "kind": "guideline",
+    "subkind": "pm_guideline",
+    "title": "SSOTディレクトリ運用指針",
+    "summary": "SSOTファイルは必ずdata/hakone-e2配下に格納する設計前提。",
+    "body": "他用途・一時ファイルの混入防止のため格納場所を固定化。info_nodes_v1.json/info_relations_v1.jsonが現状唯一のcanonicalリソース。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "engine_design_v1_20251217-051413",
+      "section_anchor": "SSOT（canonical）"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:T-PM-003",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "update plan出力ルール実装",
+    "summary": "出力のadd/update/supersede/obsoleteポリシーを設計通り適用・実装する。",
+    "body": "補助decision/長期decisionの扱いに留意。上書きや消去は原則限定。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "engine_design_v1_20251217-051413",
+      "section_anchor": "出力"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:T-PM-004",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "commit証跡・中間生成物管理ルール実装",
+    "summary": "docs/approved_plan等の証跡追跡、中間生成物の非管理を明示する。",
+    "body": "コミット/証跡として扱う範囲を厳格に定め、運用でブレを防ぐ。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "engine_design_v1_20251217-051413",
+      "section_anchor": "最小運用ルール"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:process:pr_merge_flow:2025-12-17-01",
+    "project_id": "hakone-e2",
+    "kind": "process",
+    "subkind": "lane_spec",
+    "title": "PR化～main反映手順",
+    "summary": "最終成果物はPR化の上mainブランチに反映することが必須。",
+    "body": "整合性・証跡担保の管理終了step。PR前提でcanonical反映。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "engine_design_v1_20251217-051413",
+      "section_anchor": "更新サイクル"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:decision:long_term_policy:2025-12-17-01",
+    "project_id": "hakone-e2",
+    "kind": "decision",
+    "subkind": "design_decision",
+    "title": "長期方針/decisionは消去せず補助decisionで補完",
+    "summary": "長期方針は原則消去せず、短期方針は補助decisionで運用。supersede/obsoleteの適用は慎重に。",
+    "body": "長期一貫性を担保しつつ、短期変更や補助的な決定は独立decisionで扱う（refine/supersedeリンク）。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "engine_design_v1_20251217-051413",
+      "section_anchor": "出力"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:decision:questions_gate_must:2025-12-17-01",
+    "project_id": "hakone-e2",
+    "kind": "decision",
+    "subkind": "design_decision",
+    "title": "questions gate必須導入決定",
+    "summary": "工程にquestions gateを常設し、人的介在止めをシステム要件化。",
+    "body": "questions>0時は必ずapprove/apply停止。0のみ自動判定パス。engine設計の中核decision。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "engine_design_v1_20251217-051413",
+      "section_anchor": "更新サイクル"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-17T05:14:13+09:00",
+    "updated_at": "2025-12-17T05:14:13+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "engine_design_v1_20251217-051413"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
   }
 ]
