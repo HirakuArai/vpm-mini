@@ -853,171 +853,171 @@
     "id": "hakone-e2:rel:2025-12-17-001",
     "project_id": "hakone-e2",
     "type": "part_of",
-    "from": "hakone-e2:process:update_cycle_flow:2025-12-17-01",
-    "to": "hakone-e2:fact:engine_design_v1:2025-12-17-01",
-    "strength": 0.95,
+    "from": "hakone-e2:fact:scene_stub_0001:2025-12-17-01",
+    "to": "hakone-e2:fact:scene_stub_def:2025-12-17-01",
+    "strength": 1.0,
     "status": "active",
     "source_refs": [
       {
-        "kind": "memo",
-        "value": "engine_design_v1_20251217-051413"
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
       }
     ],
-    "created_at": "2025-12-17T05:14:13+09:00",
-    "updated_at": "2025-12-17T05:14:13+09:00"
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-002",
     "project_id": "hakone-e2",
     "type": "part_of",
-    "from": "hakone-e2:process:bundle_input_flow:2025-12-17-01",
-    "to": "hakone-e2:fact:engine_design_v1:2025-12-17-01",
-    "strength": 0.9,
+    "from": "hakone-e2:gap:scene_stub_0001:year",
+    "to": "hakone-e2:fact:scene_stub_0001:gap_set",
+    "strength": 1.0,
     "status": "active",
     "source_refs": [
       {
-        "kind": "memo",
-        "value": "engine_design_v1_20251217-051413"
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
       }
     ],
-    "created_at": "2025-12-17T05:14:13+09:00",
-    "updated_at": "2025-12-17T05:14:13+09:00"
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-003",
     "project_id": "hakone-e2",
     "type": "part_of",
-    "from": "hakone-e2:process:questions_gate:2025-12-17-01",
-    "to": "hakone-e2:process:update_cycle_flow:2025-12-17-01",
-    "strength": 0.85,
+    "from": "hakone-e2:gap:scene_stub_0001:section_team_person",
+    "to": "hakone-e2:fact:scene_stub_0001:gap_set",
+    "strength": 1.0,
     "status": "active",
     "source_refs": [
       {
-        "kind": "memo",
-        "value": "engine_design_v1_20251217-051413"
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
       }
     ],
-    "created_at": "2025-12-17T05:14:13+09:00",
-    "updated_at": "2025-12-17T05:14:13+09:00"
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-004",
     "project_id": "hakone-e2",
     "type": "part_of",
-    "from": "hakone-e2:process:approve_apply_handling:2025-12-17-01",
-    "to": "hakone-e2:process:update_cycle_flow:2025-12-17-01",
-    "strength": 0.85,
+    "from": "hakone-e2:gap:scene_stub_0001:event_objective",
+    "to": "hakone-e2:fact:scene_stub_0001:gap_set",
+    "strength": 1.0,
     "status": "active",
     "source_refs": [
       {
-        "kind": "memo",
-        "value": "engine_design_v1_20251217-051413"
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
       }
     ],
-    "created_at": "2025-12-17T05:14:13+09:00",
-    "updated_at": "2025-12-17T05:14:13+09:00"
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-005",
     "project_id": "hakone-e2",
     "type": "part_of",
-    "from": "hakone-e2:process:json_integrity_check:2025-12-17-01",
-    "to": "hakone-e2:process:update_cycle_flow:2025-12-17-01",
-    "strength": 0.8,
+    "from": "hakone-e2:gap:scene_stub_0001:primary_source",
+    "to": "hakone-e2:fact:scene_stub_0001:gap_set",
+    "strength": 1.0,
     "status": "active",
     "source_refs": [
       {
-        "kind": "memo",
-        "value": "engine_design_v1_20251217-051413"
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
       }
     ],
-    "created_at": "2025-12-17T05:14:13+09:00",
-    "updated_at": "2025-12-17T05:14:13+09:00"
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-006",
     "project_id": "hakone-e2",
     "type": "part_of",
-    "from": "hakone-e2:process:pr_merge_flow:2025-12-17-01",
-    "to": "hakone-e2:process:update_cycle_flow:2025-12-17-01",
-    "strength": 0.8,
+    "from": "hakone-e2:gap:scene_stub_0001:emotion_hypothesis",
+    "to": "hakone-e2:fact:scene_stub_0001:gap_set",
+    "strength": 1.0,
     "status": "active",
     "source_refs": [
       {
-        "kind": "memo",
-        "value": "engine_design_v1_20251217-051413"
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
       }
     ],
-    "created_at": "2025-12-17T05:14:13+09:00",
-    "updated_at": "2025-12-17T05:14:13+09:00"
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-007",
     "project_id": "hakone-e2",
-    "type": "evidence_for",
-    "from": "hakone-e2:decision:questions_gate_must:2025-12-17-01",
-    "to": "hakone-e2:process:questions_gate:2025-12-17-01",
-    "strength": 0.95,
+    "type": "refers_to",
+    "from": "hakone-e2:fact:scene_stub_0001:2025-12-17-01",
+    "to": "hakone-e2:meta:scene_struct_type",
+    "strength": 0.6,
     "status": "active",
     "source_refs": [
       {
-        "kind": "memo",
-        "value": "engine_design_v1_20251217-051413"
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
       }
     ],
-    "created_at": "2025-12-17T05:14:13+09:00",
-    "updated_at": "2025-12-17T05:14:13+09:00"
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-008",
     "project_id": "hakone-e2",
-    "type": "refers_to",
-    "from": "hakone-e2:guideline:update_plan_policy:2025-12-17-01",
-    "to": "hakone-e2:decision:long_term_policy:2025-12-17-01",
-    "strength": 0.75,
+    "type": "belongs_to",
+    "from": "hakone-e2:fact:scene_stub_0001:gap_set",
+    "to": "hakone-e2:fact:scene_stub_0001:2025-12-17-01",
+    "strength": 0.9,
     "status": "active",
     "source_refs": [
       {
-        "kind": "memo",
-        "value": "engine_design_v1_20251217-051413"
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
       }
     ],
-    "created_at": "2025-12-17T05:14:13+09:00",
-    "updated_at": "2025-12-17T05:14:13+09:00"
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-009",
     "project_id": "hakone-e2",
     "type": "refers_to",
-    "from": "hakone-e2:task:T-PM-003",
-    "to": "hakone-e2:guideline:update_plan_policy:2025-12-17-01",
-    "strength": 0.9,
+    "from": "hakone-e2:process:scene_stub_additive",
+    "to": "hakone-e2:meta:scene_gap_note",
+    "strength": 0.8,
     "status": "active",
     "source_refs": [
       {
-        "kind": "memo",
-        "value": "engine_design_v1_20251217-051413"
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
       }
     ],
-    "created_at": "2025-12-17T05:14:13+09:00",
-    "updated_at": "2025-12-17T05:14:13+09:00"
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-010",
     "project_id": "hakone-e2",
-    "type": "belongs_to",
-    "from": "hakone-e2:task:T-PM-001",
-    "to": "hakone-e2:fact:engine_design_v1:2025-12-17-01",
-    "strength": 0.9,
+    "type": "refers_to",
+    "from": "hakone-e2:meta:scene_gap_note",
+    "to": "hakone-e2:fact:scene_stub_0001:gap_set",
+    "strength": 0.7,
     "status": "active",
     "source_refs": [
       {
-        "kind": "memo",
-        "value": "engine_design_v1_20251217-051413"
+        "kind": "file",
+        "value": "scene-stub/stub_0001_20251217-052853.md"
       }
     ],
-    "created_at": "2025-12-17T05:14:13+09:00",
-    "updated_at": "2025-12-17T05:14:13+09:00"
+    "created_at": "2025-12-17T05:28:53+09:00",
+    "updated_at": "2025-12-17T05:28:53+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-011",

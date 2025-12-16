@@ -1,0 +1,23 @@
+# hakone-e2 scene template v1
+
+## Scene ID
+- scene_id: hakone-e2:scene:...
+
+## Time / Range
+- from: YYYY-MM-DD (or __UNKNOWN__)
+- to:   YYYY-MM-DD (or __UNKNOWN__)
+
+## What happened (raw)
+（まずはそのまま文章で。未確定は __UNKNOWN__ でOK）
+
+## Entities (optional)
+- people/teams: …
+- location: …
+- sources: …
+
+## Why this matters (E² / fan emotion hypothesis)
+- emotional peak hypothesis: …
+- expected vs actual gap (if any): …
+
+## Gaps / what we still need
+- …
