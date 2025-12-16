@@ -1,0 +1,13 @@
+{
+  "schema": "hakone-e2.domain.e2_scenes_v1",
+  "items": [
+    {
+      "scene_id": "__EXAMPLE__",
+      "time_range": { "from": "__UNKNOWN__", "to": "__UNKNOWN__" },
+      "summary": "__UNKNOWN__",
+      "claims": [],
+      "hypotheses": [],
+      "tags": ["example"]
+    }
+  ]
+}

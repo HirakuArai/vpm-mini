@@ -1,0 +1,13 @@
+{
+  "schema": "hakone-e2.domain.e2_evidence_v1",
+  "items": [
+    {
+      "evidence_id": "__EXAMPLE__",
+      "source_type": "__UNKNOWN__",
+      "url": "__UNKNOWN__",
+      "retrieved_at": "__UNKNOWN__",
+      "note": "__UNKNOWN__",
+      "tags": ["example"]
+    }
+  ]
+}
