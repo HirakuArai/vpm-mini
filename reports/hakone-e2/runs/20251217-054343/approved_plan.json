@@ -1,0 +1,600 @@
+{
+  "project_id": "hakone-e2",
+  "source_snapshot_id": "snapshot_raw.json",
+  "generated_at": "2025-12-17T06:05:22+09:00",
+  "matches": [
+    {
+      "new": "hakone-e2:decision:scene-selection-criteria-doc-exists-v1",
+      "existing": [
+        "hakone-e2:decision:scene-selection-criteria-doc-exists-v1"
+      ],
+      "confidence": 1.0,
+      "rationale": "The IDs, titles, and summaries are identical and indicate the same design decision regarding documenting scene selection/evidence criteria v1."
+    }
+  ],
+  "add": [
+    {
+      "id": "hakone-e2:guideline:scene-selection-criteria-v1",
+      "project_id": "hakone-e2",
+      "kind": "guideline",
+      "subkind": "scene_selection_policy",
+      "title": "Scene選定ガイドライン v1",
+      "summary": "箱根駅伝の事実をE²で扱うsceneとして取り込む際の選定原則を統一した基準。",
+      "body": "優先度が高いsceneの条件:\n1. 出来事が一つに切れている（開始/終了が説明できる）\n2. 感情ピーク仮説が立てやすい（偉業、アクシデント、期待値ギャップ等）\n3. 一次/準一次ソースで裏取り可能\n4. 登場人物・チーム・区間・年が特定可能\n5. \"なぜエモいか\"を説明できる（仮説でOK）",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "scene_selection_criteria_v1_20251217-054343",
+        "section_anchor": "Scene選定基準"
+      },
+      "status": "active",
+      "importance": "high",
+      "created_at": "2025-12-17T05:43:43+09:00",
+      "updated_at": "2025-12-17T05:43:43+09:00",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "authored_by": "system",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:guideline:evidence-handling-policy-v1",
+      "project_id": "hakone-e2",
+      "kind": "guideline",
+      "subkind": "evidence_policy",
+      "title": "Scene根拠(Evidence)の扱いガイドライン v1",
+      "summary": "scene本文の『断定』と『仮説』の分離、出典明示、不明情報のgap扱い、バンドル単位での記述など統一ポリシー。",
+      "body": "・scene本文には断定と仮説を分離して書く\n・断定には可能ならsourceを付す\n・仮説はemotional hypothesisとして明示\n・出典未確定項目はUNKNOWNでgap管理\n・収集単位はbundleで分離して記述",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "scene_selection_criteria_v1_20251217-054343",
+        "section_anchor": "Evidenceの扱い"
+      },
+      "status": "active",
+      "importance": "normal",
+      "created_at": "2025-12-17T05:43:43+09:00",
+      "updated_at": "2025-12-17T05:43:43+09:00",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "authored_by": "system",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:process:scene-ingest-basic-flow-v1",
+      "project_id": "hakone-e2",
+      "kind": "process",
+      "subkind": "scene_ingest_flow",
+      "title": "Scene取り込み手順 (最小)",
+      "summary": "scene取り込みのための3ステップ基本フロー。",
+      "body": "1. scene stub作成（型通りにUNKNOWN許容）\n2. gap要素を列挙（年/区間/人物/出典/感情仮説など）\n3. 出典収集しgap埋め、update cycleで反映",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "scene_selection_criteria_v1_20251217-054343",
+        "section_anchor": "取り込み手順（最小）"
+      },
+      "status": "active",
+      "importance": "normal",
+      "created_at": "2025-12-17T05:43:43+09:00",
+      "updated_at": "2025-12-17T05:43:43+09:00",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "authored_by": "system",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:process:update-cycle-network-reflection-v1",
+      "project_id": "hakone-e2",
+      "kind": "process",
+      "subkind": "update_cycle_reflection",
+      "title": "update cycleとinfo_network反映",
+      "summary": "基準・タスク・ギャップ等をupdate cycle経由でinfo_networkに反映するプロセス指針。",
+      "body": "v1起草時点での基準文書・フロー・タスク・ギャップ情報は、update cycleで逐次info_networkに写像・同期する。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "scene_selection_criteria_v1_20251217-054343",
+        "section_anchor": "v1のDoD"
+      },
+      "status": "active",
+      "importance": "normal",
+      "created_at": "2025-12-17T05:43:43+09:00",
+      "updated_at": "2025-12-17T05:43:43+09:00",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "authored_by": "system",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:fact:scene-selection-rationale-v1",
+      "project_id": "hakone-e2",
+      "kind": "fact",
+      "subkind": "project_meta",
+      "title": "Scene選定基準策定の目的",
+      "summary": "E²で扱う箱根駅伝のscene選定を統一的・再現可能にするためのルール策定方針。",
+      "body": "事実や証拠の選定のバラツキや恣意性を防ぎ、一貫したPM用scene取り込み手法を実現する。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "scene_selection_criteria_v1_20251217-054343",
+        "section_anchor": "目的"
+      },
+      "status": "active",
+      "importance": "normal",
+      "created_at": "2025-12-17T05:43:43+09:00",
+      "updated_at": "2025-12-17T05:43:43+09:00",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "authored_by": "system",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:fact:scene-selection-bundle-unit-v1",
+      "project_id": "hakone-e2",
+      "kind": "fact",
+      "subkind": "state_snapshot",
+      "title": "scene/evidenceのbundle管理",
+      "summary": "scene及びmemo単位でのバンドル管理方針。",
+      "body": "sceneおよび関連evidenceは、bundle（source_type=scene / memo）で管理し、PM判断・gap管理単位とする。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "scene_selection_criteria_v1_20251217-054343",
+        "section_anchor": "Evidenceの扱い"
+      },
+      "status": "active",
+      "importance": "low",
+      "created_at": "2025-12-17T05:43:43+09:00",
+      "updated_at": "2025-12-17T05:43:43+09:00",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "authored_by": "system",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:norm:scene-selection-evidence-obligation-v1",
+      "project_id": "hakone-e2",
+      "kind": "norm",
+      "subkind": "update_policy",
+      "title": "Scene選定時のEvidence管理規範",
+      "summary": "scene設計で根拠（evidence）をobligation化する規範。",
+      "body": "sceneの断定事項には、一次/準一次ソースによる裏付け補強が義務。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "scene_selection_criteria_v1_20251217-054343",
+        "section_anchor": "Scene選定基準"
+      },
+      "status": "active",
+      "importance": "normal",
+      "created_at": "2025-12-17T05:43:43+09:00",
+      "updated_at": "2025-12-17T05:43:43+09:00",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "authored_by": "system",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:task:scene-stub-registration-v1",
+      "project_id": "hakone-e2",
+      "kind": "task",
+      "subkind": "pm_task",
+      "title": "scene stub作成タスク",
+      "summary": "sceneインジェストの第1ステップ。stub（型に沿った初期sceneエントリ）を登録するPM系タスク。",
+      "body": "sceneテンプレート定義・UNKNOWN許容で初期エントリ作成（取り込み手順1）。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "scene_selection_criteria_v1_20251217-054343",
+        "section_anchor": "取り込み手順（最小）"
+      },
+      "status": "active",
+      "importance": "normal",
+      "created_at": "2025-12-17T05:43:43+09:00",
+      "updated_at": "2025-12-17T05:43:43+09:00",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "authored_by": "system",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:task:evidence-gap-enumeration-v1",
+      "project_id": "hakone-e2",
+      "kind": "task",
+      "subkind": "pm_task",
+      "title": "scene gap要素列挙タスク",
+      "summary": "sceneインジェスト第2ステップ。情報ギャップの明示的列挙タスク。",
+      "body": "年／区間／人物／出典／感情仮説などの未確定事項（gap）を明示的に記録する。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "scene_selection_criteria_v1_20251217-054343",
+        "section_anchor": "取り込み手順（最小）"
+      },
+      "status": "active",
+      "importance": "normal",
+      "created_at": "2025-12-17T05:43:43+09:00",
+      "updated_at": "2025-12-17T05:43:43+09:00",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "authored_by": "system",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:gap:scene-evidence-unknown-v1",
+      "project_id": "hakone-e2",
+      "kind": "meta",
+      "subkind": "info_model_note",
+      "title": "scene evidenceギャップ（UNKNOWN）管理",
+      "summary": "scene化過程で出典未確定や推測不明のgap（UNKNOWN）を明示的にPMレポジトリへ落とす運用ノート。",
+      "body": "エビデンス未確定/不明事項は推論せずgapとして残し、明示表示される。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "scene_selection_criteria_v1_20251217-054343",
+        "section_anchor": "Evidenceの扱い"
+      },
+      "status": "active",
+      "importance": "normal",
+      "created_at": "2025-12-17T05:43:43+09:00",
+      "updated_at": "2025-12-17T05:43:43+09:00",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "authored_by": "system",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:gap:scene-field-gap-list-v1",
+      "project_id": "hakone-e2",
+      "kind": "meta",
+      "subkind": "info_model_note",
+      "title": "scene stubフィールドgapリスト",
+      "summary": "scene登録時のgapリスト（年/区間/人物/出典/感情仮説等）が必ず残る設計ノート。",
+      "body": "scene stub登録時には現状gap項目（年/区間/人物/出典/感情仮説）を明示リストアップし、更新完了まで可視管理。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "scene_selection_criteria_v1_20251217-054343",
+        "section_anchor": "取り込み手順（最小）"
+      },
+      "status": "active",
+      "importance": "normal",
+      "created_at": "2025-12-17T05:43:43+09:00",
+      "updated_at": "2025-12-17T05:43:43+09:00",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "authored_by": "system",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:decision:scene-selection-criteria-doc-exists-v1",
+      "project_id": "hakone-e2",
+      "kind": "decision",
+      "subkind": "design_decision",
+      "title": "scene選定/Evidence基準v1文書化決定",
+      "summary": "現行scene選定/Evidence方針をv1として文書化し運用する設計決定。",
+      "body": "本メモがscene selection guidelineとevidence handling policy v1の証拠文書となる。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "scene_selection_criteria_v1_20251217-054343",
+        "section_anchor": "v1のDoD"
+      },
+      "status": "active",
+      "importance": "high",
+      "created_at": "2025-12-17T05:43:43+09:00",
+      "updated_at": "2025-12-17T05:43:43+09:00",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "authored_by": "system",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:metric:scene-selection-guideline-existence-v1",
+      "project_id": "hakone-e2",
+      "kind": "metric",
+      "subkind": "cost_metric",
+      "title": "scene選定基準ドキュメント有無",
+      "summary": "現行scene選定基準（v1）の公式ドキュメント/ネットワーク反映状況の可観測メトリクス。",
+      "body": "scene選定/根拠指針v1の存在状態は、info_networkへの反映有無で定量トラッキング（DoD達成指標）。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "scene_selection_criteria_v1_20251217-054343",
+        "section_anchor": "v1のDoD"
+      },
+      "status": "active",
+      "importance": "normal",
+      "created_at": "2025-12-17T05:43:43+09:00",
+      "updated_at": "2025-12-17T05:43:43+09:00",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "authored_by": "system",
+      "review_status": "unreviewed"
+    }
+  ],
+  "add_relations": [],
+  "update": [],
+  "update_relations": [
+    {
+      "id": "hakone-e2:rel:2025-12-17-001",
+      "project_id": "hakone-e2",
+      "type": "belongs_to",
+      "from": "hakone-e2:guideline:scene-selection-criteria-v1",
+      "to": "hakone-e2:fact:scene-selection-rationale-v1",
+      "strength": 1.0,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "created_at": "2025-12-17T05:44:00+09:00",
+      "updated_at": "2025-12-17T05:44:00+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-17-002",
+      "project_id": "hakone-e2",
+      "type": "part_of",
+      "from": "hakone-e2:guideline:scene-selection-criteria-v1",
+      "to": "hakone-e2:decision:scene-selection-criteria-doc-exists-v1",
+      "strength": 0.8,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "created_at": "2025-12-17T05:44:01+09:00",
+      "updated_at": "2025-12-17T05:44:01+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-17-003",
+      "project_id": "hakone-e2",
+      "type": "belongs_to",
+      "from": "hakone-e2:guideline:evidence-handling-policy-v1",
+      "to": "hakone-e2:guideline:scene-selection-criteria-v1",
+      "strength": 0.9,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "created_at": "2025-12-17T05:44:02+09:00",
+      "updated_at": "2025-12-17T05:44:02+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-17-004",
+      "project_id": "hakone-e2",
+      "type": "belongs_to",
+      "from": "hakone-e2:process:scene-ingest-basic-flow-v1",
+      "to": "hakone-e2:guideline:scene-selection-criteria-v1",
+      "strength": 0.9,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "created_at": "2025-12-17T05:44:03+09:00",
+      "updated_at": "2025-12-17T05:44:03+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-17-005",
+      "project_id": "hakone-e2",
+      "type": "derived_from",
+      "from": "hakone-e2:process:update-cycle-network-reflection-v1",
+      "to": "hakone-e2:process:scene-ingest-basic-flow-v1",
+      "strength": 0.7,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "created_at": "2025-12-17T05:44:04+09:00",
+      "updated_at": "2025-12-17T05:44:04+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-17-006",
+      "project_id": "hakone-e2",
+      "type": "evidence_for",
+      "from": "hakone-e2:metric:scene-selection-guideline-existence-v1",
+      "to": "hakone-e2:decision:scene-selection-criteria-doc-exists-v1",
+      "strength": 0.95,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "created_at": "2025-12-17T05:44:05+09:00",
+      "updated_at": "2025-12-17T05:44:05+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-17-007",
+      "project_id": "hakone-e2",
+      "type": "evidence_for",
+      "from": "hakone-e2:fact:scene-selection-rationale-v1",
+      "to": "hakone-e2:decision:scene-selection-criteria-doc-exists-v1",
+      "strength": 0.7,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "created_at": "2025-12-17T05:44:06+09:00",
+      "updated_at": "2025-12-17T05:44:06+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-17-008",
+      "project_id": "hakone-e2",
+      "type": "part_of",
+      "from": "hakone-e2:task:scene-stub-registration-v1",
+      "to": "hakone-e2:process:scene-ingest-basic-flow-v1",
+      "strength": 1.0,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "created_at": "2025-12-17T05:44:07+09:00",
+      "updated_at": "2025-12-17T05:44:07+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-17-009",
+      "project_id": "hakone-e2",
+      "type": "part_of",
+      "from": "hakone-e2:task:evidence-gap-enumeration-v1",
+      "to": "hakone-e2:process:scene-ingest-basic-flow-v1",
+      "strength": 1.0,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "created_at": "2025-12-17T05:44:08+09:00",
+      "updated_at": "2025-12-17T05:44:08+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-17-010",
+      "project_id": "hakone-e2",
+      "type": "refers_to",
+      "from": "hakone-e2:gap:scene-field-gap-list-v1",
+      "to": "hakone-e2:task:evidence-gap-enumeration-v1",
+      "strength": 0.88,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "created_at": "2025-12-17T05:44:09+09:00",
+      "updated_at": "2025-12-17T05:44:09+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-17-011",
+      "project_id": "hakone-e2",
+      "type": "refers_to",
+      "from": "hakone-e2:gap:scene-evidence-unknown-v1",
+      "to": "hakone-e2:guideline:evidence-handling-policy-v1",
+      "strength": 0.85,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "created_at": "2025-12-17T05:44:10+09:00",
+      "updated_at": "2025-12-17T05:44:10+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-17-012",
+      "project_id": "hakone-e2",
+      "type": "refers_to",
+      "from": "hakone-e2:fact:scene-selection-bundle-unit-v1",
+      "to": "hakone-e2:guideline:evidence-handling-policy-v1",
+      "strength": 0.8,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "created_at": "2025-12-17T05:44:11+09:00",
+      "updated_at": "2025-12-17T05:44:11+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-17-013",
+      "project_id": "hakone-e2",
+      "type": "belongs_to",
+      "from": "hakone-e2:norm:scene-selection-evidence-obligation-v1",
+      "to": "hakone-e2:guideline:scene-selection-criteria-v1",
+      "strength": 0.85,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "file",
+          "value": "scene_selection_criteria_v1_20251217-054343"
+        }
+      ],
+      "created_at": "2025-12-17T05:44:12+09:00",
+      "updated_at": "2025-12-17T05:44:12+09:00"
+    }
+  ],
+  "obsolete": [],
+  "obsolete_relations": [],
+  "supersedes": [],
+  "notes": "Step4 v1.1 proposal for snapshot=snapshot_raw.json\nsupersedes proposals: none\nquestions present: 1. Owner confirmation required; do not auto-apply.\nexcluded noop decisions from consideration: 0\nmatches proposed: 1 (multi=0)\n\n[rejected] Owner rejected supersedes/obsolete; questions cleared.",
+  "noop": [],
+  "noop_relations": [],
+  "questions": []
+}
