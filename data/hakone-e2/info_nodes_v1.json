@@ -1338,5 +1338,329 @@
     ],
     "authored_by": "system",
     "review_status": "ai_ok"
+  },
+  {
+    "id": "hakone-e2:guideline:data-canonical-v1",
+    "project_id": "hakone-e2",
+    "kind": "guideline",
+    "subkind": "pm_guideline",
+    "title": "データ canonical 配置ルール",
+    "summary": "info_nodes_v1.json および info_relations_v1.json は data/hakone-e2/ 配下の2ファイルに固定し、ここを正とする。",
+    "body": "すべてのデータ編集・更新は data/hakone-e2/info_nodes_v1.json と data/hakone-e2/info_relations_v1.json をcanonicalとすることで迷子を防ぐ。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "ops_data_rules_v1_20251217-045417",
+      "section_anchor": "SSOT"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-17T04:54:17+09:00",
+    "updated_at": "2025-12-17T04:54:17+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "ops_data_rules_v1_20251217-045417"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:ssot-paths-v1",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "state_snapshot",
+    "title": "SSOTパスの事実定義",
+    "summary": "SSOTとして使うデータのファイルパスは data/hakone-e2/info_nodes_v1.json, info_relations_v1.json で固定されている。",
+    "body": "2つのjsonファイルが公式なSSOTとして全工程の基準になる。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "ops_data_rules_v1_20251217-045417",
+      "section_anchor": "SSOT"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-17T04:54:17+09:00",
+    "updated_at": "2025-12-17T04:54:17+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "ops_data_rules_v1_20251217-045417"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:guideline:artifact-retain-rules-v1",
+    "project_id": "hakone-e2",
+    "kind": "guideline",
+    "subkind": "pm_guideline",
+    "title": "run artifactsの保存・削除ルール",
+    "summary": "run artifactsのうち、証跡となる approved_plan.json と bundle yaml のみを原則コミット対象とし、それ以外の大きな生成物はコミットしない。",
+    "body": "原則コミットしないファイル（snapshot_raw等）は最小限をfixture用途でlocked配下保存可能。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "ops_data_rules_v1_20251217-045417",
+      "section_anchor": "run artifacts"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T04:54:17+09:00",
+    "updated_at": "2025-12-17T04:54:17+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "ops_data_rules_v1_20251217-045417"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:guideline:bundle-naming-rules-v1",
+    "project_id": "hakone-e2",
+    "kind": "guideline",
+    "subkind": "pm_guideline",
+    "title": "bundleファイル命名規則",
+    "summary": "bundle名には source_type, source_id, date を必ず含め、run dir（reports/hakone-e2/runs/<timestamp>/）配下に配置する。",
+    "body": "入力バンドルと出力は同ディレクトリにまとめ、命名規則の統一性を保つ。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "ops_data_rules_v1_20251217-045417",
+      "section_anchor": "bundle命名規則"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T04:54:17+09:00",
+    "updated_at": "2025-12-17T04:54:17+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "ops_data_rules_v1_20251217-045417"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:process:run-artifact-flow-v1",
+    "project_id": "hakone-e2",
+    "kind": "process",
+    "subkind": "layer_b_flow",
+    "title": "run artifacts生成・保存フロー",
+    "summary": "実行ごとに runディレクトリ配下に証跡・生成物を展開・保存する運用フロー。",
+    "body": "run dirは reports/hakone-e2/runs/<timestamp>/、軽量な証跡のみコミット。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "ops_data_rules_v1_20251217-045417",
+      "section_anchor": "run artifacts"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T04:54:17+09:00",
+    "updated_at": "2025-12-17T04:54:17+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "ops_data_rules_v1_20251217-045417"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:process:bundle-apply-flow-v1",
+    "project_id": "hakone-e2",
+    "kind": "process",
+    "subkind": "layer_b_flow",
+    "title": "bundle適用フロー（反映条件付き）",
+    "summary": "bundle作成から反映までの停止条件付き適用サイクル。質問があれば人間対応、なければ自動適用。",
+    "body": "update cycle実行（bundle→suggestion）後、questions>0なら停止。questions==0ならapprove→apply。最後にgit diff/PRでmainへ。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "ops_data_rules_v1_20251217-045417",
+      "section_anchor": "反映フロー"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-17T04:54:17+09:00",
+    "updated_at": "2025-12-17T04:54:17+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "ops_data_rules_v1_20251217-045417"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:norm:no-commit-large-artifacts-v1",
+    "project_id": "hakone-e2",
+    "kind": "norm",
+    "subkind": "update_policy",
+    "title": "大きな中間生成物の原則コミット禁止",
+    "summary": "dumps, snapshot_raw.json, seed_plan等は肥大化・再利用性を鑑みて原則コミットしない。",
+    "body": "やむを得ない場合のみfixture化してlocked/に保存する。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "ops_data_rules_v1_20251217-045417",
+      "section_anchor": "run artifacts"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T04:54:17+09:00",
+    "updated_at": "2025-12-17T04:54:17+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "ops_data_rules_v1_20251217-045417"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:norm:commit-evidence-minimum-v1",
+    "project_id": "hakone-e2",
+    "kind": "norm",
+    "subkind": "ssot_policy",
+    "title": "証跡最小限コミットの原則",
+    "summary": "approved_plan.json と bundle.yaml だけを最低限証跡として必ずコミットする。",
+    "body": "証跡が失われるリスクを回避し、工程検証時の根拠保持を担保。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "ops_data_rules_v1_20251217-045417",
+      "section_anchor": "run artifacts"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T04:54:17+09:00",
+    "updated_at": "2025-12-17T04:54:17+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "ops_data_rules_v1_20251217-045417"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:h2-ops-1-done-v1",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "infra_task",
+    "title": "データファイル運用ルール(H2-OPS-1)完了タスク",
+    "summary": "本ルールセット（v1）がチームに合意・運用フローに組み込まれていること。",
+    "body": "全ルールの導入と運用開始までをscopeとする。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "ops_data_rules_v1_20251217-045417",
+      "section_anchor": "目的"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-17T04:54:17+09:00",
+    "updated_at": "2025-12-17T04:54:17+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "ops_data_rules_v1_20251217-045417"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:run-dirs-structure-v1",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "state_snapshot",
+    "title": "runディレクトリ構成事実",
+    "summary": "各runごとに reports/hakone-e2/runs/<timestamp>/ が作成される。",
+    "body": "証跡・入力・出力・artifactは run配下に一元管理する。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "ops_data_rules_v1_20251217-045417",
+      "section_anchor": "run artifacts"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T04:54:17+09:00",
+    "updated_at": "2025-12-17T04:54:17+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "ops_data_rules_v1_20251217-045417"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:process:update-cycle-v1",
+    "project_id": "hakone-e2",
+    "kind": "process",
+    "subkind": "lane_spec",
+    "title": "update cycleの詳細仕様",
+    "summary": "反映フロー内でのbundle入力→suggestion→approve/applyの一連の自動・手動サイクル仕様。",
+    "body": "questionsが発生した場合はhuman止め、なければそのままmainへ反映。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "ops_data_rules_v1_20251217-045417",
+      "section_anchor": "反映フロー"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T04:54:17+09:00",
+    "updated_at": "2025-12-17T04:54:17+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "ops_data_rules_v1_20251217-045417"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:meta:ops-rules-note-v1",
+    "project_id": "hakone-e2",
+    "kind": "meta",
+    "subkind": "info_model_note",
+    "title": "本運用ルール v1 メタノート",
+    "summary": "このノードセットはH2-OPS-1運用規則v1確定メモよりモデル化された。",
+    "body": "モデル化の根拠情報・スコープ記載。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "ops_data_rules_v1_20251217-045417",
+      "section_anchor": ""
+    },
+    "status": "active",
+    "importance": "low",
+    "created_at": "2025-12-17T04:54:17+09:00",
+    "updated_at": "2025-12-17T04:54:17+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "ops_data_rules_v1_20251217-045417"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
   }
 ]
