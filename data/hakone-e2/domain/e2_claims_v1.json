@@ -1,0 +1,13 @@
+{
+  "schema": "hakone-e2.domain.e2_claims_v1",
+  "items": [
+    {
+      "claim_id": "__EXAMPLE__",
+      "scene_id": "__EXAMPLE__",
+      "statement": "__UNKNOWN__",
+      "confidence": "unknown",
+      "evidence_ids": [],
+      "tags": ["example"]
+    }
+  ]
+}
