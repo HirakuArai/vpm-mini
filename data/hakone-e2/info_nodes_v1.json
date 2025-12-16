@@ -2796,5 +2796,331 @@
     ],
     "authored_by": "system",
     "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:scene_0001_evidence_plan:2025-12-17",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "project_meta",
+    "title": "scene_0001 evidence plan v1",
+    "summary": "scene_0001 の断定/仮説分離と出典付与のための evidence 収集・反映計画。",
+    "body": "断定のための情報 gap を明確化し、公式/準一次 evidence 収集・構造化・update cycle 連携を定義。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "docs/projects/hakone-e2/scenes/scene_0001_stub_v1.md"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:scene_0001_gap:2025-12-17",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "state_snapshot",
+    "title": "scene_0001 情報 gap 記述 v1",
+    "summary": "scene_0001 に欠落している情報項目リスト。",
+    "body": "年/大会回/日付、区間・客観出来事、関係者一覧、記録・順位、当日条件、反応（実況等）が未確定。推測は禁止。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:scene_0001_evidence_priority:2025-12-17",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "project_meta",
+    "title": "scene_0001 evidence 優先度ポリシー",
+    "summary": "公式記録→準一次（大手報道）→まとめ記事/SNSの順で evidence 優先。",
+    "body": "根拠断定は公式～準一次 source のみ。まとめ/SNS は gap 補助。仮説で事実を補完しない。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:meta:scene_0001_evidence_plan_v1_memo:2025-12-17",
+    "project_id": "hakone-e2",
+    "kind": "meta",
+    "subkind": "info_model_note",
+    "title": "scene_0001 evidence plan：メタ情報",
+    "summary": "本 evidence 計画は add-only（既存 decision 非上書き）原則で設計。",
+    "body": "gap/task は既存決定を supersede せず積み上げ管理。情緒/scene ドメイン独自情報は除外。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:process:scene_0001_evidence_collect_flow:2025-12-17",
+    "project_id": "hakone-e2",
+    "kind": "process",
+    "subkind": "lane_spec",
+    "title": "scene_0001 evidence 収集フロー v1",
+    "summary": "evidence 候補 URL リスト化→抽出→保存→gap 統合タスク化の流れ。",
+    "body": "1: URLリスト（3-5本）化\n2: 客観事実/引用短文/要約を抽出\n3: 抽出 bundle 保存\n4: gapタスク化し update cycle へ。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:norm:scene_0001_no_guess_policy:2025-12-17",
+    "project_id": "hakone-e2",
+    "kind": "norm",
+    "subkind": "update_policy",
+    "title": "scene_0001 fact 推測禁止ポリシー",
+    "summary": "gap 埋めのため根拠なき推測は一切禁止。",
+    "body": "scene_0001 の情報ギャップ/事実は出典あり evidence でのみ埋めること。仮説挿入不可。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:T-URL-LIST-001:2025-12-17",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "scene_0001 evidence 候補URLリスト化",
+    "summary": "公式/準一次/まとめ系から evidence 候補 URL を3-5本抽出リスト化する。",
+    "body": "URL候補ごとに source_id を採番。事実確認/gap解消のため。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:T-EXTRACT-001:2025-12-17",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "scene_0001: evidence 内容抽出タスク",
+    "summary": "リスト化したURLから事実データと引用・要約抽出。",
+    "body": "公式/準一次サイト・記事から，確認済み fact/引用・要約を書き出す。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:T-BUNDLE-001:2025-12-17",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "scene_0001: evidence bundle保存タスク",
+    "summary": "抽出 evidence を bundle（memo/scene_evidence）として保存。",
+    "body": "抽出 URLごとに bundle 化・保存。source_type を明記。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:T-GAP-UPDATE-001:2025-12-17",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "scene_0001: gap 統合・タスク化",
+    "summary": "bundle 保存後、未充足 gap を再列挙・タスクに変換のプロセス。",
+    "body": "gap/fact の coverage を確認し、新規 gap task を定義・update cycle へ流す。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:T-UPDATE-CYCLE-001:2025-12-17",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "scene_0001 update cycle 流し",
+    "summary": "gap task を update cycle 内で scene_0001埋めに連携。",
+    "body": "gap task を update管理レーンへ。決して推測で埋めず証拠主義を徹底。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:process:scene_0001_update_cycle_flow:2025-12-17",
+    "project_id": "hakone-e2",
+    "kind": "process",
+    "subkind": "lane_spec",
+    "title": "scene_0001 update cycle連携フロー",
+    "summary": "gap task を update cycle レーンと連携、指標充足まで反復。",
+    "body": "DoD 到達まで update/gap 対応のループを管理。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:meta:scene_0001_evidence_plan_v1_dod:2025-12-17",
+    "project_id": "hakone-e2",
+    "kind": "meta",
+    "subkind": "info_model_note",
+    "title": "scene_0001 evidence plan: DoD",
+    "summary": "候補URL列挙と明確なgapタスク化・update cycle流しの2点成立がDoD。",
+    "body": "evidence 候補列挙済み＋gap定義/タスク化が明文化、update cycle に接続される状態で完了となる。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
   }
 ]

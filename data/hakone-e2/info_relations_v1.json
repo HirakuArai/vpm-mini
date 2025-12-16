@@ -852,189 +852,189 @@
   {
     "id": "hakone-e2:rel:2025-12-17-001",
     "project_id": "hakone-e2",
-    "type": "belongs_to",
-    "from": "hakone-e2:guideline:scene-selection-criteria-v1",
-    "to": "hakone-e2:fact:scene-selection-rationale-v1",
+    "type": "part_of",
+    "from": "hakone-e2:fact:scene_0001_gap:2025-12-17",
+    "to": "hakone-e2:fact:scene_0001_evidence_plan:2025-12-17",
     "strength": 1.0,
     "status": "active",
     "source_refs": [
       {
-        "kind": "file",
-        "value": "scene_selection_criteria_v1_20251217-054343"
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
       }
     ],
-    "created_at": "2025-12-17T05:44:00+09:00",
-    "updated_at": "2025-12-17T05:44:00+09:00"
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-002",
     "project_id": "hakone-e2",
-    "type": "part_of",
-    "from": "hakone-e2:guideline:scene-selection-criteria-v1",
-    "to": "hakone-e2:decision:scene-selection-criteria-doc-exists-v1",
-    "strength": 0.8,
+    "type": "belongs_to",
+    "from": "hakone-e2:fact:scene_0001_evidence_priority:2025-12-17",
+    "to": "hakone-e2:fact:scene_0001_evidence_plan:2025-12-17",
+    "strength": 1.0,
     "status": "active",
     "source_refs": [
       {
-        "kind": "file",
-        "value": "scene_selection_criteria_v1_20251217-054343"
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
       }
     ],
-    "created_at": "2025-12-17T05:44:01+09:00",
-    "updated_at": "2025-12-17T05:44:01+09:00"
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-003",
     "project_id": "hakone-e2",
     "type": "belongs_to",
-    "from": "hakone-e2:guideline:evidence-handling-policy-v1",
-    "to": "hakone-e2:guideline:scene-selection-criteria-v1",
-    "strength": 0.9,
+    "from": "hakone-e2:process:scene_0001_evidence_collect_flow:2025-12-17",
+    "to": "hakone-e2:fact:scene_0001_evidence_plan:2025-12-17",
+    "strength": 1.0,
     "status": "active",
     "source_refs": [
       {
-        "kind": "file",
-        "value": "scene_selection_criteria_v1_20251217-054343"
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
       }
     ],
-    "created_at": "2025-12-17T05:44:02+09:00",
-    "updated_at": "2025-12-17T05:44:02+09:00"
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-004",
     "project_id": "hakone-e2",
     "type": "belongs_to",
-    "from": "hakone-e2:process:scene-ingest-basic-flow-v1",
-    "to": "hakone-e2:guideline:scene-selection-criteria-v1",
-    "strength": 0.9,
+    "from": "hakone-e2:norm:scene_0001_no_guess_policy:2025-12-17",
+    "to": "hakone-e2:fact:scene_0001_evidence_plan:2025-12-17",
+    "strength": 1.0,
     "status": "active",
     "source_refs": [
       {
-        "kind": "file",
-        "value": "scene_selection_criteria_v1_20251217-054343"
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
       }
     ],
-    "created_at": "2025-12-17T05:44:03+09:00",
-    "updated_at": "2025-12-17T05:44:03+09:00"
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-005",
     "project_id": "hakone-e2",
-    "type": "derived_from",
-    "from": "hakone-e2:process:update-cycle-network-reflection-v1",
-    "to": "hakone-e2:process:scene-ingest-basic-flow-v1",
-    "strength": 0.7,
-    "status": "active",
-    "source_refs": [
-      {
-        "kind": "file",
-        "value": "scene_selection_criteria_v1_20251217-054343"
-      }
-    ],
-    "created_at": "2025-12-17T05:44:04+09:00",
-    "updated_at": "2025-12-17T05:44:04+09:00"
-  },
-  {
-    "id": "hakone-e2:rel:2025-12-17-006",
-    "project_id": "hakone-e2",
-    "type": "evidence_for",
-    "from": "hakone-e2:metric:scene-selection-guideline-existence-v1",
-    "to": "hakone-e2:decision:scene-selection-criteria-doc-exists-v1",
+    "type": "part_of",
+    "from": "hakone-e2:task:T-URL-LIST-001:2025-12-17",
+    "to": "hakone-e2:process:scene_0001_evidence_collect_flow:2025-12-17",
     "strength": 0.95,
     "status": "active",
     "source_refs": [
       {
-        "kind": "file",
-        "value": "scene_selection_criteria_v1_20251217-054343"
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
       }
     ],
-    "created_at": "2025-12-17T05:44:05+09:00",
-    "updated_at": "2025-12-17T05:44:05+09:00"
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-17-006",
+    "project_id": "hakone-e2",
+    "type": "part_of",
+    "from": "hakone-e2:task:T-EXTRACT-001:2025-12-17",
+    "to": "hakone-e2:process:scene_0001_evidence_collect_flow:2025-12-17",
+    "strength": 0.95,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
+      }
+    ],
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-007",
     "project_id": "hakone-e2",
-    "type": "evidence_for",
-    "from": "hakone-e2:fact:scene-selection-rationale-v1",
-    "to": "hakone-e2:decision:scene-selection-criteria-doc-exists-v1",
-    "strength": 0.7,
+    "type": "part_of",
+    "from": "hakone-e2:task:T-BUNDLE-001:2025-12-17",
+    "to": "hakone-e2:process:scene_0001_evidence_collect_flow:2025-12-17",
+    "strength": 0.95,
     "status": "active",
     "source_refs": [
       {
-        "kind": "file",
-        "value": "scene_selection_criteria_v1_20251217-054343"
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
       }
     ],
-    "created_at": "2025-12-17T05:44:06+09:00",
-    "updated_at": "2025-12-17T05:44:06+09:00"
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-008",
     "project_id": "hakone-e2",
     "type": "part_of",
-    "from": "hakone-e2:task:scene-stub-registration-v1",
-    "to": "hakone-e2:process:scene-ingest-basic-flow-v1",
-    "strength": 1.0,
+    "from": "hakone-e2:task:T-GAP-UPDATE-001:2025-12-17",
+    "to": "hakone-e2:process:scene_0001_evidence_collect_flow:2025-12-17",
+    "strength": 0.95,
     "status": "active",
     "source_refs": [
       {
-        "kind": "file",
-        "value": "scene_selection_criteria_v1_20251217-054343"
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
       }
     ],
-    "created_at": "2025-12-17T05:44:07+09:00",
-    "updated_at": "2025-12-17T05:44:07+09:00"
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-009",
     "project_id": "hakone-e2",
     "type": "part_of",
-    "from": "hakone-e2:task:evidence-gap-enumeration-v1",
-    "to": "hakone-e2:process:scene-ingest-basic-flow-v1",
-    "strength": 1.0,
+    "from": "hakone-e2:task:T-UPDATE-CYCLE-001:2025-12-17",
+    "to": "hakone-e2:process:scene_0001_update_cycle_flow:2025-12-17",
+    "strength": 0.9,
     "status": "active",
     "source_refs": [
       {
-        "kind": "file",
-        "value": "scene_selection_criteria_v1_20251217-054343"
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
       }
     ],
-    "created_at": "2025-12-17T05:44:08+09:00",
-    "updated_at": "2025-12-17T05:44:08+09:00"
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-010",
     "project_id": "hakone-e2",
-    "type": "refers_to",
-    "from": "hakone-e2:gap:scene-field-gap-list-v1",
-    "to": "hakone-e2:task:evidence-gap-enumeration-v1",
-    "strength": 0.88,
+    "type": "belongs_to",
+    "from": "hakone-e2:process:scene_0001_update_cycle_flow:2025-12-17",
+    "to": "hakone-e2:fact:scene_0001_evidence_plan:2025-12-17",
+    "strength": 1.0,
     "status": "active",
     "source_refs": [
       {
-        "kind": "file",
-        "value": "scene_selection_criteria_v1_20251217-054343"
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
       }
     ],
-    "created_at": "2025-12-17T05:44:09+09:00",
-    "updated_at": "2025-12-17T05:44:09+09:00"
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-011",
     "project_id": "hakone-e2",
     "type": "refers_to",
-    "from": "hakone-e2:gap:scene-evidence-unknown-v1",
-    "to": "hakone-e2:guideline:evidence-handling-policy-v1",
-    "strength": 0.85,
+    "from": "hakone-e2:meta:scene_0001_evidence_plan_v1_dod:2025-12-17",
+    "to": "hakone-e2:fact:scene_0001_evidence_plan:2025-12-17",
+    "strength": 0.9,
     "status": "active",
     "source_refs": [
       {
-        "kind": "file",
-        "value": "scene_selection_criteria_v1_20251217-054343"
+        "kind": "memo",
+        "value": "scene_0001_evidence_plan_v1_20251217-061234"
       }
     ],
-    "created_at": "2025-12-17T05:44:10+09:00",
-    "updated_at": "2025-12-17T05:44:10+09:00"
+    "created_at": "2025-12-17T06:12:34+09:00",
+    "updated_at": "2025-12-17T06:12:34+09:00"
   },
   {
     "id": "hakone-e2:rel:2025-12-17-012",
