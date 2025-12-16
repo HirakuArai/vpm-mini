@@ -1,2 +1,1071 @@
 [
+  {
+    "id": "hakone-e2:decision:design_decision:2025-12-09-01",
+    "project_id": "hakone-e2",
+    "kind": "decision",
+    "subkind": "design_decision",
+    "title": "情報単位・精度実現のためAPI切替を決定",
+    "summary": "課題を受け、OpenAI APIによる分割処理＆ノード化と精度向上のため、API活用に方針転換することを決定。",
+    "body": "ChatGPT対話形式では目的の分割粒度・ノード数に届かないため、APIベースで一度の処理範囲を制御し、適切な粒度のノード化と必要な精度を両立する設計に切り替える。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/2025-12-09_api_experiment_memo.md",
+      "section_anchor": "3 方針転換"
+    },
+    "status": "active",
+    "importance": "critical",
+    "created_at": "2025-12-09T12:02:00+09:00",
+    "updated_at": "2025-12-09T12:02:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "2025-12-09_api_experiment_memo"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:decision:resolve_order:2025-12-16-01",
+    "project_id": "hakone-e2",
+    "kind": "decision",
+    "subkind": "scope_decision",
+    "title": "課題解決順序（まず更新エンジン→次に疑似人格）方針決定",
+    "summary": "先に『更新エンジン』の実現詳細を固め、その次に疑似人格シミュレーション課題へ着手する。",
+    "body": "プロジェクト進行上、まず箱根駅伝『事実＋エモ視点の更新エンジン』を優先的に具体化・実装し、その成果を前提として疑似人格によるシミュレーションフェーズに進む段階的開発方針を確定。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/engine_phase_memo_2025-12-16.md",
+      "section_anchor": "decision2"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-16T10:24:00+09:00",
+    "updated_at": "2025-12-16T10:24:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "MEMO/engine_phase_memo_2025-12-16.md"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:decision:update_engine_method:2025-12-16-01",
+    "project_id": "hakone-e2",
+    "kind": "decision",
+    "subkind": "design_decision",
+    "title": "既存＋新規を組み合わせて更新エンジンを構築する方針決定",
+    "summary": "既存のSSOT管理や整合性更新エンジンの知見および新規設計要素を融合し開発を進める。",
+    "body": "全く新しく構築するのではなく、hakone-e2では既存仕組みを活用し新規課題に適応させることで、更新エンジンを現実的かつ迅速に実現する方針とした。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/engine_phase_memo_2025-12-16.md",
+      "section_anchor": "decision1"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-16T10:20:00+09:00",
+    "updated_at": "2025-12-16T10:20:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "MEMO/engine_phase_memo_2025-12-16.md"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:gap-feedback:2025-11-30",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "gap_detail",
+    "title": "未確定:vpm-miniフィードバック形式",
+    "summary": "どの抽象化軸・メモ構造でvpm-mini側へ知見共有するか不定。",
+    "body": "フィードバック時の抽象度・構造的なルール設計が課題（形式・粒度等曖昧）。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "STATE/hakone-e2/current_state.md",
+      "section_anchor": "1.3 Gap"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-11-30T12:34:56+09:00",
+    "updated_at": "2025-11-30T12:34:56+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "STATE/hakone-e2/current_state.md"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:gap-fileops:2025-11-30",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "gap_detail",
+    "title": "未整備:ファイル運用/テンプレート",
+    "summary": "運用方針（パス・命名・レビュー）と、データ記入最小テンプレートが不確定。",
+    "body": "全体運用ルールやバージョン管理、最小データテンプレ仕様が未合意。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "STATE/hakone-e2/current_state.md",
+      "section_anchor": "1.3 Gap"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-11-30T12:34:56+09:00",
+    "updated_at": "2025-11-30T12:34:56+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "STATE/hakone-e2/current_state.md"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:gap-guideline:2025-11-30",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "gap_detail",
+    "title": "未整備:意味・感情タグガイドライン",
+    "summary": "scene JSONの形は決まったが観点・語彙・強度スケール等のガイドラインが未整備",
+    "body": "どの視点でどんな意味・感情タグを付すか、スケールや具体語彙の共通化が未完成。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "STATE/hakone-e2/current_state.md",
+      "section_anchor": "1.3 Gap"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-11-30T12:34:56+09:00",
+    "updated_at": "2025-11-30T12:34:56+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "STATE/hakone-e2/current_state.md"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:gap-pmsnapshot:2025-11-30",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "gap_detail",
+    "title": "未実施:pm_snapshot初回・STATE/weekly同期",
+    "summary": "pm_snapshot未実行・週次STATEとの同期検証できていない。",
+    "body": "プロジェクト現状の正確なPM快スナップ（pm_snapshot）未実施、weeklyとの差分整備必要。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "STATE/hakone-e2/current_state.md",
+      "section_anchor": "1.3 Gap"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-11-30T12:34:56+09:00",
+    "updated_at": "2025-11-30T12:34:56+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "STATE/hakone-e2/current_state.md"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:gap-selection-scene:2025-11-30",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "gap_detail",
+    "title": "未選定:シーン初期具体選定ギャップ",
+    "summary": "初期データスコープは仮置きだが、最初の1〜2件の選定・優先順位付けが未実施",
+    "body": "今後カリカリ具体化する最初のシーン選出ができておらず、優先度確定していない。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "STATE/hakone-e2/current_state.md",
+      "section_anchor": "1.3 Gap"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-11-30T12:34:56+09:00",
+    "updated_at": "2025-11-30T12:34:56+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "STATE/hakone-e2/current_state.md"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:gap:2025-11-30",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "gap_summary",
+    "title": "hakone-e2 ギャップ総括 (2025-11-30)",
+    "summary": "データスコープ仮置きは済んだが具体シーン選定やファイル運用整備、pm_snapshotの未実施など複数ギャップが残存。",
+    "body": "シーン先行選定・語彙ガイドライン・運用テンプレート等未整備。pm_snapshot初実行・STATE/weekly同期・vpm-miniへのフィードバック形式不明等課題多数。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "STATE/hakone-e2/current_state.md",
+      "section_anchor": "1.3 Gap"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-11-30T12:34:56+09:00",
+    "updated_at": "2025-11-30T12:34:56+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "STATE/hakone-e2/current_state.md"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:goals:2025-11-30",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "weekly_summary",
+    "title": "hakone-e2 ゴール概要 (2025-11-30)",
+    "summary": "短期的にプロジェクト定義説明・現状理解。中期に5事例程度の感情含むイベント解釈を整理し、設計フィードバックへつなげる。",
+    "body": "短期では目的・範囲・成功条件の説明能力、現状サマリの自立的説明。中期はシーンごとに多視点で意味・感情解釈を抽出し、vpm-mini側の設計指針にフィードバック。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "STATE/hakone-e2/current_state.md",
+      "section_anchor": "1.2 Goals"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-11-30T12:34:56+09:00",
+    "updated_at": "2025-11-30T12:34:56+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "STATE/hakone-e2/current_state.md"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:project_meta:2025-12-09-01",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "project_meta",
+    "title": "Deep Researchによる情報収集の感触",
+    "summary": "ChatGPTのDeep Researchを複数回行うことで、一定の情報収集が可能であるとの手応えを持った。",
+    "body": "箱根駅伝の情報収集はChatGPTのディープリサーチで行う。1回で収集できる情報量の限界はあるが、複数回の問いかけで十分な情報収集ができる感触を得ている。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/2025-12-09_api_experiment_memo.md",
+      "section_anchor": "1 Deep Research"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-09T12:00:00+09:00",
+    "updated_at": "2025-12-09T12:00:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "2025-12-09_api_experiment_memo"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:project_meta:2025-12-16-01",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "project_meta",
+    "title": "hakone-e2のプロジェクト概要（2025-12-16時点）",
+    "summary": "箱根駅伝の事実＋エモーショナルな視点のデータ化と更新エンジン、および疑似人格シミュレーションの実現を中心としたPoCプロジェクト。",
+    "body": "hakone-e2は、箱根駅伝の事実情報とエモーショナルな視点を統合しデータ化・整合性管理・更新、さらに疑似人格によるエモーショナルな捉え方のシミュレーションを研究するプロジェクト。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/engine_phase_memo_2025-12-16.md",
+      "section_anchor": "main"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-16T10:00:00+09:00",
+    "updated_at": "2025-12-16T10:00:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "MEMO/engine_phase_memo_2025-12-16.md"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:state-snapshot:2025-11-30",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "state_snapshot",
+    "title": "hakone-e2 Phase 1 現在地サマリ (2025-11-30)",
+    "summary": "PM Kai v1のベースラインが整い、hakone-e2プロジェクトのVPM化初動段階。project_definition, 素材収集方針, シーン化仕様を初期定義。pm_snapshot未実施。",
+    "body": "vpm-mini でのPM Kai導入、project_definition初期稿完成、素材収集方針とチャンク化仕様v0を定義、2026サイクルのscene範囲計画、pm_snapshot未実施でweekly最新は2025-11-23。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "STATE/hakone-e2/current_state.md",
+      "section_anchor": "1.1 Current"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-11-30T12:34:56+09:00",
+    "updated_at": "2025-11-30T12:34:56+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "STATE/hakone-e2/current_state.md"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:state_snapshot:2025-12-09-01",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "state_snapshot",
+    "title": "2025-12-09時点のノード化方針スナップショット",
+    "summary": "Deep ResearchからAPIノード生成への方式転換直後の現状整理。",
+    "body": "ChatGPT対話形式によるノード化困難→APIによる粒度制御実装・実証へと運用方針変更中の段階。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_snapshot",
+      "file": "MEMO/2025-12-09_api_experiment_memo.md",
+      "section_anchor": "snapshot"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-09T12:12:00+09:00",
+    "updated_at": "2025-12-09T12:12:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "2025-12-09_api_experiment_memo"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:state_snapshot:2025-12-16-01",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "state_snapshot",
+    "title": "2025-12-16時点のhakone-e2課題認識",
+    "summary": "『事実＋エモ視点の更新エンジン』と『疑似人格エモ・シミュレーション』の2つの主要課題が認識されている。",
+    "body": "本日時点では、(1)箱根駅伝事実＋エモ視点の更新エンジン、(2)疑似人格によるエモーショナルな捉え方のシミュレーション、の2大課題が提示されている。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/engine_phase_memo_2025-12-16.md",
+      "section_anchor": "main"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-16T10:05:00+09:00",
+    "updated_at": "2025-12-16T10:05:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "MEMO/engine_phase_memo_2025-12-16.md"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:gap:node_counting:2025-12-09-01",
+    "project_id": "hakone-e2",
+    "kind": "gap",
+    "subkind": "node_generation_gap",
+    "title": "ChatGPTによるノード化の限界",
+    "summary": "ChatGPTにノード単位の出力を求めても、情報単位・ノード数共に期待した結果になりづらいという課題が明らかになった。",
+    "body": "ChatGPTの特性により、指定した情報単位やノード数に分割することが困難であり、この方法ではPMが求める粒度のノードネットワークが得られない。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/2025-12-09_api_experiment_memo.md",
+      "section_anchor": "2 問題点"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-09T12:01:00+09:00",
+    "updated_at": "2025-12-09T12:01:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "2025-12-09_api_experiment_memo"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:gap:persona_simulation:2025-12-16-01",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "gap",
+    "title": "Gap: 疑似人格によるエモーショナル・シミュレーション課題",
+    "summary": "更新エンジンを用いて、疑似人格が箱根駅伝事象をどのようにエモーショナルに捉えるかをシミュレーションする仕組みが未設計・未実装。",
+    "body": "更新エンジンのアウトプットを使い、疑似人格（AI/エージェント等）が出来事へのエモーショナルな反応をどのように再現・評価するかシナリオ設計や処理実装が課題となっている。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/engine_phase_memo_2025-12-16.md",
+      "section_anchor": "gap2"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-16T10:15:00+09:00",
+    "updated_at": "2025-12-16T10:15:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "MEMO/engine_phase_memo_2025-12-16.md"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:gap:update_engine:2025-12-16-01",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "gap",
+    "title": "Gap: 箱根駅伝『事実＋エモ視点の更新エンジン』実現の課題",
+    "summary": "現状、箱根駅伝事実とエモーショナル視点のデータ化・一元管理・更新を行うエンジンが存在せず、実現方法の具体化が必要。",
+    "body": "VPMの記憶管理や整合性更新エンジン(SSOT)の仕組みを参考に、箱根駅伝＋エモ視点のデータを収集・新規/既存を統合する更新エンジンをどう設計・実装するかが未解決。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/engine_phase_memo_2025-12-16.md",
+      "section_anchor": "gap1"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-16T10:10:00+09:00",
+    "updated_at": "2025-12-16T10:10:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "MEMO/engine_phase_memo_2025-12-16.md"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:guideline:update_method:2025-12-16-01",
+    "project_id": "hakone-e2",
+    "kind": "guideline",
+    "subkind": "pm_guideline",
+    "title": "更新エンジン構築のガイドライン（既存＋新規併用）",
+    "summary": "運用・拡張性・整合性の観点から、既存資産活用と新規実装のバランスを重視する。",
+    "body": "SSOT Update Engine等の既存知見を基盤としつつ、箱根駅伝＋エモーショナルデータに適合するよう更新エンジン仕様・構成を柔軟に設計・運用するガイドラインを定める。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/engine_phase_memo_2025-12-16.md",
+      "section_anchor": "guideline1"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-16T10:25:00+09:00",
+    "updated_at": "2025-12-16T10:25:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "MEMO/engine_phase_memo_2025-12-16.md"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:meta:info_model_note:2025-12-09-01",
+    "project_id": "hakone-e2",
+    "kind": "meta",
+    "subkind": "info_model_note",
+    "title": "情報ノード化モデルの検討記録",
+    "summary": "箱根駅伝プロジェクトの情報ノード化手法改善への実験記録。",
+    "body": "現状の記録が今後のノードモデル設計や他レーンへの展開の知見となる。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/2025-12-09_api_experiment_memo.md",
+      "section_anchor": "備考"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-09T12:11:00+09:00",
+    "updated_at": "2025-12-09T12:11:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "2025-12-09_api_experiment_memo"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:meta:info_model_note:2025-12-16-01",
+    "project_id": "hakone-e2",
+    "kind": "meta",
+    "subkind": "info_model_note",
+    "title": "info_network構成に関するメタノート",
+    "summary": "本メモ起点での課題整理結果・ノード展開方針。",
+    "body": "PM視点での課題→意思決定→設計タスク連鎖のネットワーク例として参考。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/engine_phase_memo_2025-12-16.md",
+      "section_anchor": "meta1"
+    },
+    "status": "active",
+    "importance": "low",
+    "created_at": "2025-12-16T10:31:00+09:00",
+    "updated_at": "2025-12-16T10:31:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "MEMO/engine_phase_memo_2025-12-16.md"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:meta:project_definition",
+    "project_id": "hakone-e2",
+    "kind": "meta",
+    "subkind": "info_model_note",
+    "title": "project_definition.md サマリ",
+    "summary": "hakone-e2のプロジェクト定義・目的・スコープを定義したmdのエントリーポイント。",
+    "body": "docs/projects/hakone-e2/project_definition.mdの枠組み・コンテンツ参照。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "docs/projects/hakone-e2/project_definition.md"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-11-30T12:36:15+09:00",
+    "updated_at": "2025-11-30T12:36:15+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "docs/projects/hakone-e2/project_definition.md"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:meta:view_definition:2025-12-09-01",
+    "project_id": "hakone-e2",
+    "kind": "meta",
+    "subkind": "view_definition",
+    "title": "このメモ情報ネットワークビュー定義",
+    "summary": "本メモ由来のノード/リレーション群を1ビューとして記録",
+    "body": "2025-12-09時点でのAPIノード分割実験に関する認知ネットワークの一断面。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/2025-12-09_api_experiment_memo.md",
+      "section_anchor": "情報ネットワークビュー"
+    },
+    "status": "active",
+    "importance": "low",
+    "created_at": "2025-12-09T12:20:00+09:00",
+    "updated_at": "2025-12-09T12:20:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "2025-12-09_api_experiment_memo"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:meta:weekly-20251123",
+    "project_id": "hakone-e2",
+    "kind": "meta",
+    "subkind": "info_model_note",
+    "title": "2025-11-23週次レポート概要",
+    "summary": "STATE/weeklyの初期テンプレ・最初のメモ内容参照。",
+    "body": "reports/hakone-e2/2025-11-23_weekly.mdのコンテンツ・進捗ログ。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "reports/hakone-e2/2025-11-23_weekly.md"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-11-30T12:36:20+09:00",
+    "updated_at": "2025-11-30T12:36:20+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "reports/hakone-e2/2025-11-23_weekly.md"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:norm:chunk-guideline-v0",
+    "project_id": "hakone-e2",
+    "kind": "norm",
+    "subkind": "update_policy",
+    "title": "素材収集・チャンク化仕様v0",
+    "summary": "scene JSONの構造、データchunk単位の初期仕様と基準設計。",
+    "body": "素材収集・データチャンク化・意味付け運用ルールおよびscene JSON仕様。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "STATE/hakone-e2/current_state.md"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-11-30T12:36:00+09:00",
+    "updated_at": "2025-11-30T12:36:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "STATE/hakone-e2/current_state.md"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:norm:policy_base:2025-12-16-01",
+    "project_id": "hakone-e2",
+    "kind": "norm",
+    "subkind": "ssot_policy",
+    "title": "更新エンジンにおけるSSOT基本ポリシー",
+    "summary": "更新エンジンはSSOT（Single Source of Truth）原則に従い整合性管理を推進。",
+    "body": "既存VPMのSSOT管理経験を活かし、箱根駅伝＋エモーショナルデータを一元管理・多系統更新の整合性制御を重視する基本ポリシー。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/engine_phase_memo_2025-12-16.md",
+      "section_anchor": "norm1"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-16T10:33:00+09:00",
+    "updated_at": "2025-12-16T10:33:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "MEMO/engine_phase_memo_2025-12-16.md"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:process:pm_core:2025-12-09-01",
+    "project_id": "hakone-e2",
+    "kind": "process",
+    "subkind": "lane_spec",
+    "title": "hakone-e2/pm_core情報収集・ノード化フロー ver2025-12-09",
+    "summary": "プロジェクトの情報収集からノード化までのフローを現状整理。",
+    "body": "1. ChatGPT Deep Researchで情報収集 → 2. ノード分割失敗・課題判明 → 3. APIによる処理切り替えを決定 → 4. 実験的なAPIノード分割タスク着手へ。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/2025-12-09_api_experiment_memo.md",
+      "section_anchor": "全体フロー"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-09T12:10:00+09:00",
+    "updated_at": "2025-12-09T12:10:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "2025-12-09_api_experiment_memo"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:process:pm_snapshot_spec",
+    "project_id": "hakone-e2",
+    "kind": "process",
+    "subkind": "lane_spec",
+    "title": "pm_snapshot v1仕様（参照）",
+    "summary": "pm_snapshot手順および概要、現状同期方法。",
+    "body": "docs/pm/pm_snapshot_v1_spec.md を基にした現状快スナップ取得手順/仕様。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "docs/pm/pm_snapshot_v1_spec.md"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-11-30T12:36:10+09:00",
+    "updated_at": "2025-11-30T12:36:10+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "docs/pm/pm_snapshot_v1_spec.md"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:process:update_engine_flow:2025-12-16-01",
+    "project_id": "hakone-e2",
+    "kind": "process",
+    "subkind": "lane_spec",
+    "title": "更新エンジン開発プロセス概要",
+    "summary": "ギャップ分析→設計→実装→エモ反応シミュレーションの流れによる開発プロセス設計。",
+    "body": "まずギャップ分析を起点にエンジン設計・詳細仕様を固め、順次疑似人格シミュレーション設計・開発に進むレーン仕様。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/engine_phase_memo_2025-12-16.md",
+      "section_anchor": "process1"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-16T10:35:00+09:00",
+    "updated_at": "2025-12-16T10:35:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "MEMO/engine_phase_memo_2025-12-16.md"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:H2-DATA-1",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "最初の具体シーン選定（H2-DATA-1）",
+    "summary": "初期データスコープから1-2件の具体シーンを確定選定する。",
+    "body": "「2026サイクル」ターゲットから現場具体例を抽出し、1-2件選定&優先付けする工程。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "STATE/hakone-e2/current_state.md"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-11-30T12:35:05+09:00",
+    "updated_at": "2025-11-30T12:35:05+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "STATE/hakone-e2/current_state.md"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:H2-DATA-2",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "scenes_hakone_2026_v0.json初期埋め（H2-DATA-2）",
+    "summary": "scene用JSONスケルトンを作成し、5-10件程度記入（レビュー用）。",
+    "body": "初期データストラクチャ確認と実装訓練を目的にscenes_hakone_2026_v0.jsonを仮填。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "data/hakone-e2/scenes_hakone_2026_v0.json"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-11-30T12:35:20+09:00",
+    "updated_at": "2025-11-30T12:35:20+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "data/hakone-e2/scenes_hakone_2026_v0.json"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:H2-FORMAT-1",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "イベント＋感情ミニフォーマット仕様策定（H2-FORMAT-1）",
+    "summary": "scene JSON仕様と素材・チャンク化方針の作成。完了。",
+    "body": "world_event+info_event+semantic_labelを軸とするscene JSONとchunking v0の仕様定義。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "STATE/hakone-e2/current_state.md"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-11-30T12:35:10+09:00",
+    "updated_at": "2025-11-30T12:35:10+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "STATE/hakone-e2/current_state.md"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:H2-GUIDE-1",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "意味・感情タグガイドライン初稿作成（H2-GUIDE-1）",
+    "summary": "意味・感情タグ用ガイドv0を観点語彙等含め1ページ起案。",
+    "body": "共通語彙・スケール基準・具体例含むガイドまとめを実施。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "STATE/hakone-e2/current_state.md"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-11-30T12:35:25+09:00",
+    "updated_at": "2025-11-30T12:35:25+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "STATE/hakone-e2/current_state.md"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:H2-OPS-1",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "データファイル運用ルール定義（H2-OPS-1）",
+    "summary": "命名・パス・版管理・レビュー等の運用ルールを短いメモでまとめる。",
+    "body": "最小ルール定義で、今後のデータ運用標準化と作業効率化を図る。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "STATE/hakone-e2/current_state.md"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-11-30T12:35:30+09:00",
+    "updated_at": "2025-11-30T12:35:30+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "STATE/hakone-e2/current_state.md"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:H2-PDEF-1",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "箱根E²構想をproject_definitionに明文化（H2-PDEF-1）",
+    "summary": "啓の頭の箱根構想を言葉として文書化し、目的や背景を粒度よく定義。",
+    "body": "project_definition.md を基に、「箱根E²構想」具体内容を言語化・目的背景明文化実施。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "docs/projects/hakone-e2/project_definition.md"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-11-30T12:35:00+09:00",
+    "updated_at": "2025-11-30T12:35:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "docs/projects/hakone-e2/project_definition.md"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:H2-PM-1",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "pm_snapshot初回実行（H2-PM-1）",
+    "summary": "hakone-e2にて初のpm_snapshotを実施し現状鮮度を高める。",
+    "body": "プロジェクト現状・進捗・同期用としてpm_snapshotの状態確定を目的とする。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "STATE/hakone-e2/current_state.md"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-11-30T12:35:15+09:00",
+    "updated_at": "2025-11-30T12:35:15+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "STATE/hakone-e2/current_state.md"
+      }
+    ],
+    "authored_by": "kei",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:engine_design:2025-12-16-01",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "更新エンジン方式・構成設計タスク",
+    "summary": "ギャップ分析を踏まえ、既存資産と新規要素の統合による更新エンジン具体設計・仕様化。",
+    "body": "更新フローや整合性チェック、エモーショナルデータハンドリング等を設計し、段階的プロトタイプ/仕様文書を整備するタスク。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/engine_phase_memo_2025-12-16.md",
+      "section_anchor": "task2"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-16T10:28:00+09:00",
+    "updated_at": "2025-12-16T10:28:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "MEMO/engine_phase_memo_2025-12-16.md"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:gap_analysis:2025-12-16-01",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "更新エンジン構築に関するギャップ分析",
+    "summary": "箱根駅伝事実＋エモーショナル視点のデータ化・維持に必要な要素と、既存SSOTエンジンとの差分を詳細に分析。",
+    "body": "現状の機能ではどこが不足し、どの点を新規設計・開発する必要があるかのギャップ分析を行い、要対応・要改善ポイントをリストアップする。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/engine_phase_memo_2025-12-16.md",
+      "section_anchor": "task1"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-16T10:27:00+09:00",
+    "updated_at": "2025-12-16T10:27:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "MEMO/engine_phase_memo_2025-12-16.md"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:persona_simulation_design:2025-12-16-01",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "疑似人格エモーション・シミュレーション設計タスク",
+    "summary": "更新エンジン成果を用いた疑似人格によるエモ反応シミュレーションシナリオ・アルゴリズム設計。",
+    "body": "エンジン出力データ・インタフェース定義、疑似人格パラメータ化、情動変化ロジック等を定義する設計タスク。開始は更新エンジン設計タスク後。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/engine_phase_memo_2025-12-16.md",
+      "section_anchor": "task3"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-16T10:29:00+09:00",
+    "updated_at": "2025-12-16T10:29:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "MEMO/engine_phase_memo_2025-12-16.md"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:pm_task:2025-12-09-01",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "API実験環境の整備と実行",
+    "summary": "APIでの情報分割・ノード生成を評価するための実験環境構築とテストを行う。",
+    "body": "OpenAI APIを用いて各回の処理単位を調整し、目標とするノード分割精度の検証を今後実施する。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "MEMO/2025-12-09_api_experiment_memo.md",
+      "section_anchor": "4 これから"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-09T12:03:00+09:00",
+    "updated_at": "2025-12-09T12:03:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "2025-12-09_api_experiment_memo"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  }
 ]
