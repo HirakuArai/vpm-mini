@@ -1,0 +1,496 @@
+{
+  "project_id": "hakone-e2",
+  "source_snapshot_id": "snapshot_raw.json",
+  "generated_at": "2025-12-17T01:48:45+09:00",
+  "matches": [
+    {
+      "new": "hakone-e2:decision:priority_ops_engine_scene:2025-12-16",
+      "existing": [
+        "hakone-e2:decision:resolve_order:2025-12-16-01"
+      ],
+      "confidence": 0.65,
+      "rationale": "Both decisions establish priority order among key tasks (engine, simulation, etc.) regarding upcoming development focus. The new decision is more specific in operational prioritization for the week."
+    }
+  ],
+  "add": [
+    {
+      "id": "hakone-e2:decision:priority_ops_engine_scene:2025-12-16",
+      "project_id": "hakone-e2",
+      "kind": "decision",
+      "subkind": "priority_decision",
+      "title": "OPS→engine_design→scene のタスク優先順位決定",
+      "summary": "この1週間、データファイル運用ルール（H2-OPS-1）が最優先。その後にengine_design、その後H2-DATA-1。",
+      "body": "理由：更新サイクルの混乱を避けるため、保存規則・命名・版管理が確立されていないと運用が回らない。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+        "section_anchor": "main"
+      },
+      "status": "active",
+      "importance": "critical",
+      "created_at": "2025-12-16T10:00:00+09:00",
+      "updated_at": "2025-12-16T10:00:00+09:00",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "authored_by": "kai",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:task:engine_design:2025-12-16",
+      "project_id": "hakone-e2",
+      "kind": "task",
+      "subkind": "pm_task",
+      "title": "更新エンジン方式・構成設計",
+      "summary": "次点の優先順位として更新エンジンの設計を進める。",
+      "body": "具体的なエンジン方式・構成・運用方法の策定。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+        "section_anchor": "engine_design"
+      },
+      "status": "active",
+      "importance": "high",
+      "created_at": "2025-12-16T10:03:00+09:00",
+      "updated_at": "2025-12-16T10:03:00+09:00",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "authored_by": "kai",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:task:H2-DATA-1:2025-12-16",
+      "project_id": "hakone-e2",
+      "kind": "task",
+      "subkind": "pm_task",
+      "title": "最初の具体シーン選定",
+      "summary": "新しいデータ運用方針の下、最初の具体的な分析データ／シーンを選定するタスク。",
+      "body": "engine設計後、優先して進めるべきタスク。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+        "section_anchor": "H2-DATA-1"
+      },
+      "status": "draft",
+      "importance": "normal",
+      "created_at": "2025-12-16T10:04:00+09:00",
+      "updated_at": "2025-12-16T10:04:00+09:00",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "authored_by": "kai",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:guideline:data_file_location:2025-12-16",
+      "project_id": "hakone-e2",
+      "kind": "guideline",
+      "subkind": "pm_guideline",
+      "title": "canonical dataファイルの配置ガイドライン",
+      "summary": "data/**下にcanonicalデータを配置し、runs/lockedは増殖物は原則コミット禁止。重要fixtureのみコミット可。",
+      "body": "データの正規保存先とコミット方針の運用ルール。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+        "section_anchor": "guideline-canonical"
+      },
+      "status": "active",
+      "importance": "high",
+      "created_at": "2025-12-16T10:05:00+09:00",
+      "updated_at": "2025-12-16T10:05:00+09:00",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "authored_by": "aya",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:guideline:bundle_naming:2025-12-16",
+      "project_id": "hakone-e2",
+      "kind": "guideline",
+      "subkind": "pm_guideline",
+      "title": "bundle配置・命名ガイドライン",
+      "summary": "bundleはsource_type, source_id, dateを含む命名規則に従い保存。",
+      "body": "data構造や命名の一貫性を担保する運用ルール。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+        "section_anchor": "guideline-bundle"
+      },
+      "status": "active",
+      "importance": "normal",
+      "created_at": "2025-12-16T10:06:00+09:00",
+      "updated_at": "2025-12-16T10:06:00+09:00",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "authored_by": "aya",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:guideline:run_artifacts:2025-12-16",
+      "project_id": "hakone-e2",
+      "kind": "guideline",
+      "subkind": "pm_guideline",
+      "title": "run artifacts保存ガイドライン",
+      "summary": "runs/<timestamp>/ にrun artifactsを保存。増殖物管理方法を明確化。",
+      "body": "中間生成物や成果物の格納先統一ルール。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+        "section_anchor": "guideline-runs"
+      },
+      "status": "active",
+      "importance": "normal",
+      "created_at": "2025-12-16T10:07:00+09:00",
+      "updated_at": "2025-12-16T10:07:00+09:00",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "authored_by": "aya",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:process:data_approval_flow:2025-12-16",
+      "project_id": "hakone-e2",
+      "kind": "process",
+      "subkind": "lane_spec",
+      "title": "データ承認フロー運用手順",
+      "summary": "質問発生時は一時停止し、approveを挟んでapply(反映)する承認プロセス運用。",
+      "body": "運用フロー：questions→停止→approve→apply。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+        "section_anchor": "process-approval"
+      },
+      "status": "active",
+      "importance": "normal",
+      "created_at": "2025-12-16T10:08:00+09:00",
+      "updated_at": "2025-12-16T10:08:00+09:00",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "authored_by": "aya",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:guideline:data_pr_policy:2025-12-16",
+      "project_id": "hakone-e2",
+      "kind": "guideline",
+      "subkind": "pm_guideline",
+      "title": "data/**反映方針ガイドライン",
+      "summary": "data/**はどの単位・タイミングでPR化・反映するかを明文化。",
+      "body": "PR化や反映単位の基本方針。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+        "section_anchor": "guideline-pr"
+      },
+      "status": "active",
+      "importance": "normal",
+      "created_at": "2025-12-16T10:09:00+09:00",
+      "updated_at": "2025-12-16T10:09:00+09:00",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "authored_by": "aya",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:fact:ops_rationale:2025-12-16",
+      "project_id": "hakone-e2",
+      "kind": "fact",
+      "subkind": "project_meta",
+      "title": "OPS優先の理由",
+      "summary": "更新エンジン運用ルールを最優先とする理由は、保存方法・運用ルールが未整備だと全体運用に支障が出るため。",
+      "body": "迷子や混乱を回避し、スムーズな新旧サイクル運用を行う目的。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+        "section_anchor": "rationale"
+      },
+      "status": "active",
+      "importance": "normal",
+      "created_at": "2025-12-16T10:10:00+09:00",
+      "updated_at": "2025-12-16T10:10:00+09:00",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "authored_by": "kai",
+      "review_status": "unreviewed"
+    },
+    {
+      "id": "hakone-e2:meta:info_network_gen:2025-12-16",
+      "project_id": "hakone-e2",
+      "kind": "meta",
+      "subkind": "info_model_note",
+      "title": "本情報ネットワーク生成メモ",
+      "summary": "2025-12-16 OPS優先メモ由来のinfo_network構造体",
+      "body": "この情報ネットワークはpriority_ops_engine_scene_2025-12-16メモから自動生成。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+        "section_anchor": "meta"
+      },
+      "status": "active",
+      "importance": "low",
+      "created_at": "2025-12-16T10:12:00+09:00",
+      "updated_at": "2025-12-16T10:12:00+09:00",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "authored_by": "system",
+      "review_status": "ai_ok"
+    }
+  ],
+  "add_relations": [],
+  "update": [
+    {
+      "id": "hakone-e2:task:H2-OPS-1",
+      "project_id": "hakone-e2",
+      "kind": "task",
+      "subkind": "pm_task",
+      "title": "データファイル運用ルール策定",
+      "summary": "OPS安定運用のため、データファイルの保存場所・命名・レビュー・版管理など最低限の運用ルール策定。",
+      "body": "H2-OPS-1の成果物は1ページメモ。canonical/data/**やbundle/config/runs系列、review・PR・承認フロー方針を含む。",
+      "scope": {
+        "project_phase": "phase1",
+        "lane": "pm_core",
+        "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+        "section_anchor": "H2-OPS-1"
+      },
+      "status": "active",
+      "importance": "critical",
+      "created_at": "2025-12-16T10:02:00+09:00",
+      "updated_at": "2025-12-16T10:02:00+09:00",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "authored_by": "kai",
+      "review_status": "unreviewed"
+    }
+  ],
+  "update_relations": [
+    {
+      "id": "hakone-e2:rel:2025-12-16-001",
+      "project_id": "hakone-e2",
+      "type": "evidence_for",
+      "from": "hakone-e2:fact:ops_rationale:2025-12-16",
+      "to": "hakone-e2:decision:priority_ops_engine_scene:2025-12-16",
+      "strength": 1.0,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "created_at": "2025-12-16T10:13:00+09:00",
+      "updated_at": "2025-12-16T10:13:00+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-16-002",
+      "project_id": "hakone-e2",
+      "type": "belongs_to",
+      "from": "hakone-e2:task:H2-OPS-1",
+      "to": "hakone-e2:decision:priority_ops_engine_scene:2025-12-16",
+      "strength": 1.0,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "created_at": "2025-12-16T10:14:00+09:00",
+      "updated_at": "2025-12-16T10:14:00+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-16-003",
+      "project_id": "hakone-e2",
+      "type": "belongs_to",
+      "from": "hakone-e2:task:engine_design:2025-12-16",
+      "to": "hakone-e2:decision:priority_ops_engine_scene:2025-12-16",
+      "strength": 0.9,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "created_at": "2025-12-16T10:15:00+09:00",
+      "updated_at": "2025-12-16T10:15:00+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-16-004",
+      "project_id": "hakone-e2",
+      "type": "belongs_to",
+      "from": "hakone-e2:task:H2-DATA-1:2025-12-16",
+      "to": "hakone-e2:decision:priority_ops_engine_scene:2025-12-16",
+      "strength": 0.7,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "created_at": "2025-12-16T10:16:00+09:00",
+      "updated_at": "2025-12-16T10:16:00+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-16-005",
+      "project_id": "hakone-e2",
+      "type": "evidence_for",
+      "from": "hakone-e2:guideline:data_file_location:2025-12-16",
+      "to": "hakone-e2:task:H2-OPS-1",
+      "strength": 1.0,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "created_at": "2025-12-16T10:17:00+09:00",
+      "updated_at": "2025-12-16T10:17:00+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-16-006",
+      "project_id": "hakone-e2",
+      "type": "evidence_for",
+      "from": "hakone-e2:guideline:bundle_naming:2025-12-16",
+      "to": "hakone-e2:task:H2-OPS-1",
+      "strength": 1.0,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "created_at": "2025-12-16T10:18:00+09:00",
+      "updated_at": "2025-12-16T10:18:00+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-16-007",
+      "project_id": "hakone-e2",
+      "type": "evidence_for",
+      "from": "hakone-e2:guideline:run_artifacts:2025-12-16",
+      "to": "hakone-e2:task:H2-OPS-1",
+      "strength": 1.0,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "created_at": "2025-12-16T10:19:00+09:00",
+      "updated_at": "2025-12-16T10:19:00+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-16-008",
+      "project_id": "hakone-e2",
+      "type": "evidence_for",
+      "from": "hakone-e2:process:data_approval_flow:2025-12-16",
+      "to": "hakone-e2:task:H2-OPS-1",
+      "strength": 1.0,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "created_at": "2025-12-16T10:20:00+09:00",
+      "updated_at": "2025-12-16T10:20:00+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-16-009",
+      "project_id": "hakone-e2",
+      "type": "evidence_for",
+      "from": "hakone-e2:guideline:data_pr_policy:2025-12-16",
+      "to": "hakone-e2:task:H2-OPS-1",
+      "strength": 1.0,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "created_at": "2025-12-16T10:21:00+09:00",
+      "updated_at": "2025-12-16T10:21:00+09:00"
+    },
+    {
+      "id": "hakone-e2:rel:2025-12-16-010",
+      "project_id": "hakone-e2",
+      "type": "part_of",
+      "from": "hakone-e2:meta:info_network_gen:2025-12-16",
+      "to": "hakone-e2:decision:priority_ops_engine_scene:2025-12-16",
+      "strength": 0.7,
+      "status": "active",
+      "source_refs": [
+        {
+          "kind": "memo",
+          "value": "priority_ops_engine_scene_2025-12-16"
+        }
+      ],
+      "created_at": "2025-12-16T10:22:00+09:00",
+      "updated_at": "2025-12-16T10:22:00+09:00"
+    }
+  ],
+  "obsolete": [],
+  "obsolete_relations": [],
+  "supersedes": [],
+  "notes": "Step4 v1.1 proposal for snapshot=snapshot_raw.json\nsupersedes proposals: none\nquestions present: 1. Owner confirmation required; do not auto-apply.\nexcluded noop decisions from consideration: 0\nmatches proposed: 1 (multi=0)\n\n[rejected] Owner rejected supersedes/obsolete; questions cleared.",
+  "noop": [],
+  "noop_relations": [],
+  "questions": []
+}

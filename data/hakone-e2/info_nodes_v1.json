@@ -887,25 +887,26 @@
     "project_id": "hakone-e2",
     "kind": "task",
     "subkind": "pm_task",
-    "title": "データファイル運用ルール定義（H2-OPS-1）",
-    "summary": "命名・パス・版管理・レビュー等の運用ルールを短いメモでまとめる。",
-    "body": "最小ルール定義で、今後のデータ運用標準化と作業効率化を図る。",
+    "title": "データファイル運用ルール策定",
+    "summary": "OPS安定運用のため、データファイルの保存場所・命名・レビュー・版管理など最低限の運用ルール策定。",
+    "body": "H2-OPS-1の成果物は1ページメモ。canonical/data/**やbundle/config/runs系列、review・PR・承認フロー方針を含む。",
     "scope": {
       "project_phase": "phase1",
       "lane": "pm_core",
-      "file": "STATE/hakone-e2/current_state.md"
+      "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+      "section_anchor": "H2-OPS-1"
     },
     "status": "active",
-    "importance": "normal",
-    "created_at": "2025-11-30T12:35:30+09:00",
-    "updated_at": "2025-11-30T12:35:30+09:00",
+    "importance": "critical",
+    "created_at": "2025-12-16T10:02:00+09:00",
+    "updated_at": "2025-12-16T10:02:00+09:00",
     "source_refs": [
       {
-        "kind": "file",
-        "value": "STATE/hakone-e2/current_state.md"
+        "kind": "memo",
+        "value": "priority_ops_engine_scene_2025-12-16"
       }
     ],
-    "authored_by": "kei",
+    "authored_by": "kai",
     "review_status": "unreviewed"
   },
   {
@@ -1067,5 +1068,275 @@
     ],
     "authored_by": "kai",
     "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:decision:priority_ops_engine_scene:2025-12-16",
+    "project_id": "hakone-e2",
+    "kind": "decision",
+    "subkind": "priority_decision",
+    "title": "OPS→engine_design→scene のタスク優先順位決定",
+    "summary": "この1週間、データファイル運用ルール（H2-OPS-1）が最優先。その後にengine_design、その後H2-DATA-1。",
+    "body": "理由：更新サイクルの混乱を避けるため、保存規則・命名・版管理が確立されていないと運用が回らない。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+      "section_anchor": "main"
+    },
+    "status": "active",
+    "importance": "critical",
+    "created_at": "2025-12-16T10:00:00+09:00",
+    "updated_at": "2025-12-16T10:00:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "priority_ops_engine_scene_2025-12-16"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:engine_design:2025-12-16",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "更新エンジン方式・構成設計",
+    "summary": "次点の優先順位として更新エンジンの設計を進める。",
+    "body": "具体的なエンジン方式・構成・運用方法の策定。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+      "section_anchor": "engine_design"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-16T10:03:00+09:00",
+    "updated_at": "2025-12-16T10:03:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "priority_ops_engine_scene_2025-12-16"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:H2-DATA-1:2025-12-16",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "最初の具体シーン選定",
+    "summary": "新しいデータ運用方針の下、最初の具体的な分析データ／シーンを選定するタスク。",
+    "body": "engine設計後、優先して進めるべきタスク。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+      "section_anchor": "H2-DATA-1"
+    },
+    "status": "draft",
+    "importance": "normal",
+    "created_at": "2025-12-16T10:04:00+09:00",
+    "updated_at": "2025-12-16T10:04:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "priority_ops_engine_scene_2025-12-16"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:guideline:data_file_location:2025-12-16",
+    "project_id": "hakone-e2",
+    "kind": "guideline",
+    "subkind": "pm_guideline",
+    "title": "canonical dataファイルの配置ガイドライン",
+    "summary": "data/**下にcanonicalデータを配置し、runs/lockedは増殖物は原則コミット禁止。重要fixtureのみコミット可。",
+    "body": "データの正規保存先とコミット方針の運用ルール。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+      "section_anchor": "guideline-canonical"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-16T10:05:00+09:00",
+    "updated_at": "2025-12-16T10:05:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "priority_ops_engine_scene_2025-12-16"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:guideline:bundle_naming:2025-12-16",
+    "project_id": "hakone-e2",
+    "kind": "guideline",
+    "subkind": "pm_guideline",
+    "title": "bundle配置・命名ガイドライン",
+    "summary": "bundleはsource_type, source_id, dateを含む命名規則に従い保存。",
+    "body": "data構造や命名の一貫性を担保する運用ルール。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+      "section_anchor": "guideline-bundle"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-16T10:06:00+09:00",
+    "updated_at": "2025-12-16T10:06:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "priority_ops_engine_scene_2025-12-16"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:guideline:run_artifacts:2025-12-16",
+    "project_id": "hakone-e2",
+    "kind": "guideline",
+    "subkind": "pm_guideline",
+    "title": "run artifacts保存ガイドライン",
+    "summary": "runs/<timestamp>/ にrun artifactsを保存。増殖物管理方法を明確化。",
+    "body": "中間生成物や成果物の格納先統一ルール。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+      "section_anchor": "guideline-runs"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-16T10:07:00+09:00",
+    "updated_at": "2025-12-16T10:07:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "priority_ops_engine_scene_2025-12-16"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:process:data_approval_flow:2025-12-16",
+    "project_id": "hakone-e2",
+    "kind": "process",
+    "subkind": "lane_spec",
+    "title": "データ承認フロー運用手順",
+    "summary": "質問発生時は一時停止し、approveを挟んでapply(反映)する承認プロセス運用。",
+    "body": "運用フロー：questions→停止→approve→apply。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+      "section_anchor": "process-approval"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-16T10:08:00+09:00",
+    "updated_at": "2025-12-16T10:08:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "priority_ops_engine_scene_2025-12-16"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:guideline:data_pr_policy:2025-12-16",
+    "project_id": "hakone-e2",
+    "kind": "guideline",
+    "subkind": "pm_guideline",
+    "title": "data/**反映方針ガイドライン",
+    "summary": "data/**はどの単位・タイミングでPR化・反映するかを明文化。",
+    "body": "PR化や反映単位の基本方針。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+      "section_anchor": "guideline-pr"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-16T10:09:00+09:00",
+    "updated_at": "2025-12-16T10:09:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "priority_ops_engine_scene_2025-12-16"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:ops_rationale:2025-12-16",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "project_meta",
+    "title": "OPS優先の理由",
+    "summary": "更新エンジン運用ルールを最優先とする理由は、保存方法・運用ルールが未整備だと全体運用に支障が出るため。",
+    "body": "迷子や混乱を回避し、スムーズな新旧サイクル運用を行う目的。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+      "section_anchor": "rationale"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-16T10:10:00+09:00",
+    "updated_at": "2025-12-16T10:10:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "priority_ops_engine_scene_2025-12-16"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:meta:info_network_gen:2025-12-16",
+    "project_id": "hakone-e2",
+    "kind": "meta",
+    "subkind": "info_model_note",
+    "title": "本情報ネットワーク生成メモ",
+    "summary": "2025-12-16 OPS優先メモ由来のinfo_network構造体",
+    "body": "この情報ネットワークはpriority_ops_engine_scene_2025-12-16メモから自動生成。",
+    "scope": {
+      "project_phase": "phase1",
+      "lane": "pm_core",
+      "file": "memos/priority_ops_engine_scene_2025-12-16.md",
+      "section_anchor": "meta"
+    },
+    "status": "active",
+    "importance": "low",
+    "created_at": "2025-12-16T10:12:00+09:00",
+    "updated_at": "2025-12-16T10:12:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "priority_ops_engine_scene_2025-12-16"
+      }
+    ],
+    "authored_by": "system",
+    "review_status": "ai_ok"
   }
 ]

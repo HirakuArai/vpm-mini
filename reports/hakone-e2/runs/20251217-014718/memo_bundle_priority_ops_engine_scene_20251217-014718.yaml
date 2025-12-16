@@ -1,0 +1,25 @@
+info_source_bundle_v1:
+  project_id: "hakone-e2"
+  source_type: "memo"
+  source_id: "priority_ops_engine_scene_2025-12-16"
+  title: "hakone-e2: 次の優先順位（OPS→engine_design→scene）"
+  time_range:
+    from: "2025-12-16"
+    to: "2025-12-16"
+  raw_text: |
+    hakone-e2 の次の1週間の最優先は、更新エンジンを安定運用するための データファイル運用ルール（H2-OPS-1） を先に固めることとする。
+    理由：既存＋新規の更新サイクルを回すには、保存場所・命名・レビュー・版管理が未確定だと迷子になるため。
+    次点は 更新エンジン方式・構成設計（engine_design）、その次に 最初の具体シーン選定（H2-DATA-1）。
+    H2-OPS-1 の成果物は「短い運用メモ（1ページ）」で、最低限の決めとして以下を含める：
+    - canonical の置き場所（data/**）と、runs/locked の扱い（増殖物は原則コミットしない、重要fixtureのみコミット）
+    - bundle の置き場と命名規則（source_type, source_id, date）
+    - run artifacts の保存規則（runs/<timestamp>/）
+    - 承認フロー（questionsがあれば停止→approve→apply）
+    - data/** の反映方針（いつPR化するか／どの単位で反映するか）
+  hints:
+    - "このメモは優先順位と運用方針の決定です。decision と task の優先順位として構造化してください。"
+    - "最優先: H2-OPS-1、次点: engine_design、その次: H2-DATA-1 を明確にしてください。"
+    - "運用ルールの箇条書きは guideline/process ノードとして整理してよいです。"
+  tags:
+    - "kind:memo"
+    - "topic:priority_ops_engine_scene"
