@@ -26,6 +26,31 @@
         "created_at": "__UNKNOWN__",
         "updated_at": "__UNKNOWN__"
       }
+    },
+    {
+      "event_id": "evt:hakone102q:2025-10-18",
+      "title": "第102回東京箱根間往復大学駅伝競走予選会",
+      "time": {
+        "start": "2025-10-18",
+        "end": "2025-10-18"
+      },
+      "context": {
+        "year": 2026,
+        "qualifying_for": "第102回箱根駅伝（本戦）",
+        "distance_km": 21.0975,
+        "course": "陸上自衛隊立川駐屯地～立川市街地～国営昭和記念公園"
+      },
+      "entity_refs": [
+        "ent:univ:rikkyo",
+        "ent:univ:hosei"
+      ],
+      "meta": {
+        "schema_id": "hakone-e2.domain",
+        "schema_version": "v1",
+        "run_id": "manual:2025-12-18:scn:hakone102q:borderline10-11",
+        "created_at": "2025-12-18",
+        "updated_at": "2025-12-18"
+      }
     }
   ]
 }
