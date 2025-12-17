@@ -4,10 +4,71 @@
   "type": "object",
   "required": ["evidence", "entities", "events", "claims"],
   "properties": {
-    "evidence": { "type": "array", "items": { "type": "object" } },
-    "entities": { "type": "array", "items": { "type": "object" } },
-    "events": { "type": "array", "items": { "type": "object" } },
-    "claims":  { "type": "array", "items": { "type": "object" } }
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["evidence_id", "url", "meta"],
+        "properties": {
+          "evidence_id": { "type": "string", "minLength": 1 },
+          "url": { "type": "string", "minLength": 1 },
+          "publisher": { "type": "string" },
+          "retrieved_at": { "type": "string" },
+          "type": { "type": "string" },
+          "notes": { "type": "string" },
+          "meta": { "type": "object" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["entity_id", "entity_type", "name", "meta"],
+        "properties": {
+          "entity_id": { "type": "string", "minLength": 1 },
+          "entity_type": { "type": "string", "minLength": 1 },
+          "name": { "type": "string", "minLength": 1 },
+          "aliases": { "type": "array", "items": { "type": "string" } },
+          "meta": { "type": "object" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["event_id", "title", "meta"],
+        "properties": {
+          "event_id": { "type": "string", "minLength": 1 },
+          "title": { "type": "string", "minLength": 1 },
+          "time": { "type": "object" },
+          "context": { "type": "object" },
+          "entity_refs": { "type": "array", "items": { "type": "string" } },
+          "meta": { "type": "object" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim_id", "key", "value", "evidence_refs", "event_refs", "entity_refs", "meta"],
+        "properties": {
+          "claim_id": { "type": "string", "minLength": 1 },
+          "key": { "type": "string", "minLength": 1 },
+          "value": {},
+          "evidence_refs": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "event_refs": { "type": "array", "items": { "type": "string" } },
+          "entity_refs": { "type": "array", "items": { "type": "string" } },
+          "meta": { "type": "object" }
+        },
+        "additionalProperties": true
+      }
+    }
   },
   "additionalProperties": false
 }

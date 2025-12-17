@@ -1,18 +1,26 @@
 import argparse
 import json
 import re
-from datetime import date
+from datetime import date, datetime, timezone
 from pathlib import Path
+from typing import Any, Dict, Set
 
 import requests
 from jsonschema import validate
 
-# OpenAI SDK (Responses API)
 from openai import OpenAI
 
 DOMAIN_DIR = Path("data/hakone-e2/domain")
 RUNS_DIR = Path("reports/hakone-e2/runs")
 SCHEMA_PATH = Path("schemas/hakone-e2/domain_extract_facts_patch_v1.schema.json")
+
+REQUIRED_META_KEYS = {
+    "schema_id",
+    "schema_version",
+    "run_id",
+    "created_at",
+    "updated_at",
+}
 
 
 def read_json(p: Path):
@@ -63,10 +71,77 @@ def call_model_json_object(model: str, prompt: str):
     )
     out = getattr(resp, "output_text", None)
     if not out:
-        # SDK shape fallback; raise so we notice and can update parser.
-        out = json.dumps(resp.to_dict(), ensure_ascii=False)
         raise RuntimeError("No output_text; SDK shape changed. Please update parser.")
     return json.loads(out)
+
+
+def _expect_keys(obj: Dict[str, Any], keys: Set[str], label: str):
+    miss = [k for k in keys if k not in obj]
+    if miss:
+        raise ValueError(f"{label} missing keys: {miss}")
+
+
+def enforce_quality_gate(validated: Dict[str, Any], evidence_id: str):
+    # Ensure patch has required top-level arrays
+    for k in ("evidence", "entities", "events", "claims"):
+        if k not in validated or not isinstance(validated[k], list):
+            raise ValueError(f"validated.{k} must be a list")
+
+    # claim gate: must have evidence_refs including evidence_id
+    for c in validated["claims"]:
+        if not isinstance(c, dict):
+            raise ValueError("claim must be object")
+        _expect_keys(
+            c,
+            {
+                "claim_id",
+                "key",
+                "value",
+                "evidence_refs",
+                "event_refs",
+                "entity_refs",
+                "meta",
+            },
+            "claim",
+        )
+        if not isinstance(c["evidence_refs"], list) or not c["evidence_refs"]:
+            raise ValueError(f"claim {c.get('claim_id')} evidence_refs empty")
+        if evidence_id not in c["evidence_refs"]:
+            raise ValueError(
+                f"claim {c.get('claim_id')} evidence_refs must include {evidence_id}"
+            )
+
+        if not isinstance(c["event_refs"], list):
+            raise ValueError(f"claim {c.get('claim_id')} event_refs must be list")
+        if not isinstance(c["entity_refs"], list):
+            raise ValueError(f"claim {c.get('claim_id')} entity_refs must be list")
+        if not isinstance(c["meta"], dict):
+            raise ValueError(f"claim {c.get('claim_id')} meta must be object")
+        _expect_keys(c["meta"], REQUIRED_META_KEYS, f"claim {c.get('claim_id')}.meta")
+
+
+def resolve_refs_after_upsert(evi_items, ent_items, evt_items, clm_items):
+    evi_ids = {x.get("evidence_id") for x in evi_items if isinstance(x, dict)}
+    ent_ids = {x.get("entity_id") for x in ent_items if isinstance(x, dict)}
+    evt_ids = {x.get("event_id") for x in evt_items if isinstance(x, dict)}
+
+    bad = []
+    for c in clm_items:
+        if not isinstance(c, dict):
+            continue
+        cid = c.get("claim_id")
+        for ref in c.get("evidence_refs", []) or []:
+            if ref not in evi_ids:
+                bad.append((cid, "evidence_refs", ref))
+        for ref in c.get("event_refs", []) or []:
+            if ref not in evt_ids:
+                bad.append((cid, "event_refs", ref))
+        for ref in c.get("entity_refs", []) or []:
+            if ref not in ent_ids:
+                bad.append((cid, "entity_refs", ref))
+
+    if bad:
+        raise ValueError(f"Reference resolution failed (first 20): {bad[:20]}")
 
 
 def main():
@@ -79,7 +154,8 @@ def main():
     args = ap.parse_args()
 
     today = date.today().isoformat()
-    run_id = f"api:{today}:facts:{args.evidence_id}"
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    run_id = f"api:{today}:facts:{args.evidence_id}:{ts}"
     run_dir = RUNS_DIR / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
 
@@ -99,12 +175,12 @@ Return ONLY JSON (no markdown), matching this JSON Schema:
 {json.dumps(schema, ensure_ascii=False)}
 
 Rules:
-- Create claims as atomic facts. Each claim MUST include evidence_refs containing \"{args.evidence_id}\".
-- Prefer stable IDs. Use these keys:
-  evidence_id, entity_id, event_id, claim_id
-- For every claim, include: claim_id, key, value, evidence_refs, event_refs, entity_refs, meta
-- meta must include: schema_id=\"hakone-e2.domain\", schema_version=\"v1\", run_id=\"{run_id}\", created_at=\"{today}\", updated_at=\"{today}\"
-- Use event_id \"{args.event_id}\" if it is not \"__UNKNOWN__\", otherwise create one event.
+- Create claims as atomic facts. Each claim MUST include evidence_refs containing "{args.evidence_id}".
+- Prefer stable IDs. Use these keys: evidence_id, entity_id, event_id, claim_id
+- meta must include:
+  schema_id="hakone-e2.domain", schema_version="v1", run_id="{run_id}", created_at="{today}", updated_at="{today}"
+- If event_id "{args.event_id}" is not "__UNKNOWN__", use it; otherwise create one event_id.
+
 Input evidence URL: {args.url}
 Evidence text:
 {text}
@@ -128,6 +204,8 @@ JSON:
         repaired = call_model_json_object(args.model, repair_prompt)
         validate(instance=repaired, schema=schema)
         validated = repaired
+
+    enforce_quality_gate(validated, args.evidence_id)
 
     write_json(run_dir / "validated.json", validated)
 
@@ -161,6 +239,8 @@ JSON:
 
     write_json(run_dir / "conflicts.json", {"conflicts": conflicts})
 
+    resolve_refs_after_upsert(evi["items"], ent["items"], evt["items"], clm["items"])
+
     write_json(DOMAIN_DIR / "e2_evidence_v1.json", evi)
     write_json(DOMAIN_DIR / "e2_entities_v1.json", ent)
     write_json(DOMAIN_DIR / "e2_events_v1.json", evt)
@@ -171,6 +251,7 @@ JSON:
         encoding="utf-8",
     )
 
+    print(f"RUN_ID={run_id}")
     print(f"OK run_id={run_id} conflicts={len(conflicts)} mode={args.mode}")
 
 

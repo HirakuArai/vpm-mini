@@ -1,6 +1,6 @@
 # Domain Update Lane (Fact Lane) v1 — hakone-e2
 
-目的：A(domain) SSOT を「evidence(URL) → API抽出 → Quality Gate → PR」で更新する最小レーンを作る。
+目的：A(domain) SSOT を「evidence(URL) → API抽出 → Quality Gate → PR」で更新する最小レーンを作る。  
 B(hakone-e2黒板)は触らない。
 
 ## Inputs（workflow_dispatch）
@@ -9,12 +9,15 @@ B(hakone-e2黒板)は触らない。
 - event_id: 紐づけ先イベント（任意）
 - mode: dry-run | pr
 
-## Output
+## Output（run artifacts）
 - reports/hakone-e2/runs/<run_id>/
   - extracted.json（モデル出力）
   - validated.json（スキーマ検証後）
   - conflicts.json（矛盾/重複検知）
-  - patch_preview.md（domain差分の要約）
+  - domain.diff（domain差分）
+  - patch_preview.md（要約）
+
+dry-run でも run artifacts を GitHub Actions artifact としてアップロードする。
 
 ## Quality Gate（必須）
 - claim は evidence_refs を必ず持つ
