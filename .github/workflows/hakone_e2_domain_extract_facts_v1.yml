@@ -24,10 +24,14 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
@@ -35,28 +39,79 @@ jobs:
         run: |
           pip install -U openai requests jsonschema
 
+      - name: Create work branch (mode=pr)
+        if: ${{ inputs.mode == 'pr' }}
+        run: |
+          set -euo pipefail
+          BR="auto/hakone-e2/facts/${{ inputs.evidence_id }}-$(date -u +%Y%m%d-%H%M%S)"
+          echo "BRANCH=$BR" >> "$GITHUB_ENV"
+          git checkout -b "$BR"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: Run extractor
+        id: extract
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
+          set -euo pipefail
           python scripts/hakone_e2_domain_extract_facts_v1.py \
             --url "${{ inputs.url }}" \
             --evidence-id "${{ inputs.evidence_id }}" \
             --event-id "${{ inputs.event_id }}" \
             --mode "${{ inputs.mode }}" \
-            --model "gpt-4.1"
+            --model "gpt-4.1" 2>&1 | tee /tmp/extract.log
+
+          RUN_ID="$(grep -oE 'RUN_ID=[^ ]+' /tmp/extract.log | tail -1 | cut -d= -f2)"
+          if [ -z "$RUN_ID" ]; then
+            echo "RUN_ID not found in output"; exit 1
+          fi
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "RUN_ID=$RUN_ID" >> "$GITHUB_ENV"
+
+      - name: Write domain diff into run artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p "reports/hakone-e2/runs/${RUN_ID}"
+          git diff -- data/hakone-e2/domain > "reports/hakone-e2/runs/${RUN_ID}/domain.diff" || true
+
+      - name: Upload run artifacts (always)
+        uses: actions/upload-artifact@v4
+        with:
+          name: hakone-e2-${{ steps.extract.outputs.run_id }}
+          path: reports/hakone-e2/runs/${{ steps.extract.outputs.run_id }}/
 
       - name: Commit & PR (mode=pr)
         if: ${{ inputs.mode == 'pr' }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
           git status --porcelain
-          git add data/hakone-e2/domain/e2_*.json reports/hakone-e2/runs || true
-          git commit -m "data(hakone-e2): domain facts extracted from ${{ inputs.evidence_id }}" || exit 0
-          git push -u origin HEAD
-          gh pr create \
+
+          git add data/hakone-e2/domain/e2_*.json
+          git commit -m "data(hakone-e2): domain facts extracted (${{ inputs.evidence_id }})" || exit 0
+          git push -u origin "$BRANCH"
+
+          PR_URL="$(gh pr create \
             --base main \
-            --head "$(git branch --show-current)" \
+            --head "$BRANCH" \
             -t "data(hakone-e2): domain facts extracted (${{ inputs.evidence_id }})" \
-            -b "Summary: API extraction → domain update. Evidence: ${{ inputs.url }}"
+            -b "Summary: API extraction → domain update. Evidence: ${{ inputs.url }}")"
+
+          python - << 'PY'
+import json, os, pathlib
+run_id = os.environ.get("RUN_ID")
+p = pathlib.Path(f"reports/hakone-e2/runs/{run_id}/conflicts.json")
+if not p.exists():
+    raise SystemExit(0)
+d = json.loads(p.read_text(encoding="utf-8"))
+if len(d.get("conflicts", [])) > 0:
+    print("HAS_CONFLICTS=1")
+PY
+
+          if grep -q "HAS_CONFLICTS=1" /dev/stdout 2>/dev/null; then
+            gh pr edit "$PR_URL" --add-label "review-required" || true
+          fi
+
+          echo "PR: $PR_URL"
