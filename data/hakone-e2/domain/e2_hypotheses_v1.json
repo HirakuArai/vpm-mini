@@ -1,0 +1,24 @@
+{
+  "schema": "hakone-e2.domain.e2_hypotheses_v1",
+  "schema_id": "hakone-e2.domain",
+  "schema_version": "v1",
+  "title": "Hypotheses (A: interpretations) v1",
+  "items": [
+    {
+      "hypothesis_id": "hyp:example:0001",
+      "target_event": "evt:example:0001",
+      "statement": "__UNKNOWN__",
+      "strength": "__UNKNOWN__",
+      "evidence_refs": [
+        "evi:example:0001"
+      ],
+      "meta": {
+        "schema_id": "hakone-e2.domain",
+        "schema_version": "v1",
+        "run_id": "__UNKNOWN__",
+        "created_at": "__UNKNOWN__",
+        "updated_at": "__UNKNOWN__"
+      }
+    }
+  ]
+}

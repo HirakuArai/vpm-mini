@@ -1,0 +1,21 @@
+{
+  "schema": "hakone-e2.domain.e2_entities_v1",
+  "schema_id": "hakone-e2.domain",
+  "schema_version": "v1",
+  "title": "Entities (A: person/team/race/etc) v1",
+  "items": [
+    {
+      "entity_id": "ent:example:team:0001",
+      "entity_type": "team|person|race|place|other",
+      "name": "__UNKNOWN__",
+      "aliases": [],
+      "meta": {
+        "schema_id": "hakone-e2.domain",
+        "schema_version": "v1",
+        "run_id": "__UNKNOWN__",
+        "created_at": "__UNKNOWN__",
+        "updated_at": "__UNKNOWN__"
+      }
+    }
+  ]
+}
