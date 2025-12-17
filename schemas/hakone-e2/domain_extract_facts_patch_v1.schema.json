@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "hakone-e2 domain facts patch v1",
+  "type": "object",
+  "required": ["evidence", "entities", "events", "claims"],
+  "properties": {
+    "evidence": { "type": "array", "items": { "type": "object" } },
+    "entities": { "type": "array", "items": { "type": "object" } },
+    "events": { "type": "array", "items": { "type": "object" } },
+    "claims":  { "type": "array", "items": { "type": "object" } }
+  },
+  "additionalProperties": false
+}
