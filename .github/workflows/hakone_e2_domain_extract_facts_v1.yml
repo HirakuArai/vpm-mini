@@ -1,0 +1,62 @@
+name: hakone-e2 domain extract facts (v1)
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Evidence URL (HTML only in v1)"
+        required: true
+      evidence_id:
+        description: "evidence_id to use in domain SSOT"
+        required: true
+      event_id:
+        description: "Optional existing event_id"
+        required: false
+        default: "__UNKNOWN__"
+      mode:
+        description: "dry-run or pr"
+        required: true
+        default: "dry-run"
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          pip install -U openai requests jsonschema
+
+      - name: Run extractor
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python scripts/hakone_e2_domain_extract_facts_v1.py \
+            --url "${{ inputs.url }}" \
+            --evidence-id "${{ inputs.evidence_id }}" \
+            --event-id "${{ inputs.event_id }}" \
+            --mode "${{ inputs.mode }}" \
+            --model "gpt-4.1"
+
+      - name: Commit & PR (mode=pr)
+        if: ${{ inputs.mode == 'pr' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git status --porcelain
+          git add data/hakone-e2/domain/e2_*.json reports/hakone-e2/runs || true
+          git commit -m "data(hakone-e2): domain facts extracted from ${{ inputs.evidence_id }}" || exit 0
+          git push -u origin HEAD
+          gh pr create \
+            --base main \
+            --head "$(git branch --show-current)" \
+            -t "data(hakone-e2): domain facts extracted (${{ inputs.evidence_id }})" \
+            -b "Summary: API extraction → domain update. Evidence: ${{ inputs.url }}"
