@@ -1,0 +1,31 @@
+{
+  "schema": "hakone-e2.domain.e2_events_v1",
+  "schema_id": "hakone-e2.domain",
+  "schema_version": "v1",
+  "title": "Events (A: time-bounded happenings) v1",
+  "items": [
+    {
+      "event_id": "evt:example:0001",
+      "title": "__UNKNOWN__",
+      "time": {
+        "start": "__UNKNOWN__",
+        "end": "__UNKNOWN__"
+      },
+      "context": {
+        "year": "__UNKNOWN__",
+        "leg": "__UNKNOWN__",
+        "place": "__UNKNOWN__"
+      },
+      "entity_refs": [
+        "ent:example:team:0001"
+      ],
+      "meta": {
+        "schema_id": "hakone-e2.domain",
+        "schema_version": "v1",
+        "run_id": "__UNKNOWN__",
+        "created_at": "__UNKNOWN__",
+        "updated_at": "__UNKNOWN__"
+      }
+    }
+  ]
+}

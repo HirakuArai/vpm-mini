@@ -2,12 +2,27 @@
   "schema": "hakone-e2.domain.e2_scenes_v1",
   "items": [
     {
-      "scene_id": "__EXAMPLE__",
-      "time_range": { "from": "__UNKNOWN__", "to": "__UNKNOWN__" },
-      "summary": "__UNKNOWN__",
-      "claims": [],
-      "hypotheses": [],
-      "tags": ["example"]
+      "scene_id": "scn:example:0001",
+      "title": "__UNKNOWN__",
+      "event_refs": [
+        "evt:example:0001"
+      ],
+      "claim_refs": [
+        "clm:example:0001"
+      ],
+      "hypothesis_refs": [
+        "hyp:example:0001"
+      ],
+      "meta": {
+        "schema_id": "hakone-e2.domain",
+        "schema_version": "v1",
+        "run_id": "__UNKNOWN__",
+        "created_at": "__UNKNOWN__",
+        "updated_at": "__UNKNOWN__"
+      }
     }
-  ]
+  ],
+  "schema_id": "hakone-e2.domain",
+  "schema_version": "v1",
+  "title": "Scenes (A: bundles of facts+interpretations) v1"
 }

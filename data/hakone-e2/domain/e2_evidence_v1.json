@@ -2,12 +2,22 @@
   "schema": "hakone-e2.domain.e2_evidence_v1",
   "items": [
     {
-      "evidence_id": "__EXAMPLE__",
-      "source_type": "__UNKNOWN__",
+      "evidence_id": "evi:example:0001",
       "url": "__UNKNOWN__",
+      "publisher": "__UNKNOWN__",
       "retrieved_at": "__UNKNOWN__",
-      "note": "__UNKNOWN__",
-      "tags": ["example"]
+      "type": "official|media|video|other",
+      "notes": "__UNKNOWN__",
+      "meta": {
+        "schema_id": "hakone-e2.domain",
+        "schema_version": "v1",
+        "run_id": "__UNKNOWN__",
+        "created_at": "__UNKNOWN__",
+        "updated_at": "__UNKNOWN__"
+      }
     }
-  ]
+  ],
+  "schema_id": "hakone-e2.domain",
+  "schema_version": "v1",
+  "title": "Evidence (A: sources/notes) v1"
 }
