@@ -15,6 +15,51 @@
         "created_at": "__UNKNOWN__",
         "updated_at": "__UNKNOWN__"
       }
+    },
+    {
+      "evidence_id": "evi:hakone102q:ntv:yosen_sougouresult",
+      "url": "https://www.ntv.co.jp/hakone/yosen_sougouresult/",
+      "publisher": "日本テレビ（箱根駅伝 番組公式サイト）",
+      "retrieved_at": "2025-12-18",
+      "type": "official",
+      "notes": "第102回箱根駅伝予選会の総合成績（順位・最終総合タイム）。",
+      "meta": {
+        "schema_id": "hakone-e2.domain",
+        "schema_version": "v1",
+        "run_id": "manual:2025-12-18:scn:hakone102q:borderline10-11",
+        "created_at": "2025-12-18",
+        "updated_at": "2025-12-18"
+      }
+    },
+    {
+      "evidence_id": "evi:hakone102q:nikkansports:202510180000583",
+      "url": "https://www.nikkansports.com/sports/athletics/news/202510180000583.html",
+      "publisher": "日刊スポーツ",
+      "retrieved_at": "2025-12-18",
+      "type": "media",
+      "notes": "法政大が11位で本戦逃し、10位立教大と17秒差／連続出場10でストップ等の記述。",
+      "meta": {
+        "schema_id": "hakone-e2.domain",
+        "schema_version": "v1",
+        "run_id": "manual:2025-12-18:scn:hakone102q:borderline10-11",
+        "created_at": "2025-12-18",
+        "updated_at": "2025-12-18"
+      }
+    },
+    {
+      "evidence_id": "evi:hakone102q:hakone-ekiden:official_pdf_2025",
+      "url": "https://www.hakone-ekiden.jp/_assets/2025/d3aaf3cd8414d6c0ba8bed4afa6329f6f5a21ab8.pdf",
+      "publisher": "関東学生陸上競技連盟（主催）/ 公式PDF",
+      "retrieved_at": "2025-12-18",
+      "type": "official",
+      "notes": "第102回予選会の主催/共催/コース（立川駐屯地〜昭和記念公園）/距離(21.0975km)等。",
+      "meta": {
+        "schema_id": "hakone-e2.domain",
+        "schema_version": "v1",
+        "run_id": "manual:2025-12-18:scn:hakone102q:borderline10-11",
+        "created_at": "2025-12-18",
+        "updated_at": "2025-12-18"
+      }
     }
   ],
   "schema_id": "hakone-e2.domain",

@@ -16,6 +16,38 @@
         "created_at": "__UNKNOWN__",
         "updated_at": "__UNKNOWN__"
       }
+    },
+    {
+      "entity_id": "ent:univ:rikkyo",
+      "entity_type": "team",
+      "name": "立教大学",
+      "aliases": [
+        "立大",
+        "Rikkyo University"
+      ],
+      "meta": {
+        "schema_id": "hakone-e2.domain",
+        "schema_version": "v1",
+        "run_id": "manual:2025-12-18:scn:hakone102q:borderline10-11",
+        "created_at": "2025-12-18",
+        "updated_at": "2025-12-18"
+      }
+    },
+    {
+      "entity_id": "ent:univ:hosei",
+      "entity_type": "team",
+      "name": "法政大学",
+      "aliases": [
+        "法大",
+        "Hosei University"
+      ],
+      "meta": {
+        "schema_id": "hakone-e2.domain",
+        "schema_version": "v1",
+        "run_id": "manual:2025-12-18:scn:hakone102q:borderline10-11",
+        "created_at": "2025-12-18",
+        "updated_at": "2025-12-18"
+      }
     }
   ]
 }

@@ -21,6 +21,107 @@
         "created_at": "__UNKNOWN__",
         "updated_at": "__UNKNOWN__"
       }
+    },
+    {
+      "claim_id": "clm:hakone102q:rikkyo:rank10_time",
+      "key": "hakone102q.team_total|date=2025-10-18|team=rikkyo|rank=10",
+      "value": {
+        "rank": 10,
+        "team": "立教大学",
+        "total_time": "10:36:56"
+      },
+      "evidence_refs": [
+        "evi:hakone102q:ntv:yosen_sougouresult"
+      ],
+      "event_refs": [
+        "evt:hakone102q:2025-10-18"
+      ],
+      "entity_refs": [
+        "ent:univ:rikkyo"
+      ],
+      "meta": {
+        "schema_id": "hakone-e2.domain",
+        "schema_version": "v1",
+        "run_id": "manual:2025-12-18:scn:hakone102q:borderline10-11",
+        "created_at": "2025-12-18",
+        "updated_at": "2025-12-18"
+      }
+    },
+    {
+      "claim_id": "clm:hakone102q:hosei:rank11_time",
+      "key": "hakone102q.team_total|date=2025-10-18|team=hosei|rank=11",
+      "value": {
+        "rank": 11,
+        "team": "法政大学",
+        "total_time": "10:37:13"
+      },
+      "evidence_refs": [
+        "evi:hakone102q:ntv:yosen_sougouresult"
+      ],
+      "event_refs": [
+        "evt:hakone102q:2025-10-18"
+      ],
+      "entity_refs": [
+        "ent:univ:hosei"
+      ],
+      "meta": {
+        "schema_id": "hakone-e2.domain",
+        "schema_version": "v1",
+        "run_id": "manual:2025-12-18:scn:hakone102q:borderline10-11",
+        "created_at": "2025-12-18",
+        "updated_at": "2025-12-18"
+      }
+    },
+    {
+      "claim_id": "clm:hakone102q:borderline:diff_seconds_17",
+      "key": "hakone102q.borderline|date=2025-10-18|rank10_vs_11|diff_seconds",
+      "value": {
+        "rank10_team": "立教大学",
+        "rank11_team": "法政大学",
+        "diff_seconds": 17
+      },
+      "evidence_refs": [
+        "evi:hakone102q:nikkansports:202510180000583"
+      ],
+      "event_refs": [
+        "evt:hakone102q:2025-10-18"
+      ],
+      "entity_refs": [
+        "ent:univ:rikkyo",
+        "ent:univ:hosei"
+      ],
+      "meta": {
+        "schema_id": "hakone-e2.domain",
+        "schema_version": "v1",
+        "run_id": "manual:2025-12-18:scn:hakone102q:borderline10-11",
+        "created_at": "2025-12-18",
+        "updated_at": "2025-12-18"
+      }
+    },
+    {
+      "claim_id": "clm:hakone102q:hosei:streak10_ended",
+      "key": "hakone102q.hosei|date=2025-10-18|hakone_consecutive_appearances_stopped=10",
+      "value": {
+        "team": "法政大学",
+        "streak_consecutive_appearances": 10,
+        "status": "stopped"
+      },
+      "evidence_refs": [
+        "evi:hakone102q:nikkansports:202510180000583"
+      ],
+      "event_refs": [
+        "evt:hakone102q:2025-10-18"
+      ],
+      "entity_refs": [
+        "ent:univ:hosei"
+      ],
+      "meta": {
+        "schema_id": "hakone-e2.domain",
+        "schema_version": "v1",
+        "run_id": "manual:2025-12-18:scn:hakone102q:borderline10-11",
+        "created_at": "2025-12-18",
+        "updated_at": "2025-12-18"
+      }
     }
   ],
   "schema_id": "hakone-e2.domain",
