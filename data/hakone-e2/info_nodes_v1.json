@@ -2285,13 +2285,13 @@
     "review_status": "unreviewed"
   },
   {
-    "id": "hakone-e2:gap:scene_stub_0001:emotion_hypothesis",
+    "id": "hakone-e2:gap:scene_stub_0001:interpretation_spec_notes",
     "project_id": "hakone-e2",
     "kind": "gap",
-    "subkind": "emotion_hypothesis",
-    "title": "エモ瞬間（観客感情ピーク仮説）言語化 未記載",
-    "summary": "観客の感情ピークとなる瞬間仮説の明文化が未記載。",
-    "body": "e2の枠組みで重要な『エモ瞬間』仮説の明文記述がこの時点では不明。仮説モデルや情緒的説明付与に将来展開。",
+    "subkind": "interpretation_spec_notes",
+    "title": "エモ瞬間（観客感情ピーク解釈メモ）未記載",
+    "summary": "観客感情ピークの解釈をどう設計するかの仕様メモが未記載。",
+    "body": "B黒板では仮説データを持たず、解釈を書き出す仕様メモのみを置く方針。エモ瞬間の解釈項目や書式を設計メモとして整理する必要がある。",
     "scope": {
       "project_phase": "phase1",
       "lane": "pm_core",
@@ -2425,7 +2425,7 @@
     "kind": "fact",
     "subkind": "scene_gap_set",
     "title": "sceneスタブ0001 gap一覧要約",
-    "summary": "sceneスタブ#0001で埋まっていない主要gap項目（year, 区間・チーム・選手, event, primary_source, emotion_hypothesis）のまとめ。",
+    "summary": "sceneスタブ#0001で埋まっていない主要gap項目（year, 区間・チーム・選手, event, primary_source, interpretation_spec_notes）のまとめ。",
     "body": "PM視点でgap対応必須属性として全gapノードの一覧と対応進捗を整理。",
     "scope": {
       "project_phase": "phase1",
@@ -2479,8 +2479,8 @@
     "kind": "guideline",
     "subkind": "evidence_policy",
     "title": "Scene根拠(Evidence)の扱いガイドライン v1",
-    "summary": "scene本文の『断定』と『仮説』の分離、出典明示、不明情報のgap扱い、バンドル単位での記述など統一ポリシー。",
-    "body": "・scene本文には断定と仮説を分離して書く\n・断定には可能ならsourceを付す\n・仮説はemotional hypothesisとして明示\n・出典未確定項目はUNKNOWNでgap管理\n・収集単位はbundleで分離して記述",
+    "summary": "scene本文の『断定』と『解釈メモ（spec notes）』の分離、出典明示、不明情報のgap扱い、バンドル単位での記述など統一ポリシー。",
+    "body": "・scene本文には断定と解釈メモ(spec notes)を分離して書く\n・断定には可能ならsourceを付す\n・解釈メモは interpretation spec notes として明示し、事実/根拠はA方式で保持\n・出典未確定項目はUNKNOWNでgap管理\n・収集単位はbundleで分離して記述",
     "scope": {
       "project_phase": "phase1",
       "lane": "pm_core",
@@ -3122,5 +3122,19 @@
     ],
     "authored_by": "kai",
     "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:guideline:layer_separation_guardrails_v1",
+    "project_id": "hakone-e2",
+    "kind": "guideline",
+    "subkind": "guardrail",
+    "title": "B/Aレイヤ分離ガードレール（止血）v1",
+    "summary": "B(hakone-e2黒板)は設計/運用/タスクのみ。個別事実・解釈(spec_notes)はA(事実+根拠+解釈)へ。",
+    "body": "## 運用上の禁止事項（混乱止血）\n\n### B方式（hakone-e2 Project黒板: data/hakone-e2/info_*）に入れてはいけないもの\n- 箱根駅伝の**個別事実レコード**（年/区間/結果/記録など）を canonical として入れない\n- **解釈データ（spec_notes）**を個別データとして入れない\n  - 解釈そのもの（例：「涙腺崩壊」など）は A方式（事実+根拠+解釈のSSOT）で管理する\n\n### B方式に入れてよいもの（設計枠・運用枠）\n- 「どんな解釈項目を持たせるか／どう書くか」の**仕様メモ**（interpretation spec notes）\n- scene の“収集計画”や“stub”（ただし断定事実や解釈データの保存先はA方式を参照）\n\n### A方式（事実+根拠+解釈）で完結させるもの\n- evidence（根拠URL/取得日時/メモ）\n- claim（断定できた事実。必ず evidence を参照）\n- scene（出来事の束。claim と spec_notes をぶら下げる）\n- spec_notes（解釈。断定と分離し、根拠との紐づきもA側で完結）\n",
+    "scope": "project",
+    "status": "active",
+    "importance": "critical",
+    "created_at": "2025-12-18",
+    "updated_at": "2025-12-18"
   }
 ]
