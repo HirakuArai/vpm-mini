@@ -30,3 +30,8 @@ reports/think/*
 reports/hakone-e2/runs/**/snapshot_raw.json
 reports/hakone-e2/runs/**/seed_plan_*.json
 reports/hakone-e2/runs/**/suggestion_plan_*.json
+
+# generic run intermediates (all projects)
+reports/**/runs/**/snapshot_raw.json
+reports/**/runs/**/seed_plan_*.json
+reports/**/runs/**/suggestion_plan_*.json

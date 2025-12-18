@@ -202,12 +202,17 @@ git add \
   "${RUN_DIR}"/*bundle*.yaml || true
 git add docs || true
 
+# Safety: never stage heavy run intermediates even if they slip through
+git reset -q -- "${RUN_DIR}/snapshot_raw.json" "${RUN_DIR}/seed_plan_"*".json" "${RUN_DIR}/suggestion_plan_"*".json" 2>/dev/null || true
+
 git commit -m "data(${PROJECT_ID}): merge update cycle ($(basename "$BUNDLE"))" || { echo "Nothing to commit."; exit 0; }
 
 if [[ -n "${PR_BOT_TOKEN:-}" ]]; then
   echo "PR_BOT_TOKEN present -> using it for push/PR"
   git remote set-url origin "https://x-access-token:${PR_BOT_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
   export GH_TOKEN="$PR_BOT_TOKEN"
+else
+  echo "WARNING: PR_BOT_TOKEN not set; required checks may stall when using the default GitHub token."
 fi
 
 git push -u origin "$BR"
