@@ -68,6 +68,9 @@ jobs:
             echo "RUN_ID not found in output"; exit 1
           fi
           echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          # Artifact name must be filesystem-safe (no : / \ etc)
+          RUN_ID_SAFE="$(echo "$RUN_ID" | sed 's/[^A-Za-z0-9._-]/_/g')"
+          echo "run_id_safe=$RUN_ID_SAFE" >> "$GITHUB_OUTPUT"
           echo "RUN_ID=$RUN_ID" >> "$GITHUB_ENV"
 
       - name: Write domain diff into run artifacts
@@ -79,7 +82,7 @@ jobs:
       - name: Upload run artifacts (always)
         uses: actions/upload-artifact@v4
         with:
-          name: hakone-e2-${{ steps.extract.outputs.run_id }}
+          name: hakone-e2-${{ steps.extract.outputs.run_id_safe }}
           path: reports/hakone-e2/runs/${{ steps.extract.outputs.run_id }}/
 
       - name: Detect conflicts
