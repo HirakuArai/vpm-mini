@@ -14,6 +14,27 @@ DOMAIN_DIR = Path("data/hakone-e2/domain")
 RUNS_DIR = Path("reports/hakone-e2/runs")
 SCHEMA_PATH = Path("schemas/hakone-e2/domain_extract_facts_patch_v1.schema.json")
 
+
+def load_entity_registry_for_prompt():
+    # Load existing entities (A(domain) registry). We will NOT create new entities in facts lane v1.4.
+    ent = load_container(DOMAIN_DIR / "e2_entities_v1.json")
+    items = ent.get("items", [])
+    reg = []
+    for x in items:
+        if not isinstance(x, dict):
+            continue
+        reg.append(
+            {
+                "entity_id": x.get("entity_id"),
+                "entity_type": x.get("entity_type"),
+                "name": x.get("name"),
+                "aliases": x.get("aliases", []),
+            }
+        )
+    # keep prompt small-ish
+    return reg[:500]
+
+
 REQUIRED_META_KEYS = {
     "schema_id",
     "schema_version",
@@ -167,6 +188,8 @@ def main():
 
     schema = read_json(SCHEMA_PATH)
 
+    entity_registry = load_entity_registry_for_prompt()
+
     r = requests.get(args.url, timeout=30)
     r.raise_for_status()
     content_type = r.headers.get("content-type", "")
@@ -182,19 +205,25 @@ Return ONLY JSON (no markdown), matching this JSON Schema:
 
 Rules:
 - Create claims as atomic facts (1 claim = 1断定). Each claim MUST include evidence_refs containing "{args.evidence_id}".
-- IMPORTANT: claim.key MUST be unique per claim. Do NOT reuse a generic key like "team_rank" for multiple rows.
-  - Use a normalized key that encodes what the fact is about, at least including a distinguishing dimension.
-  - Examples:
-    - "team_rank|event={args.event_id}|rank=1|team=soka"
-    - "team_total_time|event={args.event_id}|rank=10|team=rikkyo"
+- IMPORTANT: claim.key MUST be unique per claim. Do NOT reuse a generic key for multiple rows.
+  - Use a normalized key encoding at least: event (or locked event_id), rank (if ranking), and team identifier in value.
 - Prefer stable IDs. Use these keys: evidence_id, entity_id, event_id, claim_id
-  - claim_id should also be stable and aligned with key dimensions (e.g., clm:<event>:rank:01:<team>)
 - meta must include:
   schema_id="hakone-e2.domain", schema_version="v1", run_id="{run_id}", created_at="{today}", updated_at="{today}"
-- Event handling:
-  - If event_id "{args.event_id}" is not "__UNKNOWN__", ALL claims must use event_refs=["{args.event_id}"] exactly.
-  - In that case, do NOT create new events (return events as an empty list).
-  - If event_id is "__UNKNOWN__", you may create one event in events[] and reference it from claims.
+
+Entity policy (QUALITY-FIRST):
+- Do NOT invent new entity_id values in this lane.
+- You may only reference entities that already exist in the registry provided below.
+- If you cannot confidently map a team/person to an existing entity_id, set entity_refs to an empty list [].
+- Do NOT create entities of type "event". Events belong in events[].
+
+Event handling:
+- If event_id "{args.event_id}" is not "__UNKNOWN__", ALL claims must use event_refs=["{args.event_id}"] exactly.
+  In that case, return events as an empty list [] (do NOT create new events).
+- If event_id is "__UNKNOWN__", you may create one event in events[] and reference it from claims.
+
+Existing entity registry (use ONLY these entity_id values if needed):
+{json.dumps(entity_registry, ensure_ascii=False)}
 
 Input evidence URL: {args.url}
 Evidence text:
@@ -237,6 +266,18 @@ JSON:
         validated["events"] = []
 
     write_json(run_dir / "validated.json", validated)
+
+    # Entity registry lock (quality-first): do not allow new entity_ids to be introduced by this lane.
+    existing_ent = load_container(DOMAIN_DIR / "e2_entities_v1.json")
+    existing_ids = {
+        x.get("entity_id") for x in existing_ent.get("items", []) if isinstance(x, dict)
+    }
+    for e in validated.get("entities", []):
+        if not isinstance(e, dict):
+            continue
+        eid = e.get("entity_id")
+        if eid and eid not in existing_ids:
+            raise ValueError(f"new entity_id not allowed in facts lane v1.4: {eid}")
 
     evi = load_container(DOMAIN_DIR / "e2_evidence_v1.json")
     ent = load_container(DOMAIN_DIR / "e2_entities_v1.json")
