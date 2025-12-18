@@ -43,7 +43,8 @@ jobs:
         if: ${{ inputs.mode == 'pr' }}
         run: |
           set -euo pipefail
-          BR="auto/hakone-e2/facts/${{ inputs.evidence_id }}-$(date -u +%Y%m%d-%H%M%S)"
+          EID_SAFE="$(echo "${{ inputs.evidence_id }}" | tr ':/' '__' | tr -cd 'A-Za-z0-9._-')"
+          BR="auto/hakone-e2/facts/${EID_SAFE}-$(date -u +%Y%m%d-%H%M%S)"
           echo "BRANCH=$BR" >> "$GITHUB_ENV"
           git checkout -b "$BR"
           git config user.name "github-actions[bot]"
@@ -81,6 +82,22 @@ jobs:
           name: hakone-e2-${{ steps.extract.outputs.run_id }}
           path: reports/hakone-e2/runs/${{ steps.extract.outputs.run_id }}/
 
+      - name: Detect conflicts
+        id: conflicts
+        run: |
+          set -euo pipefail
+          python - << 'PY' >> "$GITHUB_OUTPUT"
+          import json, os, pathlib
+          run_id = os.environ.get("RUN_ID")
+          p = pathlib.Path(f"reports/hakone-e2/runs/{run_id}/conflicts.json")
+          has = "false"
+          if p.exists():
+              d = json.loads(p.read_text(encoding="utf-8"))
+              if len(d.get("conflicts", [])) > 0:
+                  has = "true"
+          print(f"has_conflicts={has}")
+          PY
+
       - name: Commit & PR (mode=pr)
         if: ${{ inputs.mode == 'pr' }}
         env:
@@ -99,18 +116,7 @@ jobs:
             -t "data(hakone-e2): domain facts extracted (${{ inputs.evidence_id }})" \
             -b "Summary: API extraction → domain update. Evidence: ${{ inputs.url }}")"
 
-          python - << 'PY'
-import json, os, pathlib
-run_id = os.environ.get("RUN_ID")
-p = pathlib.Path(f"reports/hakone-e2/runs/{run_id}/conflicts.json")
-if not p.exists():
-    raise SystemExit(0)
-d = json.loads(p.read_text(encoding="utf-8"))
-if len(d.get("conflicts", [])) > 0:
-    print("HAS_CONFLICTS=1")
-PY
-
-          if grep -q "HAS_CONFLICTS=1" /dev/stdout 2>/dev/null; then
+          if [ "${{ steps.conflicts.outputs.has_conflicts }}" = "true" ]; then
             gh pr edit "$PR_URL" --add-label "review-required" || true
           fi
 
