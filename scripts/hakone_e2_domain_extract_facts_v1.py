@@ -118,6 +118,12 @@ def enforce_quality_gate(validated: Dict[str, Any], evidence_id: str):
         if not isinstance(c["meta"], dict):
             raise ValueError(f"claim {c.get('claim_id')} meta must be object")
         _expect_keys(c["meta"], REQUIRED_META_KEYS, f"claim {c.get('claim_id')}.meta")
+    # key uniqueness inside this patch (avoid pseudo-conflicts)
+    keys = [c.get("key") for c in validated["claims"] if isinstance(c, dict)]
+    keys = [k for k in keys if isinstance(k, str) and k]
+    dup = sorted({k for k in keys if keys.count(k) > 1})
+    if dup:
+        raise ValueError(f"duplicate claim.key in patch: {dup[:10]}")
 
 
 def resolve_refs_after_upsert(evi_items, ent_items, evt_items, clm_items):
@@ -175,11 +181,20 @@ Return ONLY JSON (no markdown), matching this JSON Schema:
 {json.dumps(schema, ensure_ascii=False)}
 
 Rules:
-- Create claims as atomic facts. Each claim MUST include evidence_refs containing "{args.evidence_id}".
+- Create claims as atomic facts (1 claim = 1断定). Each claim MUST include evidence_refs containing "{args.evidence_id}".
+- IMPORTANT: claim.key MUST be unique per claim. Do NOT reuse a generic key like "team_rank" for multiple rows.
+  - Use a normalized key that encodes what the fact is about, at least including a distinguishing dimension.
+  - Examples:
+    - "team_rank|event={args.event_id}|rank=1|team=soka"
+    - "team_total_time|event={args.event_id}|rank=10|team=rikkyo"
 - Prefer stable IDs. Use these keys: evidence_id, entity_id, event_id, claim_id
+  - claim_id should also be stable and aligned with key dimensions (e.g., clm:<event>:rank:01:<team>)
 - meta must include:
   schema_id="hakone-e2.domain", schema_version="v1", run_id="{run_id}", created_at="{today}", updated_at="{today}"
-- If event_id "{args.event_id}" is not "__UNKNOWN__", use it; otherwise create one event_id.
+- Event handling:
+  - If event_id "{args.event_id}" is not "__UNKNOWN__", ALL claims must use event_refs=["{args.event_id}"] exactly.
+  - In that case, do NOT create new events (return events as an empty list).
+  - If event_id is "__UNKNOWN__", you may create one event in events[] and reference it from claims.
 
 Input evidence URL: {args.url}
 Evidence text:
@@ -206,6 +221,20 @@ JSON:
         validated = repaired
 
     enforce_quality_gate(validated, args.evidence_id)
+
+    # Event lock: if event_id is provided, require claims to reference ONLY that event_id, and ignore model-created events
+    locked_event_id = args.event_id
+    if locked_event_id != "__UNKNOWN__":
+        for c in validated.get("claims", []):
+            if not isinstance(c, dict):
+                continue
+            evs = c.get("event_refs", [])
+            if evs != [locked_event_id]:
+                raise ValueError(
+                    f"claim {c.get('claim_id')} event_refs must be exactly [{locked_event_id}] when event_id is provided"
+                )
+        # normalize events list to empty to avoid accidental upsert of wrong event
+        validated["events"] = []
 
     write_json(run_dir / "validated.json", validated)
 
