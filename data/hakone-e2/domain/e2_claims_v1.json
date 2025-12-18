@@ -122,6 +122,56 @@
         "created_at": "2025-12-18",
         "updated_at": "2025-12-18"
       }
+    },
+    {
+      "claim_id": "claim:hakone102q:2025:rank10:ent:univ:rikkyo",
+      "key": "event:hakone102q:2025:rank:10:team:ent:univ:rikkyo",
+      "value": {
+        "rank": 10,
+        "team_name": "立教大学",
+        "total_time": "10時間36分56秒"
+      },
+      "evidence_refs": [
+        "evi:dryrun:ntv:yosen_sougouresult"
+      ],
+      "event_refs": [
+        "evt:hakone102q:2025-10-18"
+      ],
+      "entity_refs": [
+        "ent:univ:rikkyo"
+      ],
+      "meta": {
+        "schema_id": "hakone-e2.domain",
+        "schema_version": "v1",
+        "run_id": "api:2025-12-18:facts:evi:dryrun:ntv:yosen_sougouresult:20251218-195016",
+        "created_at": "2025-12-18",
+        "updated_at": "2025-12-18"
+      }
+    },
+    {
+      "claim_id": "claim:hakone102q:2025:rank11:ent:univ:hosei",
+      "key": "event:hakone102q:2025:rank:11:team:ent:univ:hosei",
+      "value": {
+        "rank": 11,
+        "team_name": "法政大学",
+        "total_time": "10時間37分13秒"
+      },
+      "evidence_refs": [
+        "evi:dryrun:ntv:yosen_sougouresult"
+      ],
+      "event_refs": [
+        "evt:hakone102q:2025-10-18"
+      ],
+      "entity_refs": [
+        "ent:univ:hosei"
+      ],
+      "meta": {
+        "schema_id": "hakone-e2.domain",
+        "schema_version": "v1",
+        "run_id": "api:2025-12-18:facts:evi:dryrun:ntv:yosen_sougouresult:20251218-195016",
+        "created_at": "2025-12-18",
+        "updated_at": "2025-12-18"
+      }
     }
   ],
   "schema_id": "hakone-e2.domain",

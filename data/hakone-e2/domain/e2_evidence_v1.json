@@ -60,6 +60,21 @@
         "created_at": "2025-12-18",
         "updated_at": "2025-12-18"
       }
+    },
+    {
+      "evidence_id": "evi:dryrun:ntv:yosen_sougouresult",
+      "url": "https://www.ntv.co.jp/hakone/yosen_sougouresult/",
+      "publisher": "日本テレビ",
+      "retrieved_at": "2025-12-18",
+      "type": "webpage",
+      "notes": "第102回箱根駅伝予選会 総合成績（2025年）",
+      "meta": {
+        "schema_id": "hakone-e2.domain",
+        "schema_version": "v1",
+        "run_id": "api:2025-12-18:facts:evi:dryrun:ntv:yosen_sougouresult:20251218-195016",
+        "created_at": "2025-12-18",
+        "updated_at": "2025-12-18"
+      }
     }
   ],
   "schema_id": "hakone-e2.domain",
