@@ -36,3 +36,7 @@ scripts/info_network/merge_run_v1.sh --project-id hakone-e2 --bundle <bundle.yam
 
 ## env
 `.env` が repo root に無ければ `--env /path/to/.env` を使う（fallback: /Users/hiraku/projects/vpm-mini/.env）。
+
+## 注意
+- run intermediates（snapshot_raw / seed_plan / suggestion_plan）は追跡しない（.gitignore 対象）。証跡として残すのは approved_plan.json と *bundle*.yaml が基本。
+- mode=pr では PR_BOT_TOKEN（Fine-grained PAT）を推奨。未設定だと required checks が PR で止まる場合がある。
