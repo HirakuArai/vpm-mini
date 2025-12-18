@@ -1,0 +1,612 @@
+{
+  "kai_plan": {
+    "summary": "scene_0001を確定するためのevidence収集計画メモ（推測排除/出典明記）。収集対象や優先順位、作業ステップとDoDを明示している。これにより、必要なファクトギャップ・タスクが可視化される。",
+    "estimated_node_count": 15,
+    "node_categories": [
+      {
+        "category": "fact",
+        "count": 3
+      },
+      {
+        "category": "task",
+        "count": 6
+      },
+      {
+        "category": "process",
+        "count": 2
+      },
+      {
+        "category": "norm",
+        "count": 2
+      },
+      {
+        "category": "meta",
+        "count": 2
+      }
+    ],
+    "notes": "推測でfactを埋めない制約。sceneノード自体の埋めタスクやevidence候補収集、ステップごとのtask化。優先順位付け、gap管理に注意。decisionのsupersedeはしない。"
+  },
+  "aya_output": {
+    "info_nodes": [
+      {
+        "id": "hakone-e2:fact:scene_0001_target:2025-12-17-01",
+        "project_id": "hakone-e2",
+        "kind": "fact",
+        "subkind": "project_meta",
+        "title": "scene_0001 evidence収集と確定化のターゲット",
+        "summary": "scene_0001を断定/仮説分離・出典つきでfilled v1へ更新することを目指す。",
+        "body": "既存の scene_0001_stub_v1.md をもとに、確定値のみで“filled v1”への更新を目指す。推測でfactを埋めない。",
+        "scope": {
+          "project_phase": "phase1",
+          "lane": "pm_core",
+          "file": "docs/projects/hakone-e2/scenes/scene_0001_stub_v1.md",
+          "section_anchor": ""
+        },
+        "status": "active",
+        "importance": "high",
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "authored_by": "kai",
+        "review_status": "unreviewed"
+      },
+      {
+        "id": "hakone-e2:fact:scene_0001_gaplist:2025-12-17-01",
+        "project_id": "hakone-e2",
+        "kind": "fact",
+        "subkind": "state_snapshot",
+        "title": "scene_0001 における収集情報ギャップリスト",
+        "summary": "年/大会回/日付、区間出来事、関係者、結果、当日条件、反応にギャップ。これらが要確定情報として定義されている。",
+        "body": "客観的に埋めるべき情報項目：年/大会回/日付、出来事、関係者と役割、結果、当日の条件、反応（実況/コメント）など。出典付きで埋める。",
+        "scope": {
+          "project_phase": "phase1",
+          "lane": "pm_core",
+          "file": "scene_0001_evidence_plan_v1_20251217-061234"
+        },
+        "status": "active",
+        "importance": "high",
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "authored_by": "kai",
+        "review_status": "unreviewed"
+      },
+      {
+        "id": "hakone-e2:norm:no_infilling:2025-12-17-01",
+        "project_id": "hakone-e2",
+        "kind": "norm",
+        "subkind": "update_policy",
+        "title": "シーン収集時推測・仮説でfactを埋めないポリシー",
+        "summary": "推測・仮説で現在地を埋めないこと。evidence主義。",
+        "body": "scene埋め時には出典つきevidenceを優先し、仮説や埋め推測は認めない。ギャップはタスクとして管理する。",
+        "scope": {
+          "project_phase": "phase1",
+          "lane": "pm_core",
+          "file": "scene_0001_evidence_plan_v1_20251217-061234"
+        },
+        "status": "active",
+        "importance": "high",
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "authored_by": "kai",
+        "review_status": "unreviewed"
+      },
+      {
+        "id": "hakone-e2:norm:evidence_priority_policy:2025-12-17-01",
+        "project_id": "hakone-e2",
+        "kind": "norm",
+        "subkind": "ssot_policy",
+        "title": "evidence優先順位ポリシー（公式→準一次→まとめ）",
+        "summary": "official→major media→summary/SNSの順序を明確化。",
+        "body": "公式記録（大会・大学など）、主要放送局/メディア、まとめ/SNSの順にevidenceとして使う。断定には必ず公式/主要一次ソースを使う。",
+        "scope": {
+          "project_phase": "phase1",
+          "lane": "pm_core",
+          "file": "scene_0001_evidence_plan_v1_20251217-061234"
+        },
+        "status": "active",
+        "importance": "normal",
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "authored_by": "kai",
+        "review_status": "unreviewed"
+      },
+      {
+        "id": "hakone-e2:process:evidence_collection_flow:2025-12-17-01",
+        "project_id": "hakone-e2",
+        "kind": "process",
+        "subkind": "lane_spec",
+        "title": "scene_0001用 evidence収集・埋め込みフロー（v1）",
+        "summary": "evidence収集（URL列挙→事実抽出→bundle保存→ギャップタスク管理）の4ステップを設定。",
+        "body": "1) URL候補列挙、2) 事実/引用/要約の抽出、3) 抽出結果bundle保存、4) ギャップタスク化しupdate cycleへ投入。",
+        "scope": {
+          "project_phase": "phase1",
+          "lane": "pm_core",
+          "file": "scene_0001_evidence_plan_v1_20251217-061234"
+        },
+        "status": "active",
+        "importance": "normal",
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "authored_by": "kai",
+        "review_status": "unreviewed"
+      },
+      {
+        "id": "hakone-e2:process:scene_update_cycle:2025-12-17-01",
+        "project_id": "hakone-e2",
+        "kind": "process",
+        "subkind": "lane_spec",
+        "title": "scene_0001 evidence収集→scene filled化 update cycle",
+        "summary": "ギャップ→タスク化しupdate cycleに流す運用パターン。",
+        "body": "ギャップを特定→個別タスクに落とす→evidence追加で埋めていく流れを実施。",
+        "scope": {
+          "project_phase": "phase1",
+          "lane": "pm_core",
+          "file": "scene_0001_evidence_plan_v1_20251217-061234"
+        },
+        "status": "active",
+        "importance": "normal",
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "authored_by": "kai",
+        "review_status": "unreviewed"
+      },
+      {
+        "id": "hakone-e2:task:collect_evidence_urls:2025-12-17-01",
+        "project_id": "hakone-e2",
+        "kind": "task",
+        "subkind": "pm_task",
+        "title": "scene_0001 evidence候補URLを3〜5本リスト化",
+        "summary": "公式・準一次・大手メディアからの候補URL収集。",
+        "body": "公式記録・主要ニュース・スポーツメディアサイト等からscene_0001用の信頼できるURLを3-5件集める。",
+        "scope": {
+          "project_phase": "phase1",
+          "lane": "pm_core",
+          "file": "scene_0001_evidence_plan_v1_20251217-061234"
+        },
+        "status": "active",
+        "importance": "high",
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "authored_by": "kai",
+        "review_status": "unreviewed"
+      },
+      {
+        "id": "hakone-e2:task:extract_facts_from_urls:2025-12-17-01",
+        "project_id": "hakone-e2",
+        "kind": "task",
+        "subkind": "pm_task",
+        "title": "evidence URLからfact・引用短文・要約抽出",
+        "summary": "候補URLから客観的事実や引用要素を丁寧に取り出す。",
+        "body": "各候補URLから事実、必要な引用（<=25 words）、要約を機械的に抽出。出典記録も厳格に。",
+        "scope": {
+          "project_phase": "phase1",
+          "lane": "pm_core",
+          "file": "scene_0001_evidence_plan_v1_20251217-061234"
+        },
+        "status": "active",
+        "importance": "high",
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "authored_by": "kai",
+        "review_status": "unreviewed"
+      },
+      {
+        "id": "hakone-e2:task:bundle_evidence_extractions:2025-12-17-01",
+        "project_id": "hakone-e2",
+        "kind": "task",
+        "subkind": "pm_task",
+        "title": "抽出結果をbundle（memo/scene_evidence）で保存",
+        "summary": "抽出情報をstructure化bundleとして格納。",
+        "body": "抽出したfact/引用/要約をbundle（source_type=memo or scene_evidence）で収納し、管理可能な形にまとめる。",
+        "scope": {
+          "project_phase": "phase1",
+          "lane": "pm_core",
+          "file": "scene_0001_evidence_plan_v1_20251217-061234"
+        },
+        "status": "active",
+        "importance": "normal",
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "authored_by": "kai",
+        "review_status": "unreviewed"
+      },
+      {
+        "id": "hakone-e2:task:gap_task_generation:2025-12-17-01",
+        "project_id": "hakone-e2",
+        "kind": "task",
+        "subkind": "pm_task",
+        "title": "gap（未埋め情報）をtask化してupdate cycle投入",
+        "summary": "収集ギャップごとにタスクを切り運用サイクル流入。",
+        "body": "ギャップそれぞれについて個別taskとして登録し、update cycle（pm_core, scene埋めサイクル）へ投入する。",
+        "scope": {
+          "project_phase": "phase1",
+          "lane": "pm_core",
+          "file": "scene_0001_evidence_plan_v1_20251217-061234"
+        },
+        "status": "active",
+        "importance": "normal",
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "authored_by": "kai",
+        "review_status": "unreviewed"
+      },
+      {
+        "id": "hakone-e2:task:scene_0001_filling_task:2025-12-17-01",
+        "project_id": "hakone-e2",
+        "kind": "task",
+        "subkind": "pm_task",
+        "title": "scene_0001のfilled v1更新タスク",
+        "summary": "evidence gapが埋まっていることを条件にfilled v1へ更新を行う。",
+        "body": "全ギャップ解消・evidence確定後、scene_0001の“filled v1”状態として文書・データ共に更新する。",
+        "scope": {
+          "project_phase": "phase1",
+          "lane": "pm_core",
+          "file": "scene_0001_evidence_plan_v1_20251217-061234"
+        },
+        "status": "active",
+        "importance": "high",
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "authored_by": "kai",
+        "review_status": "unreviewed"
+      },
+      {
+        "id": "hakone-e2:meta:evidence_plan_note:2025-12-17-01",
+        "project_id": "hakone-e2",
+        "kind": "meta",
+        "subkind": "info_model_note",
+        "title": "scene_0001 evidence planメタ情報",
+        "summary": "このevidence計画自体が記録方針としてbundledされていることを示す。",
+        "body": "scene_0001のfilled化destに向けたevidenceプランをまとめたメタnode。",
+        "scope": {
+          "project_phase": "phase1",
+          "lane": "pm_core",
+          "file": "scene_0001_evidence_plan_v1_20251217-061234"
+        },
+        "status": "active",
+        "importance": "low",
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "authored_by": "kai",
+        "review_status": "unreviewed"
+      },
+      {
+        "id": "hakone-e2:meta:scene_0001_update_cycle:2025-12-17-01",
+        "project_id": "hakone-e2",
+        "kind": "meta",
+        "subkind": "view_definition",
+        "title": "scene_0001 update cycle設計note",
+        "summary": "gap-task運用・filled判断のメタ設計指針。",
+        "body": "gap-task→update cycle反映→充足度によるfilled判断方針のメタ記述。",
+        "scope": {
+          "project_phase": "phase1",
+          "lane": "pm_core",
+          "file": "scene_0001_evidence_plan_v1_20251217-061234"
+        },
+        "status": "active",
+        "importance": "low",
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "authored_by": "kai",
+        "review_status": "unreviewed"
+      }
+    ],
+    "info_relations": [
+      {
+        "id": "hakone-e2:rel:2025-12-17-01",
+        "project_id": "hakone-e2",
+        "type": "refers_to",
+        "from": "hakone-e2:fact:scene_0001_target:2025-12-17-01",
+        "to": "hakone-e2:fact:scene_0001_gaplist:2025-12-17-01",
+        "strength": 0.9,
+        "status": "active",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00"
+      },
+      {
+        "id": "hakone-e2:rel:2025-12-17-02",
+        "project_id": "hakone-e2",
+        "type": "evidence_for",
+        "from": "hakone-e2:fact:scene_0001_gaplist:2025-12-17-01",
+        "to": "hakone-e2:fact:scene_0001_target:2025-12-17-01",
+        "strength": 0.7,
+        "status": "active",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00"
+      },
+      {
+        "id": "hakone-e2:rel:2025-12-17-03",
+        "project_id": "hakone-e2",
+        "type": "derived_from",
+        "from": "hakone-e2:task:scene_0001_filling_task:2025-12-17-01",
+        "to": "hakone-e2:fact:scene_0001_gaplist:2025-12-17-01",
+        "strength": 0.8,
+        "status": "active",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00"
+      },
+      {
+        "id": "hakone-e2:rel:2025-12-17-04",
+        "project_id": "hakone-e2",
+        "type": "part_of",
+        "from": "hakone-e2:task:collect_evidence_urls:2025-12-17-01",
+        "to": "hakone-e2:process:evidence_collection_flow:2025-12-17-01",
+        "strength": 1.0,
+        "status": "active",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00"
+      },
+      {
+        "id": "hakone-e2:rel:2025-12-17-05",
+        "project_id": "hakone-e2",
+        "type": "part_of",
+        "from": "hakone-e2:task:extract_facts_from_urls:2025-12-17-01",
+        "to": "hakone-e2:process:evidence_collection_flow:2025-12-17-01",
+        "strength": 1.0,
+        "status": "active",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00"
+      },
+      {
+        "id": "hakone-e2:rel:2025-12-17-06",
+        "project_id": "hakone-e2",
+        "type": "part_of",
+        "from": "hakone-e2:task:bundle_evidence_extractions:2025-12-17-01",
+        "to": "hakone-e2:process:evidence_collection_flow:2025-12-17-01",
+        "strength": 1.0,
+        "status": "active",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00"
+      },
+      {
+        "id": "hakone-e2:rel:2025-12-17-07",
+        "project_id": "hakone-e2",
+        "type": "part_of",
+        "from": "hakone-e2:task:gap_task_generation:2025-12-17-01",
+        "to": "hakone-e2:process:evidence_collection_flow:2025-12-17-01",
+        "strength": 1.0,
+        "status": "active",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00"
+      },
+      {
+        "id": "hakone-e2:rel:2025-12-17-08",
+        "project_id": "hakone-e2",
+        "type": "derived_from",
+        "from": "hakone-e2:task:scene_0001_filling_task:2025-12-17-01",
+        "to": "hakone-e2:task:gap_task_generation:2025-12-17-01",
+        "strength": 0.8,
+        "status": "active",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00"
+      },
+      {
+        "id": "hakone-e2:rel:2025-12-17-09",
+        "project_id": "hakone-e2",
+        "type": "part_of",
+        "from": "hakone-e2:process:evidence_collection_flow:2025-12-17-01",
+        "to": "hakone-e2:process:scene_update_cycle:2025-12-17-01",
+        "strength": 0.9,
+        "status": "active",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00"
+      },
+      {
+        "id": "hakone-e2:rel:2025-12-17-10",
+        "project_id": "hakone-e2",
+        "type": "refers_to",
+        "from": "hakone-e2:meta:evidence_plan_note:2025-12-17-01",
+        "to": "hakone-e2:process:evidence_collection_flow:2025-12-17-01",
+        "strength": 0.8,
+        "status": "active",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00"
+      },
+      {
+        "id": "hakone-e2:rel:2025-12-17-11",
+        "project_id": "hakone-e2",
+        "type": "refers_to",
+        "from": "hakone-e2:meta:evidence_plan_note:2025-12-17-01",
+        "to": "hakone-e2:norm:no_infilling:2025-12-17-01",
+        "strength": 0.7,
+        "status": "active",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00"
+      },
+      {
+        "id": "hakone-e2:rel:2025-12-17-12",
+        "project_id": "hakone-e2",
+        "type": "part_of",
+        "from": "hakone-e2:norm:no_infilling:2025-12-17-01",
+        "to": "hakone-e2:process:scene_update_cycle:2025-12-17-01",
+        "strength": 0.9,
+        "status": "active",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00"
+      },
+      {
+        "id": "hakone-e2:rel:2025-12-17-13",
+        "project_id": "hakone-e2",
+        "type": "belongs_to",
+        "from": "hakone-e2:process:scene_update_cycle:2025-12-17-01",
+        "to": "hakone-e2:meta:scene_0001_update_cycle:2025-12-17-01",
+        "strength": 0.8,
+        "status": "active",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00"
+      },
+      {
+        "id": "hakone-e2:rel:2025-12-17-14",
+        "project_id": "hakone-e2",
+        "type": "refers_to",
+        "from": "hakone-e2:norm:evidence_priority_policy:2025-12-17-01",
+        "to": "hakone-e2:process:evidence_collection_flow:2025-12-17-01",
+        "strength": 0.7,
+        "status": "active",
+        "source_refs": [
+          {
+            "kind": "file",
+            "value": "scene_0001_evidence_plan_v1_20251217-061234"
+          }
+        ],
+        "created_at": "2025-12-17T06:12:34+09:00",
+        "updated_at": "2025-12-17T06:12:34+09:00"
+      }
+    ]
+  }
+}
