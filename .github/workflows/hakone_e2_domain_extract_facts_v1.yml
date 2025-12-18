@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
+          persist-credentials: false
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -104,13 +104,14 @@ jobs:
       - name: Commit & PR (mode=pr)
         if: ${{ inputs.mode == 'pr' }}
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.PR_BOT_TOKEN }}
         run: |
           set -euo pipefail
           git status --porcelain
 
           git add data/hakone-e2/domain/e2_*.json
           git commit -m "data(hakone-e2): domain facts extracted (${{ inputs.evidence_id }})" || exit 0
+          git remote set-url origin "https://x-access-token:${{ secrets.PR_BOT_TOKEN }}@github.com/${{ github.repository }}.git"
           git push -u origin "$BRANCH"
 
           PR_URL="$(gh pr create \
