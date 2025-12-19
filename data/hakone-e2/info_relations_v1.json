@@ -1352,5 +1352,175 @@
     ],
     "created_at": "2025-12-17T06:12:34+09:00",
     "updated_at": "2025-12-17T06:12:34+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-19-001",
+    "project_id": "hakone-e2",
+    "type": "part_of",
+    "from": "hakone-e2:fact:progress:m3-factlane-cycle:2025-12-19",
+    "to": "hakone-e2:process:factlane-flows:m3:2025-12-19",
+    "strength": 0.9,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "created_at": "2025-12-19T19:10:00+09:00",
+    "updated_at": "2025-12-19T19:10:00+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-19-002",
+    "project_id": "hakone-e2",
+    "type": "belongs_to",
+    "from": "hakone-e2:fact:dry-run-to-merge-success:m3:2025-12-19",
+    "to": "hakone-e2:fact:progress:m3-factlane-cycle:2025-12-19",
+    "strength": 0.8,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "created_at": "2025-12-19T19:10:00+09:00",
+    "updated_at": "2025-12-19T19:10:00+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-19-003",
+    "project_id": "hakone-e2",
+    "type": "evidence_for",
+    "from": "hakone-e2:norm:github-checks-token-policy:m3:2025-12-19",
+    "to": "hakone-e2:decision:fix-operation-github-pat:m3:2025-12-19",
+    "strength": 0.95,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "created_at": "2025-12-19T19:10:00+09:00",
+    "updated_at": "2025-12-19T19:10:00+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-19-004",
+    "project_id": "hakone-e2",
+    "type": "derived_from",
+    "from": "hakone-e2:fact:current-capabilities:m3:2025-12-19",
+    "to": "hakone-e2:process:factlane-flows:m3:2025-12-19",
+    "strength": 0.7,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "created_at": "2025-12-19T19:10:00+09:00",
+    "updated_at": "2025-12-19T19:10:00+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-19-005",
+    "project_id": "hakone-e2",
+    "type": "evidence_for",
+    "from": "hakone-e2:norm:artifact-name-sanitize:m3:2025-12-19",
+    "to": "hakone-e2:task:factlane-artifact-check:m3:2025-12-19",
+    "strength": 0.8,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "created_at": "2025-12-19T19:10:00+09:00",
+    "updated_at": "2025-12-19T19:10:00+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-19-006",
+    "project_id": "hakone-e2",
+    "type": "evidence_for",
+    "from": "hakone-e2:norm:entity-registry-lock:m3:2025-12-19",
+    "to": "hakone-e2:task:entity-registry-lock-check:m3:2025-12-19",
+    "strength": 0.85,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "created_at": "2025-12-19T19:10:00+09:00",
+    "updated_at": "2025-12-19T19:10:00+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-19-007",
+    "project_id": "hakone-e2",
+    "type": "evidence_for",
+    "from": "hakone-e2:norm:branch-name-sanitize:m3:2025-12-19",
+    "to": "hakone-e2:task:factlane-artifact-check:m3:2025-12-19",
+    "strength": 0.7,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "created_at": "2025-12-19T19:10:00+09:00",
+    "updated_at": "2025-12-19T19:10:00+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-19-008",
+    "project_id": "hakone-e2",
+    "type": "belongs_to",
+    "from": "hakone-e2:task:factlane-artifact-check:m3:2025-12-19",
+    "to": "hakone-e2:process:factlane-flows:m3:2025-12-19",
+    "strength": 0.8,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "created_at": "2025-12-19T19:10:00+09:00",
+    "updated_at": "2025-12-19T19:10:00+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-19-009",
+    "project_id": "hakone-e2",
+    "type": "belongs_to",
+    "from": "hakone-e2:task:entity-registry-lock-check:m3:2025-12-19",
+    "to": "hakone-e2:process:factlane-flows:m3:2025-12-19",
+    "strength": 0.8,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "created_at": "2025-12-19T19:10:00+09:00",
+    "updated_at": "2025-12-19T19:10:00+09:00"
+  },
+  {
+    "id": "hakone-e2:rel:2025-12-19-010",
+    "project_id": "hakone-e2",
+    "type": "evidence_for",
+    "from": "hakone-e2:norm:claim-key-eventlock:m3:2025-12-19",
+    "to": "hakone-e2:process:factlane-flows:m3:2025-12-19",
+    "strength": 0.7,
+    "status": "active",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "created_at": "2025-12-19T19:10:00+09:00",
+    "updated_at": "2025-12-19T19:10:00+09:00"
   }
 ]
