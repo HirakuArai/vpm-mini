@@ -1,0 +1,23 @@
+info_source_bundle_v1:
+  project_id: "__PROJECT_ID__"
+  source_type: "memo"
+  source_id: "docpointer_update_YYYY-MM-DD"
+  title: "DocPointer Update: __TITLE__"
+  time_range:
+    from: "YYYY-MM-DD"
+    to: "YYYY-MM-DD"
+  raw_text: |
+    doc_id: __DOC_ID__
+    title: __DOC_TITLE__
+    location:
+      path: docs/...  # or url: https://...
+    role: "__ROLE__"  # handoff/spec/playbook/how-to
+    when_to_consult:
+      - "__WHEN__"
+    update_triggers:
+      - "__TRIGGER__"
+  hints:
+    - "Project Lane（黒板）へのDocPointer登録。本文はdocs側に置き、黒板にはポインタ情報だけを残す。"
+  tags:
+    - "kind:memo"
+    - "kind:docpointer"

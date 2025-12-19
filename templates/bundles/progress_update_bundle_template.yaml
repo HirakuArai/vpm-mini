@@ -1,0 +1,22 @@
+info_source_bundle_v1:
+  project_id: "__PROJECT_ID__"
+  source_type: "memo"
+  source_id: "progress_update_YYYY-MM-DD"
+  title: "Progress Update: __TITLE__"
+  time_range:
+    from: "YYYY-MM-DD"
+    to: "YYYY-MM-DD"
+  raw_text: |
+    What happened:
+    - __SUMMARY__
+
+    Decisions:
+    - __DECISION__
+
+    Tasks/Gaps:
+    - __TASK_OR_GAP__
+  hints:
+    - "Project Lane（黒板）の進捗更新。短く、decision/task/gap の要点に落とす。"
+  tags:
+    - "kind:memo"
+    - "kind:progress"
