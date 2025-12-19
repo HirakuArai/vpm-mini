@@ -3745,5 +3745,308 @@
     ],
     "authored_by": "kai",
     "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:progress:m3-factlane-cycle:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "state_snapshot",
+    "title": "Fact Lane の M3フェーズ進捗（全工程一周期完了）",
+    "summary": "Fact Lane（Domain Lane抽出）が dry-run→artifact確認→PR作成→required checks→merge の全工程を実動作で一周期完了。",
+    "body": "Fact Lane の進捗確認。Domain Laneからfactsを抽出するプロセスが、dry-run、artifactの確認、PR作成、required checks、mergeまで円滑に完了し、M3運用サイクルを成立させた。",
+    "scope": {
+      "project_phase": "m3",
+      "lane": "fact_lane",
+      "file": "progress/progress_m3_fact_lane_2025-12-19.md",
+      "section_anchor": "Progress Update"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-19T19:00:00+09:00",
+    "updated_at": "2025-12-19T19:00:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:process:factlane-flows:m3:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "process",
+    "subkind": "lane_spec",
+    "title": "Fact LaneのM3フェーズオペレーションフロー",
+    "summary": "Fact Laneの進行フロー：dry-run→artifact確認→mode=pr→PR作成→required checks→merge。",
+    "body": "M3フェーズでのFact Laneオペレーションは、dry-run、artifact確認、GitHub PR作成、required checks、最終mergeまでを含む。運用チェックと自動化されたQuality Gateも含め、反復的に行われる。",
+    "scope": {
+      "project_phase": "m3",
+      "lane": "fact_lane",
+      "file": "progress/progress_m3_fact_lane_2025-12-19.md"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-19T19:00:00+09:00",
+    "updated_at": "2025-12-19T19:00:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:dry-run-to-merge-success:m3:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "state_snapshot",
+    "title": "Fact Laneにてdry-runからmergeまで実現",
+    "summary": "HTML evidence→facts抽出→Quality Gateを通過→PR化→checks実施→mergeの工程実現。",
+    "body": "最新プロセスにおいて、Fact Laneは事実抽出の初期からGitHub上mergeまでの一連フローが確立されている。",
+    "scope": {
+      "project_phase": "m3",
+      "lane": "fact_lane"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-19T19:00:00+09:00",
+    "updated_at": "2025-12-19T19:00:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:norm:github-checks-token-policy:m3:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "norm",
+    "subkind": "update_policy",
+    "title": "GitHub Required checks用トークン運用方針",
+    "summary": "required checksが“Expected”で止まる問題の回避策：PR作成・PushにはPR_BOT_TOKENを利用する。",
+    "body": "GITHUB_TOKENではrequired checksが正しく走らない場合があるため、PAT形式のPR_BOT_TOKENに一元化。これによりチェック不全となる障害を回避する。",
+    "scope": {
+      "project_phase": "m3",
+      "lane": "fact_lane"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-19T19:00:00+09:00",
+    "updated_at": "2025-12-19T19:00:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:norm:artifact-name-sanitize:m3:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "norm",
+    "subkind": "update_policy",
+    "title": "artifact名のrun_idサニタイズ方針",
+    "summary": "run_idに':'等の記号が含まれるとupload-artifact失敗。run_id_safe対応を運用。",
+    "body": "artifactなど命名時はrun_idを安全な文字列（run_id_safe）に変換して利用する。GitHub Actionsでの障害対策。",
+    "scope": {
+      "project_phase": "m3",
+      "lane": "fact_lane"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-19T19:00:00+09:00",
+    "updated_at": "2025-12-19T19:00:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:norm:branch-name-sanitize:m3:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "norm",
+    "subkind": "update_policy",
+    "title": "branch作成用evidence_idサニタイズ運用",
+    "summary": "evidence_idの':'等によるブランチ作成失敗を防止する方針。",
+    "body": "ブランチ命名時にはevidence_idをサニタイズし、GitHubで不正扱いされないよう管理するルール。",
+    "scope": {
+      "project_phase": "m3",
+      "lane": "fact_lane"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-19T19:00:00+09:00",
+    "updated_at": "2025-12-19T19:00:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:norm:claim-key-eventlock:m3:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "norm",
+    "subkind": "update_policy",
+    "title": "claim.key一意化+event_idロック運用",
+    "summary": "擬似矛盾多発（claim.keyの重複）を防ぐため、一意性・event_id lockのルール導入。",
+    "body": "claim.keyの汎用化によるconflicts多発を防ぐ施策として、keyの一意化とevent_idによるロック戦略を固定運用とする。",
+    "scope": {
+      "project_phase": "m3",
+      "lane": "fact_lane"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-19T19:00:00+09:00",
+    "updated_at": "2025-12-19T19:00:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:norm:entity-registry-lock:m3:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "norm",
+    "subkind": "update_policy",
+    "title": "entity registry lock運用",
+    "summary": "entityの増殖・IDブレ防止のため、既知entityのみ参照・新規生成禁止の運用に切り替える。",
+    "body": "実行時にentity registry lockを導入し、知られている既存entityのみ参照。新規ID発生によるブレを防止。",
+    "scope": {
+      "project_phase": "m3",
+      "lane": "fact_lane"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-19T19:00:00+09:00",
+    "updated_at": "2025-12-19T19:00:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:decision:fix-operation-github-pat:m3:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "decision",
+    "subkind": "design_decision",
+    "title": "GitHub用PATによるPR/BOT運用決定",
+    "summary": "required checksの安定動作のため、PR作成・push時はPAT（PR_BOT_TOKEN）に固定する設計判断を決定。",
+    "body": "PRやpushをGITHUB_TOKENで行うとチェックが止まる障害の根本対策として、PAT利用の運用固定を正式決定。",
+    "scope": {
+      "project_phase": "m3",
+      "lane": "fact_lane"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-19T19:00:00+09:00",
+    "updated_at": "2025-12-19T19:00:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:current-capabilities:m3:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "state_snapshot",
+    "title": "Fact Lane現状可能作業（M3）",
+    "summary": "HTML evidence から facts 抽出、Quality GateによるDomain Lane更新、GitHub PR経由でchecks/mergeまで可能状態。",
+    "body": "Fact LaneはHTML evidenceを受理後、クオリティゲートを通じDomain Lane更新、その上でチェック・mergeまで流せる基本運用能力を取得した。",
+    "scope": {
+      "project_phase": "m3",
+      "lane": "fact_lane"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-19T19:00:00+09:00",
+    "updated_at": "2025-12-19T19:00:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:factlane-artifact-check:m3:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "Fact Lane artifact確認業務",
+    "summary": "artifact命名・確実なアップロード・run_idサニタイズのタスク運用。",
+    "body": "GitHub Actions artifactアップロード時に命名規則とrun_idサニタイズを着実に管理する恒常タスク。",
+    "scope": {
+      "project_phase": "m3",
+      "lane": "fact_lane"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-19T19:00:00+09:00",
+    "updated_at": "2025-12-19T19:00:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:task:entity-registry-lock-check:m3:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "task",
+    "subkind": "pm_task",
+    "title": "entity registry lockチェック",
+    "summary": "entity参照時はregistryロックの原則遵守を確認するタスク。",
+    "body": "entity管理運用で新規生成禁止＆既知entityのみ参照を恒常的に点検する運用タスク。",
+    "scope": {
+      "project_phase": "m3",
+      "lane": "fact_lane"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-19T19:00:00+09:00",
+    "updated_at": "2025-12-19T19:00:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "progress_m3_fact_lane_2025-12-19"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
   }
 ]
