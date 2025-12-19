@@ -3477,6 +3477,276 @@
     "review_status": "unreviewed"
   },
   {
+    "id": "hakone-e2:fact:docpointer_update:2025-12-19-01",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "state_snapshot",
+    "title": "Project Lane DocPointer 更新（2025-12-19）",
+    "summary": "黒板に存在するDocPointer（運用/仕様/設計原則関連）の最新状況。ドメインデータ自体は含まない。",
+    "body": "Project Lane上の運用手順・仕様・原則に関する参照先（DocPointer）リストを、黒板の参照用として更新した。Domain Laneは対象外。",
+    "scope": {
+      "project_phase": "phase3",
+      "lane": "pm_core",
+      "file": "docs/projects/hakone-e2/domain_update_lane_facts_v1.md",
+      "section_anchor": "DocPointer Update"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-19T12:00:00+09:00",
+    "updated_at": "2025-12-19T12:00:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "docpointer_m3_ops_2025-12-19"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:fact_lane_opsdoc:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "project_meta",
+    "title": "Fact Lane 運用手順書 DocPointer",
+    "summary": "facts lane の dry-run/pr 前後や命名禁則・Expected停止に備えた運用手順参照。",
+    "body": "facts lane を dry-runやpull requestで実行前、あるいはlane特有の停止や命名ルール違反に遭遇したタイミングで参照するFact Lane運用手順書のDocPointer。",
+    "scope": {
+      "project_phase": "phase3",
+      "lane": "pm_core",
+      "file": "docs/projects/hakone-e2/domain_update_lane_facts_v1.md",
+      "section_anchor": "domain_update_lane_facts_v1"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-19T12:01:00+09:00",
+    "updated_at": "2025-12-19T12:01:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "docs/projects/hakone-e2/domain_update_lane_facts_v1.md"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:domain_schema_docpointer:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "project_meta",
+    "title": "Domain Lane スキーマ仕様書 DocPointer",
+    "summary": "claim.key設計や重複矛盾対応時に参照するdomain schemaの参照情報。",
+    "body": "claim.key設計やスキーマ変更・重複矛盾の対処時に参照するhakon-e2 Domain Laneスキーマ仕様書のDocPointer。",
+    "scope": {
+      "project_phase": "phase3",
+      "lane": "pm_core",
+      "file": "docs/projects/hakone-e2/domain_schema_v1.md",
+      "section_anchor": "domain_schema_v1"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-19T12:02:00+09:00",
+    "updated_at": "2025-12-19T12:02:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "docs/projects/hakone-e2/domain_schema_v1.md"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:fact:domain_ssot_split_docpointer:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "fact",
+    "subkind": "project_meta",
+    "title": "Lane分離の原則 DocPointer",
+    "summary": "Project Lane/Domian Laneの役目と境界を明文化した設計原則文書の参照情報。",
+    "body": "「どこに何を書くか」に迷った際やLane方針自体を変更する際に参照する、Lane分離の原則を記述した仕様書DocPointer。",
+    "scope": {
+      "project_phase": "phase3",
+      "lane": "pm_core",
+      "file": "docs/projects/hakone-e2/domain_ssot_split_v1.md",
+      "section_anchor": "domain_ssot_split_v1"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-19T12:03:00+09:00",
+    "updated_at": "2025-12-19T12:03:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "docs/projects/hakone-e2/domain_ssot_split_v1.md"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:process:docpointer_ops_flow:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "process",
+    "subkind": "lane_spec",
+    "title": "Project Lane DocPointer運用フロー",
+    "summary": "黒板（Project Lane）へ各DocPointerを反映・更新する基本手順。",
+    "body": "PMはDomain Laneの中身を含めず、運用/仕様/設計原則等のDocPointerのみ黒板に追記・反映する、Project Lane運用の手順。",
+    "scope": {
+      "project_phase": "phase3",
+      "lane": "pm_core",
+      "file": "docs/projects/hakone-e2/domain_update_lane_facts_v1.md",
+      "section_anchor": "Project Lane DocPointer運用"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-19T12:04:00+09:00",
+    "updated_at": "2025-12-19T12:04:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "docpointer_m3_ops_2025-12-19"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:norm:ssot_policy:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "norm",
+    "subkind": "ssot_policy",
+    "title": "SSOT（Single Source of Truth）ポリシー：Project Lane",
+    "summary": "運用黒板上の参照情報と実体データの厳密な分離方針。",
+    "body": "Project Lane（黒板）には参照pointerのみ記載し、ドキュメント本体はdocs配下=SSOTで一元管理するポリシー。",
+    "scope": {
+      "project_phase": "phase3",
+      "lane": "pm_core",
+      "file": "docs/projects/hakone-e2/domain_ssot_split_v1.md",
+      "section_anchor": "SSOT policy"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-19T12:05:00+09:00",
+    "updated_at": "2025-12-19T12:05:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "docs/projects/hakone-e2/domain_ssot_split_v1.md"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:norm:lane_separation_policy:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "norm",
+    "subkind": "update_policy",
+    "title": "Project Lane / Domain Lane 分離方針",
+    "summary": "実データと黒板参照pointerの混在禁止方針。",
+    "body": "Project Laneでは参照pointer（DocPointer）は載せるが、Domain Laneの中身（データ本体）は黒板に持ち込まないという厳密な分離ポリシー。設計ルールに明記。",
+    "scope": {
+      "project_phase": "phase3",
+      "lane": "pm_core",
+      "file": "docs/projects/hakone-e2/domain_ssot_split_v1.md",
+      "section_anchor": "Lane Separation Policy"
+    },
+    "status": "active",
+    "importance": "high",
+    "created_at": "2025-12-19T12:06:00+09:00",
+    "updated_at": "2025-12-19T12:06:00+09:00",
+    "source_refs": [
+      {
+        "kind": "file",
+        "value": "docs/projects/hakone-e2/domain_ssot_split_v1.md"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:guideline:docpointer_update_principle:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "guideline",
+    "subkind": "pm_guideline",
+    "title": "DocPointer参照・更新時の原則",
+    "summary": "誰が・いつ・どのタイミングでどのpointerをどう更新するか明文化した設計ガイドライン。",
+    "body": "ガバナンス観点から、Project Laneの参照更新（pointer対象/頻度/責任者）原則を明確にし、運用の属人化やpointer漏れリスクを軽減する。",
+    "scope": {
+      "project_phase": "phase3",
+      "lane": "pm_core",
+      "file": "docs/projects/hakone-e2/domain_update_lane_facts_v1.md",
+      "section_anchor": "DocPointer update principle"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-19T12:07:00+09:00",
+    "updated_at": "2025-12-19T12:07:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "docpointer_m3_ops_2025-12-19"
+      }
+    ],
+    "authored_by": "aya",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:meta:docpointer_index_meta:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "meta",
+    "subkind": "info_model_note",
+    "title": "Project Lane DocPointer index 情報",
+    "summary": "黒板上のpointer網羅状況やindex管理の現状メタ情報。",
+    "body": "Project Laneの参照pointerが網羅的かつ最新になっているか、indexとしての一覧・重複・漏れの有無等を整理する目的のメタノード。",
+    "scope": {
+      "project_phase": "phase3",
+      "lane": "pm_core",
+      "file": "docs/projects/hakone-e2/domain_update_lane_facts_v1.md",
+      "section_anchor": "DocPointer index"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-19T12:08:00+09:00",
+    "updated_at": "2025-12-19T12:08:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "docpointer_m3_ops_2025-12-19"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
+    "id": "hakone-e2:meta:project_lane_docpointer_policy:2025-12-19",
+    "project_id": "hakone-e2",
+    "kind": "meta",
+    "subkind": "info_model_note",
+    "title": "Project Lane と DocPointer運用設計メタ",
+    "summary": "DocPointer戦略や更新ガバナンス等の設計思想メタ情報。",
+    "body": "DocPointer（参照のみ）の運用目的・利点・黒板上での設計意図（なぜ分離する必要があるか等）を説明する設計思想メタ。",
+    "scope": {
+      "project_phase": "phase3",
+      "lane": "pm_core",
+      "file": "docs/projects/hakone-e2/domain_update_lane_facts_v1.md",
+      "section_anchor": "Meta"
+    },
+    "status": "active",
+    "importance": "normal",
+    "created_at": "2025-12-19T12:09:00+09:00",
+    "updated_at": "2025-12-19T12:09:00+09:00",
+    "source_refs": [
+      {
+        "kind": "memo",
+        "value": "docpointer_m3_ops_2025-12-19"
+      }
+    ],
+    "authored_by": "kai",
+    "review_status": "unreviewed"
+  },
+  {
     "id": "hakone-e2:fact:progress:m3-factlane-cycle:2025-12-19",
     "project_id": "hakone-e2",
     "kind": "fact",
