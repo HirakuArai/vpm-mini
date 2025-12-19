@@ -1,0 +1,46 @@
+name: Blackboard Healthcheck (v1)
+
+on:
+  pull_request:
+    paths:
+      - "data/**/info_nodes_v1.json"
+      - "data/**/info_relations_v1.json"
+
+jobs:
+  blackboard_healthcheck:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Healthcheck all modified blackboards
+        run: |
+          set -euo pipefail
+
+          python -m compileall -q scripts/info_network/blackboard_healthcheck_v1.py
+
+          # Detect which project dirs changed in this PR
+          git fetch origin main --depth=1
+          CHANGED="$(git diff --name-only origin/main...HEAD | rg -n "data/.+/info_(nodes|relations)_v1.json" || true)"
+          echo "Changed files:"
+          echo "$CHANGED"
+
+          # Derive project dirs from changed files, then run check per project
+          PROJS="$(echo "$CHANGED" | awk -F/ '{print $2}' | sort -u | tr '\n' ' ')"
+          echo "Projects: $PROJS"
+
+          for pid in $PROJS; do
+            N="data/${pid}/info_nodes_v1.json"
+            R="data/${pid}/info_relations_v1.json"
+            if [ -f "$N" ] && [ -f "$R" ]; then
+              echo "== Checking $pid =="
+              python scripts/info_network/blackboard_healthcheck_v1.py --nodes "$N" --relations "$R"
+            fi
+          done
