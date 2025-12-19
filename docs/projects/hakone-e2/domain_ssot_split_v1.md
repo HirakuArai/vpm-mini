@@ -24,3 +24,11 @@ hakone-e2 は「箱根駅伝の事実を情報化してE²的に扱えるよう�
 - 「何が起きたか（事実）」は Domain SSOT
 - docs/projects/hakone-e2/scenes/* は “仕様/テンプレ/作業メモ” としてはOKだが、
   断定的事実は domain の claim/evidence に落とす。
+
+## 運用上の含意（Laneごとの更新方式）
+
+- Project Lane（プロジェクト黒板）は「要点（決定・運用知・タスク・gap）」を保持し、手順書/仕様書の本文は docs をSSOTとする。
+- Domain Lane（事実+根拠+解釈）は GitHub Actions の Fact Lane で更新する。
+- Fact Lane の `mode=pr` で作るPRは PR_BOT_TOKEN（PAT）を使う。
+  `GITHUB_TOKEN` を使うと（`workflow_dispatch` / `repository_dispatch` を除き）新しいworkflow runを作成しない仕様があり、required checks が “Expected” で止まり得るため。
+

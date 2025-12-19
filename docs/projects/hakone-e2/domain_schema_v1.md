@@ -21,3 +21,18 @@ B方式（hakone-e2 Project黒板: data/hakone-e2/info_*）は設計/運用/タ�
 - claim.evidence_refs が空のレコードは追加しない
 - refs（entity/event/evidence/claim/hypothesis/scene）が参照切れしない
 - claim.key の重複は「同一断定の重複」なので検知する（運用で上書き/統合を決める）
+
+## Fact Lane（facts抽出）向けの品質ルール（v1運用）
+
+### claim.key は「同一断定=同一キー」になるように一意化する
+- `claim.key` は重複排除・矛盾検知のための正規化キーである。
+- ランキング表のように複数行を生成する場合、`rank` / `team` / `event_id` などの識別子を key に含めて **1行=1key** を保証する。
+- 汎用キー（例: `team_rank`）を複数行で使い回すと、矛盾ではなく擬似矛盾（pseudo-conflict）を大量発生させるため禁止。
+
+### event lock（event_id 指定時の扱い）
+- facts抽出に `event_id` を与えた場合、claims は `event_refs=[<event_id>]` に固定し、抽出側が別eventを勝手に作らないようにする（events[] は空を許容）。
+
+### entity registry lock（既知entityのみ参照）
+- facts抽出は品質優先のため、entityは既存レジストリ（`e2_entities_v1.json`）にロックする。
+- 抽出時にチーム/人物を既知entityへ確実にマップできない場合は、`entity_refs=[]` を許容する（新しい entity_id を増殖させない）。
+
