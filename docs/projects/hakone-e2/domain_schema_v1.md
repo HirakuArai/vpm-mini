@@ -36,3 +36,9 @@ B方式（hakone-e2 Project黒板: data/hakone-e2/info_*）は設計/運用/タ�
 - facts抽出は品質優先のため、entityは既存レジストリ（`e2_entities_v1.json`）にロックする。
 - 抽出時にチーム/人物を既知entityへ確実にマップできない場合は、`entity_refs=[]` を許容する（新しい entity_id を増殖させない）。
 
+
+
+## Conflict Policy（矛盾運用）
+- 矛盾（conflict）は「同一 claim.key に対して value が一致しない」状態。
+- 運用ルール（優先ソース順・レビュー手順）は以下に定義する：
+  - docs/projects/hakone-e2/domain_conflict_policy_v1.md
