@@ -79,6 +79,42 @@ jobs:
           mkdir -p "reports/hakone-e2/runs/${RUN_ID}"
           git diff -- data/hakone-e2/domain > "reports/hakone-e2/runs/${RUN_ID}/domain.diff" || true
 
+      - name: Write Job Summary
+        if: ${{ always() }}
+        run: |
+          set -euo pipefail
+          echo "# hakone-e2 facts lane run summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- run_id: \`${RUN_ID}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- url: \`${{ inputs.url }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- evidence_id: \`${{ inputs.evidence_id }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- event_id: \`${{ inputs.event_id }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- mode: \`${{ inputs.mode }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -f "reports/hakone-e2/runs/${RUN_ID}/patch_preview.md" ]; then
+            echo "## patch_preview" >> "$GITHUB_STEP_SUMMARY"
+            echo '```md' >> "$GITHUB_STEP_SUMMARY"
+            sed -n '1,120p' "reports/hakone-e2/runs/${RUN_ID}/patch_preview.md" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          if [ -f "reports/hakone-e2/runs/${RUN_ID}/conflicts_summary.md" ]; then
+            echo "## conflicts_summary (head)" >> "$GITHUB_STEP_SUMMARY"
+            echo '```md' >> "$GITHUB_STEP_SUMMARY"
+            sed -n '1,200p' "reports/hakone-e2/runs/${RUN_ID}/conflicts_summary.md" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          if [ -f "reports/hakone-e2/runs/${RUN_ID}/domain.diff" ]; then
+            echo "## domain.diff (stat)" >> "$GITHUB_STEP_SUMMARY"
+            echo '```diff' >> "$GITHUB_STEP_SUMMARY"
+            sed -n '1,200p' "reports/hakone-e2/runs/${RUN_ID}/domain.diff" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Upload run artifacts (always)
         uses: actions/upload-artifact@v4
         with:
@@ -102,6 +138,7 @@ jobs:
           PY
 
       - name: Commit & PR (mode=pr)
+        id: pr
         if: ${{ inputs.mode == 'pr' }}
         env:
           GH_TOKEN: ${{ secrets.PR_BOT_TOKEN }}
@@ -120,8 +157,42 @@ jobs:
             -t "data(hakone-e2): domain facts extracted (${{ inputs.evidence_id }})" \
             -b "Summary: API extraction → domain update. Evidence: ${{ inputs.url }}")"
 
+          PR_NUMBER="$(echo "$PR_URL" | grep -oE '[0-9]+$' || true)"
+          if [ -n "$PR_NUMBER" ]; then
+            echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          fi
+
           if [ "${{ steps.conflicts.outputs.has_conflicts }}" = "true" ]; then
             gh pr edit "$PR_URL" --add-label "review-required" || true
           fi
 
           echo "PR: $PR_URL"
+
+      - name: Comment summary on PR (mode=pr)
+        if: ${{ inputs.mode == 'pr' && steps.pr.outputs.pr_number != '' }}
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ steps.pr.outputs.pr_number }}
+          body: |
+            ✅ hakone-e2 facts lane run summary
+
+            - run_id: `${{ steps.extract.outputs.run_id }}`
+            - url: `${{ inputs.url }}`
+            - evidence_id: `${{ inputs.evidence_id }}`
+            - event_id: `${{ inputs.event_id }}`
+            - mode: `${{ inputs.mode }}`
+
+            ### patch_preview
+            ```md
+            (see workflow Job Summary for full text)
+            ```
+
+            ### conflicts_summary
+            ```md
+            (see workflow Job Summary for full text)
+            ```
+
+            ### domain.diff
+            ```diff
+            (see workflow Job Summary / artifact for full diff)
+            ```
