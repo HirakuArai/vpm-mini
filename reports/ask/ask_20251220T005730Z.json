@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "PR #983 と #985 でテンプレート類と運用ドキュメントが追加され、DoD（新規プロジェクトがコピペで開始可能／中間PRは Refs、最後に Close）が満たされました。本Issueをクローズして問題ありません。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "DoD 達成を確認。Issue をクローズします。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
