@@ -36,6 +36,72 @@ def load_entity_registry_for_prompt():
     return reg[:500]
 
 
+ALLOWED_EVIDENCE_TYPES = {"official", "semi_official", "media", "other"}
+
+
+def normalize_evidence_type(e: dict) -> str:
+    """
+    Normalize evidence.type into controlled vocabulary:
+      official | semi_official | media | other
+    """
+    t = (e.get("type") or "").strip().lower()
+    pub = (e.get("publisher") or "").strip()
+    url = (e.get("url") or "").strip().lower()
+
+    # If already in controlled vocab, keep
+    if t in ALLOWED_EVIDENCE_TYPES:
+        return t
+
+    # Heuristics (quality-first, conservative):
+    # Official-ish sources
+    if "hakone-ekiden.jp" in url:
+        return "official"
+    if "kgrr.org" in url or "kgrr" in pub:
+        return "official"
+
+    # Semi-official: broadcaster official pages, etc.
+    if "ntv.co.jp/hakone" in url or "日本テレビ" in pub or pub.upper() == "NTV":
+        return "semi_official"
+
+    # Media
+    if "nikkansports.com" in url or "日刊スポーツ" in pub:
+        return "media"
+
+    # Fallback: if it was "webpage" etc, map to other
+    return "other"
+
+
+_time_hms_pat = re.compile(r"^\s*(\d{1,2}):(\d{2}):(\d{2})\s*$")
+_time_jp_pat = re.compile(r"^\s*(\d{1,2})\s*時間\s*(\d{1,2})\s*分\s*(\d{1,2})\s*秒\s*$")
+
+
+def normalize_total_time(value: dict) -> None:
+    """
+    Normalize value.total_time to HH:MM:SS if possible.
+    Preserve original string in total_time_display if changed.
+    """
+    if not isinstance(value, dict):
+        return
+    t = value.get("total_time")
+    if not isinstance(t, str) or not t.strip():
+        return
+
+    raw = t.strip()
+
+    m = _time_hms_pat.match(raw)
+    if m:
+        hh, mm, ss = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        value["total_time"] = f"{hh:02d}:{mm:02d}:{ss:02d}"
+        return
+
+    m = _time_jp_pat.match(raw)
+    if m:
+        hh, mm, ss = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        value["total_time_display"] = raw
+        value["total_time"] = f"{hh:02d}:{mm:02d}:{ss:02d}"
+        return
+
+
 REQUIRED_META_KEYS = {
     "schema_id",
     "schema_version",
@@ -212,6 +278,9 @@ Rules:
 - meta must include:
   schema_id="hakone-e2.domain", schema_version="v1", run_id="{run_id}", created_at="{today}", updated_at="{today}"
 
+Evidence policy:
+- evidence.type must be one of: official | semi_official | media | other
+
 Entity policy (QUALITY-FIRST):
 - Do NOT invent new entity_id values in this lane.
 - You may only reference entities that already exist in the registry provided below.
@@ -266,6 +335,15 @@ JSON:
         # normalize events list to empty to avoid accidental upsert of wrong event
         validated["events"] = []
 
+    # Normalize evidence.type and time formats (quality-first)
+    # - evidence.type -> controlled vocab: official|semi_official|media|other
+    # - total_time -> HH:MM:SS (preserve original in total_time_display if changed)
+    for e in validated.get("evidence", []):
+        if isinstance(e, dict):
+            e["type"] = normalize_evidence_type(e)
+    for c in validated.get("claims", []):
+        if isinstance(c, dict) and isinstance(c.get("value"), dict):
+            normalize_total_time(c["value"])
     write_json(run_dir / "validated.json", validated)
 
     # Entity registry lock (quality-first): do not allow new entity_ids to be introduced by this lane.
@@ -281,6 +359,11 @@ JSON:
             raise ValueError(f"new entity_id not allowed in facts lane v1.4: {eid}")
 
     evi = load_container(DOMAIN_DIR / "e2_evidence_v1.json")
+
+    # best-effort normalize existing domain evidence types into controlled vocab
+    for e in evi.get("items", []):
+        if isinstance(e, dict):
+            e["type"] = normalize_evidence_type(e)
     ent = load_container(DOMAIN_DIR / "e2_entities_v1.json")
     evt = load_container(DOMAIN_DIR / "e2_events_v1.json")
     clm = load_container(DOMAIN_DIR / "e2_claims_v1.json")
