@@ -48,7 +48,12 @@ def normalize_evidence_type(e: dict) -> str:
     pub = (e.get("publisher") or "").strip()
     url = (e.get("url") or "").strip().lower()
 
-    # If already in controlled vocab, keep
+    # First apply source heuristics that must win (quality-first)
+    # NTV Hakone pages are treated as semi_official even if the model calls them 'official'
+    if "ntv.co.jp/hakone" in url or "日本テレビ" in pub or pub.upper() == "NTV":
+        return "semi_official"
+
+    # If already in controlled vocab, keep (after enforced heuristics)
     if t in ALLOWED_EVIDENCE_TYPES:
         return t
 
@@ -344,6 +349,10 @@ JSON:
     for c in validated.get("claims", []):
         if isinstance(c, dict) and isinstance(c.get("value"), dict):
             normalize_total_time(c["value"])
+
+    validated["entities"] = (
+        []
+    )  # facts lane does not update entity registry (quality-first)
     write_json(run_dir / "validated.json", validated)
 
     # Entity registry lock (quality-first): do not allow new entity_ids to be introduced by this lane.
@@ -370,8 +379,7 @@ JSON:
 
     for obj in validated.get("evidence", []):
         upsert_by_id(evi["items"], "evidence_id", obj)
-    for obj in validated.get("entities", []):
-        upsert_by_id(ent["items"], "entity_id", obj)
+    # entities are not upserted in facts lane (registry managed separately)
     for obj in validated.get("events", []):
         upsert_by_id(evt["items"], "event_id", obj)
     for obj in validated.get("claims", []):
