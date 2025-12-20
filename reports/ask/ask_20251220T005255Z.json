@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "Phase 2 進捗: #983 を main にマージ済み。以下を追加済み: docs/ops/templates/README.md, docs/ops/templates/handoff_template_v1.md, templates/bundles/docpointer_update_bundle_template.yaml, templates/bundles/progress_update_bundle_template.yaml。残りは #982 の DoD を満たすための 2 本の本文ドキュメント作成＋必要なら既存ドキュメントからの参照リンク追加。運用として途中 PR は Refs #982、最後のみ Closes #982。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "上記方針で着手します。まず PR1（DocPointer/Progress の使い方本文）を作成し Refs #982 として出します。その後、PR2 でマルチ PR プレイブックとリンク追加をまとめ、Closes #982 とします。特記事項や既存スタイルガイドの指定があれば共有ください。なければ既存 v1 ドキュメントのトーンに合わせて作成します。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
