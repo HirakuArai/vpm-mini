@@ -1,6 +1,7 @@
 import argparse
 import json
 import re
+from collections import defaultdict
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Set
@@ -308,6 +309,76 @@ JSON:
             by_key[k] = v
 
     write_json(run_dir / "conflicts.json", {"conflicts": conflicts})
+
+    # Human-readable conflict summary (quality-first)
+    # We DO NOT auto-resolve conflicts in v1; we only suggest by evidence type priority.
+    # Priority: official > semi_official > media > other
+    priority = {"official": 4, "semi_official": 3, "media": 2, "other": 1}
+
+    # Build evidence type map from current domain evidence items (best-effort)
+    evi_type = {}
+    for e in evi["items"]:
+        if isinstance(e, dict) and e.get("evidence_id"):
+            et = e.get("type") or "other"
+            evi_type[e["evidence_id"]] = et
+
+    # For each conflicting key, list candidate claim_ids grouped by value
+    # and output a recommended candidate (best-effort) by max evidence priority.
+    lines = []
+    lines.append("# conflicts summary (v1)\n")
+    lines.append(f"- conflicts: {len(conflicts)}\n")
+    lines.append(
+        "## Priority (best-effort)\n- official > semi_official > media > other\n"
+    )
+
+    # We need richer info than current conflicts list (which only has value_a/value_b),
+    # so we re-scan claims for each key.
+    key_to_claims = defaultdict(list)
+    for c in clm["items"]:
+        if not isinstance(c, dict):
+            continue
+        k = c.get("key")
+        if not k:
+            continue
+        key_to_claims[k].append(c)
+
+    conflict_keys = sorted(
+        {c["key"] for c in conflicts if isinstance(c, dict) and c.get("key")}
+    )
+    for k in conflict_keys:
+        candidates = key_to_claims.get(k, [])
+        lines.append(f"\n---\n## key: {k}\n")
+        # group by value
+        by_val = defaultdict(list)
+        for c in candidates:
+            by_val[str(c.get("value"))].append(c)
+        # compute recommendation by best evidence priority
+        best_score = -1
+        best_claim = None
+        for c in candidates:
+            refs = c.get("evidence_refs") or []
+            score = 0
+            for r in refs:
+                score = max(score, priority.get(evi_type.get(r, "other"), 1))
+            if score > best_score:
+                best_score = score
+                best_claim = c
+        if best_claim:
+            lines.append(
+                f"- recommended_claim_id: {best_claim.get('claim_id')} (score={best_score})\n"
+            )
+
+        lines.append("- candidates:\n")
+        for v, cs in by_val.items():
+            lines.append(f"  - value: {v[:120]}\n")
+            for c in cs:
+                refs = c.get("evidence_refs") or []
+                types = [evi_type.get(r, "other") for r in refs]
+                lines.append(
+                    f"    - claim_id: {c.get('claim_id')} evidence: {refs} types: {types}\n"
+                )
+
+    (run_dir / "conflicts_summary.md").write_text("".join(lines), encoding="utf-8")
 
     resolve_refs_after_upsert(evi["items"], ent["items"], evt["items"], clm["items"])
 
