@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "本PRは「Hello S5 S5 apply パスの初期スモーク用」であり、現在は apply_hello_dev_20251115T183901Z が本命ルートとして STATE/reports/メモリに記録済みのため、当該スモーク用PRは main に残す必要がない。よって本PRはマージせず Experiment 完了として Close する（#733 参照）。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "指示を承知しました。上記の手順で当該PRをマージせず Close（Experiment 完了）し、#733 にクロスリンクします。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
