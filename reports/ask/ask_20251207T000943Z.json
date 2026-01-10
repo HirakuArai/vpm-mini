@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "hakone-e2 の現状（STATE/current_state.md の 1. Snapshot〈C/G/δ〉、2. Active Focus/Tasks、3. Evidence Links）を、segmenter モードで info_node / info_relation に分割する。創作禁止。relation は refines / supports / blocks / depends_on のみ。refines は必ず「具体→抽象」。decision ノードは明示的な意思決定文がある場合のみ。max_nodes=40。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "着手可能ですが、指定3セクションの原文が未提供のため作業をブロック中です。STATE/hakone-e2/current_state.md の当該セクション本文を貼り付けてください。受領次第、max_nodes=40 以内で info_node / info_relation を返します。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
