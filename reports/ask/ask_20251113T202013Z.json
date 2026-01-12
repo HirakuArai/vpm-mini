@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "Create an evidence-only PR that triggers ask_inbox_producer to auto-commit codex/inbox/ask_<ts>.json. The Runner (dry-run) should detect it, write reports/codex/codex_runs/<id>/run.log, and move the JSON into codex/inbox/_done/. DoD: PR branch contains codex/inbox/ask_<ts>.json; run.log exists; codex/inbox/_done/ask_<ts>.json exists. Artifact: the run.log path; optional: any evidence PR link created by the runner.",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "Pass if: (1) The PR branch contains codex/inbox/ask_<ts>.json (auto-committed by ask_inbox_producer), (2) reports/codex/codex_runs/<id>/run.log exists, and (3) codex/inbox/_done/ask_<ts>.json exists. Provide the run.log path as evidence and, if present, the runner-opened evidence PR URL."
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
