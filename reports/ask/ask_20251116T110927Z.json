@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "この差分は reports/ask/ask_20251115T231848Z.json（自動生成の u_contract）追加のみで、コード/設定/STATE の変更はありません。M2 / u_contract_policy v1 の基準では category: persist-report に該当し、CI Green を前提に軽い人間確認後、auto-merge 候補として扱えます。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "提案のカテゴリ判定と運用方針を採用し、上記の手順で進めます。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
