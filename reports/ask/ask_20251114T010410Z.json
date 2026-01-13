@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "Create and commit codex/inbox/ask_<ts>.json into this PR branch as an evidence-only /ask. Then let Runner(DRY) consume it, generate reports/codex_runs/<id>/run.log, and move the ask JSON to codex/inbox/_done/. Provide commands to create the ask file, commit/push, and optionally wait/verify the evidence.",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "yes"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
