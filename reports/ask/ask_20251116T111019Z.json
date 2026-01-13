@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "この変更は reports/ask/ask_20251113T190330Z.json（自動生成された u_contract）のみを含み、コード／設定／STATE の変更は見当たりません。カテゴリは persist-report。CI Green を前提に、軽い人間確認後の auto-merge 候補として扱います。（Task-M2 #738, u_contract_policy v1）",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "上記のラベリング、コメント、ガード付きの自動マージ設定を適用します。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
