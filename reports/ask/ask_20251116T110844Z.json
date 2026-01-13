@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "当該変更は reports/ask/** 内の自動生成 u_contract JSON のみであり、code/config/STATE には変更なし。カテゴリは persist-report。CI Green と人間の確認後、auto-merge 候補として扱う方針で問題ありません（必要に応じて auto-merge ラベル付与）。本対応は Task-M2 #738 の一時的整頓に紐付け。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "分類メモを受領。ラベル付与とコメントを実施し、CI Green と人間確認後に自動マージを有効化します。"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
