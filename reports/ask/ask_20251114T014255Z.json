@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "T2 PR-direct smoke passed for PR #660 (ask/store: guard probe evidence). I will annotate the PR with results, label it, and merge if approved and mergeable; otherwise, I will mark it ready-to-merge and await approvals.",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "Acknowledged. I will annotate PR #660 with the T2 PASS, apply labels, and merge if it is approved and mergeable; otherwise I will leave it marked ready-to-merge and await approvals."
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
