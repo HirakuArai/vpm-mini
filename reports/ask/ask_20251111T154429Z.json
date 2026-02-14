@@ -1,0 +1,13 @@
+{
+  "understanding": "I only received a context header (repo=vpm-mini, branch=main, phase=Phase 2) but no actual question or task description. I need the concrete question and any constraints to proceed.",
+  "plan": {
+    "commands": [
+      "clarify_question: Provide the exact question/task you want solved for Phase 2.",
+      "gather_repo_context: Share any relevant specs or files (e.g., Phase 2 requirements, README, tests, target modules).",
+      "collect_constraints: Desired output (analysis, code diff/patch, commands), acceptance criteria, deadlines, and environment details.",
+      "execute_solution: Analyze provided info and produce the requested answer/patch with clear steps.",
+      "validate: Cross-check against Phase 2 criteria and any tests provided."
+    ]
+  },
+  "acceptance": "Please paste the specific question/task for Phase 2 and any relevant files or criteria so I can proceed."
+}
