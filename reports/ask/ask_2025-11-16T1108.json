@@ -1,0 +1,13 @@
+{
+  "understanding": "received '/ask'",
+  "plan": {
+    "commands": []
+  },
+  "acceptance": "ok",
+  "meta": {
+    "issue": 742,
+    "comment_id": 3538537952,
+    "asked_by": "HirakuArai",
+    "created_at": "2025-11-16T11:08:00.603Z"
+  }
+}
