@@ -1,0 +1,61 @@
+{
+  "understanding": "指定のリポジトリ vpm-mini の main ブランチにおける Phase 2 に関連した相談と理解しましたが、実際の質問内容が未記載（'QUESTION' のみ）です。具体的な課題や期待アウトプットが不明です。",
+  "plan": {
+    "commands": [
+      {
+        "name": "repo.checkout",
+        "args": {
+          "repo": "vpm-mini",
+          "branch": "main"
+        }
+      },
+      {
+        "name": "fs.find",
+        "args": {
+          "patterns": [
+            "README*",
+            "docs/**",
+            "**/PHASE*",
+            ".github/**",
+            "CONTRIBUTING*"
+          ]
+        }
+      },
+      {
+        "name": "fs.search",
+        "args": {
+          "query": "Phase 2",
+          "path": "."
+        }
+      },
+      {
+        "name": "fs.search",
+        "args": {
+          "query": "roadmap|milestone|todo|task",
+          "path": "."
+        }
+      },
+      {
+        "name": "fs.read",
+        "args": {
+          "path": "README.md",
+          "optional": true
+        }
+      },
+      {
+        "name": "issues.list",
+        "args": {
+          "repo": "vpm-mini",
+          "filters": {
+            "labels": [
+              "phase-2",
+              "P2"
+            ],
+            "state": "open"
+          }
+        }
+      }
+    ]
+  },
+  "acceptance": "Phase 2 で解決したい具体的な質問・タスク（例: 実装/設計/バグ修正/ドキュメント/テスト）と制約（期限、対象ファイル、受け入れ基準、使用技術）を教えてください。内容確認後、すぐに着手します。"
+}
