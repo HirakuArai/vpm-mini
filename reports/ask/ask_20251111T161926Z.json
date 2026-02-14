@@ -1,0 +1,17 @@
+{
+  "understanding": {
+    "C": "repo=vpm-mini、branch=main、Phase 2 のコンテキストは受領しましたが、本文が「QUESTION」のみで具体的な依頼内容が不明です。対応するには質問やタスクの詳細が必要です。",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [
+    "clarification-needed"
+  ],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
