@@ -1,0 +1,15 @@
+{
+  "understanding": {
+    "C": "You want to close an ephemeral evidence/experiment thread as non-SSOT, confirming the learnings have already been applied to the SSOT (code/state) in repo vpm-mini on branch main (Phase 2).",
+    "G": "",
+    "delta": "",
+    "assumptions": [],
+    "unknowns": []
+  },
+  "plan": [],
+  "acceptance": [],
+  "context_header": "repo=vpm-mini / branch=main / phase=Phase 2",
+  "typing": "plan要約",
+  "confidence": 0.5,
+  "citations": []
+}
